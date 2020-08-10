@@ -1,0 +1,45 @@
+---
+rhel8stig_min_ansible_version: 2.6
+
+rhel8stig_dconf_available: "{{ rhel8stig_gui or rhel8stig_dconf_audit.rc == 0 or
+       rhel8stig_always_configure_dconf }}"
+rhel8stig_has_dconf_command: "{{ rhel8stig_gui or rhel8stig_dconf_audit.rc == 0 }}"
+
+rhel8stig_service_started: "{{ rhel8stig_system_is_chroot | ternary(omit, 'started') }}"
+# !!!!!!!!possibly delete
+# rhel8stig_systemd_daemon_reload: "{{ not rhel8stig_system_is_chroot }}"
+
+rhel8stig_sysctl_reload: "{{ not rhel8stig_system_is_container }}"
+
+# these variables are for enabling tasks to run that will be further controled
+# by check_mode to prevent the remediation task from making changes as
+# requested
+rhel8stig_complex: "{{ rhel8stig_complexity_high or rhel8stig_audit_complex }}"
+rhel8stig_disruptive: "{{ rhel8stig_disruption_high or rhel8stig_audit_disruptive }}"
+
+# These vars are made to go in the check_mode property of a task that is
+# complex or disruptive, respectively.
+# !!!! possibly delete
+# rhel8stig_complex_check_mode: "{{ ansible_check_mode or rhel8stig_audit_complex and not rhel8stig_complexity_high }}"
+rhel8stig_disruptive_check_mode: "{{ ansible_check_mode or rhel8stig_audit_disruptive and not rhel8stig_disruption_high }}"
+
+# this allows us to insert a name=value into a line of the format:
+# key="name1=value1 name2=value2 nameN=valueN"
+rhel8stig_regexp_quoted_params: ^({{ rhel8stig_re_qp_key }})({{ rhel8stig_re_qp_other_params }})({{
+        rhel8stig_re_qp_param }}?)({{ rhel8stig_re_qp_other_params }})({{ rhel8stig_re_qp_key_end }})
+rhel8stig_replace_quoted_params: \1\2{{ rhel8stig_re_qp_insert | ternary('', ' ') }}{{ param }}={{
+        value }}{{ rhel8stig_re_qp_insert | ternary(' ', '') }}\4\5
+
+# none of these regexes create capture groups
+rhel8stig_re_qp_key: (?:\s*{{ key }}=")
+rhel8stig_re_qp_param: (?:{{ rhel8stig_re_qp_insert | ternary('', ' ?') }}{{
+        rhel8stig_re_qp_param_start }}{{ param }}=.*?{{
+        rhel8stig_re_qp_param_end }}{{ rhel8stig_re_qp_insert | ternary(' ?', '') }})
+rhel8stig_re_qp_other_params: (?:(?!{{ rhel8stig_re_qp_param }}.*).)*{{
+        rhel8stig_re_qp_insert | ternary('?', '') }}
+rhel8stig_re_qp_param_start: (?<=[" ])
+rhel8stig_re_qp_param_end: (?=[" ])
+rhel8stig_re_qp_key_end: (?:" *)
+
+# insert the parameter at the beginning or append to the end, default append
+rhel8stig_re_qp_insert: "{{ insert | default(not (append | default(true))) }}"

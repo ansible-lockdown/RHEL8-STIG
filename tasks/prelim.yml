@@ -1,0 +1,338 @@
+---
+- name: "PRELIM | dconf"
+  block:
+      - name: "PRELIM | Check for dconf availability"
+        command: rpm -q dconf
+        changed_when: no
+        check_mode: no
+        failed_when: rhel8stig_dconf_audit.rc >= 2
+        register: rhel8stig_dconf_audit
+
+      - name: "PRELIM | Install dconf"
+        dnf:
+            name: dconf
+        when:
+            - rhel8stig_dconf_audit.rc == 1
+            - rhel8stig_gui
+
+      - name: dconf directory structure
+        file:
+            path: /etc/dconf/db/local.d/locks
+            state: directory
+            mode: '0755'
+        when:
+            - rhel8stig_always_configure_dconf
+  when:
+      - rhel_08_010050 or
+        rhel_08_020030 or
+        rhel_08_020050 or
+        rhel_08_020060 or
+        rhel_08_020080 or
+        rhel_08_020090 or
+        rhel_08_040180
+  tags:
+      - rhel_08_010050
+      - rhel_08_020030
+      - rhel_08_020050
+      - rhel_08_020060
+      - rhel_08_020080
+      - rhel_08_020090
+      - rhel_08_040180
+
+- name: "PRELIM | Find all sudoers files."
+  command: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
+  check_mode: no
+  changed_when: no
+  failed_when: no
+  register: rhel8stig_sudoers_files
+  when:
+      - rhel_08_010380
+  tags:
+      - cat2
+      - medium
+      - RHEL-08-010380
+
+- name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150| Install grub2-tools."
+  dnf:
+      name: grub2-tools
+  when:
+      - rhel_08_010020 or
+        rhel_08_010140 or
+        rhel_08_010150
+
+  tags:
+      - cat1
+      - high
+      - RHEL-08-010020
+      - RHEL-08-010140
+      - RHEL-08-010150
+
+- name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150 | Check whether machine is UEFI-based"
+  stat:
+      path: /sys/firmware/efi
+  register: rhel_08_sys_firmware_efi
+  when:
+      - rhel_08_010020 or
+        rhel_08_010140 or
+        rhel_08_010150
+
+  tags:
+      - cat1
+      - high
+      - cat2
+      - medium
+      - RHEL-08-010020
+      - RHEL-08-010140
+      - RHEL-08-010150
+
+- name: "PRELIM | Gather chroot status"
+  setup:
+      gather_subset: chroot,!all,!min
+      filter: ansible_is_chroot
+  when:
+      - ansible_version.string is version_compare('2.7', '>=')
+      - ansible_is_chroot is not defined
+  tags:
+      - always
+
+- name: "PRELIM | Gather mount information"
+  setup:
+      gather_subset: hardware,!all,!min
+      filter: ansible_mounts
+  when:
+      - ansible_mounts is not defined
+  tags:
+      - always
+
+- name: ensure cronie is available
+  dnf:
+      name: cronie
+  when:
+      - rhel_08_010360
+  tags:
+      - cat2
+      - medium
+      - RHEL-08-010360
+
+- name: "PRELIM | RHEL-08-010740 | RHEL-08-010750 | RHEL-08-020320 | Parse /etc/passwd"
+  include_tasks: parse_etc_passwd.yml
+  vars:
+      rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
+  when:
+      - rhel_08_010740 or
+        rhel_08_010750 or
+        rhel_08_020320
+  tags:
+      - cat2
+      - medium
+      - RHEL-08-010740
+      - RHEL-08-010750
+      - RHEL-08-020320
+
+## NOTE: You will need to adjust the UID range in parenthases below.
+## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
+- name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
+  # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  register: rhel_08_010690_getent
+  changed_when: rhel_08_020680_getent.stdout_lines is defined
+  failed_when: false
+  tags:
+      - RHEL-08-010690
+      - complexity-high
+
+- name: "PRELIM | RHEL-08-010690 | Set fact for home directory paths for interactive users"
+  set_fact:
+      rhel_08_stig_interactive_homedir_results: "{{ rhel_08_010690_getent.stdout_lines }}"
+  when: rhel_08_010690_getent.stdout_lines is defined
+  tags:
+      - RHEL-08-010690
+      - complexity-high
+
+- name: "PRELIM | RHEL-08-010070 | RHEL-08-030010 | Ensure rsyslog is installed when required."
+  dnf:
+      name: rsyslog
+  when:
+      - rhel_08_010070 or
+        rhel_08_030010
+  tags:
+      - cat2
+      - medium
+      - RHEL-08-010070
+      - RHEL-08-030010
+
+- name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
+  shell: df --output=target /boot | tail -n 1
+  changed_when: no
+  check_mode: no
+  register: rhel_08_boot_part
+  when:
+      - rhel_08_010020
+  tags:
+      - cat1
+      - high
+      - RHEL-08-010020
+
+- name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | RHEL-08-030670 | RHEL-08-030680 | RHEL-08-030690 | RHEL-08-030700 | RHEL-08-030710 | RHEL-08-030720 | Install audit remote plugin."
+  dnf:
+      name: audispd-plugins
+  when:
+      - rhel_08_030620 or
+        rhel_08_030630 or
+        rhel_08_030640 or
+        rhel_08_030650 or
+        rhel_08_030670 or
+        rhel_08_030680 or
+        rhel_08_030690 or
+        rhel_08_030700 or
+        rhel_08_030710 or
+        rhel_08_030720
+  tags:
+      - cat2
+      - medium
+      - auditd
+      - RHEL-08-030620
+      - RHEL-08-030630
+      - RHEL-08-030640
+      - RHEL-08-030650
+      - RHEL-08-030670
+      - RHEL-08-030680
+      - RHEL-08-030690
+      - RHEL-08-030700
+      - RHEL-08-030710
+      - RHEL-08-030720
+
+# - name: "PRELIM | RHEL-08-030330 | Determine audit log partition."
+#   block:
+#       - name: "PRELIM | RHEL-08-030330 | Find audit.log location"
+#         command: grep -oP '^log_file\s*=\s*\K.*?(?=\s*$)' /etc/audit/auditd.conf
+#         changed_when: no
+#         check_mode: no
+#         register: rhel_08_audit_log_file
+
+#       - name: "PRELIM | RHEL-08-030330 | Find partition holding audit.log"
+#         shell: df --output=target {{ rhel_08_audit_log_file.stdout }} | tail -n 1
+#         changed_when: no
+#         check_mode: no
+#         register: rhel_08_audit_part
+#   when:
+#       - rhel_08_030330
+#   tags:
+#       - cat2
+#       - medium
+#       - auditd
+#       - RHEL-08-030330
+
+- name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install and initialize AIDE"
+  block:
+      - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install AIDE"
+        dnf:
+            name: aide
+            state: present
+        notify: "{{ rhel8stig_aide_handler }}"
+
+      - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Check for existing AIDE database"
+        stat:
+            path: "{{ rhel8stig_aide_db_file }}"
+        register: rhel8stig_aide_db_status
+        check_mode: no
+        changed_when: not rhel8stig_aide_db_status.stat.exists
+        notify: "{{ rhel8stig_aide_handler }}"
+  when:
+      - rhel_08_010360 or
+        rhel_08_010380 or
+        rhel_08_040310
+  tags:
+      - cat2
+      - medium
+      - patch
+      - aide
+      - RHEL-08-010360
+      - RHEL-08-010380
+      - RHEL-08-040310
+
+- name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
+  dnf:
+      name:
+          - libselinux-utils
+          # - policycoreutils-python-utils
+          # - selinux-policy-targeted
+  when:
+      - rhel_08_010170 or
+        rhel_08_010450
+
+- name: "PRELIM | Bare bones SSH Server"
+  block:
+      - name: "PRELIM | Install SSH"
+        dnf:
+            name: openssh-server
+
+      - name: PRELIM | Start SSH
+        service:
+            name: sshd
+            state: "{{ rhel8stig_service_started }}"
+            enabled: yes
+
+      - name: PRELIM | check if ssh host key exists
+        stat:
+            path: /etc/ssh/ssh_host_rsa_key
+        register: rhel8stig_ssh_host_rsa_key_stat
+
+      - name: PRELIM | create ssh host key to allow 'sshd -t -f %s' to succeed
+        command: ssh-keygen -N '' -f /etc/ssh/ssh_host_rsa_key -t rsa -b 4096
+        when: not rhel8stig_ssh_host_rsa_key_stat.stat.exists
+        notify: clean up ssh host key
+  when: rhel8stig_ssh_required
+
+- name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
+  shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
+  register: rhel_08_010770_ini_file_list
+  changed_when: no
+  failed_when: false
+  when:
+      - rhel_08_stig_interactive_homedir_results is defined
+      - rhel8stig_disruption_high
+      - rhel_08_010660 or
+        rhel_08_010770
+  tags:
+      - RHEL-08-010660
+      - RHEL-08-010770
+      - complexity-high
+
+- name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | Set fact for home directory paths for interactive users"
+  set_fact:
+      rhel_08_stig_interactive_homedir_inifiles: "{{ rhel_08_010770_ini_file_list.results | map(attribute='stdout_lines') | list }}"
+  when:
+      - rhel_08_stig_interactive_homedir_results is defined
+      - rhel8stig_disruption_high
+      - rhel_08_010660 or
+        rhel_08_010770
+  tags:
+      - RHEL-08-010660
+      - RHEL-08-010770
+      - complexity-high
+
+- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
+  shell: find / -name sssd.conf
+  changed_when: false
+  failed_when: false
+  register: rhel8stig_sssd_conf
+  when:
+      - rhel_08_010400 or
+        rhel_08_020090 or
+        rhel_08_020250 or
+        rhel_08_020290
+
+- name: "PRELIM | Gather interactive user ID min"
+  block:
+      - name: "PRELIM | Gather interactive user ID min"
+        shell: grep UID_MIN /etc/login.defs | grep -v SYS_UID_MIN | awk '{ print $2}'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_interactive
+      - name: "PRELIM | Setting the fact"
+        set_fact:
+            rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
+
+- debug: var=rhel8stig_interactive_uid_min

@@ -1,0 +1,114 @@
+---
+- name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8."
+  block:
+      - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Find .conf files"
+        find:
+            paths: /etc
+            recurse: yes
+            file_type: any
+            depth: 2
+            patterns:
+                - yum.conf
+                - dnf.conf
+        register: rhel_08_010440_package_confs
+
+      - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Set settings"
+        lineinfile:
+            path: "{{ item.path }}"
+            regexp: '^.*clean_requirements_on_remove'
+            line: 'clean_requirements_on_remove=True'
+        with_items:
+            - "{{ rhel_08_010440_package_confs.files }}"
+  when:
+      - rhel_08_010440
+  tags:
+      - RHEL-08-010440
+
+- name: "LOW | RHEL-08-010530 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+  debug:
+      msg:
+          - "WARNING!! /var/log/audit is not mounted on a seperate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010530
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
+  tags:
+      - RHEL-08-010530
+      - complexity_high
+      - mount
+      - auditd
+
+- name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+  debug:
+      msg: "WARNING: /var is not mounted on a separate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010540
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
+  tags:
+      - RHEL-08-021320
+      - complexity-high
+      - mount
+      - var
+
+- name: "LOW | RHEL-08-020020 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
+  lineinfile:
+      path: /etc/security/limits.conf
+      regexp: '^\*               hard    maxlogins'
+      line: '*                hard    maxlogins       10'
+      insertbefore: '^# End of file'
+      create: yes
+  when:
+      - rhel_08_020020
+  tags:
+      - RHEL-08-020020
+
+- name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
+  block:
+      - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon. | Set session required for pam_lastlog.so"
+        pamd:
+            name: postlogin
+            type: session
+            control: optional
+            new_control: required
+            module_path: pam_lastlog.so
+            state: updated
+
+      - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon. | Remove default=1 and optional control"
+        pamd:
+            name: postlogin
+            type: session
+            state: args_absent
+            control: "{{ item }}"
+            module_path: pam_lastlog.so
+            module_arguments: silent
+        with_items:
+            - '[default=1]'
+            - required
+  when:
+      - rhel_08_020340
+  tags:
+      - RHEL-08-020340
+
+- name: |
+        "LOW | RHEL-08-040300 | PATCH | The RHEL 8 file integrity tool must be configured to verify extended attributes."
+        "LOW | RHEL-08-040310 | PATCH | The RHEL 8 file integrity tool must be configured to verify Access Control Lists (ACLs)."
+  template:
+      src: aide.conf.j2
+      dest: /etc/aide.conf
+      owner: root
+      group: root
+      mode: '0600'
+  when:
+      - rhel_08_040300
+      - rhel_08_040310
+  tags:
+      - RHEL-08-040300
+      - RHEL-08-040310
+      - aide

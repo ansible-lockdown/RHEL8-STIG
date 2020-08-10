@@ -1,0 +1,119 @@
+---
+- name: restart sshd
+  service:
+      name: sshd
+      state: restarted
+  when:
+      - not rhel8stig_system_is_chroot
+
+- name: restart sssd
+  service:
+      name: sssd
+      state: restarted
+
+- name: restart snmpd
+  service:
+      name: snmpd
+      state: restarted
+  when:
+      - not rhel8stig_system_is_chroot
+
+- name: restart rsyslog
+  service:
+      name: rsyslog
+      state: restarted
+
+- name: confirm grub2 user cfg
+  stat:
+      path: /boot/grub2/user.cfg
+  register: rhel8stig_grub2_user_cfg
+  notify: make grub2 config
+
+- name: make grub2 config
+  command: /usr/sbin/grub2-mkconfig --output={{ rhel8stig_grub_cfg_path }}
+  when:
+      - rhel7stig_grub2_user_cfg.stat.exists
+      - not rhel7stig_skip_for_travis
+      - not rhel7stig_system_is_container
+
+- name: copy grub2 config to BIOS/UEFI to satisfy benchmark
+  listen: make grub2 config
+  copy:
+      src: "{{ rhel8stig_grub_cfg_path | dirname }}/{{ item }}"
+      dest: "{{ rhel8stig_grub_cfg_path_invalid | dirname }}/{{ item }}"
+      remote_src: yes
+  with_items:
+      - grub.cfg
+      - user.cfg
+  when:
+      - rhel8stig_grub2_user_cfg.stat.exists
+      - rhel8stig_workaround_for_disa_benchmark
+      - not rhel8stig_skip_for_travis
+      - not rhel8stig_system_is_container
+
+- name: "restart {{ rhel8stig_time_service }}"
+  service:
+      name: "{{ rhel8stig_time_service }}"
+      state: restarted
+  when:
+      - not rhel8stig_skip_for_travis
+      - not rhel8stig_system_is_chroot
+      - not rhel8stig_system_is_container
+
+- name: restart auditd
+  command: /usr/sbin/service auditd restart
+  args:
+      warn: no
+  when:
+      - not rhel8stig_skip_for_travis
+      - not rhel8stig_system_is_chroot
+      - not rhel8stig_system_is_container
+
+- name: rebuild initramfs
+  command: dracut -f
+
+- name: undo existing prelinking
+  command: prelink -ua
+
+- name: update running audit failure mode
+  command: auditctl -f {{ rhel8stig_auditd_failure_flag }}
+  failed_when: no
+
+- name: clean up ssh host key
+  file:
+      path: "{{ item }}"
+      state: absent
+  with_items:
+      - /etc/ssh/ssh_host_rsa_key
+      - /etc/ssh/ssh_host_rsa_key.pub
+
+- name: init aide and wait
+  command: /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}'
+  notify: move aide db
+
+- name: init aide
+  shell: nohup /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}' > /dev/null &
+  notify: move aide db
+
+- name: move aide db
+  command: "mv {{ rhel8stig_aide_temp_db_file }} {{ rhel8stig_aide_db_file }}"
+  when: not rhel8stig_aide_db_status.stat.exists or rhel8stig_overwrite_aide_db
+
+- name: dconf update
+  command: dconf update
+  when: rhel8stig_has_dconf_command
+
+- name: prereport score
+  debug:
+      msg: "Pre-run OpenSCAP score is {{ rhel8stig_prescanresults.Benchmark.TestResult.score['#text'] }}"
+  when: rhel8stig_oscap_scan
+
+- name: postreport score
+  debug:
+      msg: "Post-run OpenSCAP score is {{ rhel8stig_postscanresults.Benchmark.TestResult.score['#text'] }}"
+  when: rhel8stig_oscap_scan
+
+- name: reboot system
+  shell: sleep 3; reboot
+  async: 15
+  poll: 0

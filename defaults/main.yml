@@ -1,0 +1,577 @@
+---
+# If you would like a report at the end accordin to OpenSCAP as to the report results
+# then you should set rhel8stig_oscap_scan to true/yes.
+# NOTE: This requires the python_xmltojson package on the control host.
+rhel8stig_oscap_scan: no
+rhel8stig_report_dir: /tmp
+
+rhel8stig_cat1_patch: true
+rhel8stig_cat2_patch: true
+rhel8stig_cat3_patch: true
+
+# We've defined complexity-high to mean that we cannot automatically remediate
+# the rule in question.  In the future this might mean that the remediation
+# may fail in some cases.
+rhel8stig_complexity_high: false
+
+# Show "changed" for complex items not remediated per complexity-high setting
+# to make them stand out.  "changed" items on a second run of the role would
+# indicate items requiring manual review.
+rhel8stig_audit_complex: true
+
+# We've defined disruption-high to indicate items that are likely to cause
+# disruption in a normal workflow.  These items can be remediated automatically
+# but are disabled by default to avoid disruption.
+rhel8stig_disruption_high: true
+
+# Show "changed" for disruptive items not remediated per disruption-high
+# setting to make them stand out.
+rhel8stig_audit_disruptive: yes
+
+rhel8stig_skip_for_travis: false
+
+rhel8stig_workaround_for_disa_benchmark: true
+rhel8stig_workaround_for_ssg_benchmark: true
+
+# tweak role to run in a chroot, such as in kickstart %post script
+rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
+
+# tweak role to run in a non-privileged container
+rhel8stig_system_is_container: false
+
+# These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
+# PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
+# in order for the variables below to take effect.
+# CAT 1 rules
+rhel_08_010000: true
+rhel_08_010020: true
+rhel_08_010030: true
+rhel_08_010140: true
+rhel_08_010150: true
+rhel_08_010170: true
+rhel_08_010370: true
+rhel_08_010450: true
+rhel_08_010460: true
+rhel_08_010470: true
+rhel_08_010820: true
+rhel_08_010830: true
+rhel_08_020330: true
+rhel_08_040000: true
+rhel_08_040010: true
+rhel_08_040060: true
+rhel_08_040170: true
+rhel_08_040180: true
+rhel_08_040190: true
+rhel_08_040200: true
+rhel_08_040340: true
+rhel_08_040360: true
+
+# CAT 2 rules
+rhel_08_010010: true
+rhel_08_010040: true
+rhel_08_010050: true
+rhel_08_010060: true
+rhel_08_010070: true
+rhel_08_010080: true
+rhel_08_010090: true
+rhel_08_010100: true
+rhel_08_010110: true
+rhel_08_010120: true
+rhel_08_010130: true
+rhel_08_010160: true
+rhel_08_010180: true
+rhel_08_010190: true
+rhel_08_010200: true
+rhel_08_010210: true
+rhel_08_010220: true
+rhel_08_010230: true
+rhel_08_010240: true
+rhel_08_010250: true
+rhel_08_010260: true
+rhel_08_010270: true
+rhel_08_010280: true
+rhel_08_010290: true
+rhel_08_010300: true
+rhel_08_010310: true
+rhel_08_010320: true
+rhel_08_010330: true
+rhel_08_010340: true
+rhel_08_010350: true
+# Send AIDE reports as mail notifications - Disabled by default as this is a non-ideal way to do notifications - FIXED
+rhel_08_010360: true
+# !!!!!!!!!!!!!!!--------------!!!!!!!!!!!!!!!!!!CHANGE TO TRUE BEFORE FINALIZATION. SET TO FALSE TO PREVENT THE VAGRANT USER FROM AUTHENTICATING WHEN USING SUDO
+rhel_08_010380: false
+rhel_08_010390: true
+rhel_08_010400: true
+rhel_08_010410: true
+rhel_08_010420: true
+rhel_08_010430: true
+rhel_08_010480: true
+rhel_08_010490: true
+rhel_08_010500: true
+rhel_08_010510: true
+rhel_08_010520: true
+rhel_08_010550: true
+rhel_08_010560: true
+rhel_08_010570: true
+rhel_08_010580: true
+rhel_08_010590: true
+rhel_08_010600: true
+rhel_08_010610: true
+rhel_08_010620: true
+rhel_08_010630: true
+rhel_08_010640: true
+rhel_08_010650: true
+# !!!!!!!!!!!!!!!!!--------------------!!!!!!!!!Come back to. The RHEL7 task I was basing my RHEL8 task uses pieces from all over the stig role. I need to track down if that is really needed - FIXED
+rhel_08_010660: true
+rhel_08_010670: true
+rhel_08_010680: false
+rhel_08_010690: true
+rhel_08_010700: true
+rhel_08_010710: true
+# !!!!!!!!!!!!!!!------------!!!!!come back not ipmlemented - FIXED
+rhel_08_010720: true
+rhel_08_010730: true
+rhel_08_010740: true
+rhel_08_010750: true
+rhel_01_010760: true
+rhel_08_010770: true
+rhel_08_010780: true
+rhel_08_010790: true
+# !!!!!!!!!!!!!!!-------------!!!!!!! come back not ipmlemented - FIXED
+rhel_08_010800: true
+rhel_08_010810: true
+rhel_08_020000: true
+rhel_08_020010: true
+rhel_08_020030: true
+rhel_08_020040: true
+rhel_08_020050: true
+rhel_08_020060: true
+rhel_08_020070: true
+rhel_08_020080: true
+# !!!!!!!!!!!!!!!!!!!--------------!!!!!!!!!!!Come back to. Need to figure out path location for the file it is editing.  - FIXED
+rhel_08_020090: true
+rhel_08_020100: true
+rhel_08_020110: true
+rhel_08_020120: true
+rhel_08_020130: true
+rhel_08_020140: true
+rhel_08_020150: true
+rhel_08_020160: true
+rhel_08_020170: true
+rhel_08_020180: true
+rhel_08_020190: true
+rhel_08_020200: true
+rhel_08_020210: true
+rhel_08_020220: true
+rhel_08_020230: true
+rhel_08_020240: true
+rhel_08_020250: true
+rhel_08_020260: true
+rhel_08_020270: true
+rhel_08_020280: true
+rhel_08_020290: true
+rhel_08_020300: true
+rhel_08_020310: true
+rhel_08_020320: true
+rhel_08_020350: true
+rhel_08_030000: true
+rhel_08_030010: true
+rhel_08_030020: true
+rhel_08_030030: true
+rhel_08_030040: true
+rhel_08_030050: true
+rhel_08_030060: true
+rhel_08_030070: true
+rhel_08_030080: true
+rhel_08_030090: true
+rhel_08_030100: true
+rhel_08_030110: true
+### When logs folder is set to 600 per STIG auditd fails to start. Need to figure out perms
+rhel_08_030120: true
+rhel_08_030130: true
+rhel_08_030140: true
+rhel_08_030150: true
+rhel_08_030160: true
+rhel_08_030170: true
+rhel_08_030180: true
+rhel_08_030190: true
+rhel_08_030200: true
+rhel_08_030210: true
+rhel_08_030220: true
+rhel_08_030230: true
+rhel_08_030240: true
+rhel_08_030250: true
+rhel_08_030260: true
+rhel_08_030270: true
+rhel_08_030280: true
+rhel_08_030290: true
+rhel_08_030300: true
+rhel_08_030310: true
+rhel_08_030320: true
+rhel_08_030330: true
+rhel_08_030340: true
+rhel_08_030350: true
+rhel_08_030360: true
+rhel_08_030370: true
+rhel_08_030380: true
+rhel_08_030390: true
+rhel_08_030400: true
+rhel_08_030410: true
+rhel_08_030420: true
+rhel_08_030430: true
+rhel_08_030440: true
+rhel_08_030450: true
+rhel_08_030460: true
+rhel_08_030470: true
+rhel_08_030480: true
+rhel_08_030490: true
+rhel_08_030500: true
+rhel_08_030510: true
+rhel_08_030520: true
+rhel_08_030530: true
+rhel_08_030540: true
+rhel_08_030550: true
+rhel_08_030560: true
+rhel_08_030570: true
+rhel_08_030580: true
+rhel_08_030590: true
+rhel_08_030600: true
+rhel_08_030610: true
+rhel_08_030620: true
+rhel_08_030630: true
+rhel_08_030640: true
+# !!!!!!!!!---------- handlers are overwriting the config change for this item
+rhel_08_030650: true
+rhel_08_030660: true
+rhel_08_030670: true
+rhel_08_030680: true
+rhel_08_030690: true
+rhel_08_030700: true
+rhel_08_030710: true
+rhel_08_030720: true
+rhel_08_030730: true
+rhel_08_030740: true
+rhel_08_040020: true
+rhel_08_040030: true
+rhel_08_040040: true
+rhel_08_040050: true
+rhel_08_040070: true
+rhel_08_040080: true
+# !!!!!!!!!!!!!!------ Not ipmlemented. Need to figure out what what [CUSTOM] means - Fixed
+rhel_08_040090: true
+# !!!!!!!!!!!----- Need to find which task kills dnf/yum. Once figured out enable this task - FIXED
+rhel_08_040100: true
+rhel_08_040110: true
+rhel_08_040120: true
+# !!!!!!!!!------ the four below have dnf use and needs to be enabled once internet connection figured out - FIXED
+rhel_08_040130: true
+rhel_08_040140: true
+rhel_08_040150: true
+rhel_08_040160: true
+rhel_08_040210: true
+rhel_08_040220: true
+rhel_08_040230: true
+rhel_08_040240: true
+rhel_08_040250: true
+rhel_08_040260: true
+rhel_08_040270: true
+rhel_08_040280: true
+rhel_08_040290: true
+# !!!!!!!!!!!! enable 040230 when internet issue sorted out - FIXED
+rhel_08_040320: true
+rhel_08_040330: true
+rhel_08_040350: true
+
+# CAT 3 rules
+rhel_08_010440: true
+rhel_08_010530: true
+rhel_08_010540: true
+rhel_08_020020: true
+rhel_08_020340: true
+rhel_08_040300: true
+rhel_08_040310: true
+
+# Whether or not to run tasks related to auditing/patching the desktop environment
+rhel8stig_gui: false
+
+# Whether to configure dconf rules unconditionally (ignoring presence of dconf
+# or rhel8stig_gui)
+rhel8stig_always_configure_dconf: false
+
+# Whether or not to run tasks related to smart card authentication enforcement
+rhel8stig_smartcard: false
+# Configure your smartcard driver
+rhel8stig_smartcarddriver: cackey
+
+# RHEL-08-010690
+# Set standard user paths here
+# Also set whether we should automatically remediate paths in user ini files.
+# rhel_08_020720_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
+rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
+rhel8stig_change_user_path: false
+
+# RHEL-08-020250
+# This is a check for a "supported release"
+# These are the minimum supported releases.
+# (Red Hat has support for older versions if you pay extra for it.)
+rhel8stig_min_supported_os_ver:
+    RedHat: "8.0"
+    CentOS: "8.0"
+
+# RHEL-08-040260
+# If system is not router, run tasks that disable router functions.
+rhel8stig_system_is_router: no
+
+rhel8stig_time_service: chronyd
+
+rhel8stig_firewall_service: firewalld
+rhel8stig_start_firewall_service: true
+
+# RHEL-08-040160
+# RHEL-08-040310
+# Install and enable ssh on networked systems
+rhel8stig_ssh_required: true
+
+# RHEL-08-040500
+# If not required, remove tftp
+rhel8stig_tftp_required: no
+
+# RHEL-08-010140 and RHEL-08-020280
+# Password protect the boot loader
+rhel8stig_bootloader_password: 'Boot1tUp!'
+rhel8stig_bootloader_password_hash: "{{ rhel8stig_bootloader_password | grub2_hash(salt='KeokpkECTJeoDhEA5XtiLQ') }}"
+rhel8stig_boot_superuser: root
+
+# AIDE settings
+# Set to false for fire and forget mode
+rhel8stig_wait_for_aide_init: true
+rhel8stig_aide_handler: "{{ (rhel8stig_wait_for_aide_init) | ternary('init aide and wait','init aide') }}"
+
+# Set to false to not overwrite an existing AIDE DB
+rhel8stig_overwrite_aide_db: true
+
+# AIDE database file locations
+rhel8stig_aide_temp_db_file: /var/lib/aide/aide.db.new.gz
+rhel8stig_aide_db_file: /var/lib/aide/aide.db.gz
+
+rhel8stig_aide_cron:
+    user: root
+    cron_file: aide
+    job: '/usr/sbin/aide --check'
+    special_time: daily
+    # Disable the notification check rule to disable mailing notifications
+    notify_by_mail: true
+    notify_cmd: ' | /bin/mail -s "$(hostname) - AIDE Integrity Check" root@localhost'
+
+rhel8stig_cron_special_disable: "{{
+        rhel8stig_workaround_for_disa_benchmark or
+        rhel8stig_workaround_for_ssg_benchmark or
+        false }}"
+
+# Set maximum number of simultaneous system logins (RHEL-08-040000)
+rhel8stig_maxlogins: 10
+
+rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary(
+        rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '),
+        rhel8stig_logon_banner_nice) }}"
+rhel8stig_logon_banner_nice: |
+    You are accessing a U.S. Government (USG) Information System (IS) that is
+    provided for USG-authorized use only.
+
+    By using this IS (which includes any device attached to this IS), you consent
+    to the following conditions:
+
+    -The USG routinely intercepts and monitors communications on this IS for
+    purposes including, but not limited to, penetration testing, COMSEC monitoring,
+    network operations and defense, personnel misconduct (PM), law enforcement
+    (LE), and counterintelligence (CI) investigations.
+
+    -At any time, the USG may inspect and seize data stored on this IS.
+
+    -Communications using, or data stored on, this IS are not private, are subject
+    to routine monitoring, interception, and search, and may be disclosed or used
+    for any USG-authorized purpose.
+
+    -This IS includes security measures (e.g., authentication and access controls)
+    to protect USG interests--not for your personal benefit or privacy.
+
+    -Notwithstanding the above, using this IS does not constitute consent to PM, LE
+    or CI investigative searching or monitoring of the content of privileged
+    communications, or work product, related to personal representation or services
+    by attorneys, psychotherapists, or clergy, and their assistants. Such
+    communications and work product are private and confidential. See User
+    Agreement for details.
+
+# Password complexity settings
+rhel8stig_password_complexity:
+    ucredit: -1
+    lcredit: -1
+    dcredit: -1
+    ocredit: -1
+    difok: 8
+    minclass: 4
+    maxrepeat: 3
+    maxclassrepeat: 4
+    minlen: 15
+    dictcheck: 1
+
+# RHEL-08-020070
+# Session timeout setting file (TMOUT setting can be set in multiple files)
+# Timeout value is in seconds. (60 seconds * 10 = 600)
+rhel8stig_shell_session_timeout:
+    file: /etc/profile.d/tmout.sh
+    timeout: 600
+
+# RHEL-08-010200 | All network connections associated with SSH traffic must
+# terminate at the end of the session or after 10 minutes of inactivity, except
+# to fulfill documented and validated mission requirements.
+# Timeout value is in seconds. (60 seconds * 10 = 600)
+rhel8stig_ssh_session_timeout: 600
+
+# RHEL-08-020320
+# If vsftpd is required, remove 'ftp' from rhel8stig_unnecessary_accounts.
+#
+# By default, files owned by removed users will be retained, but this may
+# trigger RHEL-08-020320 (all files and directories must have a valid owner).
+# Set rhel8stig_remove_unnecessary_user_files to yes to remove old files,
+# but this could remove files you intended to keep. And it's probably best to
+# avoid removing 'dbus', 'nobody', 'systemd-network', and 'polkitd', as they all
+# have home directories of '/' by default.
+rhel8stig_unnecessary_accounts:
+    - ftp
+    - games
+rhel8stig_remove_unnecessary_user_files: no
+
+# RHEL-08-020220
+# pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
+rhel8stig_pam_pwhistory:
+    remember: 5
+    retries: 3
+
+# RHEL-08-010320
+# RHEL-08-010330
+# pam_faillock settings - accounts must be locked for max time period after 3 unsuccessful attempts within 15 minutes.
+rhel8stig_pam_faillock:
+    attempts: 3
+    interval: 900
+    unlock_time: 900
+    fail_for_root: yes
+
+# RHEL-08-030670
+# rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards
+rhel8stig_audisp_disk_full_action: single
+
+# RHEL-08-030680
+# rhel8stig_audisp_network_failure_action optoins are syslog, halt, and single
+rhel8stig_audisp_network_failure_action: single
+
+# RHEL-08-030060 
+# rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
+rhel8stig_auditd_disk_full_action: HALT
+
+# RHEL-08-030040 - Options are SYSLOG, SINGLE, and HALT to fit STIG standards
+rhel8stig_auditd_disk_error_action: HALT
+
+# RHEL-08-030050 - Options are SYSLOG or KEEP_LOGS to fit STIG standards
+rhel8stig_auditd_max_log_file_action: SYSLOG
+
+# RHEL-08-030700
+# rhel8stig_audisp_overflow_action - Options are syslog, single, or halt to fit STIG standards
+rhel8stig_audisp_overflow_action: syslog
+
+# RHEL-08-040330
+# Network interface promiscuous mode setting will be disabled unless set to true
+rhel8stig_net_promisc_mode_required: no
+
+# /etc/login.defs settings
+# RHEL-08-010110
+# RHEL-08-020190
+# RHEL-08-020200
+# RHEL-08-020310
+rhel8stig_login_defaults:
+    encrypt_method: SHA512
+    pass_min_days: 1
+    pass_max_days: 60
+    fail_delay_secs: 4
+    umask: '077'
+    create_home: 'yes'
+
+# RHEL-08-030690 uncomment and set the value to a remote IP address that can receive audit logs
+rhel8stig_audisp_remote_server: 10.10.10.10
+
+# RHEL-08-030020
+rhel8stig_auditd_mail_acct: root
+
+# RHEL-08-010380
+# Setting to enable or disable fixes that depend on password-based authentication
+# i.e. if users authenticate with a means other than passwords (pubkey)
+# and will not know or use passwords then this should be 'no'
+rhel8stig_using_password_auth: yes
+
+rhel8stig_availability_override: false
+# auditd_failure_flag
+# 2    Tells your system to perform an immediate shutdown without
+#      flushing any pending data to disk when the limits of your
+#      audit system are exceeded. Because this shutdown is not a clean shutdown.
+#      restrict the use of -f 2 to only the most security conscious environments
+# 1    System continues to run, issues a warning and audit stops.
+#      Use this for any other setup to avoid loss of data or data corruption.
+rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
+
+# REHL-08-010020
+rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
+
+# 
+rhel8stig_machine_uses_uefi: "{{ rhel_08_sys_firmware_efi.stat.exists }}"
+rhel8stig_grub_cfg_path: "{{ rhel8stig_machine_uses_uefi | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
+rhel8stig_grub_cfg_path_invalid: "{{ (not rhel8stig_machine_uses_uefi) | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
+
+# RHEL-08-010740/RHEL-08-010750
+rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
+
+# RHEL-08-010630/RHEL-08-010640/RHEL-08-010650
+rhel8stig_nfs_mounts: "{{ ansible_mounts | to_json | from_json | json_query(rhel8stig_nfs_mounts_query) }}"
+rhel8stig_nfs_mounts_query: "[?starts_with(fstype, 'nfs')].mount"
+
+# RHEL-08-010680
+rhel8stig_dns_servers:
+    - 9.9.9.9
+    - 149.112.112.112
+
+rhel8stig_int_gid: 1000
+
+# RHEL-08-010130
+# The rounds parameter goes into the password sufficient pam_unix.so element of the password-auth and system-auth files. The value shoudl be set no lower than 5000
+rhel8stig_hashing_rounds: 5000 
+
+# RHEL-08-010100
+rhel8stig_path_to_sshkey: "/root/.ssh/"
+
+# RHEL-08-010510
+# rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
+rhel8stig_sshd_compression: "no"
+
+# !!!!!!!!!!------------ I added a prelim task to grab the MIN_UID value but I can't use it in some tasks. Review and fix
+rhel8stig_interactive_uid_start: 1000
+
+# RHEL-08-030740
+# rhel8stig_ntp_server_name is the name of the NTP server
+rhel8stig_ntp_server_name: server.name
+
+# RHEL-08-040130
+# rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
+rhel8stig_fapolicy_white_list:
+    - deny all all
+
+# RHEL-08-040090
+# rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
+rhel8stig_custom_firewall_zone: "new_fw_zone"
+
+# RHEL-08-040090
+# rhel8stig_white_list_services is the services that you want to allow through initially for teh new firewall zone
+# http and ssh need to be enabled for the role to run. 
+rhel8stig_white_list_services:
+    - http
+    - https
+    - ssh
