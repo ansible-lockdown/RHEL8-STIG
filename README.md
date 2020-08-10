@@ -35,7 +35,7 @@ Role Variables
 | `rhel8stig_cat1_patch` | `yes` | Correct CAT I findings        |
 | `rhel8stig_cat2_patch` | `yes`  | Correct CAT II findings       |
 | `rhel8stig_cat3_patch` | `yes`  | Correct CAT III findings      |
-| `rhel_07_######` | [see defaults/main.yml](./defaults/main.yml)  | Individual variables to enable/disable each STIG ID. |
+| `rhel_08_######` | [see defaults/main.yml](./defaults/main.yml)  | Individual variables to enable/disable each STIG ID. |
 | `rhel8stig_gui` | `no` | Whether or not to run tasks related to auditing/patching the desktop environment |
 | `rhel8stig_system_is_router` | `no` | Run tasks that disable router functions. |
 | `rhel8stig_time_service` | `chronyd` | Set to `ntpd` or `chronyd`. |
