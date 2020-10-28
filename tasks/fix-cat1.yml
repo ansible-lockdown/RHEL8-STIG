@@ -184,6 +184,7 @@
             insertafter: '### BEGIN /etc/grub.d/01_users ###'
         notify: confirm grub2 user cfg
   when:
+      - not system_is_ec2
       - rhel_08_010140 or
         rhel_08_010150
   tags:
