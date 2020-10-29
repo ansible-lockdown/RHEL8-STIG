@@ -4,6 +4,7 @@
       name: "*"
       state: latest
   when:
+      - not system_is_ec2
       - rhel_08_010010
   tags:
       - RHEL-08-010010
@@ -31,6 +32,7 @@
             mode: '0644'
         notify: restart sshd
         when:
+            # - not system_is_ec2
             - rhel_08_010040 or
               rhel_08_010060
         tags:
