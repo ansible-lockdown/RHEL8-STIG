@@ -40,3 +40,5 @@ benchparse/
 *xccdf.xml
 *.retry
 
+# GitHub Action/Workflow files
+.github/

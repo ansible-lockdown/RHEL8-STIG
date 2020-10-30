@@ -334,5 +334,3 @@
       - name: "PRELIM | Setting the fact"
         set_fact:
             rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
-
-- debug: var=rhel8stig_interactive_uid_min

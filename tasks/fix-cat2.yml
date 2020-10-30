@@ -4,6 +4,7 @@
       name: "*"
       state: latest
   when:
+      - not system_is_ec2
       - rhel_08_010010
   tags:
       - RHEL-08-010010
@@ -31,6 +32,7 @@
             mode: '0644'
         notify: restart sshd
         when:
+            # - not system_is_ec2
             - rhel_08_010040 or
               rhel_08_010060
         tags:
@@ -3103,6 +3105,32 @@
       - RHEL-08-040080
       - usb_devices
 
+- name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
+  block:
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
+        dnf:
+            name: firewalld
+            state: present
+        when: rhel8stig_firewall_service == "firewalld"
+
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install IPTables"
+        dnf:
+            name: iptables-services
+            state: present
+        when: rhel8stig_firewall_service == "iptables"
+
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Start and enable service"
+        service:
+            name: "{{ rhel8stig_firewall_service }}"
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040100
+  tags:
+      - RHEL-08-040100
+      - firewall
+      - "{{ rhel8stig_firewall_service }}"
+
 - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
   block:
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone"
@@ -3135,33 +3163,7 @@
       - rhel_08_040090
   tags:
       - RHEL-08-040090
-      - firewall
-
-- name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
-  block:
-      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
-        dnf:
-            name: firewalld
-            state: present
-        when: rhel8stig_firewall_service == "firewalld"
-
-      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install IPTables"
-        dnf:
-            name: iptables-services
-            state: present
-        when: rhel8stig_firewall_service == "iptables"
-
-      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Start and enable service"
-        service:
-            name: "{{ rhel8stig_firewall_service }}"
-            state: started
-            enabled: yes
-  when:
-      - rhel_08_040100
-  tags:
-      - RHEL-08-040100
-      - firewall
-      - "{{ rhel8stig_firewall_service }}"
+      - firewall 
 
 - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled."
   block:
