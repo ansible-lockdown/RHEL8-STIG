@@ -101,7 +101,6 @@ rhel_08_010320: true
 rhel_08_010330: true
 rhel_08_010340: true
 rhel_08_010350: true
-# Send AIDE reports as mail notifications - Disabled by default as this is a non-ideal way to do notifications - FIXED
 rhel_08_010360: true
 # !!!!!!!!!!!!!!!--------------!!!!!!!!!!!!!!!!!!CHANGE TO TRUE BEFORE FINALIZATION. SET TO FALSE TO PREVENT THE VAGRANT USER FROM AUTHENTICATING WHEN USING SUDO
 rhel_08_010380: false
@@ -126,14 +125,12 @@ rhel_08_010620: true
 rhel_08_010630: true
 rhel_08_010640: true
 rhel_08_010650: true
-# !!!!!!!!!!!!!!!!!--------------------!!!!!!!!!Come back to. The RHEL7 task I was basing my RHEL8 task uses pieces from all over the stig role. I need to track down if that is really needed - FIXED
 rhel_08_010660: true
 rhel_08_010670: true
 rhel_08_010680: false
 rhel_08_010690: true
 rhel_08_010700: true
 rhel_08_010710: true
-# !!!!!!!!!!!!!!!------------!!!!!come back not ipmlemented - FIXED
 rhel_08_010720: true
 rhel_08_010730: true
 rhel_08_010740: true
@@ -142,7 +139,6 @@ rhel_01_010760: true
 rhel_08_010770: true
 rhel_08_010780: true
 rhel_08_010790: true
-# !!!!!!!!!!!!!!!-------------!!!!!!! come back not ipmlemented - FIXED
 rhel_08_010800: true
 rhel_08_010810: true
 rhel_08_020000: true
@@ -153,7 +149,6 @@ rhel_08_020050: true
 rhel_08_020060: true
 rhel_08_020070: true
 rhel_08_020080: true
-# !!!!!!!!!!!!!!!!!!!--------------!!!!!!!!!!!Come back to. Need to figure out path location for the file it is editing.  - FIXED
 rhel_08_020090: true
 rhel_08_020100: true
 rhel_08_020110: true
@@ -262,13 +257,10 @@ rhel_08_040040: true
 rhel_08_040050: true
 rhel_08_040070: true
 rhel_08_040080: true
-# !!!!!!!!!!!!!!------ Not ipmlemented. Need to figure out what what [CUSTOM] means - Fixed
 rhel_08_040090: true
-# !!!!!!!!!!!----- Need to find which task kills dnf/yum. Once figured out enable this task - FIXED
 rhel_08_040100: true
 rhel_08_040110: true
 rhel_08_040120: true
-# !!!!!!!!!------ the four below have dnf use and needs to be enabled once internet connection figured out - FIXED
 rhel_08_040130: true
 rhel_08_040140: true
 rhel_08_040150: true
@@ -282,7 +274,6 @@ rhel_08_040260: true
 rhel_08_040270: true
 rhel_08_040280: true
 rhel_08_040290: true
-# !!!!!!!!!!!! enable 040230 when internet issue sorted out - FIXED
 rhel_08_040320: true
 rhel_08_040330: true
 rhel_08_040350: true
