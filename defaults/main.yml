@@ -7,7 +7,7 @@ rhel8stig_report_dir: /tmp
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: false
-rhel8stig_cat3_patch: false
+rhel8stig_cat3_patch: true
 
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
@@ -68,10 +68,10 @@ rhel_08_040060: true
 rhel_08_040170: true
 rhel_08_040171: true
 rhel_08_040172: true
-rhel_08_040180: true
+# rhel_08_040180: true
 rhel_08_040190: true
 rhel_08_040200: true
-rhel_08_040340: true
+# rhel_08_040340: true
 rhel_08_040360: true
 
 # CAT 2 rules
@@ -283,11 +283,33 @@ rhel_08_040330: true
 rhel_08_040350: true
 
 # CAT 3 rules
+rhel_08_010171: true
+rhel_08_010292: true
+rhel_08_010375: true
+rhel_08_010376: true
 rhel_08_010440: true
-rhel_08_010530: true
+rhel_08_010471: true
+# rhel_08_010530: true
 rhel_08_010540: true
-rhel_08_020020: true
+rhel_08_010541: true
+rhel_08_010542: true
+# rhel_08_020020: true
+rhel_08_020024: true
+rhel_08_020042: true
 rhel_08_020340: true
+rhel_08_030063: true
+rhel_08_030601: true
+rhel_08_030602: true
+rhel_08_030603: true
+rhel_08_030741: true
+rhel_08_030742: true
+rhel_08_040004: true
+rhel_08_040021: true
+rhel_08_040022: true
+rhel_08_040023: true
+rhel_08_040024: true
+rhel_08_040025: true
+rhel_08_040026: true
 rhel_08_040300: true
 rhel_08_040310: true
 
