@@ -6,8 +6,8 @@ rhel8stig_oscap_scan: no
 rhel8stig_report_dir: /tmp
 
 rhel8stig_cat1_patch: true
-rhel8stig_cat2_patch: true
-rhel8stig_cat3_patch: true
+rhel8stig_cat2_patch: false
+rhel8stig_cat3_patch: false
 
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
@@ -49,21 +49,25 @@ system_is_ec2: false
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
-rhel_08_010030: true
+# rhel_08_010030: true
 rhel_08_010140: true
 rhel_08_010150: true
-rhel_08_010170: true
+# rhel_08_010170: true
 rhel_08_010370: true
-rhel_08_010450: true
+rhel_08_010371: true
 rhel_08_010460: true
+# rhel_08_010450: true
+# rhel_08_010460: true
 rhel_08_010470: true
 rhel_08_010820: true
-rhel_08_010830: true
+# rhel_08_010830: true
 rhel_08_020330: true
 rhel_08_040000: true
 rhel_08_040010: true
 rhel_08_040060: true
 rhel_08_040170: true
+rhel_08_040171: true
+rhel_08_040172: true
 rhel_08_040180: true
 rhel_08_040190: true
 rhel_08_040200: true

@@ -251,15 +251,15 @@
       - RHEL-08-010380
       - RHEL-08-040310
 
-- name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
-  dnf:
-      name:
-          - libselinux-utils
-          # - policycoreutils-python-utils
-          # - selinux-policy-targeted
-  when:
-      - rhel_08_010170 or
-        rhel_08_010450
+# - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
+#   dnf:
+#       name:
+#           - libselinux-utils
+#           # - policycoreutils-python-utils
+#           # - selinux-policy-targeted
+#   when:
+#       - rhel_08_010170 or
+#         rhel_08_010450
 
 - name: "PRELIM | Bare bones SSH Server"
   block:
