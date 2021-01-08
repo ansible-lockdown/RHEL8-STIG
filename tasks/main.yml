@@ -32,19 +32,19 @@
   tags:
       - prelim_tasks
 
-# - name: Include CAT I patches
-#   import_tasks: fix-cat1.yml
-#   when: rhel8stig_cat1_patch | bool
-#   tags:
-#       - cat1
-#       - high
+- name: Include CAT I patches
+  import_tasks: fix-cat1.yml
+  when: rhel8stig_cat1_patch | bool
+  tags:
+      - cat1
+      - high
 
-# - name: Include CAT II patches
-#   import_tasks: fix-cat2.yml
-#   when: rhel8stig_cat2_patch | bool
-#   tags:
-#       - cat2
-#       - medium
+- name: Include CAT II patches
+  import_tasks: fix-cat2.yml
+  when: rhel8stig_cat2_patch | bool
+  tags:
+      - cat2
+      - medium
 
 - name: Include CAT III patches
   import_tasks: fix-cat3.yml

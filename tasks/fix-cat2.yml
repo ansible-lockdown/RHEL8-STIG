@@ -9,6 +9,25 @@
   tags:
       - RHEL-08-010010
 
+- name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection."
+  block:
+      - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Get partition layout"
+        command: lsblk
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010030_partition_layout
+
+      - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Message out warning"
+        debug:
+            msg:
+                - 'WARNING!! Below is partition layout. Please run the "sudo more /etc/crypttab" command to confirm'
+                - "every persistent disk partition has an entry. If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
+                - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
+
+  when: rhel_08_010030
+  tags:
+      - RHEL-08-010030
+
 - name: |
         "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon."
         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
@@ -73,20 +92,6 @@
       - rhel_08_010070
   tags:
       - RHEL-08-010070
-
-- name: "MEDIUM | RHEL-08-010080 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections"
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '(?i)^Ciphers.*'
-      line: Ciphers aes128-ctr,aes192-ctr,aes256-ctr
-      insertafter: '# Ciphers and keying'
-  notify: restart sshd
-  when:
-      - rhel_08_010080
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010080
-      - ssh
 
 # This task wants you to download the latest DoD root certs and place the chain pem in /etc/sssd/pki/sssd_auth_ca_db.pem. This might need to be a message out, but I will circle back to this and confirm.
 - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor."
@@ -181,6 +186,18 @@
   tags:
       - RHEL-08-010130
 
+- name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
+  lineinfile:
+      path: /usr/lib/systemd/system/rescue.service
+      regexp: '^ExecStart='
+      line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
+      create: yes
+  when:
+      - rhel_08_010151
+  tags:
+      - RHEL-08-010151
+      - systemd
+
 - name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication. | Add sha512 argument"
   pamd:
       name: "{{ item }}"
@@ -196,6 +213,226 @@
       - rhel_08_010160
   tags:
       - RHEL-08-010160
+
+- name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
+  block:
+      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
+        find:
+            path: /
+            patterns: '*.keytab'
+            recurse: yes
+        register: rhel8stig_010161_keytab_files
+
+      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
+        file:
+            path: "{{ item.path }}"
+            state: absent
+        with_items:
+            - "{{ rhel8stig_010161_keytab_files.files }}"
+        when: rhel8stig_010161_keytab_files.matched > 0
+  when:
+      - rhel_08_010161
+  tags:
+      - RHEL-08-010161
+      - kerberos
+# ===========below here is old===========
+# - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
+#   dnf:
+#       name: "*"
+#       state: latest
+#   when:
+#       - not system_is_ec2
+#       - rhel_08_010010
+#   tags:
+#       - RHEL-08-010010
+
+# - name: |
+#         "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon."
+#         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
+#   block:
+#       - name: |
+#               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path""
+#               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
+#         lineinfile:
+#             path: /etc/ssh/sshd_config
+#             regexp: '(?i)^.*banner'
+#             line: 'Banner /etc/issue'
+
+#       - name: |
+#               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
+#               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
+#         copy:
+#             dest: /etc/issue
+#             content: "{{ rhel8stig_logon_banner }}"
+#             owner: root
+#             group: root
+#             mode: '0644'
+#         notify: restart sshd
+#         when:
+#             # - not system_is_ec2
+#             - rhel_08_010040 or
+#               rhel_08_010060
+#         tags:
+#             - RHEL-08-010040
+#             - RHEL-08-010060
+
+# - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
+#   copy:
+#       dest: /etc/dconf/db/local.d/01-banner-message
+#       content: |
+#           [org/gnome/login-screen]
+#           banner-message-enable=true
+#           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
+#       mode: '0644'
+#       owner: root
+#       group: root
+#   vars:
+#       newline: "\n"
+#   notify: dconf update
+#   when:
+#       - rhel_08_010050
+#       - rhel8stig_dconf_available
+#   tags:
+#       - RHEL-08-010050
+
+# - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
+#   lineinfile:
+#       path: /etc/rsyslog.d/50-default.conf
+#       regexp: "{{ item.regexp }}"
+#       line: "{{ item.line }}"
+#       create: yes
+#       mode: '0644'
+#   notify: restart rsyslog
+#   with_items:
+#       - { regexp: '^auth.*', line: 'auth.*,authpriv.* /var/log/secure' }
+#       - { regexp: '^daemon.*', line: 'daemon.* /var/log/messages' }
+#   when:
+#       - rhel_08_010070
+#   tags:
+#       - RHEL-08-010070
+
+# - name: "MEDIUM | RHEL-08-010080 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections"
+#   lineinfile:
+#       path: /etc/ssh/sshd_config
+#       regexp: '(?i)^Ciphers.*'
+#       line: Ciphers aes128-ctr,aes192-ctr,aes256-ctr
+#       insertafter: '# Ciphers and keying'
+#   notify: restart sshd
+#   when:
+#       - rhel_08_010080
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010080
+#       - ssh
+
+# # This task wants you to download the latest DoD root certs and place the chain pem in /etc/sssd/pki/sssd_auth_ca_db.pem. This might need to be a message out, but I will circle back to this and confirm.
+# - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. | Get current certs"
+#         command: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010090_certs_list
+
+#       - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. | Message out certs"
+#         debug:
+#             msg:
+#                 - "WARNING!!!!The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
+#                 - "If they are not please apply the latest PKI CA certificate bundle from cyber.mil and copy the DoD_PKE_CA_chain.pem into /etc/sssd/pki/sssd_auth_ca_db.pem"
+#                 - "{{ rhel_08_010090_certs_list.stdout_lines }}"
+#   when:
+#       - rhel_08_010090
+#   tags:
+#       - RHEL-08-010090
+
+# - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create .ssh folder"
+#         file:
+#             path: "{{ rhel8stig_path_to_sshkey }}"
+#             state: directory
+#             mode: '0700'
+
+#       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create key pair"
+#         openssh_keypair:
+#             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
+#   when:
+#       - rhel_08_010100
+#   tags:
+#       - RHEL-08-010100
+
+# - name: "MEDIUM | RHEL-08-010110 | PATCH | RHEL 8 must encrypt all stored passwords with a FIPS 140-2 approved cryptographic hashing algorithm."
+#   lineinfile:
+#       path: /etc/login.defs
+#       regexp: '^ENCRYPT_METHOD.*'
+#       line: "ENCRYPT_METHOD {{ rhel8stig_login_defaults.encrypt_method | default('SHA512') }}"
+#   when:
+#       - rhel_08_010110
+#   tags:
+#       - RHEL-08-010110
+#       - login
+
+# - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Get user accounts not using FIPS 140-2 hashing"
+#         command: 'cat /etc/shadow | grep -v "*" | grep -v "!" | grep -v ":$6$" | cut -f1 -d:'
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010120_non_fips_hashed_accounts
+
+#       - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Lock user not using FIPS 140-2 hashing"
+#         command: "passwd -l {{ item }}"
+#         with_items:
+#             -"{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
+#         when:
+#             - rhel_08_010120_non_fips_hashed_accounts.stdout != ""
+
+#       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
+#         debug:
+#             msg:
+#                 - "ALERT!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
+#                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
+#         when:
+#             - not rhel8stig_disruption_high
+#             - rhel_08_010120_non_fips_hashed_accounts.stdout != ""
+#   when:
+#       - rhel_08_010120
+#       - rhel8stig_disruption_high
+#   tags:
+#       - RHEL-08-010120
+#       - disruption_high
+
+# - name: "MEDIUM | RHEL-08-010130 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all created passwords. | Add rounds argument"
+#   pamd:
+#       name: "{{ item }}"
+#       type: password
+#       control: sufficient
+#       module_path: pam_unix.so
+#       module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
+#       state: args_present
+#   with_items:
+#       - password-auth
+#       - system-auth
+#   when:
+#       - rhel_08_010130
+#   tags:
+#       - RHEL-08-010130
+
+# - name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication. | Add sha512 argument"
+#   pamd:
+#       name: "{{ item }}"
+#       type: password
+#       control: sufficient
+#       module_path: pam_unix.so
+#       module_arguments: sha512
+#       state: args_present
+#   with_items:
+#       - password-auth
+#       - system-auth
+#   when:
+#       - rhel_08_010160
+#   tags:
+#       - RHEL-08-010160
 
 - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
   block:
