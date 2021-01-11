@@ -343,5 +343,8 @@
       file_type: any
   register: rhel8stig_sysctlconf_filename
   when:
-      - rhel_08_010375 or
+      - rhel_08_010372 or
+        rhel_08_010373 or
+        rhel_08_010374 or
+        rhel_08_010375 or
         rhel_08_010376

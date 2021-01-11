@@ -355,38 +355,956 @@
       - RHEL-08-010250
       - RHEL-08-010260
 
-- name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms."
+- name: |
+    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms."
+    "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections"
   block:
-      - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
+      - name: |
+          "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
+          "MEDIUM | RHEL-08-010291 | AUDIT | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Get current FIPS mode state"
         command: fips-mode-setup --check
         changed_when: false
         failed_when: false
         register: rhel_08_010290_pre_fips_check
 
-      - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
+      - name: |
+          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
+          "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Enable FIPS"
         command: fips-mode-setup --enable
         register: rhel_08_010290_fips_enable
         notify: reboot system
         when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
+
+      - name: |
+          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
+          "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Add ssh ciphers"
+        lineinfile:
+            path: "{{ item.path }}"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        notify: reboot system
+        with_items:
+            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^MACs', line: "MACs {{ rhel8stig_ssh_macs_settings }}" }
+            - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
   when:
-      - rhel_08_010290
+      - rhel_08_010290 or
+        rhel_08_010291
   tags:
       - RHEL-08-010290
-      - FIPS
+      - RHEL-08-010291
+      - fips
 
-- name: "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections"
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '(?i)^Ciphers.*'
-      line: Ciphers aes128-ctr,aes192-ctr,aes256-ctr
-      insertafter: '# Ciphers and keying'
-  notify: restart sshd
+- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
+  block:
+      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
+        command: fips-mode-setup --check
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010293_pre_fips_check
+
+      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
+        command: fips-mode-setup --enable
+        register: rhel_08_010290_fips_enable
+        notify: reboot system
+        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
   when:
-      - rhel_08_010291
+      - rhel_08_010293
+  tags:
+      - RHEL-08-010293
+      - fips
+
+- name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/opensslcnf.config
+      regexp: '^MinProtocol ='
+      line: "MinProtocol = TLSv1.2"
+  notify: reboot system
+  when:
+      - rhel_08_010294
+  tags:
+      - RHEL-08-010294
+      - openssl
+
+- name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/gnutls.config
+      regexp: '^\+VERS-ALL:'
+      line: "+VERS-ALL:{{ rhel8stig_gnutls_encryption }}"
+      create: yes
+  notify: reboot system
+  when:
+      - rhel_08_010295
+  tags:
+      - RHEL-08-010295
+      - gnutls
+
+- name: |
+        "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
+        "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root."
+        "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root."
+  block:
+      - name: |
+              "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 0755 or less permissive. | Get commands less permissive"
+              "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
+              "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root. | Get commands no group-owned by root"
+        shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010300_commands
+
+      - name: |
+              "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive. | Set permissions"
+              "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root. | Set permissions"
+              "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root. | Set permissions"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+            mode: '0755'
+            force: yes
+        with_items:
+            - "{{ rhel_08_010300_commands.stdout_lines }}"
+  when:
+      - rhel_08_010300 or
+        rhel_08_010310 or
+        rhel_08_010320
+  tags:
+      - RHEL-08-010300
+      - RHEL-08-010310
+      - RHEL-08-010320
+
+- name: |
+        "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive."
+        "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
+        "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
+  block:
+      - name: |
+              "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+              "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+              "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
+        shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010330_library_files
+
+      - name: |
+              "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+              "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+              "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+            mode: '0755'
+        with_items:
+            - "{{ rhel_08_010330_library_files.stdout_lines }}"
+  when:
+      - rhel_08_010330 or
+        rhel_08_010340 or
+        rhel_08_010350
+  tags:
+      - RHEL-08-010330
+      - RHEL-08-010340
+      - RHEL-08-010350
+
+- name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
+  cron:
+      name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
+      user: "{{ rhel8stig_aide_cron.user }}"
+      cron_file: "{{ rhel8stig_aide_cron.cron_file }}"
+      job: "{{ rhel8stig_aide_cron.job + ((rhel8stig_aide_cron.notify_by_mail) | ternary(rhel8stig_aide_cron.notify_cmd,'')) }}"
+      minute: "{{ rhel8stig_aide_cron.minute | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+              ternary('0', omit)) | default(omit) }}"
+      hour: "{{ rhel8stig_aide_cron.hour | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['daily', 'weekly', 'monthly']) |
+              ternary('0', omit)) | default(omit) }}"
+      weekday: "{{ rhel8stig_aide_cron.weekday | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['weekly']) |
+              ternary('0', omit)) | default(omit) }}"
+      day: "{{ rhel8stig_aide_cron.day | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['monthly']) |
+              ternary('1', omit)) | default(omit) }}"
+      special_time: "{{ (rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+              ternary(omit, rhel8stig_aide_cron.special_time) }}"
+  when:
+      - rhel_08_010360
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010360
+      - aide
+
+- name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
+  block:
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.kexec_load_disabled ='
+            line: "kernel.kexec_load_disabled = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.kexec_load_disabled ='
+            line: "kernel.kexec_load_disabled = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010372
+  tags:
+      - RHEL-08-010372
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
+  block:
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^fs.protected_symlinks ='
+            line: "fs.protected_symlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^fs.protected_symlinks ='
+            line: "fs.protected_symlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010373
+  tags:
+      - RHEL-08-010373
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
+  block:
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^fs.protected_hardlinks ='
+            line: "fs.protected_hardlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^fs.protected_hardlinks ='
+            line: "fs.protected_hardlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010374
+  tags:
+      - RHEL-08-010374
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
+  replace:
+      path: "{{ item }}"
+      regexp: '^([^#].*)NOPASSWD(.*)'
+      replace: '\1PASSWD\2'
+  with_items:
+      - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+  when:
+      - rhel_08_010380
+      - rhel8stig_using_password_auth
+  tags:
+      - RHEL-08-010380
+      - sudoers
+
+- name: "MEDIUM | RHEL-08-010381 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation."
+  replace:
+      path: "{{ item }}"
+      regexp: '^([^#].*)!authenticate(.*)'
+      replace: '\1authenticate\2'
+  with_items:
+      - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+  when:
+      - rhel_08_010381
+      - rhel8stig_using_password_auth
+  tags:
+      - RHEL-08-010381
+      - sudoers
+
+- name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
+  block:
+      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
+        dnf:
+            name: esc
+            state: present
+        when: rhel8stig_gui
+      
+      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
+        dnf:
+            name: openssl-pkcs11
+            state: present
+  when:
+      - rhel_08_010390
+  tags:
+      - RHEL-08-010390
+      - multifactor
+
+- name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
+  lineinfile:
+      path: '{{ rhel8stig_sssd_conf.stdout }}'
+      regexp: '^certificate_verification = {{ item }}'
+      state: absent
+  with_items:
+      - 'no_ocsp, no_verification'
+      - no_ocsp
+      - no_verification
+  notify: restart sssd
+  when:
+      - rhel_08_010400
+  tags:
+      - RHEL-08-010400
+
+- name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
+  dnf:
+      name: opensc
+      state: present
+  when:
+      - rhel_08_010410
+  tags:
+      - RHEL-08-010410
+      - opensc
+      - piv
+
+- name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
+  block:
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
+        shell: dmesg |grep "NX ("
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010420_nx_bit_state
+
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX being set"
+        debug:
+            msg:
+                - "Good News! You are setup with execute disable active."
+        when: '"(Execute Disable) protection: active" in rhel_08_010420_nx_bit_state.stdout'
+
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
+        debug:
+            msg:
+                - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
+        when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
+  when:
+      - rhel_08_010420
+  tags:
+      - RHEL-08-010420
+
+- name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks."
+  block:
+      - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010421_grub_cmdline_linux
+
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 as active"
+        shell: grubby --update-kernel=ALL --args="page_poison=1"
+
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010421_grub_cmdline_linux.stdout }} page_poison=1"'
+        when: '"page_poison=" not in rhel8stig_010421_grub_cmdline_linux.stdout'
+
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'page_poison=([^\s|"])+'
+            replace: "page_poison=1"
+        when: '"page_poison=" in rhel8stig_010421_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010421
+  tags:
+      - RHEL-08-010421
+      - grub
+
+- name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls."
+  block:
+      - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010422_grub_cmdline_linux
+
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
+        shell: grubby --update-kernel=ALL --args="vsyscall=none"
+
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010422_grub_cmdline_linux.stdout }} vsyscall=none"'
+        when: '"vsyscall=" not in rhel8stig_010422_grub_cmdline_linux.stdout'
+
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'vsyscall=([^\s|"])+'
+            replace: "vsyscall=none"
+        when: '"vsyscall=" in rhel8stig_010422_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010422
+  tags:
+      - RHEL-08-010422
+      - grub
+
+- name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks."
+  block:
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010423_grub_cmdline_linux
+
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
+        shell: grubby --update-kernel=ALL --args="slub_debug=P"
+
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010423_grub_cmdline_linux.stdout }} slub_debug=P"'
+        when: '"slub_debug=" not in rhel8stig_010423_grub_cmdline_linux.stdout'
+
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'slub_debug=([^\s|"])+'
+            replace: "slub_debug=P"
+        when: '"slub_debug=" in rhel8stig_010423_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010423
+  tags:
+      - RHEL-08-010423
+      - grub
+
+- name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
+  sysctl:
+      name: kernel.randomize_va_space
+      value: '2'
+      state: present
+      reload: "{{ rhel8stig_sysctl_reload }}"
+      sysctl_set: yes
+      ignoreerrors: yes
+  notify: sysctl system
+  when:
+      - rhel_08_010430
+  tags:
+      - RHEL-08-010430
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*_key.pub'
+            hidden: true
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010480_public_files
+
+      - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
+        file:
+            path: "{{ item.path }}"
+            mode: '0644'
+        with_items:
+            - "{{ rhel_08_010480_public_files.files }}"
+        notify: restart sshd
+  when:
+      - rhel_08_010480
       - rhel8stig_ssh_required
   tags:
-      - RHEL-08-010291
+      - RHEL-08-010480
       - ssh
+
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*key'
+            hidden: true
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010490_private_host_key_files
+
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
+        file:
+            path: "{{ item.path }}"
+            mode: '0640'
+        with_items:
+            - "{{ rhel_08_010490_private_host_key_files.files }}"
+        notify: restart sshd
+  when:
+      - rhel_08_010490
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010490
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '#StrictModes.(yes|no)|StrictModes.(yes|no)'
+      line: 'StrictModes yes'
+  notify: restart sshd
+  when:
+      - rhel_08_010500
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010500
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^#Compression.(yes|delayed|no)|^Compression.(yes|delayed|no)'
+      line: 'Compression {{ rhel8stig_sshd_compression }}'
+  notify: restart sshd
+  when:
+      - rhel_08_010510
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010510
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '#IgnoreUserKnownHosts.(yes|no)|IgnoreUserKnownHosts.(yes|no)'
+      line: 'IgnoreUserKnownHosts yes'
+  notify: restart sshd
+  when:
+      - rhel_08_010520
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010520
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow unused methods of authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '^KerberosAuthentication ', line: "KerberosAuthentication no" }
+      - { regexp: '^GSSAPIAuthentication ', line: "GSSAPIAuthentication no" }
+  notify: restart sshd
+  when:
+      - rhel_08_010521
+  tags:
+      - RHEL-08-010521
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
+  debug:
+      msg: "WARNING!!!! /tmp is not mounted on a separate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010543
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
+  tags:
+      - RHEL-08-010543
+      - complexity-high
+      - mount
+      - tmp
+
+- name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^#PermitRootLogin.(yes|without-password|forced-commands-only|no)|^PermitRootLogin.(yes|without-password|forced-commands-only|no)'
+      line: 'PermitRootLogin no'
+  notify: restart sshd
+  when:
+      - rhel_08_010550
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010550
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
+  service:
+      name: auditd
+      state: started
+      enabled: yes
+  when:
+      - rhel_08_010560
+      - not rhel8stig_system_is_container
+  tags:
+      - RHEL-08-010560
+      - auditd
+
+- name: "MEDIUM | RHEL-08-010561 | PATCH | The rsyslog service must be running in RHEL 8."
+  service:
+      name: rsyslog.service
+      state: started
+      enabled: true
+  when:
+      - rhel_08_010561
+  tags:
+      - RHEL-08-010561
+      - rsyslog
+
+- name: "MEDIUM | RHEL-08-010570 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
+  mount:
+      path: /home
+      state: mounted
+      src: "{{ home_mount.device }}"
+      fstype: "{{ home_mount.fstype }}"
+      opts: "{{ home_mount.options }},nosuid"
+  when:
+      - rhel_08_010570
+      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
+      - "'nosuid' not in home_mount.options"
+  vars:
+      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+  tags:
+      - RHEL-08-010570
+      - mounts
+      - home
+
+- name: "MEDIUM | RHEL-08-010571 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on the /boot directory."
+  mount:
+      path: /boot
+      state: mounted
+      src: "{{ boot_mount.device }}"
+      fstype: "{{ boot_mount.fstype }}"
+      opts: "{{ boot_mount.options }},nosuid"
+  when:
+      - rhel_08_010571
+      - ansible_mounts | selectattr('mount', 'match', '^/boot$') | list | length != 0
+      - "'nosuid' not in boot_mount.options"
+  vars:
+      boot_mount: "{{ ansible_mounts | json_query('[?mount == `/boot`] | [0]') }}"
+  tags:
+      - RHEL-08-010571
+      - mounts
+      - boot
+
+- name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions."
+  command: /bin/true
+  changed_when: false
+  failed_when: false
+  when:
+      - rhel_08_010580
+  tags:
+      - RHEL-08-010580
+      - mounts
+      - non-root
+
+- name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent code from being executed on file systems that contain user home directories."
+  mount:
+      path: /home
+      state: mounted
+      src: "{{ home_mount.device }}"
+      fstype: "{{ home_mount.fstype }}"
+      opts: "{{ home_mount.options }},noexec"
+  when:
+      - rhel_08_010590
+      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
+      - "'noexec' not in home_mount.options"
+  vars:
+      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+  tags:
+      - RHEL-08-010590
+      - mounts
+      - home
+
+- name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media."
+  block:
+      - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media. | Set nodev to /media"
+        mount:
+            path: /media
+            state: mounted
+            src: "{{ removable_mount.device }}"
+            fstype: "{{ removable_mount.fstype }}"
+            opts: "{{ removable_mount.options }},nodev"
+        when:
+            - rhel_08_010600
+            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+            - "'nodev' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+
+      - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media. | Set nodev to /mnt"
+        mount:
+            path: /mnt
+            state: mounted
+            src: "{{ removable_mount2.device }}"
+            fstype: "{{ removable_mount2.fstype }}"
+            opts: "{{ removable_mount2.options }},nodev"
+        when:
+            - rhel_08_010600
+            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+            - "'nodev' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+  when:
+      - rhel_08_010600
+      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+  tags:
+      - RHEL-08-010600
+      - mounts
+      - media
+
+- name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent code from being executed on file systems that are used with removable media."
+  block:
+      - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent code from being executed on file systems that are used with removable media. | Set noexec to /media"
+        mount:
+            path: /media
+            state: mounted
+            src: "{{ removable_mount.device }}"
+            fstype: "{{ removable_mount.fstype }}"
+            opts: "{{ removable_mount.options }},noexec"
+        when:
+            - rhel_08_010600
+            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+            - "'noexec' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+
+      - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent code from being executed on file systems that are used with removable media. | Set noexec to /mnt"
+        mount:
+            path: /mnt
+            state: mounted
+            src: "{{ removable_mount2.device }}"
+            fstype: "{{ removable_mount2.fstype }}"
+            opts: "{{ removable_mount2.options }},noexec"
+        when:
+            - rhel_08_010610
+            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+            - "'noexec' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+  when:
+      - rhel_08_010610
+      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+  tags:
+      - RHEL-08-010610
+      - mounts
+      - media
+
+- name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
+  block:
+      - name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /media"
+        mount:
+            path: /media
+            state: mounted
+            src: "{{ removable_mount.device }}"
+            fstype: "{{ removable_mount.fstype }}"
+            opts: "{{ removable_mount.options }},nosuid"
+        when:
+            - rhel_08_010620
+            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+            - "'nosuid' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+
+      - name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
+        mount:
+            path: /mnt
+            state: mounted
+            src: "{{ removable_mount2.device }}"
+            fstype: "{{ removable_mount2.fstype }}"
+            opts: "{{ removable_mount2.options }},nosuid"
+        when:
+            - rhel_08_010620
+            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+            - "'nosuid' not in home_mount.options"
+            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+        vars:
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+  when:
+      - rhel_08_010620
+      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+  tags:
+      - RHEL-08-010620
+      - mounts
+      - media
+
+- name: "MEDIUM | RHEL-08-010630 | PATCH | RHEL 8 must prevent code from being executed on file systems that are imported via Network File System (NFS)."
+  mount:
+      path: "{{ item }}"
+      src: "{{ ansible_mounts | json_query(device_query) }}"
+      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+      opts: "{{ ansible_mounts | json_query(options_query) }},noexec"
+      state: mounted
+  vars:
+      device_query: '[?mount == `{{ item }}`] | [0].device'
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+      options_query: '[?mount == `{{ item }}`] | [0].options'
+  with_items: "{{ rhel8stig_nfs_mounts }}"
+  when:
+      - rhel_08_010630
+      - "'noexec' not in (ansible_mounts | json_query(options_query))"
+  tags:
+      - RHEL-08-010630
+      - mounts
+      - nfs
+
+- name: "MEDIUM | RHEL-08-010640 | PATCH | RHEL 8 must prevent special devices on file systems that are imported via Network File System (NFS)."
+  mount:
+      path: "{{ item }}"
+      src: "{{ ansible_mounts | json_query(device_query) }}"
+      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+      opts: "{{ ansible_mounts | json_query(options_query) }},nodev"
+      state: mounted
+  vars:
+      device_query: '[?mount == `{{ item }}`] | [0].device'
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+      options_query: '[?mount == `{{ item }}`] | [0].options'
+  with_items: "{{ rhel8stig_nfs_mounts }}"
+  when:
+      - rhel_08_010640
+      - "'nodev' not in (ansible_mounts | json_query(options_query))"
+  tags:
+      - RHEL-08-010640
+
+- name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)"
+  mount:
+      path: "{{ item }}"
+      src: "{{ ansible_mounts | json_query(device_query) }}"
+      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+      opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
+      state: mounted
+  vars:
+      device_query: '[?mount == `{{ item }}`] | [0].device'
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+      options_query: '[?mount == `{{ item }}`] | [0].options'
+  with_items: "{{ rhel8stig_nfs_mounts }}"
+  when:
+      - rhel_08_010650
+      - "'nosuid' not in (ansible_mounts | json_query(options_query))"
+  tags:
+      - RHEL-08-010650
+
+- name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
+  block:
+      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
+        shell: find {{ item.mount }} -xdev -type f -perm -002
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010660_world_writable_files
+        with_items:
+            - "{{ ansible_mounts }}"
+
+      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
+        set_fact:
+            rhel_08_010660_change_perms: "{{ rhel_08_010660_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
+
+      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
+        include_tasks: audit_homedirinifiles.yml
+        loop:
+            - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+        loop_control:
+            loop_var: ini_item
+        when:
+            - rhel_08_010660_change_perms != []
+
+      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
+        file:
+            path: "{{ item }}"
+            mode: '0755'
+            state: file
+        with_items:
+            - "{{ rhel_08_010660_change_perms }}"
+        when:
+            - rhel_08_010660_change_perms != []
+  when:
+      - rhel_08_010660
+      - rhel8stig_disruption_high
+      # - rhel_08_stig_interactive_homedir_inifiles is defined
+  tags:
+      - RHEL-08-010660
+
+- name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
+  service:
+      name: kdump
+      enabled: no
+      state: stopped
+  when:
+      - rhel_08_010670
+      - not rhel8stig_kdump_needed
+  tags:
+      - RHEL-08-010670
+      - kdump
+
+- name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
+  block:
+      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.core_pattern ='
+            line: "kernel.core_pattern = |/bin/false"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.core_pattern ='
+            line: "kernel.core_pattern = |/bin/false"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010671
+  tags:
+      - RHEL-08-010671
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-010672 | PATCH | RHEL 8 must disable acquiring, saving, and processing core dumps."
+  systemd:
+      name: systemd-coredump.socket
+      masked: yes
+      daemon_reload: yes
+  notify: systemctl daemon-reload
+  when:
+      - rhel_08_010672
+  tags:
+      - RHEL-08-010672
+      - systemd
+
 # ===========below here is old===========
 # - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
 #   dnf:
@@ -723,598 +1641,598 @@
 #       - RHEL-08-010290
 #       - FIPS
 
-- name: |
-        "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
-        "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root."
-        "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root."
-  block:
-      - name: |
-              "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 0755 or less permissive. | Get commands less permissive"
-              "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
-              "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root. | Get commands no group-owned by root"
-        shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010300_commands
+# - name: |
+#         "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
+#         "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root."
+#         "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root."
+#   block:
+#       - name: |
+#               "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 0755 or less permissive. | Get commands less permissive"
+#               "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
+#               "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root. | Get commands no group-owned by root"
+#         shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010300_commands
 
-      - name: |
-              "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive. | Set permissions"
-              "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root. | Set permissions"
-              "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root. | Set permissions"
-        file:
-            path: "{{ item }}"
-            owner: root
-            group: root
-            mode: '0755'
-            force: yes
-        with_items:
-            - "{{ rhel_08_010300_commands.stdout_lines }}"
-  when:
-      - rhel_08_010300 or
-        rhel_08_010310 or
-        rhel_08_010320
-  tags:
-      - RHEL-08-010300
-      - RHEL-08-010310
-      - RHEL-08-010320
+#       - name: |
+#               "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive. | Set permissions"
+#               "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root. | Set permissions"
+#               "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root. | Set permissions"
+#         file:
+#             path: "{{ item }}"
+#             owner: root
+#             group: root
+#             mode: '0755'
+#             force: yes
+#         with_items:
+#             - "{{ rhel_08_010300_commands.stdout_lines }}"
+#   when:
+#       - rhel_08_010300 or
+#         rhel_08_010310 or
+#         rhel_08_010320
+#   tags:
+#       - RHEL-08-010300
+#       - RHEL-08-010310
+#       - RHEL-08-010320
 
-- name: |
-        "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive."
-        "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
-        "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
-  block:
-      - name: |
-              "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
-              "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
-              "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
-        shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010330_library_files
+# - name: |
+#         "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive."
+#         "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
+#         "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
+#   block:
+#       - name: |
+#               "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+#               "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+#               "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
+#         shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010330_library_files
 
-      - name: |
-              "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
-              "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
-              "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
-        file:
-            path: "{{ item }}"
-            owner: root
-            group: root
-            mode: '0755'
-        with_items:
-            - "{{ rhel_08_010330_library_files.stdout_lines }}"
-  when:
-      - rhel_08_010330 or
-        rhel_08_010340 or
-        rhel_08_010350
-  tags:
-      - RHEL-08-010330
-      - RHEL-08-010340
-      - RHEL-08-010350
+#       - name: |
+#               "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+#               "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+#               "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
+#         file:
+#             path: "{{ item }}"
+#             owner: root
+#             group: root
+#             mode: '0755'
+#         with_items:
+#             - "{{ rhel_08_010330_library_files.stdout_lines }}"
+#   when:
+#       - rhel_08_010330 or
+#         rhel_08_010340 or
+#         rhel_08_010350
+#   tags:
+#       - RHEL-08-010330
+#       - RHEL-08-010340
+#       - RHEL-08-010350
 
-- name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
-  cron:
-      name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
-      user: "{{ rhel8stig_aide_cron.user }}"
-      cron_file: "{{ rhel8stig_aide_cron.cron_file }}"
-      job: "{{ rhel8stig_aide_cron.job + ((rhel8stig_aide_cron.notify_by_mail) | ternary(rhel8stig_aide_cron.notify_cmd,'')) }}"
-      minute: "{{ rhel8stig_aide_cron.minute | default((rhel8stig_cron_special_disable and
-              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
-              ternary('0', omit)) | default(omit) }}"
-      hour: "{{ rhel8stig_aide_cron.hour | default((rhel8stig_cron_special_disable and
-              rhel8stig_aide_cron.special_time in ['daily', 'weekly', 'monthly']) |
-              ternary('0', omit)) | default(omit) }}"
-      weekday: "{{ rhel8stig_aide_cron.weekday | default((rhel8stig_cron_special_disable and
-              rhel8stig_aide_cron.special_time in ['weekly']) |
-              ternary('0', omit)) | default(omit) }}"
-      day: "{{ rhel8stig_aide_cron.day | default((rhel8stig_cron_special_disable and
-              rhel8stig_aide_cron.special_time in ['monthly']) |
-              ternary('1', omit)) | default(omit) }}"
-      special_time: "{{ (rhel8stig_cron_special_disable and
-              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
-              ternary(omit, rhel8stig_aide_cron.special_time) }}"
-  when:
-      - rhel_08_010360
-      - rhel8stig_disruption_high
-  tags:
-      - RHEL-08-010360
-      - aide
+# - name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
+#   cron:
+#       name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
+#       user: "{{ rhel8stig_aide_cron.user }}"
+#       cron_file: "{{ rhel8stig_aide_cron.cron_file }}"
+#       job: "{{ rhel8stig_aide_cron.job + ((rhel8stig_aide_cron.notify_by_mail) | ternary(rhel8stig_aide_cron.notify_cmd,'')) }}"
+#       minute: "{{ rhel8stig_aide_cron.minute | default((rhel8stig_cron_special_disable and
+#               rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+#               ternary('0', omit)) | default(omit) }}"
+#       hour: "{{ rhel8stig_aide_cron.hour | default((rhel8stig_cron_special_disable and
+#               rhel8stig_aide_cron.special_time in ['daily', 'weekly', 'monthly']) |
+#               ternary('0', omit)) | default(omit) }}"
+#       weekday: "{{ rhel8stig_aide_cron.weekday | default((rhel8stig_cron_special_disable and
+#               rhel8stig_aide_cron.special_time in ['weekly']) |
+#               ternary('0', omit)) | default(omit) }}"
+#       day: "{{ rhel8stig_aide_cron.day | default((rhel8stig_cron_special_disable and
+#               rhel8stig_aide_cron.special_time in ['monthly']) |
+#               ternary('1', omit)) | default(omit) }}"
+#       special_time: "{{ (rhel8stig_cron_special_disable and
+#               rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+#               ternary(omit, rhel8stig_aide_cron.special_time) }}"
+#   when:
+#       - rhel_08_010360
+#       - rhel8stig_disruption_high
+#   tags:
+#       - RHEL-08-010360
+#       - aide
 
-- name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles."
-  block:
-      - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles. | Remove NOPASSWD"
-        replace:
-            path: "{{ item }}"
-            regexp: '^([^#].*)NOPASSWD(.*)'
-            replace: '\1PASSWD\2'
-        with_items:
-            - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+# - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles. | Remove NOPASSWD"
+#         replace:
+#             path: "{{ item }}"
+#             regexp: '^([^#].*)NOPASSWD(.*)'
+#             replace: '\1PASSWD\2'
+#         with_items:
+#             - "{{ rhel8stig_sudoers_files.stdout_lines }}"
 
-      - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles. | Remove !authenticate"
-        replace:
-            path: "{{ item }}"
-            regexp: '^([^#].*)!authenticate(.*)'
-            replace: '\1authenticate\2'
-        with_items:
-            - "{{ rhel8stig_sudoers_files.stdout_lines }}"
-  when:
-      - rhel_08_010380
-      - rhel8stig_using_password_auth
-  tags:
-      - RHEL-08-010380
-      - sudoers
+#       - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation and changing roles. | Remove !authenticate"
+#         replace:
+#             path: "{{ item }}"
+#             regexp: '^([^#].*)!authenticate(.*)'
+#             replace: '\1authenticate\2'
+#         with_items:
+#             - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+#   when:
+#       - rhel_08_010380
+#       - rhel8stig_using_password_auth
+#   tags:
+#       - RHEL-08-010380
+#       - sudoers
 
-- name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
-  block:
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
-        dnf:
-            name: esc
-            state: present
-        when: rhel8stig_gui
+# - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
+#         dnf:
+#             name: esc
+#             state: present
+#         when: rhel8stig_gui
       
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
-        dnf:
-            name: openssl-pkcs11
-            state: present
-  when:
-      - rhel_08_010390
-  tags:
-      - RHEL-08-010390
-      - multifactor
+#       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
+#         dnf:
+#             name: openssl-pkcs11
+#             state: present
+#   when:
+#       - rhel_08_010390
+#   tags:
+#       - RHEL-08-010390
+#       - multifactor
 
-- name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
-  # block:
-  #     - name: "MEDIUM | RHEL-08-010400 | AUDIT | RHEL 8 must implement certificate status checking for multifactor authentication | Find sssd_config location."
-  #       shell: find / -name sssd.conf
-  #       changed_when: false
-  #       failed_when: false
-  #       register: rhel_08_010400_sssd_config
+# - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
+#   # block:
+#   #     - name: "MEDIUM | RHEL-08-010400 | AUDIT | RHEL 8 must implement certificate status checking for multifactor authentication | Find sssd_config location."
+#   #       shell: find / -name sssd.conf
+#   #       changed_when: false
+#   #       failed_when: false
+#   #       register: rhel_08_010400_sssd_config
 
-      # - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication | Set certificate_verification."
-  lineinfile:
-      path: '{{ rhel8stig_sssd_conf.stdout }}'
-      regexp: '^certificate_verification = {{ item }}'
-      state: absent
-  with_items:
-      - 'no_ocsp, no_verification'
-      - no_ocsp
-      - no_verification
-  notify: restart sssd
-  when:
-      - rhel_08_010400
-  tags:
-      - RHEL-08-010400 
+#       # - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication | Set certificate_verification."
+#   lineinfile:
+#       path: '{{ rhel8stig_sssd_conf.stdout }}'
+#       regexp: '^certificate_verification = {{ item }}'
+#       state: absent
+#   with_items:
+#       - 'no_ocsp, no_verification'
+#       - no_ocsp
+#       - no_verification
+#   notify: restart sssd
+#   when:
+#       - rhel_08_010400
+#   tags:
+#       - RHEL-08-010400 
 
-- name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
-  dnf:
-      name: opensc
-      state: present
-  when:
-      - rhel_08_010410
-  tags:
-      - RHEL-08-010410
+# - name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
+#   dnf:
+#       name: opensc
+#       state: present
+#   when:
+#       - rhel_08_010410
+#   tags:
+#       - RHEL-08-010410
 
-- name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
-  block:
-      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
-        shell: dmesg |grep "NX ("
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010420_nx_bit_state
+# - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
+#         shell: dmesg |grep "NX ("
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010420_nx_bit_state
 
-      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX being set"
-        debug:
-            msg:
-                - "Good News! You are setup with execute disable active."
-        when: '"(Execute Disable) protection: active" in rhel_08_010420_nx_bit_state.stdout'
+#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX being set"
+#         debug:
+#             msg:
+#                 - "Good News! You are setup with execute disable active."
+#         when: '"(Execute Disable) protection: active" in rhel_08_010420_nx_bit_state.stdout'
 
-      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
-        debug:
-            msg:
-                - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
-        when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
-  when:
-      - rhel_08_010420
-  tags:
-      - RHEL-08-010420
+#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
+#         debug:
+#             msg:
+#                 - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
+#         when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
+#   when:
+#       - rhel_08_010420
+#   tags:
+#       - RHEL-08-010420
 
-- name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
-  sysctl:
-      name: kernel.randomize_va_space
-      value: '2'
-      state: present
-      reload: "{{ rhel8stig_sysctl_reload }}"
-      sysctl_set: yes
-      ignoreerrors: yes
-  when:
-      - rhel_08_010430
-  tags:
-      - RHEL-08-010430
-      - sysctl
+# - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
+#   sysctl:
+#       name: kernel.randomize_va_space
+#       value: '2'
+#       state: present
+#       reload: "{{ rhel8stig_sysctl_reload }}"
+#       sysctl_set: yes
+#       ignoreerrors: yes
+#   when:
+#       - rhel_08_010430
+#   tags:
+#       - RHEL-08-010430
+#       - sysctl
 
-- name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
-  block:
-      - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
-        find:
-            paths: /etc/ssh
-            recurse: yes
-            file_type: file
-            patterns: 'ssh_host*_key.pub'
-            hidden: true
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010480_public_files
+# - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
+#         find:
+#             paths: /etc/ssh
+#             recurse: yes
+#             file_type: file
+#             patterns: 'ssh_host*_key.pub'
+#             hidden: true
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010480_public_files
 
-      - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
-        file:
-            path: "{{ item.path }}"
-            mode: '0644'
-        with_items:
-            - "{{ rhel_08_010480_public_files.files }}"
-        notify: restart sshd
-  when:
-      - rhel_08_010480
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010480
-      - ssh
+#       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
+#         file:
+#             path: "{{ item.path }}"
+#             mode: '0644'
+#         with_items:
+#             - "{{ rhel_08_010480_public_files.files }}"
+#         notify: restart sshd
+#   when:
+#       - rhel_08_010480
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010480
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
-  block:
-      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
-        find:
-            paths: /etc/ssh
-            recurse: yes
-            file_type: file
-            patterns: 'ssh_host*key'
-            hidden: true
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010490_private_host_key_files
+# - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+#         find:
+#             paths: /etc/ssh
+#             recurse: yes
+#             file_type: file
+#             patterns: 'ssh_host*key'
+#             hidden: true
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
-        file:
-            path: "{{ item.path }}"
-            mode: '0600'
-        with_items:
-            - "{{ rhel_08_010490_private_host_key_files.files }}"
-        notify: restart sshd
-  when:
-      - rhel_08_010490
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010490
-      - ssh
+#       - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
+#         file:
+#             path: "{{ item.path }}"
+#             mode: '0600'
+#         with_items:
+#             - "{{ rhel_08_010490_private_host_key_files.files }}"
+#         notify: restart sshd
+#   when:
+#       - rhel_08_010490
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010490
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '#StrictModes.(yes|no)|StrictModes.(yes|no)'
-      line: 'StrictModes yes'
-  notify: restart sshd
-  when:
-      - rhel_08_010500
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010500
-      - ssh
+# - name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
+#   lineinfile:
+#       path: /etc/ssh/sshd_config
+#       regexp: '#StrictModes.(yes|no)|StrictModes.(yes|no)'
+#       line: 'StrictModes yes'
+#   notify: restart sshd
+#   when:
+#       - rhel_08_010500
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010500
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '^#Compression.(yes|delayed|no)|^Compression.(yes|delayed|no)'
-      line: 'Compression {{ rhel8stig_sshd_compression }}'
-  notify: restart sshd
-  when:
-      - rhel_08_010510
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010510
-      - ssh
+# - name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
+#   lineinfile:
+#       path: /etc/ssh/sshd_config
+#       regexp: '^#Compression.(yes|delayed|no)|^Compression.(yes|delayed|no)'
+#       line: 'Compression {{ rhel8stig_sshd_compression }}'
+#   notify: restart sshd
+#   when:
+#       - rhel_08_010510
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010510
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '#IgnoreUserKnownHosts.(yes|no)|IgnoreUserKnownHosts.(yes|no)'
-      line: 'IgnoreUserKnownHosts yes'
-  notify: restart sshd
-  when:
-      - rhel_08_010520
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010520
-      - ssh
+# - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
+#   lineinfile:
+#       path: /etc/ssh/sshd_config
+#       regexp: '#IgnoreUserKnownHosts.(yes|no)|IgnoreUserKnownHosts.(yes|no)'
+#       line: 'IgnoreUserKnownHosts yes'
+#   notify: restart sshd
+#   when:
+#       - rhel_08_010520
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010520
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '^#PermitRootLogin.(yes|without-password|forced-commands-only|no)|^PermitRootLogin.(yes|without-password|forced-commands-only|no)'
-      line: 'PermitRootLogin no'
-  notify: restart sshd
-  when:
-      - rhel_08_010550
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010550
-      - ssh
+# - name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
+#   lineinfile:
+#       path: /etc/ssh/sshd_config
+#       regexp: '^#PermitRootLogin.(yes|without-password|forced-commands-only|no)|^PermitRootLogin.(yes|without-password|forced-commands-only|no)'
+#       line: 'PermitRootLogin no'
+#   notify: restart sshd
+#   when:
+#       - rhel_08_010550
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-010550
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
-  service:
-      name: auditd
-      state: started
-      enabled: yes
-  when:
-      - rhel_08_010560
-      - not rhel8stig_system_is_container
-  tags:
-      - RHEL-08-010560
-      - auditd
+# - name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
+#   service:
+#       name: auditd
+#       state: started
+#       enabled: yes
+#   when:
+#       - rhel_08_010560
+#       - not rhel8stig_system_is_container
+#   tags:
+#       - RHEL-08-010560
+#       - auditd
 
-- name: "MEDIUM | RHEL-08-010570 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
-  mount:
-      path: /home
-      state: mounted
-      src: "{{ home_mount.device }}"
-      fstype: "{{ home_mount.fstype }}"
-      opts: "{{ home_mount.options }},nosuid"
-  when:
-      - rhel_08_010570
-      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
-      - "'nosuid' not in home_mount.options"
-  vars:
-      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
-  tags:
-      - RHEL-08-010570
+# - name: "MEDIUM | RHEL-08-010570 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
+#   mount:
+#       path: /home
+#       state: mounted
+#       src: "{{ home_mount.device }}"
+#       fstype: "{{ home_mount.fstype }}"
+#       opts: "{{ home_mount.options }},nosuid"
+#   when:
+#       - rhel_08_010570
+#       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
+#       - "'nosuid' not in home_mount.options"
+#   vars:
+#       home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+#   tags:
+#       - RHEL-08-010570
 
 # The cotnrol in the stig has the same title as the RHEL-08-010570 control
-- name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
-  mount:
-      path: /home
-      state: mounted
-      src: "{{ home_mount.device }}"
-      fstype: "{{ home_mount.fstype }}"
-      opts: "{{ home_mount.options }},nodev"
-  when:
-      - rhel_08_010580
-      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
-      - "'nodev' not in home_mount.options"
-  vars:
-      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
-  tags:
-      - RHEL-08-010580
+# - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
+#   mount:
+#       path: /home
+#       state: mounted
+#       src: "{{ home_mount.device }}"
+#       fstype: "{{ home_mount.fstype }}"
+#       opts: "{{ home_mount.options }},nodev"
+#   when:
+#       - rhel_08_010580
+#       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
+#       - "'nodev' not in home_mount.options"
+#   vars:
+#       home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+#   tags:
+#       - RHEL-08-010580
 
 # The control in the stig has the same title as RHEL-01-01570
-- name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
-  mount:
-      path: /home
-      state: mounted
-      src: "{{ home_mount.device }}"
-      fstype: "{{ home_mount.fstype }}"
-      opts: "{{ home_mount.options }},noexec"
-  when:
-      - rhel_08_010590
-      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
-      - "'noexec' not in home_mount.options"
-  vars:
-      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
-  tags:
-      - RHEL-08-010590
+# - name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories."
+#   mount:
+#       path: /home
+#       state: mounted
+#       src: "{{ home_mount.device }}"
+#       fstype: "{{ home_mount.fstype }}"
+#       opts: "{{ home_mount.options }},noexec"
+#   when:
+#       - rhel_08_010590
+#       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
+#       - "'noexec' not in home_mount.options"
+#   vars:
+#       home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+#   tags:
+#       - RHEL-08-010590
 
-- name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
-  block:
-      - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nodev to /media"
-        mount:
-            path: /media
-            state: mounted
-            src: "{{ removable_mount.device }}"
-            fstype: "{{ removable_mount.fstype }}"
-            opts: "{{ removable_mount.options }},nodev"
-        when:
-            - rhel_08_010600
-            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
-            - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+# - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nodev to /media"
+#         mount:
+#             path: /media
+#             state: mounted
+#             src: "{{ removable_mount.device }}"
+#             fstype: "{{ removable_mount.fstype }}"
+#             opts: "{{ removable_mount.options }},nodev"
+#         when:
+#             - rhel_08_010600
+#             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+#             - "'nodev' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
-      - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nodev to /mnt"
-        mount:
-            path: /mnt
-            state: mounted
-            src: "{{ removable_mount2.device }}"
-            fstype: "{{ removable_mount2.fstype }}"
-            opts: "{{ removable_mount2.options }},nodev"
-        when:
-            - rhel_08_010600
-            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
-            - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
-  when:
-      - rhel_08_010600
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-  tags:
-      - RHEL-08-010600
+#       - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nodev to /mnt"
+#         mount:
+#             path: /mnt
+#             state: mounted
+#             src: "{{ removable_mount2.device }}"
+#             fstype: "{{ removable_mount2.fstype }}"
+#             opts: "{{ removable_mount2.options }},nodev"
+#         when:
+#             - rhel_08_010600
+#             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+#             - "'nodev' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+#   when:
+#       - rhel_08_010600
+#       - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#   tags:
+#       - RHEL-08-010600
+
+# # The control has the same title as RHEL-08-010600
+# - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set noexec to /media"
+#         mount:
+#             path: /media
+#             state: mounted
+#             src: "{{ removable_mount.device }}"
+#             fstype: "{{ removable_mount.fstype }}"
+#             opts: "{{ removable_mount.options }},noexec"
+#         when:
+#             - rhel_08_010600
+#             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+#             - "'noexec' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+
+#       - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set noexec to /mnt"
+#         mount:
+#             path: /mnt
+#             state: mounted
+#             src: "{{ removable_mount2.device }}"
+#             fstype: "{{ removable_mount2.fstype }}"
+#             opts: "{{ removable_mount2.options }},noexec"
+#         when:
+#             - rhel_08_010610
+#             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+#             - "'noexec' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+#   when:
+#       - rhel_08_010610
+#       - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#   tags:
+#       - RHEL-08-010610
 
 # The control has the same title as RHEL-08-010600
-- name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
-  block:
-      - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set noexec to /media"
-        mount:
-            path: /media
-            state: mounted
-            src: "{{ removable_mount.device }}"
-            fstype: "{{ removable_mount.fstype }}"
-            opts: "{{ removable_mount.options }},noexec"
-        when:
-            - rhel_08_010600
-            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
-            - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+# - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /media"
+#         mount:
+#             path: /media
+#             state: mounted
+#             src: "{{ removable_mount.device }}"
+#             fstype: "{{ removable_mount.fstype }}"
+#             opts: "{{ removable_mount.options }},nosuid"
+#         when:
+#             - rhel_08_010620
+#             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
+#             - "'nosuid' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
-      - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set noexec to /mnt"
-        mount:
-            path: /mnt
-            state: mounted
-            src: "{{ removable_mount2.device }}"
-            fstype: "{{ removable_mount2.fstype }}"
-            opts: "{{ removable_mount2.options }},noexec"
-        when:
-            - rhel_08_010610
-            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
-            - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
-  when:
-      - rhel_08_010610
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-  tags:
-      - RHEL-08-010610
+#       - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
+#         mount:
+#             path: /mnt
+#             state: mounted
+#             src: "{{ removable_mount2.device }}"
+#             fstype: "{{ removable_mount2.fstype }}"
+#             opts: "{{ removable_mount2.options }},nosuid"
+#         when:
+#             - rhel_08_010620
+#             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
+#             - "'nosuid' not in home_mount.options"
+#             - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#         vars:
+#             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+#   when:
+#       - rhel_08_010620
+#       - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+#   tags:
+#       - RHEL-08-010620
 
-# The control has the same title as RHEL-08-010600
-- name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
-  block:
-      - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /media"
-        mount:
-            path: /media
-            state: mounted
-            src: "{{ removable_mount.device }}"
-            fstype: "{{ removable_mount.fstype }}"
-            opts: "{{ removable_mount.options }},nosuid"
-        when:
-            - rhel_08_010620
-            - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
-            - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+# - name: "MEDIUM | RHEL-08-010630 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
+#   mount:
+#       path: "{{ item }}"
+#       src: "{{ ansible_mounts | json_query(device_query) }}"
+#       fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+#       opts: "{{ ansible_mounts | json_query(options_query) }},noexec"
+#       state: mounted
+#   vars:
+#       device_query: '[?mount == `{{ item }}`] | [0].device'
+#       fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+#       options_query: '[?mount == `{{ item }}`] | [0].options'
+#   with_items: "{{ rhel8stig_nfs_mounts }}"
+#   when:
+#       - rhel_08_010630
+#       - "'noexec' not in (ansible_mounts | json_query(options_query))"
+#   tags:
+#       - RHEL-08-010630
 
-      - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
-        mount:
-            path: /mnt
-            state: mounted
-            src: "{{ removable_mount2.device }}"
-            fstype: "{{ removable_mount2.fstype }}"
-            opts: "{{ removable_mount2.options }},nosuid"
-        when:
-            - rhel_08_010620
-            - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
-            - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-        vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
-  when:
-      - rhel_08_010620
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
-  tags:
-      - RHEL-08-010620
+# - name: "MEDIUM | RHEL-08-010640 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
+#   mount:
+#       path: "{{ item }}"
+#       src: "{{ ansible_mounts | json_query(device_query) }}"
+#       fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+#       opts: "{{ ansible_mounts | json_query(options_query) }},nodev"
+#       state: mounted
+#   vars:
+#       device_query: '[?mount == `{{ item }}`] | [0].device'
+#       fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+#       options_query: '[?mount == `{{ item }}`] | [0].options'
+#   with_items: "{{ rhel8stig_nfs_mounts }}"
+#   when:
+#       - rhel_08_010640
+#       - "'nodev' not in (ansible_mounts | json_query(options_query))"
+#   tags:
+#       - RHEL-08-010640
 
-- name: "MEDIUM | RHEL-08-010630 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
-  mount:
-      path: "{{ item }}"
-      src: "{{ ansible_mounts | json_query(device_query) }}"
-      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
-      opts: "{{ ansible_mounts | json_query(options_query) }},noexec"
-      state: mounted
-  vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
-  with_items: "{{ rhel8stig_nfs_mounts }}"
-  when:
-      - rhel_08_010630
-      - "'noexec' not in (ansible_mounts | json_query(options_query))"
-  tags:
-      - RHEL-08-010630
+# - name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
+#   mount:
+#       path: "{{ item }}"
+#       src: "{{ ansible_mounts | json_query(device_query) }}"
+#       fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+#       opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
+#       state: mounted
+#   vars:
+#       device_query: '[?mount == `{{ item }}`] | [0].device'
+#       fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+#       options_query: '[?mount == `{{ item }}`] | [0].options'
+#   with_items: "{{ rhel8stig_nfs_mounts }}"
+#   when:
+#       - rhel_08_010650
+#       - "'nosuid' not in (ansible_mounts | json_query(options_query))"
+#   tags:
+#       - RHEL-08-010650
 
-- name: "MEDIUM | RHEL-08-010640 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
-  mount:
-      path: "{{ item }}"
-      src: "{{ ansible_mounts | json_query(device_query) }}"
-      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
-      opts: "{{ ansible_mounts | json_query(options_query) }},nodev"
-      state: mounted
-  vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
-  with_items: "{{ rhel8stig_nfs_mounts }}"
-  when:
-      - rhel_08_010640
-      - "'nodev' not in (ansible_mounts | json_query(options_query))"
-  tags:
-      - RHEL-08-010640
+# - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
+#         shell: find {{ item.mount }} -xdev -type f -perm -002
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010660_world_writable_files
+#         with_items:
+#             - "{{ ansible_mounts }}"
 
-- name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)."
-  mount:
-      path: "{{ item }}"
-      src: "{{ ansible_mounts | json_query(device_query) }}"
-      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
-      opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
-      state: mounted
-  vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
-  with_items: "{{ rhel8stig_nfs_mounts }}"
-  when:
-      - rhel_08_010650
-      - "'nosuid' not in (ansible_mounts | json_query(options_query))"
-  tags:
-      - RHEL-08-010650
+#       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
+#         set_fact:
+#             rhel_08_010660_change_perms: "{{ rhel_08_010660_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
 
-- name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
-  block:
-      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
-        shell: find {{ item.mount }} -xdev -type f -perm -002
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010660_world_writable_files
-        with_items:
-            - "{{ ansible_mounts }}"
+#       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
+#         include_tasks: audit_homedirinifiles.yml
+#         loop:
+#             - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+#         loop_control:
+#             loop_var: ini_item
+#         when:
+#             - rhel_08_010660_change_perms != []
 
-      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
-        set_fact:
-            rhel_08_010660_change_perms: "{{ rhel_08_010660_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
+#       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
+#         file:
+#             path: "{{ item }}"
+#             mode: '0755'
+#             state: file
+#         with_items:
+#             - "{{ rhel_08_010660_change_perms }}"
+#         when:
+#             - rhel_08_010660_change_perms != []
+#   when:
+#       - rhel_08_010660
+#       - rhel8stig_disruption_high
+#       # - rhel_08_stig_interactive_homedir_inifiles is defined
+#   tags:
+#       - RHEL-010660
 
-      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
-        include_tasks: audit_homedirinifiles.yml
-        loop:
-            - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
-        loop_control:
-            loop_var: ini_item
-        when:
-            - rhel_08_010660_change_perms != []
-
-      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
-        file:
-            path: "{{ item }}"
-            mode: '0755'
-            state: file
-        with_items:
-            - "{{ rhel_08_010660_change_perms }}"
-        when:
-            - rhel_08_010660_change_perms != []
-  when:
-      - rhel_08_010660
-      - rhel8stig_disruption_high
-      # - rhel_08_stig_interactive_homedir_inifiles is defined
-  tags:
-      - RHEL-010660
-
-- name: "MEDIUM | RHEL-08-010670 | PATCH | In the event of a system failure, RHEL 8 must preserve any information necessary to determine cause of failure and any information necessary to return to operations with least disruption to mission processes."
-  service:
-      name: kdump
-      enabled: yes
-      state: started
-  when:
-      - rhel_08_010670
-  tags:
-      - RHEL-08-010670
+# - name: "MEDIUM | RHEL-08-010670 | PATCH | In the event of a system failure, RHEL 8 must preserve any information necessary to determine cause of failure and any information necessary to return to operations with least disruption to mission processes."
+#   service:
+#       name: kdump
+#       enabled: yes
+#       state: started
+#   when:
+#       - rhel_08_010670
+#   tags:
+#       - RHEL-08-010670
 
 # NOTE: The following does not address that /etc/resolv.conf can be modified by DHCP when running networkmanager, and thus having two DNS servers may be a config setting not on the hosts, but on the DHCP service.
 - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured."
