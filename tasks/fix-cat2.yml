@@ -235,6 +235,74 @@
   tags:
       - RHEL-08-010161
       - kerberos
+
+- name: "MEDIUM | RHEL-08-010162 | PATCH | The krb5-workstation package must not be installed on RHEL 8."
+  dnf:
+      name: krb5-workstation
+      state: absent
+  when:
+      - rhel_08_010162
+  tags:
+      - RHEL-08-010162
+      - kerberos
+
+- name: |
+        "HIGH | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
+        "HIGH | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
+  selinux:
+      state: enforcing
+      policy: targeted
+  check_mode: "{{ ansible_check_mode or rhel8stig_system_is_chroot }}"
+  notify: reboot system
+  when:
+      - rhel_08_010170 or rhel_08_010450
+      - not rhel8stig_system_is_container
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010170
+      - RHEL-08-010450
+      - selinux
+      - disruption_high
+
+- name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
+  block:
+      - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
+        shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010180_public_not_root_owned
+
+      - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+        with_items:
+            - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
+  when:
+      - rhel_08_010180
+  tags:
+      - RHEL-08-010180
+
+- name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
+  block:
+      - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
+        shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010190_world_writable_files
+
+      - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
+        file:
+            path: "{{ item }}"
+            mode: '1777'
+        with_items: 
+            - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
+  when:
+      - rhel_08_010190
+  tags:
+      - RHEL-08-010190
+
 # ===========below here is old===========
 # - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
 #   dnf:
@@ -434,44 +502,44 @@
 #   tags:
 #       - RHEL-08-010160
 
-- name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
-  block:
-      - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
-        shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010180_public_not_root_owned
+# - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
+#         shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010180_public_not_root_owned
 
-      - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
-        file:
-            path: "{{ item }}"
-            owner: root
-            group: root
-        with_items:
-            - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
-  when:
-      - rhel_08_010180
-  tags:
-      - RHEL-08-010180
+#       - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
+#         file:
+#             path: "{{ item }}"
+#             owner: root
+#             group: root
+#         with_items:
+#             - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
+#   when:
+#       - rhel_08_010180
+#   tags:
+#       - RHEL-08-010180
 
-- name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
-  block:
-      - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
-        shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010190_world_writable_files
+# - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
+#   block:
+#       - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
+#         shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_010190_world_writable_files
 
-      - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
-        file:
-            path: "{{ item }}"
-            mode: '1777'
-        with_items: 
-            - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
-  when:
-      - rhel_08_010190
-  tags:
-      - RHEL-08-010190
+#       - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
+#         file:
+#             path: "{{ item }}"
+#             mode: '1777'
+#         with_items: 
+#             - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
+#   when:
+#       - rhel_08_010190
+#   tags:
+#       - RHEL-08-010190
 
 - name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
   lineinfile:

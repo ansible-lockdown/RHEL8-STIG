@@ -52,7 +52,7 @@ rhel_08_010020: true
 # rhel_08_010030: true
 rhel_08_010140: true
 rhel_08_010150: true
-# rhel_08_010170: true
+# rhel_08_010170: true - Moved to cat2
 rhel_08_010370: true
 rhel_08_010371: true
 rhel_08_010460: true
@@ -90,6 +90,8 @@ rhel_08_010130: true
 rhel_08_010151: true
 rhel_08_010160: true
 rhel_08_010161: true
+rhel_08_010162: true
+rhel_08_010170: true
 rhel_08_010180: true
 rhel_08_010190: true
 rhel_08_010200: true
@@ -116,6 +118,7 @@ rhel_08_010400: true
 rhel_08_010410: true
 rhel_08_010420: true
 rhel_08_010430: true
+rhel_08_010450: true
 rhel_08_010480: true
 rhel_08_010490: true
 rhel_08_010500: true
