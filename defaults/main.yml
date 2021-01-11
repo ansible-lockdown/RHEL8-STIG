@@ -101,9 +101,10 @@ rhel_08_010230: true
 rhel_08_010240: true
 rhel_08_010250: true
 rhel_08_010260: true
-rhel_08_010270: true
-rhel_08_010280: true
+# rhel_08_010270: true
+# rhel_08_010280: true
 rhel_08_010290: true
+rhel_08_010291: true
 rhel_08_010300: true
 rhel_08_010310: true
 rhel_08_010320: true
