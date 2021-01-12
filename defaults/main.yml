@@ -173,40 +173,56 @@ rhel_08_010770: true
 rhel_08_010780: true
 rhel_08_010790: true
 rhel_08_010800: true
-rhel_08_010810: false
-rhel_08_020000: false
-rhel_08_020010: false
-rhel_08_020030: false
-rhel_08_020040: false
-rhel_08_020050: false
-rhel_08_020060: false
-rhel_08_020070: false
-rhel_08_020080: false
-rhel_08_020090: false
-rhel_08_020100: false
-rhel_08_020110: false
-rhel_08_020120: false
-rhel_08_020130: false
-rhel_08_020140: false
-rhel_08_020150: false
-rhel_08_020160: false
-rhel_08_020170: false
-rhel_08_020180: false
-rhel_08_020190: false
-rhel_08_020200: false
-rhel_08_020210: false
-rhel_08_020220: false
-rhel_08_020230: false
-rhel_08_020240: false
-rhel_08_020250: false
-rhel_08_020260: false
-rhel_08_020270: false
-rhel_08_020280: false
-rhel_08_020290: false
-rhel_08_020300: false
-rhel_08_020310: false
-rhel_08_020320: false
-rhel_08_020350: false
+# rhel_08_010810: false
+rhel_08_010830: true
+rhel_08_020000: true
+rhel_08_020010: true
+rhel_08_020011: true
+rhel_08_020012: true
+rhel_08_020013: true
+rhel_08_020014: true
+rhel_08_020015: true
+rhel_08_020016: true
+rhel_08_020017: true
+rhel_08_020018: true
+rhel_08_020019: true
+rhel_08_020020: true
+rhel_08_020021: true
+rhel_08_020022: true
+rhel_08_020023: true
+rhel_08_020030: true
+rhel_08_020040: true
+rhel_08_020041: true
+rhel_08_020050: true
+rhel_08_020060: true
+rhel_08_020070: true
+rhel_08_020080: true
+rhel_08_020090: true
+rhel_08_020100: true
+rhel_08_020110: true
+rhel_08_020120: true
+rhel_08_020130: true
+rhel_08_020140: true
+rhel_08_020150: true
+rhel_08_020160: true
+rhel_08_020170: true
+rhel_08_020180: true
+rhel_08_020190: true
+rhel_08_020200: true
+rhel_08_020210: true
+rhel_08_020220: true
+rhel_08_020230: true
+rhel_08_020231: true
+rhel_08_020240: true
+rhel_08_020250: true
+rhel_08_020260: true
+rhel_08_020270: true
+rhel_08_020280: true
+rhel_08_020290: true
+rhel_08_020300: true
+rhel_08_020310: true
+rhel_08_020320: true
+rhel_08_020350: true
 rhel_08_030000: false
 rhel_08_030010: false
 rhel_08_030020: false
@@ -502,13 +518,15 @@ rhel8stig_pam_pwhistory:
     remember: 5
     retries: 3
 
-# RHEL-08-010320
-# RHEL-08-010330
+# RHEL-08-020010
+# RHEL-08-020011
+# RHEL-08-020012
+# RHEL-08-020013
 # pam_faillock settings - accounts must be locked for max time period after 3 unsuccessful attempts within 15 minutes.
 rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
-    unlock_time: 900
+    unlock_time: 0
     fail_for_root: yes
 
 # RHEL-08-030670
@@ -645,3 +663,7 @@ rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-gcm@openssh.com,aes256-c
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
 # to conform to STIG standards this variable must contain -VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
 rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
+
+# RHEL-08-020070
+# This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
+rhel8stig_tmux_lock_after_time: 900

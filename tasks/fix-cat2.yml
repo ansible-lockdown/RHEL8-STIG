@@ -1618,6 +1618,1293 @@
       - complexity-high
       - mount
       - home
+
+- name: "MEDIUM | RHEL-08-010830 | PATCH |Unattended or automatic logon to RHEL 8 via ssh must not be allowed."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: ^PermitUserEnvironment
+      line: 'PermitUserEnvironment no'
+  notify: restart sshd
+  when:
+      - rhel_08_010830
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010830
+      - ssh
+      - disruption_high
+
+- name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+  debug:
+      msg: 
+          - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
+          - "To do this please run sudo chage -l account_name for the accounts you need to check"
+          - "The results will display the Account Expires information"
+          - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
+  when:
+      - rhel_08_020000
+  tags:
+      - RHEL-08-020000
+
+- name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock  unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020010
+  tags:
+      - RHEL-08-020010
+      - pamd
+
+- name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set deny in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^deny =|^\# deny ='
+            line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
+  when:
+      - rhel_08_020011
+  tags:
+      - RHEL-08-020011
+      - pamd
+
+- name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020012
+  tags:
+      - RHEL-08-020012
+      - pamd
+
+- name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set fail_interval in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^fail_interval =|^\# fail_interval ='
+            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }} }}"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020013
+  tags:
+      - RHEL-08-020013
+      - pamd
+
+- name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020013
+  tags:
+      - RHEL-08-020013
+      - pamd
+
+- name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020015 | PATCH |RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set unlock_time in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^unlock_time =|^\# unlock_time ='
+            line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020015
+  tags:
+      - RHEL-08-020015
+      - pamd
+
+- name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
+  block:
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020016
+  tags:
+      - RHEL-08-020016
+      - pamd
+
+- name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
+  block:
+      - name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set dir in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^dir =|^\# dir ='
+            line: "dir = /var/log/faillock"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020017
+  tags:
+      - RHEL-08-020017
+      - pamd
+
+- name: "MEDIUM | RHEL-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur.| Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020018
+  tags:
+      - RHEL-08-020018
+      - pamd
+
+- name: "MEDIUM | RHEL-020019| PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set silent in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^silent|^\# silent'
+            line: "silent"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020019
+  tags:
+      - RHEL-08-020019
+      - pamd
+
+- name: "MEDIUM | RHEL-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020018 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020020
+  tags:
+      - RHEL-08-020020
+      - pamd
+
+- name: "MEDIUM | RHEL-020021| PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set audit in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^audit|^\# audit'
+            line: "audit"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020021
+  tags:
+      - RHEL-08-020021
+      - pamd
+
+- name: "MEDIUM | RHEL-020022| PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020022
+  tags:
+      - RHEL-08-020022
+      - pamd
+
+- name: "MEDIUM | RHEL-020023| PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+
+      - name: "MEDIUM | RHEL-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set audit in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^even_deny_root|^\# even_deny_root'
+            line: "even_deny_root"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020023
+  tags:
+      - RHEL-08-020023
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
+  block:
+      - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
+        command: "grep lock-enabled /etc/dconf/db/* -r | cut -f1 -d:"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020030_lock_enabled
+
+      - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
+        lineinfile:
+            path: "{{ rhel_08_020030_lock_enabled.stdout }}"
+            regexp: '^lock-enabled'
+            line: lock-enabled=true
+        when: rhel_08_020030_lock_enabled.stdout != ""
+        notify: dconf update
+
+      - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
+        lineinfile:
+            path: /etc/dconf/db/local.d/00-screensaver
+            create: yes
+            regexp: '^lock-enabled'
+            line: |
+                [org/gnome/desktop/screensaver]
+                # Set this to true to lock the screen when the screensaver activates
+                lock-enabled=true
+        when: rhel_08_020030_lock_enabled.stdout == ""
+        notify: dconf update
+  when:
+      - rhel_08_020030
+      - rhel8stig_dconf_available
+  tags:
+      - RHEL-08-020030
+      - gui
+
+- name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
+  block:
+      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
+        dnf:
+            name: tmux
+            state: present
+
+      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
+        lineinfile:
+            path: /etc/tmux.conf
+            regexp: '^set \-g'
+            line: "set -g lock-command vlock"
+            create: yes
+  when:
+      - rhel_08_020040
+  tags:
+      - RHEL-08-020040
+      - tmux
+
+- name: " MEDIUM | RHEL-08-020041 | PATCH | RHEL 8 must ensure session control is automatically started at shell initialization."
+  lineinfile:
+      path: /etc/bashrc
+      regexp: '^\[ -n "$PS1" -a -z "$TMUX" \]'
+      line: '[ -n "$PS1" -a -z "$TMUX" ] && exec tmux'
+  when:
+      - rhel_08_020041
+  tags:
+      - RHEL-08-020041
+      - tmux
+
+- name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
+  block:
+      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+        shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020050_removal_action
+
+      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+        shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020050_removal_action_file
+
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
+        lineinfile:
+            path: /etc/dconf/db/distro.d/20-authselect
+            create: yes
+            line: |
+                [org/gnome/settings-daemon/peripherals/smartcard]
+                removal-action='lock-screen'
+        when: rhel_08_020050_removal_action.stdout == ""
+        notify: dconf update
+
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
+        lineinfile:
+            path: "{{ rhel_08_020050_removal_action.stdout }}"
+            regexp: ^removal-action=
+            line: removal-action='lock-screen'
+        when: rhel_08_020050_removal_action.stdout != ""
+        notify: dconf update
+
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+        lineinfile:
+            path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
+            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        when: rhel_08_020050_removal_action_file.stdout != ""
+        notify: dconf update
+
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+        lineinfile:
+            path: /etc/dconf/db/distro.d/locks/20-authselect
+            create: yes
+            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        when: rhel_08_020050_removal_action_file.stdout == ""
+        notify: dconf update
+  when:
+      - rhel_08_020050
+  tags:
+      - RHEL-08-020050
+      - smartcard
+
+- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
+  block:
+      - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
+        shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020060_idle_delay_param
+
+      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
+        lineinfile:
+            path: /etc/dconf/db/local.d/00-screensaver
+            create: yes
+            regexp: '^idle-delay'
+            line: |
+                [org/gnome/desktop/session]
+                # Set the lock time out to 900 seconds before the session is considered idle
+                idle-delay=uint32 900
+        notify: dconf update
+        when: rhel_08_020060_idle_delay_param.stdout == ""
+
+      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
+        lineinfile:
+            path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
+            regexp: '^idle-delay='
+            line: idle-delay=uint32 900
+        notify: dconf update
+        when: rhel_08_020060_idle_delay_param.stdout != ""
+  when:
+      - rhel_08_020060
+      - rhel8stig_dconf_available
+  tags:
+      - RHEL-08-020060
+      - gui
+
+- name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
+  lineinfile:
+      path: /etc/tmux.conf
+      regexp: '^set -g lock-after-time'
+      line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
+  when:
+      - rhel_08_020070
+  tags:
+      - RHEL-08-020070
+      - tmux
+
+- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
+  lineinfile:
+      path: /etc/dconf/db/local.d/locks/session
+      create: yes
+      line: "{{ item }}"
+  with_items:
+      - /org/gnome/desktop/session/idle-delay
+      - /org/gnome/desktop/screensaver/lock-enabled
+      - /org/gnome/desktop/screensaver/lock-delay
+      - /org/gnome/settings-daemon/plugins/media-keys/logout
+      - /org/gnome/login-screen/disable-user-list
+      - /org/gnome/login-screen/banner-message-text
+      - /org/gnome/login-screen/banner-message-enable
+      - /org/gnome/desktop/lockdown/disable-lock-screen
+  when:
+      - rhel_08_020080
+      # - rhel8stig_dconf_available
+  tags:
+      - RHEL-08-020080
+
+# Need to figure out real location of the sssd.conf. STIG and internet say /etc/sssd/sssd.conf but on the test system it's in /usr/lib64/sssd/conf/sssd.conf. Also need some default values/variables
+- name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
+  lineinfile:
+      path: "{{ rhel8stig_sssd_conf.stdout }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '^\[certmap/testing.test/rule_name]', line: '[certmap/testing.test/rule_name]' }
+      - { regexp: '^matchrule =', line: 'matchrule =<SAN>.*EDIPI@mil' }
+      - { regexp: '^maprule =', line: 'maprule = (userCertificate;binary={cert!bin})' }
+      - { regexp: 'dmains =', line: 'dmains = testing.test' }
+  notify: restart sssd
+  when:
+      - rhel_08_020090
+  tags:
+      - RHEL-08-020090
+
+- name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
+  lineinfile:
+      path: "{{ item.path }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: '^password'
+  with_items:
+      - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+      - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+  when:
+      - rhel_08_020100
+  tags:
+      - RHEL-08-020100
+
+- name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*ucredit'
+      line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
+  when:
+      - rhel_08_020110
+  tags:
+      - RHEL-08-020110
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*lcredit'
+      line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
+  when:
+      - rhel_08_020120
+  tags:
+      - RHEL-08-020120
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*dcredit'
+      line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
+  when:
+      - rhel_08_020130
+  tags:
+      - RHEL-08-020130
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*maxclassrepeat'
+      line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
+  when:
+      - rhel_08_020140
+  tags:
+      - RHEL-08-020140
+      - pwquality
+
+- name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*maxrepeat'
+      line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
+  when:
+      - rhel_08_020150
+  tags:
+      - RHEL-08-020150
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*minclass'
+      line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
+  when:
+      - rhel_08_020160
+  tags:
+      - RHEL-08-020160
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*difok'
+      line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
+  when:
+      - rhel_08_020170
+  tags:
+      - RHEL-08-020170
+      - pwquality
+
+- name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+  block:
+      - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
+        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020180_users
+
+      - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
+        command: chage -m 1 {{ item }}
+        with_items: "{{ rhel_08_020180_users.stdout_lines }}"
+  when:
+      - rhel_08_020180
+  tags:
+      - RHEL8-08-020180
+      - password
+
+- name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
+  lineinfile:
+      path: /etc/login.defs
+      create: yes
+      regexp: ^#?PASS_MIN_DAYS
+      line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
+  when:
+      - rhel_08_020190
+  tags:
+      - RHEL-08-020190
+      - login
+
+- name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
+  lineinfile:
+      path: /etc/login.defs
+      create: yes
+      regexp: ^#?PASS_MAX_DAYS
+      line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
+  when:
+      - rhel_08_020200
+  tags:
+      - RHEL-08-020200
+      - login
+
+- name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
+  block:
+      - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
+        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
+        check_mode: no
+        changed_when: rhel_08_020210_users.stdout != ""
+        register: rhel_08_020210_users
+
+      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
+        command: chage -d '-1 day' {{ item }}
+        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+
+      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
+        command: chage -M 60 {{ item }}
+        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+  when:
+      - rhel_08_020210
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-020210
+      - disruption-high
+      - password
+
+- name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations."
+  block:
+      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
+        pamd:
+            name: "{{ item }}"
+            state: before
+            type: password
+            control: sufficient
+            module_path: pam_unix.so
+            new_type: password
+            new_control: required
+            new_module_path: pam_pwhistory.so
+        with_items:
+            - "system-auth"
+            - "password-auth"
+
+      # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
+      - name: "MEDIUM | RHEL-08-020220 | AUDIT | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Check for existing password history reuse settings"
+        command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/{{ item }}"
+        check_mode: no
+        changed_when: no
+        failed_when: rhel_08_020220_pw_hist_settings.rc > 1
+        register: rhel_08_020220_pw_hist_settings
+        with_items:
+            - "system-auth"
+            - "password-auth"
+
+      # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
+      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
+        pamd:
+            name: "{{ item.item }}"
+            state: updated
+            type: password
+            control: required
+            module_path: pam_pwhistory.so
+            module_arguments:
+                - use_authtok
+                - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
+                - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
+        with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
+        when: item.rc == 1
+  when:
+      - rhel_08_020220
+  tags:
+      - RHEL-08-020220
+      - pamd
+
+- name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*minlen'
+      line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
+  when:
+      - rhel_08_020230
+  tags:
+      - RHEL-08-020230
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020231 | PATCH | RHEL 8 passwords for new users must have a minimum of 15 characters."
+  lineinfile:
+      path: /etc/login.defs
+      regexp: '^PASS_MIN_LEN|^#PASS_MIN_LEN'
+      line: "PASS_MIN_LEN 15"
+  when:
+      - rhel_08_020231
+  tags:
+      - RHEL-08-020231
+      - passwords
+
+- name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
+  block:
+      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
+        command: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020240_duplicate_uid_users
+
+      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
+        debug:
+            msg:
+                - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+                - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
+  when:
+      - rhel_08_020240
+  tags:
+      - RHEL-08-020240
+
+- name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
+  block:
+      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
+        shell: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020250_sc_auth_sss
+
+      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
+        shell: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020250_system_auth_sss
+
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
+        lineinfile:
+            path: "{{ rhel8stig_sssd_conf.stdout }}"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            insertafter: "{{ item.insertafter }}"
+        notify: restart sssd
+        with_items:
+            - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+            - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
+
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
+        lineinfile:
+            path: /etc/pam.d/smartcard-auth
+            line: auth       sufficient pam_sss.so try_cert_auth
+        notify: restart sssd
+        when: rhel_08_020250_sc_auth_sss.stdout == ""
+
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
+        pamd:
+            name: /etc/pam.d/smartcard-auth
+            state: updated
+            type: auth
+            control: sufficient
+            module_path: pam_sss.so
+            module_arguments: 'try_cert_auth'
+        notify: restart sssd
+        when: rhel_08_020250_sc_auth_sss.stdout != ""
+
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
+        pamd:
+            name: /etc/pam.d/system-auth
+            state: after
+            type: auth
+            control: required
+            module_path: pam_env.so
+            new_type: auth
+            new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+            new_module_path: pam_sss.so
+            module_arguments: try_cert_auth
+        notify: restart sssd
+        when: rhel_08_020250_system_auth_sss.stdout == ""
+
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
+        pamd:
+            name: /etc/pam.d/system-auth
+            state: updated
+            type: auth
+            control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+            module_path: pam_env.so
+            module_arguments: try_cert_auth
+        notify: restart sssd
+        when: rhel_08_020250_system_auth_sss.stdout != ""
+  when:
+      - rhel_08_020250
+  tags:
+      - RHEL-08-020250
+      - pamd
+
+- name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
+  command: useradd -D -f 35
+  when:
+      - rhel_08_020260
+  tags:
+      - RHEL-08-020260
+      - useradd
+
+- name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+  block:
+      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+        command: "awk -F: '{if ($3 <= {{ rhel8stig_interactive_uid_start }}) { print $1 }}' /etc/passwd"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020270_system_users
+
+      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+        debug:
+            msg:
+                - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+                - "{{ rhel_08_020270_system_users.stdout_lines }}"
+  when:
+      - rhel_08_020270
+  tags:
+      - RHEL-08-020270
+
+- name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*ocredit'
+      line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
+  when:
+      - rhel_08_020280
+  tags:
+      - RHEL-08-020280
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
+  lineinfile:
+      path: "{{ rhel8stig_sssd_conf.stdout }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+  with_items:
+      - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+      - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
+  when:
+      - rhel_08_020290
+  tags:
+      - RHEL-08-020290
+      - sssd
+
+- name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*dictcheck'
+      line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}" 
+  when:
+      - rhel_08_020300
+  tags:
+      - RHEL-08-020300
+      - pwquality
+
+- name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
+  lineinfile:
+      dest: /etc/login.defs
+      regexp: ^#?FAIL_DELAY
+      line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
+  when:
+      - rhel_08_020310
+  tags:
+      - RHEL-08-020310
+      - login
+
+- name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
+  block:
+      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
+        command: "grep '^{{ item }}:' /etc/passwd"
+        check_mode: no
+        failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
+        changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
+        register: rhel_08_020320_unnecessary_accounts_found
+        with_items: "{{ rhel8stig_unnecessary_accounts }}"
+
+      - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
+        user:
+            name: "{{ item }}"
+            state: absent
+            remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
+        register: rhel_08_020320_accounts_removed
+        with_items: "{{ rhel8stig_unnecessary_accounts }}"
+
+      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
+        include_tasks: parse_etc_passwd.yml
+        vars:
+            rhel8stig_passwd_tasks: "RHEL-08-020320"
+        when: rhel_08_020320_accounts_removed is changed
+  when:
+      - rhel_08_020320
+  tags:
+      - RHEL-08-020320
+
+- name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?PrintLastLog"
+      line: PrintLastLog yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  when:
+      - rhel_08_020350
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-020350
+      - ssh
 # ===========below here is old===========
 # - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
 #   dnf:
@@ -2826,694 +4113,694 @@
 #       - mount
 #       - home
 
-- name: "MEDIUM | RHEL-08-010810 | PATCH | RHEL 8 default permissions must be defined in such a way that all authenticated users can only read and modify their own files"
-  lineinfile:
-      path: /etc/login.defs
-      regexp: .*?UMASK.*
-      line: 'UMASK           077'
-  when:
-      - rhel_08_010810
-  tags:
-      - RHEL-08-010810
-      - login
-      - umask
+# - name: "MEDIUM | RHEL-08-010810 | PATCH | RHEL 8 default permissions must be defined in such a way that all authenticated users can only read and modify their own files"
+#   lineinfile:
+#       path: /etc/login.defs
+#       regexp: .*?UMASK.*
+#       line: 'UMASK           077'
+#   when:
+#       - rhel_08_010810
+#   tags:
+#       - RHEL-08-010810
+#       - login
+#       - umask
 
-- name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-  debug:
-      msg: 
-          - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
-          - "To do this please run sudo chage -l account_name for the accounts you need to check"
-          - "The results will display the Account Expires information"
-          - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
-  when:
-      - rhel_08_020000
-  tags:
-      - RHEL-08-020000
+# - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+#   debug:
+#       msg: 
+#           - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
+#           - "To do this please run sudo chage -l account_name for the accounts you need to check"
+#           - "The results will display the Account Expires information"
+#           - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
+#   when:
+#       - rhel_08_020000
+#   tags:
+#       - RHEL-08-020000
 
-- name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
-  block:
-      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
+# - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+#   block:
+#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+#         lineinfile:
+#             path: "/etc/pam.d/{{ item }}"
+#             regexp: '^auth       required pam_faillock.so preauth'
+#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }}"
+#             insertafter: '^auth'
+#         notify: restart sssd
+#         with_items:
+#             - system-auth
+#             - password-auth
 
-      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
+#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+#         lineinfile:
+#             path: "/etc/pam.d/{{ item }}"
+#             regexp: '^auth       required pam_faillock.so authfail'
+#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock'
+#             insertafter: '^auth'
+#         notify: restart sssd
+#         with_items:
+#             - system-auth
+#             - password-auth
 
-      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authsucc"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authsucc'
-            line: 'auth       required pam_faillock.so authsucc'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-  when:
-      - rhel_08_020010
-  tags:
-      - RHEL-08-020010
-      - pamd
+#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authsucc"
+#         lineinfile:
+#             path: "/etc/pam.d/{{ item }}"
+#             regexp: '^auth       required pam_faillock.so authsucc'
+#             line: 'auth       required pam_faillock.so authsucc'
+#             insertafter: '^auth'
+#         notify: restart sssd
+#         with_items:
+#             - system-auth
+#             - password-auth
+#   when:
+#       - rhel_08_020010
+#   tags:
+#       - RHEL-08-020010
+#       - pamd
 
-- name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
-  block:
-      - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
-        command: "grep lock-enabled /etc/dconf/db/* -r | cut -f1 -d:"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020030_lock_enabled
+# - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
+#         command: "grep lock-enabled /etc/dconf/db/* -r | cut -f1 -d:"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020030_lock_enabled
 
-      - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
-        lineinfile:
-            path: "{{ rhel_08_020030_lock_enabled.stdout }}"
-            regexp: '^lock-enabled'
-            line: lock-enabled=true
-        when: rhel_08_020030_lock_enabled.stdout != ""
-        notify: dconf update
+#       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
+#         lineinfile:
+#             path: "{{ rhel_08_020030_lock_enabled.stdout }}"
+#             regexp: '^lock-enabled'
+#             line: lock-enabled=true
+#         when: rhel_08_020030_lock_enabled.stdout != ""
+#         notify: dconf update
 
-      - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
-        lineinfile:
-            path: /etc/dconf/db/local.d/00-screensaver
-            create: yes
-            regexp: '^lock-enabled'
-            line: |
-                [org/gnome/desktop/screensaver]
-                # Set this to true to lock the screen when the screensaver activates
-                lock-enabled=true
-        when: rhel_08_020030_lock_enabled.stdout == ""
-        notify: dconf update
-  when:
-      - rhel_08_020030
-      - rhel8stig_dconf_available
-  tags:
-      - RHEL-08-020030
+#       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
+#         lineinfile:
+#             path: /etc/dconf/db/local.d/00-screensaver
+#             create: yes
+#             regexp: '^lock-enabled'
+#             line: |
+#                 [org/gnome/desktop/screensaver]
+#                 # Set this to true to lock the screen when the screensaver activates
+#                 lock-enabled=true
+#         when: rhel_08_020030_lock_enabled.stdout == ""
+#         notify: dconf update
+#   when:
+#       - rhel_08_020030
+#       - rhel8stig_dconf_available
+#   tags:
+#       - RHEL-08-020030
 
-- name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
-  dnf:
-      name: kbd
-      state: present
-  when:
-      - rhel_08_020040
-  tags:
-      - RHEL-08-020040
+# - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
+#   dnf:
+#       name: kbd
+#       state: present
+#   when:
+#       - rhel_08_020040
+#   tags:
+#       - RHEL-08-020040
 
-- name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
-  block:
-      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020050_removal_action
+# - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+#         shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020050_removal_action
 
-      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020050_removal_action_file
+#       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+#         shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020050_removal_action_file
 
-      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
-        lineinfile:
-            path: /etc/dconf/db/distro.d/20-authselect
-            create: yes
-            line: |
-                [org/gnome/settings-daemon/peripherals/smartcard]
-                removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout == ""
-        notify: dconf update
+#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
+#         lineinfile:
+#             path: /etc/dconf/db/distro.d/20-authselect
+#             create: yes
+#             line: |
+#                 [org/gnome/settings-daemon/peripherals/smartcard]
+#                 removal-action='lock-screen'
+#         when: rhel_08_020050_removal_action.stdout == ""
+#         notify: dconf update
 
-      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
-        lineinfile:
-            path: "{{ rhel_08_020050_removal_action.stdout }}"
-            regexp: ^removal-action=
-            line: removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout != ""
-        notify: dconf update
+#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
+#         lineinfile:
+#             path: "{{ rhel_08_020050_removal_action.stdout }}"
+#             regexp: ^removal-action=
+#             line: removal-action='lock-screen'
+#         when: rhel_08_020050_removal_action.stdout != ""
+#         notify: dconf update
 
-      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
-        lineinfile:
-            path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
-            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout != ""
-        notify: dconf update
+#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+#         lineinfile:
+#             path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
+#             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+#         when: rhel_08_020050_removal_action_file.stdout != ""
+#         notify: dconf update
 
-      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
-        lineinfile:
-            path: /etc/dconf/db/distro.d/locks/20-authselect
-            create: yes
-            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout == ""
-        notify: dconf update
-  when:
-      - rhel_08_020050
-  tags:
-      - RHEL-08-020050
+#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+#         lineinfile:
+#             path: /etc/dconf/db/distro.d/locks/20-authselect
+#             create: yes
+#             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+#         when: rhel_08_020050_removal_action_file.stdout == ""
+#         notify: dconf update
+#   when:
+#       - rhel_08_020050
+#   tags:
+#       - RHEL-08-020050
 
-- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
-  block:
-      - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
-        shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020060_idle_delay_param
+# - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
+#         shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020060_idle_delay_param
 
-      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
-        lineinfile:
-            path: /etc/dconf/db/local.d/00-screensaver
-            create: yes
-            regexp: '^idle-delay'
-            line: |
-                [org/gnome/desktop/session]
-                # Set the lock time out to 900 seconds before the session is considered idle
-                idle-delay=uint32 900
-        notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout == ""
+#       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
+#         lineinfile:
+#             path: /etc/dconf/db/local.d/00-screensaver
+#             create: yes
+#             regexp: '^idle-delay'
+#             line: |
+#                 [org/gnome/desktop/session]
+#                 # Set the lock time out to 900 seconds before the session is considered idle
+#                 idle-delay=uint32 900
+#         notify: dconf update
+#         when: rhel_08_020060_idle_delay_param.stdout == ""
 
-      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
-        lineinfile:
-            path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
-            regexp: '^idle-delay='
-            line: idle-delay=uint32 900
-        notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout != ""
-  when:
-      - rhel_08_020060
-      - rhel8stig_dconf_available
-  tags:
-      - RHEL-08-020060
+#       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
+#         lineinfile:
+#             path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
+#             regexp: '^idle-delay='
+#             line: idle-delay=uint32 900
+#         notify: dconf update
+#         when: rhel_08_020060_idle_delay_param.stdout != ""
+#   when:
+#       - rhel_08_020060
+#       - rhel8stig_dconf_available
+#   tags:
+#       - RHEL-08-020060
 
-- name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
-  blockinfile:
-      create: yes
-      mode: 0644
-      dest: "{{ item.dest }}"
-      state: "{{ item.state }}"
-      marker: "# {mark} ANSIBLE MANAGED"
-      block: |
-        # Set session timeout - STIG ID RHEL-08-020070
-        TMOUT={{ rhel8stig_shell_session_timeout.timeout }}
-        readonly TMOUT
-        export TMOUT
-  with_items:
-      - dest: "{{ rhel8stig_shell_session_timeout.file }}"
-        state: present
-      - dest: /etc/profile
-        state: "{{ (rhel8stig_shell_session_timeout.file == '/etc/profile') | ternary('present', 'absent') }}"
-  when:
-      - rhel_08_020070
-  tags:
-      - RHEL-08-020070
-      - profile
+# - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
+#   blockinfile:
+#       create: yes
+#       mode: 0644
+#       dest: "{{ item.dest }}"
+#       state: "{{ item.state }}"
+#       marker: "# {mark} ANSIBLE MANAGED"
+#       block: |
+#         # Set session timeout - STIG ID RHEL-08-020070
+#         TMOUT={{ rhel8stig_shell_session_timeout.timeout }}
+#         readonly TMOUT
+#         export TMOUT
+#   with_items:
+#       - dest: "{{ rhel8stig_shell_session_timeout.file }}"
+#         state: present
+#       - dest: /etc/profile
+#         state: "{{ (rhel8stig_shell_session_timeout.file == '/etc/profile') | ternary('present', 'absent') }}"
+#   when:
+#       - rhel_08_020070
+#   tags:
+#       - RHEL-08-020070
+#       - profile
 
-- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
-  lineinfile:
-      path: /etc/dconf/db/local.d/locks/session
-      create: yes
-      line: "{{ item }}"
-  with_items:
-      - /org/gnome/desktop/session/idle-delay
-      - /org/gnome/desktop/screensaver/lock-enabled
-      - /org/gnome/desktop/screensaver/lock-delay
-      - /org/gnome/settings-daemon/plugins/media-keys/logout
-      - /org/gnome/login-screen/disable-user-list
-      - /org/gnome/login-screen/banner-message-text
-      - /org/gnome/login-screen/banner-message-enable
-      - /org/gnome/desktop/lockdown/disable-lock-screen
-  when:
-      - rhel_08_020080
-      # - rhel8stig_dconf_available
-  tags:
-      - RHEL-08-020080
+# - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
+#   lineinfile:
+#       path: /etc/dconf/db/local.d/locks/session
+#       create: yes
+#       line: "{{ item }}"
+#   with_items:
+#       - /org/gnome/desktop/session/idle-delay
+#       - /org/gnome/desktop/screensaver/lock-enabled
+#       - /org/gnome/desktop/screensaver/lock-delay
+#       - /org/gnome/settings-daemon/plugins/media-keys/logout
+#       - /org/gnome/login-screen/disable-user-list
+#       - /org/gnome/login-screen/banner-message-text
+#       - /org/gnome/login-screen/banner-message-enable
+#       - /org/gnome/desktop/lockdown/disable-lock-screen
+#   when:
+#       - rhel_08_020080
+#       # - rhel8stig_dconf_available
+#   tags:
+#       - RHEL-08-020080
 
-# Need to figure out real location of the sssd.conf. STIG and internet say /etc/sssd/sssd.conf but on the test system it's in /usr/lib64/sssd/conf/sssd.conf. Also need some default values/variables
-- name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
-  lineinfile:
-      path: "{{ rhel8stig_sssd_conf.stdout }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-  with_items:
-      - { regexp: '^\[certmap/testing.test/rule_name]', line: '[certmap/testing.test/rule_name]' }
-      - { regexp: '^matchrule =', line: 'matchrule =<SAN>.*EDIPI@mil' }
-      - { regexp: '^maprule =', line: 'maprule = (userCertificate;binary={cert!bin})' }
-      - { regexp: 'dmains =', line: 'dmains = testing.test' }
-  notify: dconf update
-  when:
-      - rhel_08_020090
-  tags:
-      - RHEL-08-020090
+# # Need to figure out real location of the sssd.conf. STIG and internet say /etc/sssd/sssd.conf but on the test system it's in /usr/lib64/sssd/conf/sssd.conf. Also need some default values/variables
+# - name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
+#   lineinfile:
+#       path: "{{ rhel8stig_sssd_conf.stdout }}"
+#       regexp: "{{ item.regexp }}"
+#       line: "{{ item.line }}"
+#   with_items:
+#       - { regexp: '^\[certmap/testing.test/rule_name]', line: '[certmap/testing.test/rule_name]' }
+#       - { regexp: '^matchrule =', line: 'matchrule =<SAN>.*EDIPI@mil' }
+#       - { regexp: '^maprule =', line: 'maprule = (userCertificate;binary={cert!bin})' }
+#       - { regexp: 'dmains =', line: 'dmains = testing.test' }
+#   notify: dconf update
+#   when:
+#       - rhel_08_020090
+#   tags:
+#       - RHEL-08-020090
 
-- name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
-  lineinfile:
-      path: "{{ item.path }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: '^password'
-  with_items:
-      - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
-      - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
-  when:
-      - rhel_08_020100
-  tags:
-      - RHEL-08-020100
+# - name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
+#   lineinfile:
+#       path: "{{ item.path }}"
+#       regexp: "{{ item.regexp }}"
+#       line: "{{ item.line }}"
+#       insertafter: '^password'
+#   with_items:
+#       - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+#       - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+#   when:
+#       - rhel_08_020100
+#   tags:
+#       - RHEL-08-020100
 
-- name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*ucredit'
-      line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
-  when:
-      - rhel_08_020110
-  tags:
-      - RHEL-08-020110
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*ucredit'
+#       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
+#   when:
+#       - rhel_08_020110
+#   tags:
+#       - RHEL-08-020110
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*lcredit'
-      line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
-  when:
-      - rhel_08_020120
-  tags:
-      - RHEL-08-020120
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*lcredit'
+#       line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
+#   when:
+#       - rhel_08_020120
+#   tags:
+#       - RHEL-08-020120
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*dcredit'
-      line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
-  when:
-      - rhel_08_020130
-  tags:
-      - RHEL-08-020130
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*dcredit'
+#       line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
+#   when:
+#       - rhel_08_020130
+#   tags:
+#       - RHEL-08-020130
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*maxclassrepeat'
-      line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
-  when:
-      - rhel_08_020140
-  tags:
-      - RHEL-08-020140
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*maxclassrepeat'
+#       line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
+#   when:
+#       - rhel_08_020140
+#   tags:
+#       - RHEL-08-020140
+#       - pwquality
 
-- name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*maxrepeat'
-      line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
-  when:
-      - rhel_08_020150
-  tags:
-      - RHEL-08-020150
-      - pwquality
+# - name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*maxrepeat'
+#       line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
+#   when:
+#       - rhel_08_020150
+#   tags:
+#       - RHEL-08-020150
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*minclass'
-      line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
-  when:
-      - rhel_08_020160
-  tags:
-      - RHEL-08-020160
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*minclass'
+#       line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
+#   when:
+#       - rhel_08_020160
+#   tags:
+#       - RHEL-08-020160
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*difok'
-      line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
-  when:
-      - rhel_08_020170
-  tags:
-      - RHEL-08-020170
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*difok'
+#       line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
+#   when:
+#       - rhel_08_020170
+#   tags:
+#       - RHEL-08-020170
+#       - pwquality
 
-- name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
-  block:
-      - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
-        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020180_users
+# - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+#   block:
+#       - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
+#         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020180_users
 
-      - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
-        command: chage -m 1 {{ item }}
-        with_items: "{{ rhel_08_020180_users.stdout_lines }}"
-  when:
-      - rhel_08_020180
-  tags:
-      - RHEL8-08-020180
-      - password
+#       - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
+#         command: chage -m 1 {{ item }}
+#         with_items: "{{ rhel_08_020180_users.stdout_lines }}"
+#   when:
+#       - rhel_08_020180
+#   tags:
+#       - RHEL8-08-020180
+#       - password
 
-- name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
-  lineinfile:
-      path: /etc/login.defs
-      create: yes
-      regexp: ^#?PASS_MIN_DAYS
-      line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
-  when:
-      - rhel_08_020190
-  tags:
-      - RHEL-08-020190
-      - login
+# - name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
+#   lineinfile:
+#       path: /etc/login.defs
+#       create: yes
+#       regexp: ^#?PASS_MIN_DAYS
+#       line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
+#   when:
+#       - rhel_08_020190
+#   tags:
+#       - RHEL-08-020190
+#       - login
 
-- name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
-  lineinfile:
-      path: /etc/login.defs
-      create: yes
-      regexp: ^#?PASS_MAX_DAYS
-      line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
-  when:
-      - rhel_08_020200
-  tags:
-      - RHEL-08-020200
-      - login
+# - name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
+#   lineinfile:
+#       path: /etc/login.defs
+#       create: yes
+#       regexp: ^#?PASS_MAX_DAYS
+#       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
+#   when:
+#       - rhel_08_020200
+#   tags:
+#       - RHEL-08-020200
+#       - login
 
-- name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
-  block:
-      - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
-        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
-        check_mode: no
-        changed_when: rhel_08_020210_users.stdout != ""
-        register: rhel_08_020210_users
+# - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
+#         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
+#         check_mode: no
+#         changed_when: rhel_08_020210_users.stdout != ""
+#         register: rhel_08_020210_users
 
-      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
-        command: chage -d '-1 day' {{ item }}
-        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
-        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+#       - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
+#         command: chage -d '-1 day' {{ item }}
+#         check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+#         with_items: "{{ rhel_08_020210_users.stdout_lines }}"
 
-      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
-        command: chage -M 60 {{ item }}
-        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
-        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
-  when:
-      - rhel_08_020210
-      - rhel8stig_disruption_high
-  tags:
-      - RHEL-08-020210
-      - disruption-high
-      - password
+#       - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
+#         command: chage -M 60 {{ item }}
+#         check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+#         with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+#   when:
+#       - rhel_08_020210
+#       - rhel8stig_disruption_high
+#   tags:
+#       - RHEL-08-020210
+#       - disruption-high
+#       - password
 
-- name: "MEDIUM | RHEL-08-020220 | PATCH | 8 passwords must be prohibited from reuse for a minimum of five generations."
-  block:
-      - name: "MEDIUM | RHEL-08-020220 | PATCH | 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
-        pamd:
-            name: "{{ item }}"
-            state: before
-            type: password
-            control: sufficient
-            module_path: pam_unix.so
-            new_type: password
-            new_control: required
-            new_module_path: pam_pwhistory.so
-        with_items:
-            - "system-auth"
-            - "password-auth"
+# - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
+#         pamd:
+#             name: "{{ item }}"
+#             state: before
+#             type: password
+#             control: sufficient
+#             module_path: pam_unix.so
+#             new_type: password
+#             new_control: required
+#             new_module_path: pam_pwhistory.so
+#         with_items:
+#             - "system-auth"
+#             - "password-auth"
 
-      # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
-      - name: "MEDIUM | RHEL-08-020220 | AUDIT | 8 passwords must be prohibited from reuse for a minimum of five generations. | Check for existing password history reuse settings"
-        command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/{{ item }}"
-        check_mode: no
-        changed_when: no
-        failed_when: rhel_08_020220_pw_hist_settings.rc > 1
-        register: rhel_08_020220_pw_hist_settings
-        with_items:
-            - "system-auth"
-            - "password-auth"
+#       # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
+#       - name: "MEDIUM | RHEL-08-020220 | AUDIT | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Check for existing password history reuse settings"
+#         command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/{{ item }}"
+#         check_mode: no
+#         changed_when: no
+#         failed_when: rhel_08_020220_pw_hist_settings.rc > 1
+#         register: rhel_08_020220_pw_hist_settings
+#         with_items:
+#             - "system-auth"
+#             - "password-auth"
 
-      # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
-      - name: "MEDIUM | RHEL-08-020220 | PATCH | 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
-        pamd:
-            name: "{{ item.item }}"
-            state: updated
-            type: password
-            control: required
-            module_path: pam_pwhistory.so
-            module_arguments:
-                - use_authtok
-                - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
-                - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
-        with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
-        when: item.rc == 1
-  when:
-      - rhel_08_020220
-  tags:
-      - RHEL-08-020220
-      - pamd
+#       # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
+#       - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
+#         pamd:
+#             name: "{{ item.item }}"
+#             state: updated
+#             type: password
+#             control: required
+#             module_path: pam_pwhistory.so
+#             module_arguments:
+#                 - use_authtok
+#                 - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
+#                 - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
+#         with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
+#         when: item.rc == 1
+#   when:
+#       - rhel_08_020220
+#   tags:
+#       - RHEL-08-020220
+#       - pamd
 
-- name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*minlen'
-      line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
-  when:
-      - rhel_08_020230
-  tags:
-      - RHEL-08-020230
-      - pwquality
+# - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*minlen'
+#       line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
+#   when:
+#       - rhel_08_020230
+#   tags:
+#       - RHEL-08-020230
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
-  block:
-      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
-        command: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020240_duplicate_uid_users
+# - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
+#         command: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020240_duplicate_uid_users
 
-      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
-        debug:
-            msg:
-                - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
-                - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
-  when:
-      - rhel_08_020240
-  tags:
-      - RHEL-08-020240
+#       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
+#         debug:
+#             msg:
+#                 - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+#                 - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
+#   when:
+#       - rhel_08_020240
+#   tags:
+#       - RHEL-08-020240
 
-- name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
-  block:
-      # - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find sssd.conf file for path"
-      #   find:
-      #       paths: /
-      #       recurse: yes
-      #       patterns: sssd.conf
-      #   register: rhel_08_020250_sssd_conf
+# - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
+#   block:
+#       # - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find sssd.conf file for path"
+#       #   find:
+#       #       paths: /
+#       #       recurse: yes
+#       #       patterns: sssd.conf
+#       #   register: rhel_08_020250_sssd_conf
 
-      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
-        shell: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020250_sc_auth_sss
+#       - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
+#         shell: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020250_sc_auth_sss
 
-      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
-        shell: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020250_system_auth_sss
+#       - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
+#         shell: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020250_system_auth_sss
 
-      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
-        lineinfile:
-            path: "{{ rhel8stig_sssd_conf.stdout }}"
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-            insertafter: "{{ item.insertafter }}"
-        notify: restart sssd
-        with_items:
-            - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
-            - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
+#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
+#         lineinfile:
+#             path: "{{ rhel8stig_sssd_conf.stdout }}"
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#             insertafter: "{{ item.insertafter }}"
+#         notify: restart sssd
+#         with_items:
+#             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+#             - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
 
-      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
-        lineinfile:
-            path: /etc/pam.d/smartcard-auth
-            line: auth       sufficient pam_sss.so try_cert_auth
-        notify: restart sssd
-        when: rhel_08_020250_sc_auth_sss.stdout == ""
+#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
+#         lineinfile:
+#             path: /etc/pam.d/smartcard-auth
+#             line: auth       sufficient pam_sss.so try_cert_auth
+#         notify: restart sssd
+#         when: rhel_08_020250_sc_auth_sss.stdout == ""
 
-      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
-        pamd:
-            name: /etc/pam.d/smartcard-auth
-            state: updated
-            type: auth
-            control: sufficient
-            module_path: pam_sss.so
-            module_arguments: 'try_cert_auth'
-        notify: restart sssd
-        when: rhel_08_020250_sc_auth_sss.stdout != ""
+#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
+#         pamd:
+#             name: /etc/pam.d/smartcard-auth
+#             state: updated
+#             type: auth
+#             control: sufficient
+#             module_path: pam_sss.so
+#             module_arguments: 'try_cert_auth'
+#         notify: restart sssd
+#         when: rhel_08_020250_sc_auth_sss.stdout != ""
 
-      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
-        pamd:
-            name: /etc/pam.d/system-auth
-            state: after
-            type: auth
-            control: required
-            module_path: pam_env.so
-            new_type: auth
-            new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
-            new_module_path: pam_sss.so
-            module_arguments: try_cert_auth
-        notify: restart sssd
-        when: rhel_08_020250_system_auth_sss.stdout == ""
+#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
+#         pamd:
+#             name: /etc/pam.d/system-auth
+#             state: after
+#             type: auth
+#             control: required
+#             module_path: pam_env.so
+#             new_type: auth
+#             new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+#             new_module_path: pam_sss.so
+#             module_arguments: try_cert_auth
+#         notify: restart sssd
+#         when: rhel_08_020250_system_auth_sss.stdout == ""
 
-      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
-        pamd:
-            name: /etc/pam.d/system-auth
-            state: updated
-            type: auth
-            control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
-            module_path: pam_env.so
-            module_arguments: try_cert_auth
-        notify: restart sssd
-        when: rhel_08_020250_system_auth_sss.stdout != ""
-  when:
-      - rhel_08_020250
-  tags:
-      - RHEL-08-020250
-      - pamd
+#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
+#         pamd:
+#             name: /etc/pam.d/system-auth
+#             state: updated
+#             type: auth
+#             control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+#             module_path: pam_env.so
+#             module_arguments: try_cert_auth
+#         notify: restart sssd
+#         when: rhel_08_020250_system_auth_sss.stdout != ""
+#   when:
+#       - rhel_08_020250
+#   tags:
+#       - RHEL-08-020250
+#       - pamd
 
-- name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
-  command: useradd -D -f 35
-  when:
-      - rhel_08_020260
-  tags:
-      - RHEL-08-020260
-      - useradd
+# - name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
+#   command: useradd -D -f 35
+#   when:
+#       - rhel_08_020260
+#   tags:
+#       - RHEL-08-020260
+#       - useradd
 
-- name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-  block:
-      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-        command: "awk -F: '{if ($3 <= {{ rhel8stig_interactive_uid_start }}) { print $1 }}' /etc/passwd"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020270_system_users
+# - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+#         command: "awk -F: '{if ($3 <= {{ rhel8stig_interactive_uid_start }}) { print $1 }}' /etc/passwd"
+#         changed_when: false
+#         failed_when: false
+#         register: rhel_08_020270_system_users
 
-      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-        debug:
-            msg:
-                - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
-                - "{{ rhel_08_020270_system_users.stdout_lines }}"
-  when:
-      - rhel_08_020270
-  tags:
-      - RHEL-08-020270
+#       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+#         debug:
+#             msg:
+#                 - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+#                 - "{{ rhel_08_020270_system_users.stdout_lines }}"
+#   when:
+#       - rhel_08_020270
+#   tags:
+#       - RHEL-08-020270
 
-- name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*ocredit'
-      line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
-  when:
-      - rhel_08_020280
-  tags:
-      - RHEL-08-020280
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*ocredit'
+#       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
+#   when:
+#       - rhel_08_020280
+#   tags:
+#       - RHEL-08-020280
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
-  lineinfile:
-      path: "{{ rhel8stig_sssd_conf.stdout }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: "{{ item.insertafter }}"
-  with_items:
-      - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
-      - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
-  when:
-      - rhel_08_020290
-  tags:
-      - RHEL-08-020290
-      - sssd
+# - name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
+#   lineinfile:
+#       path: "{{ rhel8stig_sssd_conf.stdout }}"
+#       regexp: "{{ item.regexp }}"
+#       line: "{{ item.line }}"
+#       insertafter: "{{ item.insertafter }}"
+#   with_items:
+#       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+#       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
+#   when:
+#       - rhel_08_020290
+#   tags:
+#       - RHEL-08-020290
+#       - sssd
 
-- name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
-  lineinfile:
-      path: /etc/security/pwquality.conf
-      create: yes
-      regexp: '^#?\s*dictcheck'
-      line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}" 
-  when:
-      - rhel_08_020300
-  tags:
-      - RHEL-08-020300
-      - pwquality
+# - name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
+#   lineinfile:
+#       path: /etc/security/pwquality.conf
+#       create: yes
+#       regexp: '^#?\s*dictcheck'
+#       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}" 
+#   when:
+#       - rhel_08_020300
+#   tags:
+#       - RHEL-08-020300
+#       - pwquality
 
-- name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
-  lineinfile:
-      dest: /etc/login.defs
-      regexp: ^#?FAIL_DELAY
-      line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
-  when:
-      - rhel_08_020310
-  tags:
-      - RHEL-08-020310
-      - login
+# - name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
+#   lineinfile:
+#       dest: /etc/login.defs
+#       regexp: ^#?FAIL_DELAY
+#       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
+#   when:
+#       - rhel_08_020310
+#   tags:
+#       - RHEL-08-020310
+#       - login
 
-- name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
-  block:
-      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
-        command: "grep '^{{ item }}:' /etc/passwd"
-        check_mode: no
-        failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
-        changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
-        register: rhel_08_020320_unnecessary_accounts_found
-        with_items: "{{ rhel8stig_unnecessary_accounts }}"
+# - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
+#   block:
+#       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
+#         command: "grep '^{{ item }}:' /etc/passwd"
+#         check_mode: no
+#         failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
+#         changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
+#         register: rhel_08_020320_unnecessary_accounts_found
+#         with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
-      - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
-        user:
-            name: "{{ item }}"
-            state: absent
-            remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
-        register: rhel_08_020320_accounts_removed
-        with_items: "{{ rhel8stig_unnecessary_accounts }}"
+#       - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
+#         user:
+#             name: "{{ item }}"
+#             state: absent
+#             remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
+#         register: rhel_08_020320_accounts_removed
+#         with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
-      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
-        include_tasks: parse_etc_passwd.yml
-        vars:
-            rhel8stig_passwd_tasks: "RHEL-08-020320"
-        when: rhel_08_020320_accounts_removed is changed
-  when:
-      - rhel_08_020320
-  tags:
-      - RHEL-08-020320
+#       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
+#         include_tasks: parse_etc_passwd.yml
+#         vars:
+#             rhel8stig_passwd_tasks: "RHEL-08-020320"
+#         when: rhel_08_020320_accounts_removed is changed
+#   when:
+#       - rhel_08_020320
+#   tags:
+#       - RHEL-08-020320
 
-- name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
-  lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "(?i)^#?PrintLastLog"
-      line: PrintLastLog yes
-      validate: /usr/sbin/sshd -t -f %s
-  notify: restart sshd
-  when:
-      - rhel_08_020350
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-020350
-      - ssh
+# - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
+#   lineinfile:
+#       dest: /etc/ssh/sshd_config
+#       regexp: "(?i)^#?PrintLastLog"
+#       line: PrintLastLog yes
+#       validate: /usr/sbin/sshd -t -f %s
+#   notify: restart sshd
+#   when:
+#       - rhel_08_020350
+#       - rhel8stig_ssh_required
+#   tags:
+#       - RHEL-08-020350
+#       - ssh
 
 - name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
   lineinfile:
