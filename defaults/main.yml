@@ -155,20 +155,24 @@ rhel_08_010660: true
 rhel_08_010670: true
 rhel_08_010671: true
 rhel_08_010672: true
+rhel_08_010673: true
+rhel_08_010674: true
+rhel_08_010675: true
 # below set to false when running, don't change back after testing
 rhel_08_010680: false
-rhel_08_010690: false
-rhel_08_010700: false
-rhel_08_010710: false
-rhel_08_010720: false
-rhel_08_010730: false
-rhel_08_010740: false
-rhel_08_010750: false
-rhel_01_010760: false
-rhel_08_010770: false
-rhel_08_010780: false
-rhel_08_010790: false
-rhel_08_010800: false
+# check to make sure I'm doing this one right
+rhel_08_010690: true
+rhel_08_010700: true
+rhel_08_010710: true
+rhel_08_010720: true
+rhel_08_010730: true
+rhel_08_010740: true
+rhel_08_010750: true
+rhel_01_010760: true
+rhel_08_010770: true
+rhel_08_010780: true
+rhel_08_010790: true
+rhel_08_010800: true
 rhel_08_010810: false
 rhel_08_020000: false
 rhel_08_020010: false
