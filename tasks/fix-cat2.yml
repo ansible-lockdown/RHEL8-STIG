@@ -4235,14 +4235,18 @@
       - dnf
       - sendmail
 
-- name: "MEDIUM | RHEL-08-040003 | PATCH | RHEL 8 must not have the gssproxy package installed."
+- name: |
+    "MEDIUM | RHEL-08-040003 | PATCH | RHEL 8 must not have the gssproxy package installed."
+    "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
   dnf:
       name: gssproxy
       state: absent
   when:
-      - rhel_08_040003
+      - rhel_08_040003 or
+        rhel_08_040370
   tags:
       - RHEL-08-040003
+      - RHEL-08-040370
       - dnf
       - gssproxy
 
@@ -4701,6 +4705,508 @@
   tags:
       - RHEL-08-040135
       - fapolicyd
+
+- name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
+  block:
+      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
+        dnf:
+            name: usbguard
+            state: present
+
+      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
+        service:
+            name: usbguard
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040140
+  tags:
+      - RHEL-08-040140
+      - usbguard
+
+- name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
+  block:
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
+        dnf:
+            name: nftables
+            state: present
+
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
+        service:
+            name: nftables
+            state: started
+            enabled: yes
+
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
+        lineinfile:
+            path: /etc/firewalld/firewalld.conf
+            regexp: '^FirewallBackend='
+            line: 'FirewallBackend=nftables'
+  when:
+      - rhel_08_040150
+  tags:
+      - RHEL-08-040150
+      - firewall
+      - nftables
+
+- name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
+  block:
+      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
+        dnf:
+            name: openssh-server
+            state: present
+
+      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
+        service:
+            name: sshd
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040160
+  tags:
+      - rhel_08_040160
+      - ssh
+
+- name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^RekeyLimit '
+      line: "RekeyLimit 1G 1h"
+  notify: restart sshd
+  when:
+      - rhel_08_040161
+  tags:
+      - RHEL-08-040161
+      - sshd
+
+- name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
+  lineinfile:
+      path: /etc/ssh/ssh_config
+      regexp: '^RekeyLimit '
+      line: "RekeyLimit 1G 1h"
+  notify: restart sshd
+  when:
+      - rhel_08_040162
+  tags:
+      - RHEL-08-040162
+      - sshd
+
+- name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
+  systemd:
+      name: debug-shell.service
+      state: stopped
+      enabled: no
+      masked: yes
+      daemon_reload: yes
+  when:
+      - rhel_08_040180
+  tags:
+      - RHEL-08-040180
+      - debug-shell
+
+- name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+  block:
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.default.accept_redirects
+            - net.ipv6.conf.default.accept_redirects
+
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
+            - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
+  when:
+      - rhel_08_040210
+  tags:
+      - RHEL-08-040210
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
+  block:
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
+        sysctl:
+            name: net.ipv4.conf.all.send_redirects
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.all.send_redirects'
+            line: 'net.ipv4.conf.all.send_redirects=0'
+  when:
+      - rhel_08_040220
+  tags:
+      - RHEL-08-040220
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
+  block:
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
+        sysctl:
+            name: net.ipv4.icmp_echo_ignore_broadcasts
+            state: present
+            value: '1'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
+        lineinfile:
+            name: /etc/sysctl.conf
+            regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
+            line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
+  when:
+      - rhel_08_040230
+  tags:
+      - RHEL-08-040230
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
+  block:
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.all.accept_source_route
+            - net.ipv6.conf.all.accept_source_route
+
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
+            - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
+  when:
+      - rhel_08_040240
+  tags:
+      - RHEL-08-040240
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.default.accept_source_route
+            - net.ipv6.conf.default.accept_source_route
+
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
+            - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
+  when:
+      - rhel_08_040250
+  tags:
+      - RHEL-08-040250
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
+  block:
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.ip_forward
+            - net.ipv6.conf.all.forwarding
+
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
+            - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
+
+  when:
+      - rhel_08_040260
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040260
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
+  block:
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra in sysctl"
+        sysctl:
+            name: net.ipv6.conf.all.accept_ra
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload}}"
+
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.all.accept_ra'
+            line: 'net.ipv6.conf.all.accept_ra=0'
+  when:
+      - rhel_08_040261
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040261
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra in sysctl"
+        sysctl:
+            name: net.ipv6.conf.default.accept_ra
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra to value 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.default.accept_ra'
+            line: 'net.ipv6.conf.default.accept_ra=0'
+  when:
+      - rhel_08_040262
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040262
+      - icmp
+
+- name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
+  block:
+      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
+        sysctl:
+            name: net.ipv4.conf.default.send_redirects
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+
+      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.default.send_redirects'
+            line: 'net.ipv4.conf.default.send_redirects=0'
+  when:
+      - rhel_08_040270
+  tags:
+      - RHEL-08-040270
+      - icmp
+
+- name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
+  block:
+      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.all.accept_redirects
+            - net.ipv6.conf.all.accept_redirects
+
+      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
+            - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
+  when:
+      - rhel_08_040280
+  tags:
+      - RHEL-08-040280
+      - icmp
+
+- name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.unprivileged_bpf_disabled'
+      line: 'kernel.unprivileged_bpf_disabled = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040281
+  tags:
+      - RHEL-08-040281
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.yama.ptrace_scope'
+      line: 'kernel.yama.ptrace_scope = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040282
+  tags:
+      - RHEL-08-040282
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.kptr_restrict'
+      line: 'kernel.kptr_restrict = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040283
+  tags:
+      - RHEL-08-040283
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^user.max_user_namespaces'
+      line: 'user.max_user_namespaces = 0'
+  notify: sysctl system
+  when:
+      - rhel_08_040284
+  tags:
+      - RHEL-08-040284
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^net.ipv4.conf.all.rp_filter'
+      line: 'net.ipv4.conf.all.rp_filter = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040285
+  tags:
+      - RHEL-08-040285
+      - sysctl
+
+- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
+  block:
+      - name: "MEDIUM | RHEL-08-040290 | AUDIT | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
+        command: rpm -q postfix
+        failed_when: no
+        check_mode: no
+        changed_when: no
+        register: rhel_08_040290_rpm_audit
+
+      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+        command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
+        check_mode: no
+        when: '"postfix-" in rhel_08_040290_rpm_audit.stdout'
+  when:
+      - rhel_08_040290
+  tags:
+      - RHEL-08-040290
+
+- name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
+  package:
+      name:
+          - '@x11'
+          - xorg-11-server-common
+      state: absent
+  when:
+      - rhel_08_040320
+      - not rhel8stig_gui
+
+- name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
+  block:
+      - name: "MEDIUM | RHEL-040330 | AUDIT | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
+        shell: "ip link | grep -i promisc | cut -d ':' -f 2"
+        check_mode: no
+        failed_when: no
+        changed_when: rhel_08_040670_promisc_check.stdout != ''
+        ignore_errors: yes
+        register: rhel_08_040670_promisc_check
+
+      - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
+        shell: "ip link set dev {{ item }} promisc off"
+        with_items: "{{ rhel_08_040670_promisc_check.stdout_lines }}"
+  when:
+      - rhel_08_040330
+      - not rhel8stig_net_promisc_mode_required
+  tags:
+      - RHEL-08-040330
+
+- name: "HIGH | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^.*X11Forwarding'
+      line: 'X11Forwarding yes'
+      create: yes
+  notify: restart sshd
+  when:
+      - rhel_08_040340
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-040340
+      - ssh
+
+- name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '^X11UseLocalhost'
+      line: 'X11UseLocalhost yes'
+  when:
+      - rhel_08_040341
+  tags:
+      - RHEL-08-040341
+      - ssh
+
+- name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
+  lineinfile:
+      path: /etc/xinetd.d/tftp
+      regexp: "(?i)^.*server_args.*="
+      line: "\tserver_args\t\t= -s /var/lib/tftpboot"
+      insertafter: "\tserver\t\t\t="
+      state: present
+  register: result
+  failed_when:
+      - result is failed
+      - result.rc != 257
+  when:
+      - rhel_08_040350
+      - rhel8stig_tftp_required
+  tags:
+      - RHEL-08-040350
+      - tftp
+
+- name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: iprutils
+      state: absent
+  when:
+      - rhel_08_040380
+  tags:
+      - RHEL-08-040380
+      - iprutils
+
+- name: "MEDIUM | RHEL-08-040390 | PATCH | The tuned package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: tuned
+      state: absent
+  when:
+      - rhel_08_040390
+  tags:
+      - RHEL-08-040390
+      - tuned
 
 # ===========below here is old===========
 # - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
@@ -7944,327 +8450,327 @@
 #       - RHEL-08-040130
 #       - fapolicyd
 
-- name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
-  block:
-      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
-        dnf:
-            name: usbguard
-            state: present
+# - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
+#         dnf:
+#             name: usbguard
+#             state: present
 
-      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
-        service:
-            name: usbguard
-            state: started
-            enabled: yes
-  when:
-      - rhel_08_040140
-  tags:
-      - RHEL-08-040140
-      - usbguard
+#       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
+#         service:
+#             name: usbguard
+#             state: started
+#             enabled: yes
+#   when:
+#       - rhel_08_040140
+#   tags:
+#       - RHEL-08-040140
+#       - usbguard
 
-- name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
-  block:
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
-        dnf:
-            name: nftables
-            state: present
+# - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
+#         dnf:
+#             name: nftables
+#             state: present
 
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
-        service:
-            name: nftables
-            state: started
-            enabled: yes
+#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
+#         service:
+#             name: nftables
+#             state: started
+#             enabled: yes
 
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
-        lineinfile:
-            path: /etc/firewalld/firewalld.conf
-            regexp: '^FirewallBackend='
-            line: 'FirewallBackend=nftables'
-  when:
-      - rhel_08_040150
-  tags:
-      - RHEL-08-040150
-      - firewall
-      - nftables
+#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
+#         lineinfile:
+#             path: /etc/firewalld/firewalld.conf
+#             regexp: '^FirewallBackend='
+#             line: 'FirewallBackend=nftables'
+#   when:
+#       - rhel_08_040150
+#   tags:
+#       - RHEL-08-040150
+#       - firewall
+#       - nftables
 
-- name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
-  block:
-      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
-        dnf:
-            name: openssh-server
-            state: present
+# - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
+#         dnf:
+#             name: openssh-server
+#             state: present
 
-      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
-        service:
-            name: sshd
-            state: started
-            enabled: yes
-  when:
-      - rhel_08_040160
-  tags:
-      - rhel_08_040160
-      - ssh
+#       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
+#         service:
+#             name: sshd
+#             state: started
+#             enabled: yes
+#   when:
+#       - rhel_08_040160
+#   tags:
+#       - rhel_08_040160
+#       - ssh
 
-- name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  block:
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
-        sysctl:
-            name: "{{ item }}"
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
-        with_items:
-            - net.ipv4.conf.default.accept_redirects
-            - net.ipv6.conf.default.accept_redirects
+# - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
+#         sysctl:
+#             name: "{{ item }}"
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
+#         with_items:
+#             - net.ipv4.conf.default.accept_redirects
+#             - net.ipv6.conf.default.accept_redirects
 
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
-            - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
-  when:
-      - rhel_08_040210
-  tags:
-      - RHEL-08-040210
-      - icmp
+#       - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#         with_items:
+#             - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
+#             - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
+#   when:
+#       - rhel_08_040210
+#   tags:
+#       - RHEL-08-040210
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
-  block:
-      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
-        sysctl:
-            name: net.ipv4.conf.all.send_redirects
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
+# - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
+#         sysctl:
+#             name: net.ipv4.conf.all.send_redirects
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
 
-      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.all.send_redirects'
-            line: 'net.ipv4.conf.all.send_redirects=0'
-  when:
-      - rhel_08_040220
-  tags:
-      - RHEL-08-040220
-      - icmp
+#       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: '^net.ipv4.conf.all.send_redirects'
+#             line: 'net.ipv4.conf.all.send_redirects=0'
+#   when:
+#       - rhel_08_040220
+#   tags:
+#       - RHEL-08-040220
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
-  block:
-      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
-        sysctl:
-            name: net.ipv4.icmp_echo_ignore_broadcasts
-            state: present
-            value: '1'
-            reload: "{{ rhel8stig_sysctl_reload }}"
+# - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
+#         sysctl:
+#             name: net.ipv4.icmp_echo_ignore_broadcasts
+#             state: present
+#             value: '1'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
 
-      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
-        lineinfile:
-            name: /etc/sysctl.conf
-            regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
-            line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
-  when:
-      - rhel_08_040230
-  tags:
-      - RHEL-08-040230
-      - icmp
+#       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
+#         lineinfile:
+#             name: /etc/sysctl.conf
+#             regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
+#             line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
+#   when:
+#       - rhel_08_040230
+#   tags:
+#       - RHEL-08-040230
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
-  block:
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
-        sysctl:
-            name: "{{ item }}"
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
-        with_items:
-            - net.ipv4.conf.all.accept_source_route
-            - net.ipv6.conf.all.accept_source_route
+# - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
+#         sysctl:
+#             name: "{{ item }}"
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
+#         with_items:
+#             - net.ipv4.conf.all.accept_source_route
+#             - net.ipv6.conf.all.accept_source_route
 
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
-            - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
-  when:
-      - rhel_08_040240
-  tags:
-      - RHEL-08-040240
-      - icmp
+#       - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#         with_items:
+#             - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
+#             - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
+#   when:
+#       - rhel_08_040240
+#   tags:
+#       - RHEL-08-040240
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
-  block:
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
-        sysctl:
-            name: "{{ item }}"
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
-        with_items:
-            - net.ipv4.conf.default.accept_source_route
-            - net.ipv6.conf.default.accept_source_route
+# - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
+#         sysctl:
+#             name: "{{ item }}"
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
+#         with_items:
+#             - net.ipv4.conf.default.accept_source_route
+#             - net.ipv6.conf.default.accept_source_route
 
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
-            - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
-  when:
-      - rhel_08_040250
-  tags:
-      - RHEL-08-040250
-      - icmp
+#       - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#         with_items:
+#             - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
+#             - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
+#   when:
+#       - rhel_08_040250
+#   tags:
+#       - RHEL-08-040250
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
-  block:
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
-        sysctl:
-            name: "{{ item }}"
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
-        with_items:
-            - net.ipv4.ip_forward
-            - net.ipv6.conf.all.forwarding
+# - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
+#         sysctl:
+#             name: "{{ item }}"
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
+#         with_items:
+#             - net.ipv4.ip_forward
+#             - net.ipv6.conf.all.forwarding
 
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
-            - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
+#       - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#         with_items:
+#             - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
+#             - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
 
-  when:
-      - rhel_08_040260
-      - not rhel8stig_system_is_router
-  tags:
-      - RHEL-08-040260
-      - icmp
+#   when:
+#       - rhel_08_040260
+#       - not rhel8stig_system_is_router
+#   tags:
+#       - RHEL-08-040260
+#       - icmp
 
-- name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
-  block:
-      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
-        sysctl:
-            name: net.ipv4.conf.default.send_redirects
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
+# - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
+#   block:
+#       - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
+#         sysctl:
+#             name: net.ipv4.conf.default.send_redirects
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
 
-      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.default.send_redirects'
-            line: 'net.ipv4.conf.default.send_redirects=0'
-  when:
-      - rhel_08_040270
-  tags:
-      - RHEL-08-040270
-      - icmp
+#       - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: '^net.ipv4.conf.default.send_redirects'
+#             line: 'net.ipv4.conf.default.send_redirects=0'
+#   when:
+#       - rhel_08_040270
+#   tags:
+#       - RHEL-08-040270
+#       - icmp
 
-- name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
-  block:
-      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
-        sysctl:
-            name: "{{ item }}"
-            state: present
-            value: '0'
-            reload: "{{ rhel8stig_sysctl_reload }}"
-        with_items:
-            - net.ipv4.conf.all.accept_redirects
-            - net.ipv6.conf.all.accept_redirects
+# - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
+#   block:
+#       - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
+#         sysctl:
+#             name: "{{ item }}"
+#             state: present
+#             value: '0'
+#             reload: "{{ rhel8stig_sysctl_reload }}"
+#         with_items:
+#             - net.ipv4.conf.all.accept_redirects
+#             - net.ipv6.conf.all.accept_redirects
 
-      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
-            - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
-  when:
-      - rhel_08_040280
-  tags:
-      - RHEL-08-040280
-      - icmp
+#       - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
+#         lineinfile:
+#             path: /etc/sysctl.conf
+#             regexp: "{{ item.regexp }}"
+#             line: "{{ item.line }}"
+#         with_items:
+#             - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
+#             - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
+#   when:
+#       - rhel_08_040280
+#   tags:
+#       - RHEL-08-040280
+#       - icmp
 
-- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
-  block:
-      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
-        command: rpm -q postfix
-        failed_when: no
-        check_mode: no
-        changed_when: no
-        register: rhel_08_040290_rpm_audit
+# - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
+#   block:
+#       - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
+#         command: rpm -q postfix
+#         failed_when: no
+#         check_mode: no
+#         changed_when: no
+#         register: rhel_08_040290_rpm_audit
 
-      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
-        command: "/usr/sbin/postconf -n smtpd_client_restrictions"
-        check_mode: no
-        changed_when: no
-        register: rhel_08_040290_postconf_audit
-        when: rhel_08_040290_rpm_audit.rc == 0
+#       - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+#         command: "/usr/sbin/postconf -n smtpd_client_restrictions"
+#         check_mode: no
+#         changed_when: no
+#         register: rhel_08_040290_postconf_audit
+#         when: rhel_08_040290_rpm_audit.rc == 0
 
-      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set reject"
-        command: "/usr/sbin/postconf -e 'smtpd_client_restrictions=permit_mynetworks, reject'"
-        when:
-            - rhel_08_040290_rpm_audit.rc == 0
-            - rhel_08_040290_postconf_audit.stdout != 'smtpd_client_restrictions = permit_mynetworks, reject'
-  when:
-      - rhel_08_040290
-  tags:
-      - RHEL-08-040290
+#       - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set reject"
+#         command: "/usr/sbin/postconf -e 'smtpd_client_restrictions=permit_mynetworks, reject'"
+#         when:
+#             - rhel_08_040290_rpm_audit.rc == 0
+#             - rhel_08_040290_postconf_audit.stdout != 'smtpd_client_restrictions = permit_mynetworks, reject'
+#   when:
+#       - rhel_08_040290
+#   tags:
+#       - RHEL-08-040290
 
-- name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
-  dnf:
-      name:
-          -@x11
-          - xorg-11-server-common
-      state: absent
-  when:
-      - rhel_08_040320
-      - not rhel8stig_gui
+# - name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
+#   dnf:
+#       name:
+#           -@x11
+#           - xorg-11-server-common
+#       state: absent
+#   when:
+#       - rhel_08_040320
+#       - not rhel8stig_gui
 
-- name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
-  block:
-      - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
-        shell: "ip link | grep -i promisc | cut -d ':' -f 2"
-        check_mode: no
-        failed_when: no
-        changed_when: rhel_08_040670_promisc_check.stdout != ''
-        ignore_errors: yes
-        register: rhel_08_040670_promisc_check
+# - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
+#   block:
+#       - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
+#         shell: "ip link | grep -i promisc | cut -d ':' -f 2"
+#         check_mode: no
+#         failed_when: no
+#         changed_when: rhel_08_040670_promisc_check.stdout != ''
+#         ignore_errors: yes
+#         register: rhel_08_040670_promisc_check
 
-      - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
-        shell: "ip link set dev {{ item }} promisc off"
-        with_items: "{{ rhel_08_040670_promisc_check.stdout_lines }}"
-  when:
-      - rhel_08_040330
-      - not rhel8stig_net_promisc_mode_required
-  tags:
-      - RHEL-08-040330
+#       - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
+#         shell: "ip link set dev {{ item }} promisc off"
+#         with_items: "{{ rhel_08_040670_promisc_check.stdout_lines }}"
+#   when:
+#       - rhel_08_040330
+#       - not rhel8stig_net_promisc_mode_required
+#   tags:
+#       - RHEL-08-040330
 
-- name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
-  lineinfile:
-      path: /etc/xinetd.d/tftp
-      regexp: "(?i)^.*server_args.*="
-      line: "\tserver_args\t\t= -s /var/lib/tftpboot"
-      insertafter: "\tserver\t\t\t="
-      state: present
-  register: result
-  failed_when:
-      - result is failed
-      - result.rc != 257
-  when:
-      - rhel_08_040350
-      - rhel8stig_tftp_required
-  tags:
-      - RHEL-08-040350
+# - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
+#   lineinfile:
+#       path: /etc/xinetd.d/tftp
+#       regexp: "(?i)^.*server_args.*="
+#       line: "\tserver_args\t\t= -s /var/lib/tftpboot"
+#       insertafter: "\tserver\t\t\t="
+#       state: present
+#   register: result
+#   failed_when:
+#       - result is failed
+#       - result.rc != 257
+#   when:
+#       - rhel_08_040350
+#       - rhel8stig_tftp_required
+#   tags:
+#       - RHEL-08-040350
