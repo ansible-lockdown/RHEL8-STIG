@@ -49,18 +49,13 @@ system_is_ec2: false
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
-# rhel_08_010030: true
 rhel_08_010140: true
 rhel_08_010150: true
-# rhel_08_010170: true - Moved to cat2
 rhel_08_010370: true
 rhel_08_010371: true
 rhel_08_010460: true
-# rhel_08_010450: true
-# rhel_08_010460: true
 rhel_08_010470: true
 rhel_08_010820: true
-# rhel_08_010830: true
 rhel_08_020330: true
 rhel_08_040000: true
 rhel_08_040010: true
@@ -68,10 +63,8 @@ rhel_08_040060: true
 rhel_08_040170: true
 rhel_08_040171: true
 rhel_08_040172: true
-# rhel_08_040180: true
 rhel_08_040190: true
 rhel_08_040200: true
-# rhel_08_040340: true
 rhel_08_040360: true
 
 # CAT 2 rules
@@ -81,7 +74,6 @@ rhel_08_010040: true
 rhel_08_010050: true
 rhel_08_010060: true
 rhel_08_010070: true
-# rhel_08_010080: true
 rhel_08_010090: true
 rhel_08_010100: true
 rhel_08_010110: true
@@ -101,8 +93,6 @@ rhel_08_010230: true
 rhel_08_010240: true
 rhel_08_010250: true
 rhel_08_010260: true
-# rhel_08_010270: true
-# rhel_08_010280: true
 rhel_08_010290: true
 rhel_08_010291: true
 rhel_08_010293: true
@@ -119,7 +109,6 @@ rhel_08_010372: true
 rhel_08_010373: true
 rhel_08_010374: true
 # !!!!!!!!!!!!!!!--------------!!!!!!!!!!!!!!!!!!CHANGE TO TRUE BEFORE FINALIZATION. SET TO FALSE TO PREVENT THE VAGRANT USER FROM AUTHENTICATING WHEN USING SUDO (380/381)
-# below set to false when running, don't change back to true after testing
 rhel_08_010380: false
 rhel_08_010381: false
 rhel_08_010390: true
@@ -158,9 +147,7 @@ rhel_08_010672: true
 rhel_08_010673: true
 rhel_08_010674: true
 rhel_08_010675: true
-# below set to false when running, don't change back after testing
-rhel_08_010680: false
-# check to make sure I'm doing this one right
+rhel_08_010680: true
 rhel_08_010690: true
 rhel_08_010700: true
 rhel_08_010710: true
@@ -173,7 +160,6 @@ rhel_08_010770: true
 rhel_08_010780: true
 rhel_08_010790: true
 rhel_08_010800: true
-# rhel_08_010810: false
 rhel_08_010830: true
 rhel_08_020000: true
 rhel_08_020010: true
@@ -311,7 +297,6 @@ rhel_08_030610: true
 rhel_08_030620: true
 rhel_08_030630: true
 rhel_08_030640: true
-# !!!!!!!!!---------- handlers are overwriting the config change for this item
 rhel_08_030650: true
 rhel_08_030660: true
 rhel_08_030670: true
@@ -327,8 +312,6 @@ rhel_08_040002: true
 rhel_08_040003: true
 rhel_08_040020: true
 rhel_08_040030: true
-# rhel_08_040040: false
-# rhel_08_040050: false
 rhel_08_040070: true
 rhel_08_040080: true
 rhel_08_040090: true
@@ -389,11 +372,9 @@ rhel_08_010375: true
 rhel_08_010376: true
 rhel_08_010440: true
 rhel_08_010471: true
-# rhel_08_010530: true
 rhel_08_010540: true
 rhel_08_010541: true
 rhel_08_010542: true
-# rhel_08_020020: true
 rhel_08_020024: true
 rhel_08_020042: true
 rhel_08_020340: true
@@ -664,8 +645,8 @@ rhel8stig_nfs_mounts_query: "[?starts_with(fstype, 'nfs')].mount"
 
 # RHEL-08-010680
 rhel8stig_dns_servers:
-    - 9.9.9.9
-    - 149.112.112.112
+    - 8.8.8.8
+    - 8.8.4.4
 
 rhel8stig_int_gid: 1000
 
