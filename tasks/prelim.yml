@@ -28,8 +28,8 @@
         rhel_08_020050 or
         rhel_08_020060 or
         rhel_08_020080 or
-        rhel_08_020090 or
-        rhel_08_040180
+        rhel_08_020090
+        # rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
   tags:
       - rhel_08_010050
       - rhel_08_020030
@@ -37,7 +37,7 @@
       - rhel_08_020060
       - rhel_08_020080
       - rhel_08_020090
-      - rhel_08_040180
+      # - rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
 
 - name: "PRELIM | Find all sudoers files."
   command: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
@@ -173,20 +173,14 @@
       - high
       - RHEL-08-010020
 
-- name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | RHEL-08-030670 | RHEL-08-030680 | RHEL-08-030690 | RHEL-08-030700 | RHEL-08-030710 | RHEL-08-030720 | Install audit remote plugin."
+- name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
   dnf:
       name: audispd-plugins
   when:
       - rhel_08_030620 or
         rhel_08_030630 or
         rhel_08_030640 or
-        rhel_08_030650 or
-        rhel_08_030670 or
-        rhel_08_030680 or
-        rhel_08_030690 or
-        rhel_08_030700 or
-        rhel_08_030710 or
-        rhel_08_030720
+        rhel_08_030650
   tags:
       - cat2
       - medium
@@ -195,12 +189,6 @@
       - RHEL-08-030630
       - RHEL-08-030640
       - RHEL-08-030650
-      - RHEL-08-030670
-      - RHEL-08-030680
-      - RHEL-08-030690
-      - RHEL-08-030700
-      - RHEL-08-030710
-      - RHEL-08-030720
 
 # - name: "PRELIM | RHEL-08-030330 | Determine audit log partition."
 #   block:
@@ -334,3 +322,23 @@
       - name: "PRELIM | Setting the fact"
         set_fact:
             rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
+      
+- name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
+  find:
+      paths: /etc/sysctl.d
+      patterns: '.*sysctl.conf'
+      use_regex: yes
+      file_type: any
+  register: rhel8stig_sysctlconf_filename
+  when:
+      - rhel_08_010372 or
+        rhel_08_010373 or
+        rhel_08_010374 or
+        rhel_08_010375 or
+        rhel_08_010376 or
+        rhel_08_040280 or
+        rhel_08_040281 or 
+        rhel_08_040282 or
+        rhel_08_040283 or
+        rhel_08_040284 or
+        rhel_08_040285

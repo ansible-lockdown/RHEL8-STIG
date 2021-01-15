@@ -125,25 +125,6 @@
   tags:
       - RHEL-08-010020
 
-- name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection."
-  block:
-      - name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Get partition layout"
-        command: lsblk
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010030_partition_layout
-
-      - name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Message out warning"
-        debug:
-            msg:
-                - 'WARNING!! Below is partition layout. Please run the "sudo more /etc/crypttab" command to confirm'
-                - "every persistent disk partition has an entry. If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
-                - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
-
-  when: rhel_08_010030
-  tags:
-      - RHEL-08-010030
-
 - name: |
         "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
         "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
@@ -193,37 +174,19 @@
       - grub
       - bootloader
 
-- name: |
-        "HIGH | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
-        "HIGH | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
-  selinux:
-      state: enforcing
-      policy: targeted
-  check_mode: "{{ ansible_check_mode or rhel8stig_system_is_chroot }}"
-  notify: reboot system
-  when:
-      - rhel_08_010170 or rhel_08_010450
-      - not rhel8stig_system_is_container
-      - rhel8stig_disruption_high
-  tags:
-      - RHEL-08-010170
-      - RHEL-08-010450
-      - selinux
-      - disruption_high
-
-- name: "HIGH | RHEL-08-010370 | PATCH | YUM must be configured to prevent the installation of patches, service packs, device drivers, or RHEL 8 system components that have not been digitally signed using a certificate that is recognized and approved by the organization."
+- name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
-      - name: "HIGH | RHEL-08-010370 | AUDIT | YUM must be configured to prevent the installation of patches, service packs, device drivers, or RHEL 8 system components that have not been digitally signed using a certificate that is recognized and approved by the organization. | Gather Repos"
+      - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
         find:
             paths: /etc/yum.repos.d
             pattern: '*.repo'
         register: rhel_08_010370_repos_files_list_full
 
-      - name: "HIGH | RHEL-08-010370 | AUDIT | YUM must be configured to prevent the installation of patches, service packs, device drivers, or RHEL 8 system components that have not been digitally signed using a certificate that is recognized and approved by the organization. | Flatten result"
+      - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Flatten result"
         set_fact:
             rhel_08_010370_repos_files_list: "{{ rhel_08_010370_repos_files_list_full.files | map(attribute='path') | flatten }}"
 
-      - name: "HIGH | RHEL-08-010370 | PATCH | YUM must be configured to prevent the installation of patches, service packs, device drivers, or RHEL 8 system components that have not been digitally signed using a certificate that is recognized and approved by the organization. | Set gpgcheck"
+      - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Set gpgcheck"
         lineinfile:
             path: "{{ item }}"
             regexp: '^gpgcheck'
@@ -234,6 +197,18 @@
       - rhel_08_010370
   tags:
       - RHEL-08-010370
+      - yum
+
+- name: "HIGH | RHEL-08-010371 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+  lineinfile:
+      path: /etc/dnf/dnf.conf
+      regexp: '^localpkg_gpgcheck='
+      line: localpkg_gpgcheck=True
+  when:
+      - rhel_08_010371
+  tags:
+      - RHEL-08-010371
+      - dnf
 
 - name: "HIGH | RHEL-08-010460 | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
   file:
@@ -243,6 +218,7 @@
       - rhel_08_010460
   tags:
       - RHEL-08-010460
+      - shosts
 
 - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system."
   block:
@@ -263,6 +239,7 @@
       - rhel_08_010470
   tags:
       - RHEL-08-010470
+      - shosts
 
 - name: "HIGH | RHEL-08-010820 | PATCH | Unattended or automatic logon via the RHEL 8 graphical user interface must not be allowed."
   lineinfile:
@@ -275,19 +252,6 @@
       - rhel_08_010820
   tags:
       - RHEL-08-010820
-
-- name: "HIGH | RHEL-08-010830 | PATCH |Unattended or automatic logon to RHEL 8 via ssh must not be allowed."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: ^PermitUserEnvironment
-      line: 'PermitUserEnvironment no'
-  notify: restart sshd
-  when:
-      - rhel_08_010830
-      - rhel8stig_disruption_high
-  tags:
-      - RHEL-08-010830
-      - disruption_high
 
 - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
   block:
@@ -350,30 +314,60 @@
         systemd:
             name: ctrl-alt-del.target
             masked: yes
+        notify: systemctl daemon-reload
 
       - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
         file:
             src: /dev/null
             dest: /etc/systemd/system/ctrl-alt-del.target
             state: link
+        notify: systemctl daemon-reload
   when:
       - rhel_08_040170
   tags:
       - RHEL-08-040170
 
-- name: "HIGH | RHEL-08-040180 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
-  copy:
-      dest: /etc/dconf/db/local.d/00-disable-CAD
-      content: |
-          [org/gnome/settings-daemon/plugins/media-keys]
-          logout=''
-      mode: '0644'
-  notify: dconf update
+- name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
+  block:
+      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
+        command: grep -s logout /etc/dconf/db/local.d/*
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040171_logout_settings_status
+
+      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Add if missing"
+        lineinfile:
+            path: /etc/dconf/db/local.d/00-disable-CAD
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            insertafter: "{{ item.insertafter }}"
+            create: yes
+        with_items:
+            - { regexp: '^\[org/gnome/settings-daemon/plugins/media-keys\]', line: '[org/gnome/settings-daemon/plugins/media-keys]', insertafter: 'EOF' }
+            - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }
+        when: rhel_08_040171_logout_settings_status.stdout == ""
+
+      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
+        replace:
+            path: "{{ rhel_08_040171_logout_settings_status.stdout }}"
+            regexp: '^[L|l]ogout=.*'
+            replace: "logout=''"
+        when: rhel_08_040171_logout_settings_status.stdout != ""
   when:
-      - rhel_08_040180
-      - rhel8stig_dconf_available
+      - rhel_08_040171
   tags:
-      - RHEL-08-040180
+      - RHEL-08-040171
+
+- name: "HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
+  lineinfile:
+      path: /etc/systemd/system.conf
+      regexp: '^CtrlAltDelBurstAction=|^#CtrlAltDelBurstAction='
+      line: CtrlAltDelBurstAction=none
+  notify: systemctl daemon-reload
+  when:
+      - rhel_08_040172
+  tags:
+      - RHEL-08-040172
 
 - name: "HIGH | RHEL-08-040190 | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
   dnf:
@@ -412,20 +406,6 @@
   tags:
       - RHEL-08-040200
       - disruption_high
-
-- name: "HIGH | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '^.*X11Forwarding'
-      line: 'X11Forwarding yes'
-      create: yes
-  notify: restart sshd
-  when:
-      - rhel_08_040340
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-040340
-      - ssh
 
 - name: "HIGH | RHEL-08-040360 | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
   dnf:

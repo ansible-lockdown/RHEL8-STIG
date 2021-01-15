@@ -1,4 +1,79 @@
 ---
+- name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
+  dnf:
+      name: policycoreutils
+  when:
+      - rhel_08_010171
+  tags:
+      - RHEL-08-010171
+      - policycoreutils
+
+- name: "LOW | RHEL-08-010292 | PATCH | RHEL 8 must ensure the SSH server uses strong entropy."
+  lineinfile:
+      path: /etc/sysconfig/sshd
+      regexp: '^SSH_USE_STRONG_RNG=|^.*SSH_USE_STRONG_RNG='
+      line: SSH_USE_STRONG_RNG=3
+  notify: restart sshd
+  when:
+      - rhel_08_010292
+  tags:
+      - RHEL-08-010292
+      - sshd
+
+- name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
+  block:
+      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.dmesg_restrict ='
+            line: "kernel.dmesg_restrict = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.dmesg_restrict ='
+            line: "kernel.dmesg_restrict = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010375
+  tags:
+      - RHEL-08-010375
+      - sysctl
+
+- name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
+  block:
+      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.perf_event_paranoid ='
+            line: 'kernel.perf_event_paranoid = 2'
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
+
+      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.perf_event_paranoid ='
+            line: 'kernel.perf_event_paranoid = 2'
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010376
+  tags:
+      - RHEL-08-010376
+      - sysctl
+
 - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8."
   block:
       - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Find .conf files"
@@ -24,22 +99,15 @@
   tags:
       - RHEL-08-010440
 
-- name: "LOW | RHEL-08-010530 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
-  debug:
-      msg:
-          - "WARNING!! /var/log/audit is not mounted on a seperate partition"
-  changed_when:
-      - rhel8stig_audit_complex
+- name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
+  systemd:
+      name: rngd.service
+      state: started
+      enabled: yes
   when:
-      - rhel_08_010530
-      - not rhel8stig_system_is_container
-      - rhel8stig_complex
-      - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
+      - rhel_08_010471
   tags:
-      - RHEL-08-010530
-      - complexity_high
-      - mount
-      - auditd
+      - RHEL-08-010471
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
@@ -52,12 +120,46 @@
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
-      - RHEL-08-021320
+      - RHEL-08-010540
       - complexity-high
       - mount
       - var
 
-- name: "LOW | RHEL-08-020020 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
+- name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
+  debug:
+      msg:
+          - "WARNING!! /var/log is not mounted on a seperate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010541
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
+  tags:
+      - RHEL-08-010541
+      - complexity_high
+      - mount
+      - auditd
+
+- name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+  debug:
+      msg:
+          - "WARNING!! /var/log/audit is not mounted on a seperate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010542
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
+  tags:
+      - RHEL-08-010542
+      - complexity_high
+      - mount
+      - auditd
+
+- name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
   lineinfile:
       path: /etc/security/limits.conf
       regexp: '^\*               hard    maxlogins'
@@ -65,9 +167,20 @@
       insertbefore: '^# End of file'
       create: yes
   when:
-      - rhel_08_020020
+      - rhel_08_020024
   tags:
-      - RHEL-08-020020
+      - RHEL-08-020024
+
+- name: "LOW | RHEL-08-020042 | PATCH | RHEL 8 must prevent users from disabling session control mechanisms."
+  lineinfile:
+      path: /etc/shells
+      regexp: 'tmux'
+      state: absent
+  when:
+      - rhel_08_020042
+  tags:
+      - RHEL-08-020042
+      - tmux
 
 - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
   block:
@@ -95,6 +208,250 @@
       - rhel_08_020340
   tags:
       - RHEL-08-020340
+
+- name: "LOW | RHEL-08-030063 | PATCH | RHEL 8 must resolve audit information before writing to disk."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^log_format ='
+      line: "log_format = ENRICHED"
+  notify: restart auditd
+  when:
+      - rhel_08_030063
+  tags:
+      - RHEL-08-030063
+      - auditd
+
+- name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon."
+  block:
+      - name: "LOW | RHEL-08-030601 | AUDIT | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_030601_grub_cmdline_linux
+
+      - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit to 1 as active"
+        shell: grubby --update-kernel=ALL --args="audit=1"
+
+      - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if doesnt exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_030601_grub_cmdline_linux.stdout }} audit=1"'
+        when: '"audit=" not in rhel8stig_030601_grub_cmdline_linux.stdout'
+
+      - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'audit=([^\s|"])+'
+            replace: "audit=1"
+        when: '"audit=" in rhel8stig_030601_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_030601
+  tags:
+      - RHEL-08-030601
+      - grub
+
+- name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon."
+  block:
+      - name: "LOW | RHEL-08-030602 | AUDIT | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_030602_grub_cmdline_linux
+
+      - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | set audit_backlog_limit active"
+        shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
+
+      - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_030602_grub_cmdline_linux.stdout }} audit_backlog_limit=8192"'
+        when: '"audit_backlog_limit=" not in rhel8stig_030602_grub_cmdline_linux.stdout'
+
+      - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'audit_backlog_limit=([^\s|"])+'
+            replace: "audit_backlog_limit=8192"
+        when: '"audit_backlog_limit=" in rhel8stig_030602_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_030602
+  tags:
+      - RHEL-08-030602
+      - grub
+
+- name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
+  lineinfile:
+      path: /etc/usbguard/usbguard-daemon.conf
+      regexp: '^AuditBackend='
+      line: "AuditBackend=LinuxAudit"
+      create: yes
+  when:
+      - rhel_08_030603
+  tags:
+      - RHEL-08-030603
+      - usb
+
+- name: "LOW | RHEL-08-030741 | PATCH | RHEL 8 must disable the chrony daemon from acting as a server."
+  lineinfile:
+      path: /etc/chrony.conf
+      regexp: '^port|#port'
+      line: "port 0"
+  when:
+      - rhel_08_030741
+  tags:
+      - RHEL-08-030741
+      - chrony
+
+- name: "LOW | RHEL-08-030742 | PATCH | RHEL 8 must disable network management of the chrony daemon."
+  lineinfile:
+      path: /etc/chrony.conf
+      regexp: '^cmdport|#cmdport'
+      line: "cmdport 0"
+  when:
+      - rhel_08_030742
+  tags:
+      - RHEL-08-030742
+      - chrony
+
+- name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
+  block:
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040004_grub_cmdline_linux
+
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
+        shell: grubby --update-kernel=ALL --args="pti=on"
+
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_040004_grub_cmdline_linux.stdout }} pti=on"'
+        when: '"pti=" not in rhel8stig_040004_grub_cmdline_linux.stdout'
+
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'pti=([^\s|"])+'
+            replace: "pti=on"
+        when: '"pti=" in rhel8stig_040004_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_040004
+  tags:
+      - RHEL-08-040004
+      - grub
+
+- name: "LOW | RHEL-08-040021 | PATCH | RHEL 8 must disable the asynchronous transfer mode (ATM) protocol."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install ATM', line: 'install ATM /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist ATM', line: 'blacklist ATM', insertafter: '^install ATM /bin/true' }
+  when:
+      - rhel_08_040021
+  tags:
+      - RHEL-08-040021
+      - modprobe
+      - atm
+
+- name: "LOW | RHEL-08-040022 | PATCH | RHEL 8 must disable the controller area network (CAN) protocol."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install CAN', line: 'install CAN /bin/true', insertafter: 'EOF' }
+      - { regexp: 'blacklist CAN', line: 'blacklist CAN', insertafter: '^install CAN /bin/true' }
+  when:
+      - rhel_08_040022
+  tags:
+      - RHEL-08-040022
+      - modprobe
+      - can
+
+- name: "LOW | RHEL-08-040023 | PATCH | RHEL 8 must disable the stream control transmission (SCTP) protocol."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install SCTP', line: 'install SCTP /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist SCTP', line: 'blacklist SCTP', insertafter: '^install SCTP' }
+  when:
+      - rhel_08_040023
+  tags:
+      - RHEL-08-040023
+      - modprobe
+      - sctp
+
+- name: "LOW | RHEL-08-040024 | PATCH | RHEL 8 must disable the transparent inter-process communication (TIPC) protocol."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install TIPC', line: 'install TIPC /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist TIPC', line: 'blacklist TIPC', insertafter: '^install TIPC' }
+  when:
+      - rhel_08_040024
+  tags:
+      - RHEL-08-040024
+      - modprobe
+      - tipc
+
+- name: "LOW | RHEL-08-040025 | PATCH | RHEL 8 must disable mounting of cramfs."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install cramfs', line: 'install cramfs /bin/true', insertafter: 'EOF' }
+      - { regexp: 'blacklist cramfs', line: 'blacklist cramfs', insertafter: '^install cramfs' }
+  when:
+      - rhel_08_040025
+  tags:
+      - RHEL-08-040025
+      - modprobe
+      - cramfs
+
+- name: "LOW | RHEL-08-040026 | PATCH | RHEL 8 must disable IEEE 1394 (FireWire) Support."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      create: yes
+  notify: reboot system
+  with_items:
+      - { regexp: '^install firewire-core', line: 'install firewire-core /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist firewire-core', line: 'blacklist firewire-core', insertafter: '^install firewire-core' }
+  when:
+      - rhel_08_040026
+  tags:
+      - RHEL-08-040026
+      - modprobe
+      - firewire
 
 - name: |
         "LOW | RHEL-08-040300 | PATCH | The RHEL 8 file integrity tool must be configured to verify extended attributes."
