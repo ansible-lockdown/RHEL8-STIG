@@ -1429,6 +1429,7 @@
       - rhel_08_010680
       - not rhel8stig_system_is_chroot
       - not rhel8stig_system_is_container
+      - not system_is_ec2
   tags:
       - RHEL-08-010680
 
