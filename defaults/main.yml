@@ -7,7 +7,7 @@ rhel8stig_report_dir: /tmp
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
-rhel8stig_cat3_patch: false
+rhel8stig_cat3_patch: true
 
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
@@ -380,6 +380,7 @@ rhel_08_040341: true
 rhel_08_040350: true
 rhel_08_040370: true
 rhel_08_040380: true
+rhel_08_040390: true
 
 # CAT 3 rules
 rhel_08_010171: true

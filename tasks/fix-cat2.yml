@@ -1014,9 +1014,43 @@
       - boot
 
 - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions."
-  command: /bin/true
-  changed_when: false
-  failed_when: false
+  block:
+      - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Get mounts"
+        shell: mount | grep '^/dev\S* on /\S' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'
+        changed_when: no
+        check_mode: no
+        register: rhel8stig_010580_mounts_nodev
+
+      - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Split results"
+        set_fact:
+            rhel8stig_010580_mounts: "{{ rhel8stig_010580_mounts_nodev  .stdout_lines | map('regex_replace', ld_mount_regex, ld_mount_yaml) | map('from_yaml') | list }}"
+
+        with_items: "{{ rhel8stig_010580_mounts_nodev.stdout_lines }}"
+        vars:
+            ld_mount_regex: >-
+                ^(?P<device>[^'']*)\s(?P<mpoint>[^'']*)\s(?P<fs>[^'']*)\s(?P<opts>[^'']*)
+            ld_mount_yaml: |
+                device: >-4
+                    \g<device>
+                mpoint: >-4
+                    \g<mpoint>
+                fs: >-4
+                    \g<fs>
+                opts: >-4
+                    \g<opts>
+
+      - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Set value"
+        mount:
+            path: "{{ item.mpoint }}"
+            state: mounted
+            src: "{{ item.device }}"
+            fstype: "{{ item.fs }}"
+            opts: "{{ item.opts }},nodev"
+        with_items:
+            - "{{ rhel8stig_010580_mounts }}"
+        when:
+            - item.device != "/"
+            - "'odev' not in item.opts"
   when:
       - rhel_08_010580
   tags:
@@ -1026,11 +1060,11 @@
 
 - name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent code from being executed on file systems that contain user home directories."
   mount:
-      path: /home
-      state: mounted
-      src: "{{ home_mount.device }}"
-      fstype: "{{ home_mount.fstype }}"
-      opts: "{{ home_mount.options }},noexec"
+        path: /home
+        state: mounted
+        src: "{{ home_mount.device }}"
+        fstype: "{{ home_mount.fstype }}"
+        opts: "{{ home_mount.options }},noexec"
   when:
       - rhel_08_010590
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
@@ -5118,9 +5152,7 @@
 
 - name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
   package:
-      name:
-          - '@x11'
-          - xorg-11-server-common
+      name: xorg-x11-server-common
       state: absent
   when:
       - rhel_08_040320
