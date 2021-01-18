@@ -1,4 +1,10 @@
 ---
+- name: systemctl daemon-reload
+  systemd: daemon_reload=yes
+
+- name: sysctl system
+  command: sysctl --system
+
 - name: restart sshd
   service:
       name: sshd
