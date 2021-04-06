@@ -108,9 +108,8 @@ rhel_08_010360: true
 rhel_08_010372: true
 rhel_08_010373: true
 rhel_08_010374: true
-# !!!!!!!!!!!!!!!--------------!!!!!!!!!!!!!!!!!!CHANGE TO TRUE BEFORE FINALIZATION. SET TO FALSE TO PREVENT THE VAGRANT USER FROM AUTHENTICATING WHEN USING SUDO (380/381)
-rhel_08_010380: false
-rhel_08_010381: false
+rhel_08_010380: true
+rhel_08_010381: true
 rhel_08_010390: true
 rhel_08_010400: true
 rhel_08_010410: true
@@ -155,7 +154,7 @@ rhel_08_010720: true
 rhel_08_010730: true
 rhel_08_010740: true
 rhel_08_010750: true
-rhel_01_010760: true
+rhel_08_010760: true
 rhel_08_010770: true
 rhel_08_010780: true
 rhel_08_010790: true

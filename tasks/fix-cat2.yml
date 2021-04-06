@@ -1581,7 +1581,7 @@
       regexp: '.*?CREATE_HOME.*'
       line: CREATE_HOME     yes
   when:
-      - rhel_01_010760
+      - rhel_08_010760
   tags:
       - REHL-08-010760
       - login
