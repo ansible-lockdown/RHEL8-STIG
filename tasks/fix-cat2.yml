@@ -44,12 +44,15 @@
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
         copy:
-            dest: /etc/issue
+            dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
             owner: root
             group: root
             mode: '0644'
         notify: restart sshd
+        with_items:
+            - /etc/issue
+            - /etc/issue.net
         when:
             # - not system_is_ec2
             - rhel_08_010040 or
@@ -247,8 +250,8 @@
       - kerberos
 
 - name: |
-        "HIGH | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
-        "HIGH | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
+        "MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
+        "MEDIUM | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
   selinux:
       state: enforcing
       policy: targeted
@@ -5177,7 +5180,7 @@
   tags:
       - RHEL-08-040330
 
-- name: "HIGH | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
+- name: "MEDIUM | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '^.*X11Forwarding'
