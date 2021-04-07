@@ -1,9 +1,4 @@
 ---
-# If you would like a report at the end accordin to OpenSCAP as to the report results
-# then you should set rhel8stig_oscap_scan to true/yes.
-# NOTE: This requires the python_xmltojson package on the control host.
-rhel8stig_oscap_scan: no
-rhel8stig_report_dir: /tmp
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
