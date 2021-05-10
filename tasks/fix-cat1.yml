@@ -134,7 +134,7 @@
               "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Create user.cfg"
               "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Create user.cfg"
         shell: test -f {{ file_q }} && echo exists || {{ create_cmd }}
-        check_mode: ansible_check_mode is not defined
+        check_mode: "{{ ansible_check_mode is not defined|bool }}"
         register: rhel8stig_create_grub_user_cfg
         changed_when:
             - rhel8stig_create_grub_user_cfg.stdout == "created"
