@@ -1413,7 +1413,7 @@
         lineinfile:
             dest: /etc/resolv.conf
             regexp: '^nameserver'
-            line: namserver "{{ item }}"
+            line: nameserver "{{ item }}"
             insertafter: '^search'
         with_items:
             - "{{ rhel8stig_dns_servers }}"
