@@ -1,0 +1,14 @@
+{% if rhel8_stig_resolv_domain is defined %}
+domain {{ rhel8_stig_resolv_domain }}
+{% endif %}
+{% if rhel8_stig_resolv_search is iterable %}
+search {{ rhel8_stig_resolv_search | join(' ') }}
+{% endif %}
+{% if rhel8stig_dns_servers is iterable %}
+{% for server in rhel8stig_dns_servers %}
+nameserver {{ server }}
+{% endfor %}
+{% endif %}
+{% if rhel8_stig_resolv_options is iterable %}
+options {{ rhel8_stig_resolv_options | join(' ') }}
+{% endif %}
