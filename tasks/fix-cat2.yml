@@ -3079,8 +3079,8 @@
 - name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
   lineinfile:
       path: /etc/login.defs
-      regexp: .*?UMASK.*
-      line: 'UMASK           077'
+      regexp: ^#?UMASK.*
+      line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
       owner: root
       group: root
       mode: 0644
@@ -3104,7 +3104,7 @@
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         lineinfile:
             path: "{{ item.path }}"
-            regexp: 'umask.*0([0-6][0-6])'
+            regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
             - "{{ rhel8stig_020352_files.files }}"
@@ -3119,7 +3119,7 @@
   replace:
       path: "{{ item }}"
       regexp: 'umask\s\d\d\d'
-      replace: "umask 077"
+      replace: "umask {{ rhel8stig_login_defaults.umask | default('077') }}"
   with_items:
       - /etc/bashrc
       - /etc/csh.cshrc
