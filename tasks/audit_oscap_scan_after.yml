@@ -11,6 +11,8 @@
   ignore_errors: true
   changed_when: false
   failed_when: false
+  tags:
+      - skip_ansible_lint
 
 - name: Get the second scan result from the XML
   slurp:

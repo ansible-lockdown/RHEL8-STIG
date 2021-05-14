@@ -23,10 +23,10 @@
 
 - name: Check if using resolv.conf template settings are changed
   assert:
-    that: 
-        - rhel8_stig_resolv_domain != 'example.com'
-        - rhel8_stig_resolv_search | length > 0
-    msg: "You are set to change your resolv.conf file this can be very disruptive if not configured correctly"
+      that:
+          - rhel8_stig_resolv_domain != 'example.com'
+          - rhel8_stig_resolv_search | length > 0
+      msg: "You are set to change your resolv.conf file this can be very disruptive if not configured correctly"
   when:
       - rhel8_stig_use_resolv_template
       - rhel_08_010680
