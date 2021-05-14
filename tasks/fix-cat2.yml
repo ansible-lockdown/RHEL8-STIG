@@ -3350,7 +3350,7 @@
 
 - name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
   lineinfile:
-      path: /etc/audit/audit.rules
+      path: /etc/audit/rules.d/audit.rules
       regexp: '^-e '
       line: "-e 2"
   when:
