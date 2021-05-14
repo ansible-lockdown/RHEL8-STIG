@@ -128,3 +128,4 @@
   shell: sleep 3; reboot
   async: 15
   poll: 0
+  when: not rhel8stig_skip_reboot
