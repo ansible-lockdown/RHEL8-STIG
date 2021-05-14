@@ -48,6 +48,9 @@
       src: "{{ rhel8stig_grub_cfg_path | dirname }}/{{ item }}"
       dest: "{{ rhel8stig_grub_cfg_path_invalid | dirname }}/{{ item }}"
       remote_src: yes
+      user: root
+      group: root
+      mode: 0755
   with_items:
       - grub.cfg
       - user.cfg
