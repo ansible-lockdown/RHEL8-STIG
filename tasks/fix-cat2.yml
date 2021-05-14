@@ -3135,10 +3135,10 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F key=execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F key=execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F key=execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F key=execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F key=execpriv' }
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv' }
   notify: restart auditd
   when:
       - rhel_08_030000
@@ -3473,11 +3473,11 @@
       - dnf
       - auditd
 
-- name: "MEDIUM | RHEL-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      regexp: '^-a always,exit -F path=/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
-      line: '-a always,exit -F path=/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+      regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+      line: '-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
   notify: restart auditd
   when:
       - rhel_08_030190
@@ -3632,6 +3632,7 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
+      - -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
       - -a always,exit -F arch=b32 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
       - -a always,exit -F arch=b64 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
   notify: restart auditd
@@ -3657,7 +3658,7 @@
 - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+      line: -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
   notify: restart auditd
   when:
       - rhel_08_030310
@@ -3745,7 +3746,7 @@
 - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/lib/openssh/ssh-keysign -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
+      line: -a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
   notify: restart auditd
   when:
       - rhel_08_030320
@@ -4044,7 +4045,10 @@
 - name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
   notify: restart auditd
   when:
       - rhel_08_030490
@@ -4111,7 +4115,10 @@
 - name: "MEDIUM | RHEL-08-030540 | PATCH | Successful/unsuccessful uses of the fchmod system call in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
   notify: restart auditd
   when:
       - rhel_08_030540
