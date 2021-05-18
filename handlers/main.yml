@@ -16,6 +16,8 @@
   service:
       name: sssd
       state: restarted
+  when:
+      - rhel8stig_sssd_conf.stdout | length > 0
 
 - name: restart snmpd
   service:
