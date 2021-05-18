@@ -638,7 +638,16 @@ rhel8stig_nfs_mounts: "{{ ansible_mounts | to_json | from_json | json_query(rhel
 rhel8stig_nfs_mounts_query: "[?starts_with(fstype, 'nfs')].mount"
 
 # RHEL-08-010680
-rhel8stig_dns_servers:
+# This can be managed using a template ensure settings are correct
+rhel8_stig_use_resolv_template: false
+rhel8_stig_resolv_domain: example.com
+rhel8_stig_resolv_search:
+#    - 'example.com'
+#    - 'blah'
+rhel8_stig_resolv_options:
+#    - 'rotate 2'
+#    - 'timeout:1'
+rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
     - 8.8.8.8
     - 8.8.4.4
 
