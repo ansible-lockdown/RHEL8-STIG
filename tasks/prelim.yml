@@ -310,17 +310,26 @@
       - complexity-high
 
 - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
-  shell: find / -name sssd.conf
-  args:
-      warn: no
-  changed_when: false
-  failed_when: false
-  register: rhel8stig_sssd_conf
-  when:
-      - rhel_08_010400 or
-        rhel_08_020090 or
-        rhel_08_020250 or
-        rhel_08_020290
+  block:
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
+        shell: find / -name sssd.conf
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_sssd_conf
+        when:
+            - rhel_08_010400 or
+              rhel_08_020090 or
+              rhel_08_020250 or
+              rhel_08_020290
+
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
+        debug:
+            msg: "Warning!! sssd config file has not been found, some items will skip"
+        changed_when: true
+        when:
+            - rhel8stig_sssd_conf.stdout | length  0
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
