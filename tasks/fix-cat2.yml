@@ -197,7 +197,7 @@
       regexp: '^ExecStart='
       line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
 
@@ -440,7 +440,7 @@
       regexp: '^\+VERS-ALL:'
       line: "+VERS-ALL:{{ rhel8stig_gnutls_encryption }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -2365,7 +2365,7 @@
             path: /etc/dconf/db/local.d/00-screensaver
             create: yes
             regexp: '^lock-enabled'
-            user: root
+            owner: root
             group: root
             mode: 0644
             line: |
@@ -2394,7 +2394,7 @@
             regexp: '^set \-g'
             line: "set -g lock-command vlock"
             create: yes
-            user: root
+            owner: root
             group: root
             mode: 0644
   when:
@@ -2434,7 +2434,7 @@
         lineinfile:
             path: /etc/dconf/db/distro.d/20-authselect
             create: yes
-            user: root
+            owner: root
             group: root
             mode: 0644
             line: |
@@ -2463,7 +2463,7 @@
             path: /etc/dconf/db/distro.d/locks/20-authselect
             create: yes
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-            user: root
+            owner: root
             group: root
             mode: 0640
         when: rhel_08_020050_removal_action_file.stdout | length == 0
@@ -2488,7 +2488,7 @@
         lineinfile:
             path: /etc/dconf/db/local.d/00-screensaver
             create: yes
-            user: root
+            owner: root
             group: root
             mode: 0640
             regexp: '^idle-delay'
@@ -2504,7 +2504,7 @@
             path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
             regexp: '^idle-delay='
             line: idle-delay=uint32 900
-            user: root
+            owner: root
             group: root
             mode: 0640
         notify: dconf update
@@ -2521,7 +2521,7 @@
       path: /etc/tmux.conf
       regexp: '^set -g lock-after-time'
       line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
-      user: root
+      owner: root
       group: root
       mode: 0640
   when:
@@ -2535,7 +2535,7 @@
       path: /etc/dconf/db/local.d/locks/session
       create: yes
       line: "{{ item }}"
-      user: root
+      owner: root
       group: root
       mode: 0640
   with_items:
@@ -2558,7 +2558,7 @@
       path: "{{ rhel8stig_sssd_conf.stdout }}"
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
-      user: root
+      owner: root
       group: root
       mode: 0640
   with_items:
@@ -2578,7 +2578,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: '^password'
-      user: root
+      owner: root
       group: root
       mode: 0640
   with_items:
@@ -2593,7 +2593,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*ucredit'
@@ -2608,7 +2608,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*lcredit'
@@ -2623,7 +2623,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*dcredit'
@@ -2638,7 +2638,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*maxclassrepeat'
@@ -2653,7 +2653,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*maxrepeat'
@@ -2668,7 +2668,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*minclass'
@@ -2683,7 +2683,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*difok'
@@ -2715,7 +2715,7 @@
   lineinfile:
       path: /etc/login.defs
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: ^#?PASS_MIN_DAYS
@@ -2730,7 +2730,7 @@
   lineinfile:
       path: /etc/login.defs
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: ^#?PASS_MAX_DAYS
@@ -2817,7 +2817,7 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: '^#?\s*minlen'
@@ -2833,7 +2833,7 @@
       path: /etc/login.defs
       regexp: '^PASS_MIN_LEN|^#PASS_MIN_LEN'
       line: "PASS_MIN_LEN 15"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -2880,7 +2880,7 @@
             regexp: "{{ item.regexp }}"
             line: "{{ item.line }}"
             insertafter: "{{ item.insertafter }}"
-            user: root
+            owner: root
             group: root
             mode: 0644
         notify: restart sssd
@@ -2892,7 +2892,7 @@
         lineinfile:
             path: /etc/pam.d/smartcard-auth
             line: auth       sufficient pam_sss.so try_cert_auth
-            user: root
+            owner: root
             group: root
             mode: 0644
         notify: restart sssd
@@ -2971,7 +2971,7 @@
       create: yes
       regexp: '^#?\s*ocredit'
       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -2986,7 +2986,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      user: root
+      owner: root
       group: root
       mode: 0644
   with_items:
@@ -3004,7 +3004,7 @@
       create: yes
       regexp: '^#?\s*dictcheck'
       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -3018,7 +3018,7 @@
       dest: /etc/login.defs
       regexp: ^#?FAIL_DELAY
       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -3061,7 +3061,7 @@
       regexp: "(?i)^#?PrintLastLog"
       line: PrintLastLog yes
       validate: /usr/sbin/sshd -t -f %s
-      user: root
+      owner: root
       group: root
       mode: 0644
   notify: restart sshd
@@ -3077,7 +3077,7 @@
       path: /etc/login.defs
       regexp: .*?UMASK.*
       line: 'UMASK           077'
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -3206,7 +3206,7 @@
       path: /etc/audit/auditd.conf
       regexp: '^disk_full_action ='
       line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -3220,7 +3220,7 @@
       path: /etc/audit/auditd.conf
       regexp: '^local_events ='
       line: "local_events = yes"
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -4256,7 +4256,7 @@
   lineinfile:
       path: /etc/aide.conf
       line: "{{ item }}"
-      user: root
+      owner: root
       group: root
       mode: 0600
   with_items:
@@ -4347,7 +4347,7 @@
   lineinfile:
       path: /etc/rsyslog.conf
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
       regexp: "{{ item.regexp }}"
@@ -4443,7 +4443,7 @@
       create: yes
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
-      user: root
+      owner: root
       group: root
       mode: 0640
       insertafter: "{{ item.insertafter }}"
@@ -4573,7 +4573,7 @@
   lineinfile:
       path: "{{ item.path }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
       regexp: "{{ item.regexp }}"
@@ -4683,7 +4683,7 @@
       regexp: '^install bluetooth '
       line: "install bluetooth /bin/true"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -5243,7 +5243,7 @@
       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
       regexp: '^kernel.unprivileged_bpf_disabled'
       line: 'kernel.unprivileged_bpf_disabled = 1'
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: sysctl system
@@ -5270,7 +5270,7 @@
       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
       regexp: '^kernel.kptr_restrict'
       line: 'kernel.kptr_restrict = 1'
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: sysctl system
@@ -5355,7 +5355,7 @@
       regexp: '^.*X11Forwarding'
       line: 'X11Forwarding yes'
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: restart sshd
