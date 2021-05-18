@@ -347,7 +347,7 @@
             line: "{{ item.line }}"
             insertafter: "{{ item.insertafter }}"
             create: yes
-            user: root
+            owner: root
             group: root
             mode: 0644
         with_items:
