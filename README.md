@@ -79,4 +79,3 @@ Example Playbook
             when:
                 - ansible_os_family == 'RedHat'
                 - ansible_distribution_major_version | version_compare('8', '=')
-
