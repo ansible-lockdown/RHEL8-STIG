@@ -166,7 +166,7 @@
       line: '*                hard    maxlogins       10'
       insertbefore: '^# End of file'
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0644
   when:
@@ -294,7 +294,7 @@
       regexp: '^AuditBackend='
       line: "AuditBackend=LinuxAudit"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   when:
@@ -366,7 +366,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -387,7 +387,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -408,7 +408,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -429,7 +429,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -450,7 +450,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
@@ -471,7 +471,7 @@
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       create: yes
-      user: root
+      owner: root
       group: root
       mode: 0640
   notify: reboot system
