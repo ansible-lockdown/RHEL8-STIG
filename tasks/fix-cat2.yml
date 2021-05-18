@@ -2589,6 +2589,7 @@
       - { regexp: 'dmains =', line: 'dmains = testing.test' }
   notify: restart sssd
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020090
   tags:
       - RHEL-08-020090
