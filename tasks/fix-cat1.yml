@@ -136,7 +136,7 @@
         shell: test -f {{ file_q }} && echo exists || {{ create_cmd }}
         args:
             warn: no
-        check_mode: ansible_check_mode is not defined
+        check_mode: "{{ ansible_check_mode is not defined }}"
         register: rhel8stig_create_grub_user_cfg
         changed_when:
             - rhel8stig_create_grub_user_cfg.stdout == "created"
