@@ -33,11 +33,11 @@
   tags:
       - always
 
-# - name: Install OpenSCAP and run a report
-#   import_tasks: audit_oscap_scan_before.yml
-#   when: rhel8stig_oscap_scan
-#   tags:
-#       - oscapreport
+  # - name: Install OpenSCAP and run a report
+  #   import_tasks: audit_oscap_scan_before.yml
+  #   when: rhel8stig_oscap_scan
+  #   tags:
+  #       - oscapreport
 
 - import_tasks: prelim.yml
   become: yes
