@@ -37,7 +37,7 @@
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
         lineinfile:
             path: /etc/ssh/sshd_config
-            regexp: '(?i)^.*banner'
+            regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
 
       - name: |
@@ -319,8 +319,8 @@
       line: "{{ item.line }}"
   notify: restart sshd
   with_items:
-      - { regexp: '^.*ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
-      - { regexp: '^.*ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
+      - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
+      - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
   when:
       - rhel_08_010200
       - rhel8stig_ssh_required
@@ -897,7 +897,7 @@
 - name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '#StrictModes.(yes|no)|StrictModes.(yes|no)'
+      regexp: '(?i)^#?StrictModes'
       line: 'StrictModes yes'
   notify: restart sshd
   when:
@@ -910,7 +910,7 @@
 - name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^#Compression.(yes|delayed|no)|^Compression.(yes|delayed|no)'
+      regexp: '(?i)^#?Compression'
       line: 'Compression {{ rhel8stig_sshd_compression }}'
   notify: restart sshd
   when:
@@ -923,7 +923,7 @@
 - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '#IgnoreUserKnownHosts.(yes|no)|IgnoreUserKnownHosts.(yes|no)'
+      regexp: '(?i)^#?IgnoreUserKnownHosts'
       line: 'IgnoreUserKnownHosts yes'
   notify: restart sshd
   when:
@@ -939,8 +939,8 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
-      - { regexp: '^KerberosAuthentication ', line: "KerberosAuthentication no" }
-      - { regexp: '^GSSAPIAuthentication ', line: "GSSAPIAuthentication no" }
+      - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
+      - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -967,7 +967,7 @@
 - name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^#PermitRootLogin.(yes|without-password|forced-commands-only|no)|^PermitRootLogin.(yes|without-password|forced-commands-only|no)'
+      regexp: '(?i)^#?PermitRootLogin'
       line: 'PermitRootLogin no'
   notify: restart sshd
   when:
@@ -1702,7 +1702,7 @@
 - name: "MEDIUM | RHEL-08-010830 | PATCH |Unattended or automatic logon to RHEL 8 via ssh must not be allowed."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: ^PermitUserEnvironment
+      regexp: '(?i)^#?PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
   notify: restart sshd
   when:
@@ -3062,8 +3062,8 @@
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   lineinfile:
       dest: /etc/ssh/sshd_config
-      regexp: "(?i)^#?PrintLastLog"
-      line: PrintLastLog yes
+      regexp: '(?i)^#?PrintLastLog'
+      line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
       owner: root
       group: root
@@ -4983,8 +4983,8 @@
 - name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^RekeyLimit '
-      line: "RekeyLimit 1G 1h"
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
   notify: restart sshd
   when:
       - rhel_08_040161
@@ -4995,8 +4995,8 @@
 - name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
   lineinfile:
       path: /etc/ssh/ssh_config
-      regexp: '^RekeyLimit '
-      line: "RekeyLimit 1G 1h"
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
   notify: restart sshd
   when:
       - rhel_08_040162
@@ -5365,7 +5365,7 @@
 - name: "MEDIUM | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^.*X11Forwarding'
+      regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding yes'
       create: yes
       owner: root
@@ -5382,7 +5382,7 @@
 - name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^X11UseLocalhost'
+      regexp: '(?i)^#?X11UseLocalhost'
       line: 'X11UseLocalhost yes'
   when:
       - rhel_08_040341
