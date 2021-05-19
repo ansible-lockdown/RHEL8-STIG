@@ -1435,13 +1435,13 @@
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
         lineinfile:
             dest: /etc/resolv.conf
-            regexp: ^nameserver {{ item.line }}
-            line: 'nameserver {{ item.line }}'
+            regexp: "{{ item.regexp }}"
+            line: "nameserver {{ item.line }}"
             insertafter: "{{ item.after }}"
-        with_items:
-            - { line: '{{ rhel8stig_dns_servers.0 }}', after: ^search }
-            - { line: '{{ rhel8stig_dns_servers.1 }}', after: '^nameserver {{ rhel8stig_dns_servers.0 }}' }
-        #    - { line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        with_items:  # Written as lineinfile replaces last found so reverse logic to keep order of servers
+            - { regexp: ^nameserver, line: '{{ rhel8stig_dns_servers.1 }}', after: ^search }
+            - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }})', line: '{{ rhel8stig_dns_servers.0 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        #    - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }}|{{ rhel8stig_dns_servers.0 }})', line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
         when:
             - not rhel8_stig_use_resolv_template
             - rhel_08_010680_networkmanager_check.stdout == '0'
