@@ -2910,7 +2910,7 @@
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
             - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
-           
+
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
         lineinfile:
             path: /etc/pam.d/smartcard-auth
