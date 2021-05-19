@@ -4755,10 +4755,13 @@
         mount:
             path: /tmp
             state: mounted
-            src: xfs
+            src: "{{ tmp_mount.device }}"
             fstype: xfs
             opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
+        vars:
+            tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"
         when: rhel8stig_040123_dev_status.stdout | length > 0
+
   when:
       - rhel_08_040123 or
         rhel_08_040124 or
@@ -4790,9 +4793,11 @@
         mount:
             path: /var/log
             state: mounted
-            src: xfs
+            src: "{{ var_log_mount.device }}"
             fstype: xfs
             opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '') }}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
+        vars:
+            var_log_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log`] | [0]') }}"
         when: rhel8stig_040126_var_log_status.stdout | length > 0
   when:
       - rhel_08_040126 or
@@ -4825,9 +4830,11 @@
         mount:
             path: /var/log/audit
             state: mounted
-            src: xfs
+            src: "{{ audit_mount.device }}"
             fstype: xfs
             opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '') }}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
+        vars:
+            audit_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log/audit`] | [0]') }}"
         when: rhel8stig_040129_var_log_audit_status.stdout | length > 0
   when:
       - rhel_08_040129 or
@@ -4860,9 +4867,11 @@
         mount:
             path: /var/tmp
             state: mounted
-            src: xfs
+            src: "{{ var_tmp_mount.device }}"
             fstype: xfs
             opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
+        vars:
+            var_tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/var/tmp`] | [0]') }}"
         when: rhel8stig_040132_var_tmp_status.stdout | length > 0
   when:
       - rhel_08_040132 or
@@ -5419,4 +5428,3 @@
   tags:
       - RHEL-08-040390
       - tuned
-      
