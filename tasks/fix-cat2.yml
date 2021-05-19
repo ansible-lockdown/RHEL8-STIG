@@ -1435,9 +1435,9 @@
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
         lineinfile:
             dest: /etc/resolv.conf
-            regexp: '^nameserver'
-            line: "nameserver {{ item }}"
-            insertafter: '^search'
+            regexp: ^nameserver {{ item.line }}
+            line: 'nameserver {{ item.line }}'
+            insertafter: "{{ item.after }}"
         with_items:
             - { line: '{{ rhel8stig_dns_servers.0 }}', after: ^search }
             - { line: '{{ rhel8stig_dns_servers.1 }}', after: '^nameserver {{ rhel8stig_dns_servers.0 }}' }
