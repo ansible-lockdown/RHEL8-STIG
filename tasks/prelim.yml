@@ -329,7 +329,7 @@
             msg: "Warning!! sssd config file has not been found, some items will skip"
         changed_when: true
         when:
-            - rhel8stig_sssd_conf.stdout | length  0
+            - rhel8stig_sssd_conf.stdout | length == 0
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
