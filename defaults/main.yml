@@ -648,7 +648,7 @@ rhel8_stig_resolv_options:
 #    - 'rotate 2'
 #    - 'timeout:1'
 
-rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
+rhel8stig_dns_servers:  # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
     - 8.8.8.8
     - 8.8.4.4
 
