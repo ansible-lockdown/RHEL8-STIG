@@ -3,6 +3,8 @@
   block:
       - name: "PRELIM | Check for dconf availability"
         command: rpm -q dconf
+        args:
+            warn: no
         changed_when: no
         check_mode: no
         failed_when: rhel8stig_dconf_audit.rc >= 2
@@ -29,7 +31,7 @@
         rhel_08_020060 or
         rhel_08_020080 or
         rhel_08_020090
-        # rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
+  # rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
   tags:
       - rhel_08_010050
       - rhel_08_020030
@@ -134,6 +136,8 @@
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  args:
+      warn: no
   register: rhel_08_010690_getent
   changed_when: rhel_08_020680_getent.stdout_lines is defined
   failed_when: false
@@ -163,6 +167,8 @@
 
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
+  args:
+      warn: no
   changed_when: no
   check_mode: no
   register: rhel_08_boot_part
@@ -274,6 +280,8 @@
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  args:
+      warn: no
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
   changed_when: no
@@ -302,15 +310,26 @@
       - complexity-high
 
 - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
-  shell: find / -name sssd.conf
-  changed_when: false
-  failed_when: false
-  register: rhel8stig_sssd_conf
-  when:
-      - rhel_08_010400 or
-        rhel_08_020090 or
-        rhel_08_020250 or
-        rhel_08_020290
+  block:
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
+        shell: find / -name sssd.conf
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_sssd_conf
+        when:
+            - rhel_08_010400 or
+              rhel_08_020090 or
+              rhel_08_020250 or
+              rhel_08_020290
+
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
+        debug:
+            msg: "Warning!! sssd config file has not been found, some items will skip"
+        changed_when: true
+        when:
+            - rhel8stig_sssd_conf.stdout | length == 0
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
@@ -322,7 +341,7 @@
       - name: "PRELIM | Setting the fact"
         set_fact:
             rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
-      
+
 - name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
   find:
       paths: /etc/sysctl.d
@@ -337,7 +356,7 @@
         rhel_08_010375 or
         rhel_08_010376 or
         rhel_08_040280 or
-        rhel_08_040281 or 
+        rhel_08_040281 or
         rhel_08_040282 or
         rhel_08_040283 or
         rhel_08_040284 or

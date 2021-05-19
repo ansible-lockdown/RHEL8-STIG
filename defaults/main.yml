@@ -567,7 +567,7 @@ rhel8stig_audisp_disk_full_action: single
 # rhel8stig_audisp_network_failure_action optoins are syslog, halt, and single
 rhel8stig_audisp_network_failure_action: single
 
-# RHEL-08-030060 
+# RHEL-08-030060
 # rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
 rhel8stig_auditd_disk_full_action: HALT
 
@@ -625,7 +625,7 @@ rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 
 # REHL-08-010020
 rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 
-# 
+#
 rhel8stig_machine_uses_uefi: "{{ rhel_08_sys_firmware_efi.stat.exists }}"
 rhel8stig_grub_cfg_path: "{{ rhel8stig_machine_uses_uefi | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
 rhel8stig_grub_cfg_path_invalid: "{{ (not rhel8stig_machine_uses_uefi) | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
@@ -647,6 +647,7 @@ rhel8_stig_resolv_search:
 rhel8_stig_resolv_options:
 #    - 'rotate 2'
 #    - 'timeout:1'
+
 rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
     - 8.8.8.8
     - 8.8.4.4
@@ -655,7 +656,7 @@ rhel8stig_int_gid: 1000
 
 # RHEL-08-010130
 # The rounds parameter goes into the password sufficient pam_unix.so element of the password-auth and system-auth files. The value shoudl be set no lower than 5000
-rhel8stig_hashing_rounds: 5000 
+rhel8stig_hashing_rounds: 5000
 
 # RHEL-08-010100
 rhel8stig_path_to_sshkey: "/root/.ssh/"
@@ -682,7 +683,7 @@ rhel8stig_custom_firewall_zone: "new_fw_zone"
 
 # RHEL-08-040090
 # rhel8stig_white_list_services is the services that you want to allow through initially for teh new firewall zone
-# http and ssh need to be enabled for the role to run. 
+# http and ssh need to be enabled for the role to run.
 rhel8stig_white_list_services:
     - http
     - https

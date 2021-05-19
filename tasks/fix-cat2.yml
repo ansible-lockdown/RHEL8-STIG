@@ -153,10 +153,12 @@
 
       - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Lock user not using FIPS 140-2 hashing"
         command: "passwd -l {{ item }}"
+        args:
+            warn: no
         with_items:
-            -"{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
+            - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
-            - rhel_08_010120_non_fips_hashed_accounts.stdout != ""
+            - rhel_08_010120_non_fips_hashed_accounts.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
         debug:
@@ -165,7 +167,7 @@
                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
             - not rhel8stig_disruption_high
-            - rhel_08_010120_non_fips_hashed_accounts.stdout != ""
+            - rhel_08_010120_non_fips_hashed_accounts.stdout | length > 0
   when:
       - rhel_08_010120
       - rhel8stig_disruption_high
@@ -195,6 +197,10 @@
       regexp: '^ExecStart='
       line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
       create: yes
+      owner: root
+      group: root
+      mode: 0644
+
   when:
       - rhel_08_010151
   tags:
@@ -434,6 +440,9 @@
       regexp: '^\+VERS-ALL:'
       line: "+VERS-ALL:{{ rhel8stig_gnutls_encryption }}"
       create: yes
+      owner: root
+      group: root
+      mode: 0640
   notify: reboot system
   when:
       - rhel_08_010295
@@ -451,6 +460,8 @@
               "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
               "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root. | Get commands no group-owned by root"
         shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_010300_commands
@@ -486,6 +497,8 @@
               "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
         shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_010330_library_files
@@ -676,6 +689,7 @@
       - no_verification
   notify: restart sssd
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_010400
   tags:
       - RHEL-08-010400
@@ -719,6 +733,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel8stig_010421_grub_cmdline_linux
@@ -749,6 +765,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel8stig_010422_grub_cmdline_linux
@@ -779,6 +797,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel8stig_010423_grub_cmdline_linux
@@ -1020,6 +1040,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Get mounts"
         shell: mount | grep '^/dev\S* on /\S' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'
+        args:
+            warn: no
         changed_when: no
         check_mode: no
         register: rhel8stig_010580_mounts_nodev
@@ -1041,7 +1063,7 @@
                     \g<fs>
                 opts: >-4
                     \g<opts>
-        when: rhel8stig_010580_mounts_nodev.stdout != ""
+        when: rhel8stig_010580_mounts_nodev.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Set value"
         mount:
@@ -1055,7 +1077,7 @@
         when:
             - item.device != "/"
             - "'odev' not in item.opts"
-            - rhel8stig_010580_mounts_nodev.stdout != ""
+            - rhel8stig_010580_mounts_nodev.stdout | length > 0
   when:
       - rhel_08_010580
   tags:
@@ -1065,11 +1087,11 @@
 
 - name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent code from being executed on file systems that contain user home directories."
   mount:
-        path: /home
-        state: mounted
-        src: "{{ home_mount.device }}"
-        fstype: "{{ home_mount.fstype }}"
-        opts: "{{ home_mount.options }},noexec"
+      path: /home
+      state: mounted
+      src: "{{ home_mount.device }}"
+      fstype: "{{ home_mount.fstype }}"
+      opts: "{{ home_mount.options }},noexec"
   when:
       - rhel_08_010590
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
@@ -1258,6 +1280,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
         shell: find {{ item.mount }} -xdev -type f -perm -002
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_010660_world_writable_files
@@ -1411,13 +1435,13 @@
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
         lineinfile:
             dest: /etc/resolv.conf
-            regexp: ^nameserver {{ item.line }}
-            line: 'nameserver {{ item.line }}'
+            regexp: "{{ item.regexp }}"
+            line: "nameserver {{ item.line }}"
             insertafter: "{{ item.after }}"
-        with_items: 
-            - { line: '{{ rhel8stig_dns_servers.0 }}', after: ^search }
-            - { line: '{{ rhel8stig_dns_servers.1 }}', after: '^nameserver {{ rhel8stig_dns_servers.0 }}' }
-        #    - { line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        with_items:  # Written as lineinfile replaces last found so reverse logic to keep order of servers
+            - { regexp: ^nameserver, line: '{{ rhel8stig_dns_servers.1 }}', after: ^search }
+            - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }})', line: '{{ rhel8stig_dns_servers.0 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        #    - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }}|{{ rhel8stig_dns_servers.0 }})', line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
         when:
             - not rhel8_stig_use_resolv_template
             - rhel_08_010680_networkmanager_check.stdout == '0'
@@ -1493,7 +1517,7 @@
             owner: root
         with_items:
             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010700_world_writable_directories.stdout != ""
+        when: rhel_08_010700_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010700
   tags:
@@ -1513,7 +1537,7 @@
             group: root
         with_items:
             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010710_world_writable_directories.stdout != ""
+        when: rhel_08_010710_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010710
   tags:
@@ -1538,7 +1562,7 @@
             msg:
                 - "WARNING!!!!The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
                 - "{{ rhel_08_010720_user_list.stdout_lines }}"
-        when: rhel_08_010720_user_list.stdout != ""
+        when: rhel_08_010720_user_list.stdout | length > 0
   when:
       - rhel_08_010720
   tags:
@@ -1558,7 +1582,7 @@
             mode: 0750
         with_items:
             - "{{ rhel_08_010730_home_directories.stdout_lines }}"
-        when: rhel_08_010730_home_directories.stdout != ""
+        when: rhel_08_010730_home_directories.stdout | length > 0
   when:
       - rhel_08_010730
   tags:
@@ -1576,6 +1600,7 @@
       - rhel_08_010740
       - item.uid >= rhel8stig_interactive_uid_start
   tags:
+      - skip_ansible_lint
       - RHEL-08-010740
 
 - name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
@@ -1589,6 +1614,7 @@
       - rhel_08_010750
       - item.uid >= rhel8stig_interactive_uid_start
   tags:
+      - skip_ansible_lint
       - RHEL-08-010750
 
 - name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
@@ -1621,6 +1647,8 @@
   block:
       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
         shell: find / -nouser
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_010780_nouser_files
@@ -1630,7 +1658,7 @@
             msg:
                 - "ALERT!!! There are files with no user assigned. Please review files listed below and assign owner"
                 - "{{ rhel_08_010780_nouser_files.stdout_lines }}"
-        when: rhel_08_010780_nouser_files.stdout != ""
+        when: rhel_08_010780_nouser_files.stdout | length > 0
   when:
       - rhel_08_010780
   tags:
@@ -1649,7 +1677,7 @@
             msg:
                 - "ALERT!!!! There are files with no group assigned. Please review files listed below and assign group"
                 - "{{ rhel_08_010790_nogroup_files.stdout_lines }}"
-        when: rhel_08_010790_nogroup_files.stdout != ""
+        when: rhel_08_010790_nogroup_files.stdout | length > 0
   when:
       - rhel_08_010790
   tags:
@@ -2330,7 +2358,7 @@
             path: "{{ rhel_08_020030_lock_enabled.stdout }}"
             regexp: '^lock-enabled'
             line: lock-enabled=true
-        when: rhel_08_020030_lock_enabled.stdout != ""
+        when: rhel_08_020030_lock_enabled.stdout | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
@@ -2338,11 +2366,14 @@
             path: /etc/dconf/db/local.d/00-screensaver
             create: yes
             regexp: '^lock-enabled'
+            owner: root
+            group: root
+            mode: 0644
             line: |
                 [org/gnome/desktop/screensaver]
                 # Set this to true to lock the screen when the screensaver activates
                 lock-enabled=true
-        when: rhel_08_020030_lock_enabled.stdout == ""
+        when: rhel_08_020030_lock_enabled.stdout | length == 0
         notify: dconf update
   when:
       - rhel_08_020030
@@ -2364,6 +2395,9 @@
             regexp: '^set \-g'
             line: "set -g lock-command vlock"
             create: yes
+            owner: root
+            group: root
+            mode: 0644
   when:
       - rhel_08_020040
   tags:
@@ -2385,6 +2419,8 @@
   block:
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
         shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action
@@ -2399,10 +2435,13 @@
         lineinfile:
             path: /etc/dconf/db/distro.d/20-authselect
             create: yes
+            owner: root
+            group: root
+            mode: 0644
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout == ""
+        when: rhel_08_020050_removal_action.stdout | length == 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
@@ -2410,14 +2449,14 @@
             path: "{{ rhel_08_020050_removal_action.stdout }}"
             regexp: ^removal-action=
             line: removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout != ""
+        when: rhel_08_020050_removal_action.stdout | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
         lineinfile:
             path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout != ""
+        when: rhel_08_020050_removal_action_file.stdout | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
@@ -2425,7 +2464,10 @@
             path: /etc/dconf/db/distro.d/locks/20-authselect
             create: yes
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout == ""
+            owner: root
+            group: root
+            mode: 0640
+        when: rhel_08_020050_removal_action_file.stdout | length == 0
         notify: dconf update
   when:
       - rhel_08_020050
@@ -2437,6 +2479,8 @@
   block:
       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
         shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_020060_idle_delay_param
@@ -2445,21 +2489,27 @@
         lineinfile:
             path: /etc/dconf/db/local.d/00-screensaver
             create: yes
+            owner: root
+            group: root
+            mode: 0640
             regexp: '^idle-delay'
             line: |
                 [org/gnome/desktop/session]
                 # Set the lock time out to 900 seconds before the session is considered idle
                 idle-delay=uint32 900
         notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout == ""
+        when: rhel_08_020060_idle_delay_param.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         lineinfile:
             path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
             regexp: '^idle-delay='
             line: idle-delay=uint32 900
+            owner: root
+            group: root
+            mode: 0640
         notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout != ""
+        when: rhel_08_020060_idle_delay_param.stdout | length > 0
   when:
       - rhel_08_020060
       - rhel8stig_dconf_available
@@ -2472,6 +2522,9 @@
       path: /etc/tmux.conf
       regexp: '^set -g lock-after-time'
       line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020070
   tags:
@@ -2483,6 +2536,9 @@
       path: /etc/dconf/db/local.d/locks/session
       create: yes
       line: "{{ item }}"
+      owner: root
+      group: root
+      mode: 0640
   with_items:
       - /org/gnome/desktop/session/idle-delay
       - /org/gnome/desktop/screensaver/lock-enabled
@@ -2503,6 +2559,9 @@
       path: "{{ rhel8stig_sssd_conf.stdout }}"
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
+      owner: root
+      group: root
+      mode: 0640
   with_items:
       - { regexp: '^\[certmap/testing.test/rule_name]', line: '[certmap/testing.test/rule_name]' }
       - { regexp: '^matchrule =', line: 'matchrule =<SAN>.*EDIPI@mil' }
@@ -2510,6 +2569,7 @@
       - { regexp: 'dmains =', line: 'dmains = testing.test' }
   notify: restart sssd
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020090
   tags:
       - RHEL-08-020090
@@ -2520,6 +2580,9 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: '^password'
+      owner: root
+      group: root
+      mode: 0640
   with_items:
       - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
       - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
@@ -2532,6 +2595,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*ucredit'
       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
   when:
@@ -2544,6 +2610,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*lcredit'
       line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
   when:
@@ -2556,6 +2625,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*dcredit'
       line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
   when:
@@ -2568,6 +2640,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*maxclassrepeat'
       line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
   when:
@@ -2580,6 +2655,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*maxrepeat'
       line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
   when:
@@ -2592,6 +2670,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*minclass'
       line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
   when:
@@ -2604,6 +2685,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*difok'
       line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
   when:
@@ -2633,6 +2717,9 @@
   lineinfile:
       path: /etc/login.defs
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: ^#?PASS_MIN_DAYS
       line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
   when:
@@ -2645,6 +2732,9 @@
   lineinfile:
       path: /etc/login.defs
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: ^#?PASS_MAX_DAYS
       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
   when:
@@ -2658,7 +2748,7 @@
       - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
         check_mode: no
-        changed_when: rhel_08_020210_users.stdout != ""
+        changed_when: rhel_08_020210_users.stdout | length > 0
         register: rhel_08_020210_users
 
       - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
@@ -2729,6 +2819,9 @@
   lineinfile:
       path: /etc/security/pwquality.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: '^#?\s*minlen'
       line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
   when:
@@ -2742,6 +2835,9 @@
       path: /etc/login.defs
       regexp: '^PASS_MIN_LEN|^#PASS_MIN_LEN'
       line: "PASS_MIN_LEN 15"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020231
   tags:
@@ -2786,6 +2882,9 @@
             regexp: "{{ item.regexp }}"
             line: "{{ item.line }}"
             insertafter: "{{ item.insertafter }}"
+            owner: root
+            group: root
+            mode: 0644
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -2795,8 +2894,11 @@
         lineinfile:
             path: /etc/pam.d/smartcard-auth
             line: auth       sufficient pam_sss.so try_cert_auth
+            owner: root
+            group: root
+            mode: 0644
         notify: restart sssd
-        when: rhel_08_020250_sc_auth_sss.stdout == ""
+        when: rhel_08_020250_sc_auth_sss.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
         pamd:
@@ -2807,7 +2909,7 @@
             module_path: pam_sss.so
             module_arguments: 'try_cert_auth'
         notify: restart sssd
-        when: rhel_08_020250_sc_auth_sss.stdout != ""
+        when: rhel_08_020250_sc_auth_sss.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
         pamd:
@@ -2821,7 +2923,7 @@
             new_module_path: pam_sss.so
             module_arguments: try_cert_auth
         notify: restart sssd
-        when: rhel_08_020250_system_auth_sss.stdout == ""
+        when: rhel_08_020250_system_auth_sss.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
         pamd:
@@ -2832,8 +2934,9 @@
             module_path: pam_env.so
             module_arguments: try_cert_auth
         notify: restart sssd
-        when: rhel_08_020250_system_auth_sss.stdout != ""
+        when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020250
   tags:
       - RHEL-08-020250
@@ -2871,6 +2974,9 @@
       create: yes
       regexp: '^#?\s*ocredit'
       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020280
   tags:
@@ -2883,10 +2989,14 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
+      owner: root
+      group: root
+      mode: 0644
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020290
   tags:
       - RHEL-08-020290
@@ -2898,6 +3008,9 @@
       create: yes
       regexp: '^#?\s*dictcheck'
       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020300
   tags:
@@ -2909,6 +3022,9 @@
       dest: /etc/login.defs
       regexp: ^#?FAIL_DELAY
       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020310
   tags:
@@ -2949,6 +3065,9 @@
       regexp: "(?i)^#?PrintLastLog"
       line: PrintLastLog yes
       validate: /usr/sbin/sshd -t -f %s
+      owner: root
+      group: root
+      mode: 0644
   notify: restart sshd
   when:
       - rhel_08_020350
@@ -2962,6 +3081,9 @@
       path: /etc/login.defs
       regexp: .*?UMASK.*
       line: 'UMASK           077'
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_020351
   tags:
@@ -3088,6 +3210,9 @@
       path: /etc/audit/auditd.conf
       regexp: '^disk_full_action ='
       line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_030060
   tags:
@@ -3099,6 +3224,9 @@
       path: /etc/audit/auditd.conf
       regexp: '^local_events ='
       line: "local_events = yes"
+      owner: root
+      group: root
+      mode: 0644
   when:
       - rhel_08_030061
   tags:
@@ -3140,7 +3268,7 @@
         file:
             path: "{{ rhel8stig_030080_audit_log_file.stdout }}"
             owner: root
-        when: rhel8stig_030080_audit_log_file.stdout != ""
+        when: rhel8stig_030080_audit_log_file.stdout | length > 0
   when:
       - rhel_08_030080
   tags:
@@ -3169,7 +3297,9 @@
             path: "{{ rhel_08_030100_audit_log_dir.stdout }}"
             owner: root
             state: directory
-        when: rhel_08_030100_audit_log_dir.stdout != ""
+        when: rhel_08_030100_audit_log_dir.stdout | length > 0
+        tags:
+            - skip_ansible_lint
   when:
       - rhel_08_030100
   tags:
@@ -3179,6 +3309,8 @@
   block:
       - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel_08_030110_audit_log_dir
@@ -3188,10 +3320,13 @@
             path: "{{ rhel_08_030110_audit_log_dir.stdout }}"
             group: root
             state: directory
-        when: rhel_08_030110_audit_log_dir.stdout != ""
+        when: rhel_08_030110_audit_log_dir.stdout | length > 0
+        tags:
+            - skip_ansible_lint
   when:
       - rhel_08_030110
   tags:
+      - skip_ansible_lint
       - RHEL-08-030110
 
 - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
@@ -3207,7 +3342,7 @@
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
             mode: 0700
             state: directory
-        when: rhel_08_030120_audit_log_dir.stdout != ""
+        when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
       - rhel_08_030120
   tags:
@@ -3682,7 +3817,7 @@
 - name: "MEDIUM | RHEL-0-030362 | PATCH | Successful/unsuccessful uses of the renameat command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line:  "{{ item }}"
+      line: "{{ item }}"
   with_items:
       - -a always,exit -F arch=b32 -S renameat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k delete
       - -a always,exit -F arch=b64 -S renameat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k delete
@@ -4076,7 +4211,7 @@
             path: "{{ item }}"
             mode: 0755
         with_items:
-          - "{{ rhel_08_030620_tools.stdout_lines }}"
+            - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
       - rhel_08_030620
   tags:
@@ -4088,14 +4223,14 @@
       path: "{{ item }}"
       owner: root
   with_items:
-    - /sbin/auditctl
-    - /sbin/aureport
-    - /sbin/ausearch
-    - /sbin/autrace
-    - /sbin/auditd
-    - /sbin/audisp-remote
-    - /sbin/audisp-syslog
-    - /sbin/augenrules
+      - /sbin/auditctl
+      - /sbin/aureport
+      - /sbin/ausearch
+      - /sbin/autrace
+      - /sbin/auditd
+      - /sbin/audisp-remote
+      - /sbin/audisp-syslog
+      - /sbin/augenrules
   when:
       - rhel_08_030630
   tags:
@@ -4107,14 +4242,14 @@
       path: "{{ item }}"
       owner: root
   with_items:
-    - /sbin/auditctl
-    - /sbin/aureport
-    - /sbin/ausearch
-    - /sbin/autrace
-    - /sbin/auditd
-    - /sbin/audisp-remote
-    - /sbin/audisp-syslog
-    - /sbin/augenrules
+      - /sbin/auditctl
+      - /sbin/aureport
+      - /sbin/ausearch
+      - /sbin/autrace
+      - /sbin/auditd
+      - /sbin/audisp-remote
+      - /sbin/audisp-syslog
+      - /sbin/augenrules
   when:
       - rhel_08_030640
   tags:
@@ -4125,6 +4260,9 @@
   lineinfile:
       path: /etc/aide.conf
       line: "{{ item }}"
+      owner: root
+      group: root
+      mode: 0600
   with_items:
       - "# Audit Tools"
       - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
@@ -4213,6 +4351,9 @@
   lineinfile:
       path: /etc/rsyslog.conf
       create: yes
+      owner: root
+      group: root
+      mode: 0644
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
@@ -4306,6 +4447,9 @@
       create: yes
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
+      owner: root
+      group: root
+      mode: 0640
       insertafter: "{{ item.insertafter }}"
   notify: reboot system
   with_items:
@@ -4433,6 +4577,9 @@
   lineinfile:
       path: "{{ item.path }}"
       create: yes
+      owner: root
+      group: root
+      mode: 0640
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
@@ -4518,6 +4665,8 @@
 
       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
         command: nmcli radio wifi
+        args:
+            warn: no
         register: rhel_08_wifi_enabled
         check_mode: no
         changed_when: rhel_08_wifi_enabled.stdout != "disabled"
@@ -4538,6 +4687,9 @@
       regexp: '^install bluetooth '
       line: "install bluetooth /bin/true"
       create: yes
+      owner: root
+      group: root
+      mode: 0640
   notify: reboot system
   when:
       - rhel_08_040111
@@ -4551,10 +4703,12 @@
       "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
   block:
       - name: |
-          "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
-          "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
-          "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
+            "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
+            "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
+            "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
         shell: mount | grep /dev/shm
+        args:
+            warn: no
         changed_when: false
         failed_when: false
         register: rhel8stig_040120_dev_shm_status
@@ -4568,8 +4722,8 @@
             state: mounted
             src: tmpfs
             fstype: tmpfs
-            opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '')}}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
-        when: rhel8stig_040120_dev_shm_status.stdout != ""
+            opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
+        when: rhel8stig_040120_dev_shm_status.stdout | length > 0
   when:
       - rhel_08_040120 or
         rhel_08_040121 or
@@ -4581,30 +4735,30 @@
       - mounts
 
 - name: |
-    "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-    "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-    "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
+      "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
+      "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
+      "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
   block:
       - name: |
-          "MEDIUM | RHEL-08-040123 | AUDIT | RHEL 8 must mount /tmp with the nodev option."
-          "MEDIUM | RHEL-08-040124 | AUDIT | RHEL 8 must mount /tmp with the nosuid option."
-          "MEDIUM | RHEL-08-040125 | AUDIT | RHEL 8 must mount /tmp with the noexec option."
+            "MEDIUM | RHEL-08-040123 | AUDIT | RHEL 8 must mount /tmp with the nodev option."
+            "MEDIUM | RHEL-08-040124 | AUDIT | RHEL 8 must mount /tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040125 | AUDIT | RHEL 8 must mount /tmp with the noexec option."
         shell: mount | grep /tmp
         changed_when: false
         failed_when: false
         register: rhel8stig_040123_dev_status
 
       - name: |
-          "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-          "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-          "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
+            "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
+            "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
         mount:
             path: /tmp
             state: mounted
             src: xfs
             fstype: xfs
-            opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '')}}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
-        when: rhel8stig_040123_dev_status.stdout != ""
+            opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
+        when: rhel8stig_040123_dev_status.stdout | length > 0
   when:
       - rhel_08_040123 or
         rhel_08_040124 or
@@ -4616,14 +4770,14 @@
       - mounts
 
 - name: |
-    "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-    "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-    "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+      "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
+      "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+      "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
   block:
       - name: |
-          "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-          "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-          "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+            "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
+            "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+            "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
         shell: mount | grep /var/log
         changed_when: false
         failed_when: false
@@ -4638,8 +4792,8 @@
             state: mounted
             src: xfs
             fstype: xfs
-            opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '')}}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
-        when: rhel8stig_040126_var_log_status.stdout != ""
+            opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '') }}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
+        when: rhel8stig_040126_var_log_status.stdout | length > 0
   when:
       - rhel_08_040126 or
         rhel_08_040127 or
@@ -4651,30 +4805,30 @@
       - mounts
 
 - name: |
-    "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-    "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-    "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
+      "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
+      "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
+      "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
   block:
       - name: |
-          "MEDIUM | RHEL-08-040129 | AUDIT | RHEL 8 must mount /var/log/audit with the nodev option."
-          "MEDIUM | RHEL-08-040130 | AUDIT | RHEL 8 must mount /var/log/audit with the nosuid option."
-          "MEDIUM | RHEL-08-040131 | AUDIT | RHEL 8 must mount /var/log/audit with the noexec option."
+            "MEDIUM | RHEL-08-040129 | AUDIT | RHEL 8 must mount /var/log/audit with the nodev option."
+            "MEDIUM | RHEL-08-040130 | AUDIT | RHEL 8 must mount /var/log/audit with the nosuid option."
+            "MEDIUM | RHEL-08-040131 | AUDIT | RHEL 8 must mount /var/log/audit with the noexec option."
         shell: mount | grep /var/log/audit
         changed_when: false
         failed_when: false
         register: rhel8stig_040129_var_log_audit_status
 
       - name: |
-          "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-          "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-          "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
+            "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
+            "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
+            "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
         mount:
             path: /var/log/audit
             state: mounted
             src: xfs
             fstype: xfs
-            opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '')}}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
-        when: rhel8stig_040129_var_log_audit_status.stdout != ""
+            opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '') }}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
+        when: rhel8stig_040129_var_log_audit_status.stdout | length > 0
   when:
       - rhel_08_040129 or
         rhel_08_040130 or
@@ -4686,30 +4840,30 @@
       - mounts
 
 - name: |
-    "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-    "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-    "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+      "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
+      "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
+      "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
   block:
       - name: |
-          "MEDIUM | RHEL-08-040132 | AUDIT | RHEL 8 must mount /var/tmp with the nodev option"
-          "MEDIUM | RHEL-08-040133 | AUDIT | RHEL 8 must mount /var/tmp with the nosuid option."
-          "MEDIUM | RHEL-08-040134 | AUDIT | RHEL 8 must mount /var/tmp with the noexec option."
+            "MEDIUM | RHEL-08-040132 | AUDIT | RHEL 8 must mount /var/tmp with the nodev option"
+            "MEDIUM | RHEL-08-040133 | AUDIT | RHEL 8 must mount /var/tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040134 | AUDIT | RHEL 8 must mount /var/tmp with the noexec option."
         shell: mount | grep /var/tmp
         changed_when: false
         failed_when: false
         register: rhel8stig_040132_var_tmp_status
 
       - name: |
-          "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-          "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-          "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+            "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
+            "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
         mount:
             path: /var/tmp
             state: mounted
             src: xfs
             fstype: xfs
-            opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '')}}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
-        when: rhel8stig_040132_var_tmp_status.stdout != ""
+            opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
+        when: rhel8stig_040132_var_tmp_status.stdout | length > 0
   when:
       - rhel_08_040132 or
         rhel_08_040133 or
@@ -5007,7 +5161,7 @@
             name: net.ipv6.conf.all.accept_ra
             state: present
             value: '0'
-            reload: "{{ rhel8stig_sysctl_reload}}"
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
       - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
         lineinfile:
@@ -5093,6 +5247,9 @@
       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
       regexp: '^kernel.unprivileged_bpf_disabled'
       line: 'kernel.unprivileged_bpf_disabled = 1'
+      owner: root
+      group: root
+      mode: 0640
   notify: sysctl system
   when:
       - rhel_08_040281
@@ -5117,6 +5274,9 @@
       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
       regexp: '^kernel.kptr_restrict'
       line: 'kernel.kptr_restrict = 1'
+      owner: root
+      group: root
+      mode: 0640
   notify: sysctl system
   when:
       - rhel_08_040283
@@ -5199,6 +5359,9 @@
       regexp: '^.*X11Forwarding'
       line: 'X11Forwarding yes'
       create: yes
+      owner: root
+      group: root
+      mode: 0640
   notify: restart sshd
   when:
       - rhel_08_040340
@@ -5233,6 +5396,7 @@
       - rhel_08_040350
       - rhel8stig_tftp_required
   tags:
+      - skip_ansible_lint
       - RHEL-08-040350
       - tftp
 
@@ -5255,3 +5419,4 @@
   tags:
       - RHEL-08-040390
       - tuned
+      
