@@ -689,6 +689,7 @@
       - no_verification
   notify: restart sssd
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_010400
   tags:
       - RHEL-08-010400
@@ -2523,7 +2524,7 @@
       line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
       owner: root
       group: root
-      mode: 0640
+      mode: 0644
   when:
       - rhel_08_020070
   tags:
@@ -2888,7 +2889,7 @@
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
             - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
-
+           
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
         lineinfile:
             path: /etc/pam.d/smartcard-auth
@@ -2935,6 +2936,7 @@
         notify: restart sssd
         when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020250
   tags:
       - RHEL-08-020250
@@ -2994,6 +2996,7 @@
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
+      - rhel8stig_sssd_conf.stdout | length > 0
       - rhel_08_020290
   tags:
       - RHEL-08-020290
