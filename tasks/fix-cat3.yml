@@ -296,7 +296,7 @@
       create: yes
       owner: root
       group: root
-      mode: 0640
+      mode: 0600
   when:
       - rhel_08_030603
   tags:
