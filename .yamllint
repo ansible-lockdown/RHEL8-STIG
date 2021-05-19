@@ -2,6 +2,7 @@
 ignore: |
   tests/
   molecule/
+  .github/
   .gitlab-ci.yml
   *molecule.yml
 
