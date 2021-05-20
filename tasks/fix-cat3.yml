@@ -12,7 +12,7 @@
   lineinfile:
       path: /etc/sysconfig/sshd
       regexp: '^SSH_USE_STRONG_RNG=|^.*SSH_USE_STRONG_RNG='
-      line: SSH_USE_STRONG_RNG=3
+      line: SSH_USE_STRONG_RNG=32
   notify: restart sshd
   when:
       - rhel_08_010292

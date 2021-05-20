@@ -37,7 +37,7 @@
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
         lineinfile:
             path: /etc/ssh/sshd_config
-            regexp: '(?i)^.*banner'
+            regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
 
       - name: |
@@ -319,8 +319,8 @@
       line: "{{ item.line }}"
   notify: restart sshd
   with_items:
-      - { regexp: '^.*ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
-      - { regexp: '^.*ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
+      - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
+      - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
   when:
       - rhel_08_010200
       - rhel8stig_ssh_required
@@ -897,7 +897,7 @@
 - name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '#StrictModes.(yes|no)|StrictModes.(yes|no)'
+      regexp: '(?i)^#?StrictModes'
       line: 'StrictModes yes'
   notify: restart sshd
   when:
@@ -910,7 +910,7 @@
 - name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^#Compression.(yes|delayed|no)|^Compression.(yes|delayed|no)'
+      regexp: '(?i)^#?Compression'
       line: 'Compression {{ rhel8stig_sshd_compression }}'
   notify: restart sshd
   when:
@@ -923,7 +923,7 @@
 - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '#IgnoreUserKnownHosts.(yes|no)|IgnoreUserKnownHosts.(yes|no)'
+      regexp: '(?i)^#?IgnoreUserKnownHosts'
       line: 'IgnoreUserKnownHosts yes'
   notify: restart sshd
   when:
@@ -939,8 +939,8 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
-      - { regexp: '^KerberosAuthentication ', line: "KerberosAuthentication no" }
-      - { regexp: '^GSSAPIAuthentication ', line: "GSSAPIAuthentication no" }
+      - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
+      - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -967,7 +967,7 @@
 - name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^#PermitRootLogin.(yes|without-password|forced-commands-only|no)|^PermitRootLogin.(yes|without-password|forced-commands-only|no)'
+      regexp: '(?i)^#?PermitRootLogin'
       line: 'PermitRootLogin no'
   notify: restart sshd
   when:
@@ -1702,7 +1702,7 @@
 - name: "MEDIUM | RHEL-08-010830 | PATCH |Unattended or automatic logon to RHEL 8 via ssh must not be allowed."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: ^PermitUserEnvironment
+      regexp: '(?i)^#?PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
   notify: restart sshd
   when:
@@ -3062,8 +3062,8 @@
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   lineinfile:
       dest: /etc/ssh/sshd_config
-      regexp: "(?i)^#?PrintLastLog"
-      line: PrintLastLog yes
+      regexp: '(?i)^#?PrintLastLog'
+      line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
       owner: root
       group: root
@@ -3079,8 +3079,8 @@
 - name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
   lineinfile:
       path: /etc/login.defs
-      regexp: .*?UMASK.*
-      line: 'UMASK           077'
+      regexp: ^#?UMASK.*
+      line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
       owner: root
       group: root
       mode: 0644
@@ -3104,7 +3104,7 @@
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         lineinfile:
             path: "{{ item.path }}"
-            regexp: 'umask.*0([0-6][0-6])'
+            regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
             - "{{ rhel8stig_020352_files.files }}"
@@ -3119,7 +3119,7 @@
   replace:
       path: "{{ item }}"
       regexp: 'umask\s\d\d\d'
-      replace: "umask 077"
+      replace: "umask {{ rhel8stig_login_defaults.umask | default('077') }}"
   with_items:
       - /etc/bashrc
       - /etc/csh.cshrc
@@ -3135,10 +3135,10 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F key=execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F key=execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F key=execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F key=execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F key=execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F key=execpriv' }
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv' }
   notify: restart auditd
   when:
       - rhel_08_030000
@@ -3350,7 +3350,7 @@
 
 - name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
   lineinfile:
-      path: /etc/audit/audit.rules
+      path: /etc/audit/rules.d/audit.rules
       regexp: '^-e '
       line: "-e 2"
   when:
@@ -3473,11 +3473,11 @@
       - dnf
       - auditd
 
-- name: "MEDIUM | RHEL-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      regexp: '^-a always,exit -F path=/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
-      line: '-a always,exit -F path=/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+      regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+      line: '-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
   notify: restart auditd
   when:
       - rhel_08_030190
@@ -3632,6 +3632,7 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
+      - -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
       - -a always,exit -F arch=b32 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
       - -a always,exit -F arch=b64 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
   notify: restart auditd
@@ -3657,7 +3658,7 @@
 - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+      line: -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
   notify: restart auditd
   when:
       - rhel_08_030310
@@ -3745,7 +3746,7 @@
 - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/lib/openssh/ssh-keysign -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
+      line: -a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
   notify: restart auditd
   when:
       - rhel_08_030320
@@ -4044,7 +4045,10 @@
 - name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
   notify: restart auditd
   when:
       - rhel_08_030490
@@ -4111,7 +4115,10 @@
 - name: "MEDIUM | RHEL-08-030540 | PATCH | Successful/unsuccessful uses of the fchmod system call in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
   notify: restart auditd
   when:
       - rhel_08_030540
@@ -4983,8 +4990,8 @@
 - name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^RekeyLimit '
-      line: "RekeyLimit 1G 1h"
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
   notify: restart sshd
   when:
       - rhel_08_040161
@@ -4995,8 +5002,8 @@
 - name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
   lineinfile:
       path: /etc/ssh/ssh_config
-      regexp: '^RekeyLimit '
-      line: "RekeyLimit 1G 1h"
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
   notify: restart sshd
   when:
       - rhel_08_040162
@@ -5365,7 +5372,7 @@
 - name: "MEDIUM | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^.*X11Forwarding'
+      regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding yes'
       create: yes
       owner: root
@@ -5382,7 +5389,7 @@
 - name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '^X11UseLocalhost'
+      regexp: '(?i)^#?X11UseLocalhost'
       line: 'X11UseLocalhost yes'
   when:
       - rhel_08_040341
