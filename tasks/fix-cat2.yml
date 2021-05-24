@@ -1890,7 +1890,7 @@
         lineinfile:
             path: "/etc/security/faillock.conf"
             regexp: '^fail_interval =|^\# fail_interval ='
-            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }} }}"
+            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
         with_items:
             - system-auth
             - password-auth
@@ -5373,7 +5373,7 @@
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
-      line: 'X11Forwarding yes'
+      line: 'X11Forwarding no'
       create: yes
       owner: root
       group: root
