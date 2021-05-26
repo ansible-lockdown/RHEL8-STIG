@@ -34,6 +34,12 @@
   tags:
       - always
 
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - always
+
 # - name: Install OpenSCAP and run a report
 #   import_tasks: audit_oscap_scan_before.yml
 #   when: rhel8stig_oscap_scan
