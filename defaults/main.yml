@@ -425,6 +425,9 @@ rhel8stig_min_supported_os_ver:
 # If system is not router, run tasks that disable router functions.
 rhel8stig_system_is_router: no
 
+# rhel_08_010400 or rhel_08_020090 or rhel_08_020250 or rhel_08_020290
+rhel8stig_sssd_conf: /etc/sssd/sssd.conf
+
 rhel8stig_time_service: chronyd
 
 rhel8stig_firewall_service: firewalld
