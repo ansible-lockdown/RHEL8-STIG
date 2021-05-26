@@ -39,6 +39,7 @@ Role Variables
 | `rhel_08_######` | [see defaults/main.yml](./defaults/main.yml)  | Individual variables to enable/disable each STIG ID. |
 | `rhel8stig_gui` | `no` | Whether or not to run tasks related to auditing/patching the desktop environment |
 | `rhel8stig_system_is_router` | `no` | Run tasks that disable router functions. |
+| `rhel8stig_sssd_conf` | [see defaults/main.yml](./defaults/main.yml)  | Default location for sssd.conf |
 | `rhel8stig_time_service` | `chronyd` | Set to `ntpd` or `chronyd`. |
 | `rhel8stig_firewall_service` | `firewalld` | Set to `firewalld` or `iptables`. |
 | `rhel8stig_tftp_required` | `no` | If set to `no`, remove `tftp` client and server packages. |
