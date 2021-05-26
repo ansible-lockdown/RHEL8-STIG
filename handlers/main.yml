@@ -17,7 +17,7 @@
       name: sssd
       state: restarted
   when:
-      - rhel8stig_sssd_conf.stdout | length > 0
+      - "'sssd' in ansible_facts.packages" 
 
 - name: restart snmpd
   service:

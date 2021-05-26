@@ -680,7 +680,7 @@
 
 - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
   lineinfile:
-      path: '{{ rhel8stig_sssd_conf.stdout }}'
+      path: '{{ rhel8stig_sssd_conf }}'
       regexp: '^certificate_verification = {{ item }}'
       state: absent
   with_items:
@@ -689,7 +689,8 @@
       - no_verification
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf.stdout | length > 0
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_010400
   tags:
       - RHEL-08-010400
@@ -2556,20 +2557,21 @@
 
 - name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
   lineinfile:
-      path: "{{ rhel8stig_sssd_conf.stdout }}"
+      path: "{{ rhel8stig_sssd_conf }}"
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       owner: root
       group: root
       mode: 0640
   with_items:
-      - { regexp: '^\[certmap/testing.test/rule_name]', line: '[certmap/testing.test/rule_name]' }
-      - { regexp: '^matchrule =', line: 'matchrule =<SAN>.*EDIPI@mil' }
-      - { regexp: '^maprule =', line: 'maprule = (userCertificate;binary={cert!bin})' }
-      - { regexp: 'dmains =', line: 'dmains = testing.test' }
+      - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
+      - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
+      - { regexp: '^maprule = {{ rhel8stig_sssd.maprule }}', line: 'maprule = {{ rhel8stig_sssd.maprule }}' }
+      - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains}}' }
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf.stdout | length > 0
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020090
   tags:
       - RHEL-08-020090
@@ -2878,13 +2880,13 @@
 
       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
         lineinfile:
-            path: "{{ rhel8stig_sssd_conf.stdout }}"
+            path: "{{ rhel8stig_sssd_conf }}"
             regexp: "{{ item.regexp }}"
             line: "{{ item.line }}"
             insertafter: "{{ item.insertafter }}"
             owner: root
             group: root
-            mode: 0644
+            mode: 0640
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -2936,7 +2938,8 @@
         notify: restart sssd
         when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
-      - rhel8stig_sssd_conf.stdout | length > 0
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020250
   tags:
       - RHEL-08-020250
@@ -2985,18 +2988,19 @@
 
 - name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
   lineinfile:
-      path: "{{ rhel8stig_sssd_conf.stdout }}"
+      path: "{{ rhel8stig_sssd_conf }}"
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
       owner: root
       group: root
-      mode: 0644
+      mode: 0640
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
-      - rhel8stig_sssd_conf.stdout | length > 0
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020290
   tags:
       - RHEL-08-020290

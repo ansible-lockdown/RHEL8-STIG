@@ -425,9 +425,6 @@ rhel8stig_min_supported_os_ver:
 # If system is not router, run tasks that disable router functions.
 rhel8stig_system_is_router: no
 
-# rhel_08_010400 or rhel_08_020090 or rhel_08_020250 or rhel_08_020290
-rhel8stig_sssd_conf: /etc/sssd/sssd.conf
-
 rhel8stig_time_service: chronyd
 
 rhel8stig_firewall_service: firewalld
@@ -520,6 +517,15 @@ rhel8stig_password_complexity:
     maxclassrepeat: 4
     minlen: 15
     dictcheck: 1
+
+# rhel_08_010400 or rhel_08_020090 or rhel_08_020250 or rhel_08_020290
+rhel8stig_sssd_conf: /etc/sssd/sssd.conf
+rhel8stig_sssd_domain: testing.test
+rhel8stig_sssd:
+    certmap: "certmap/{{ rhel8stig_sssd_domain }}/rule_name"
+    matchrule: "=.*EDIPI@mil"
+    maprule: (userCertificate;binary={cert!bin})
+    domains: "{{ rhel8stig_sssd_domain }}"
 
 # RHEL-08-020070
 # Session timeout setting file (TMOUT setting can be set in multiple files)
