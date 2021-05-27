@@ -363,3 +363,9 @@
         rhel_08_040283 or
         rhel_08_040284 or
         rhel_08_040285
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - always

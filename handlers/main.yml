@@ -112,7 +112,10 @@
 
 - name: dconf update
   command: dconf update
-  when: rhel8stig_has_dconf_command
+  when: 
+  - "'dconf' in ansible_facts.packages"
+  - rhel8stig_always_configure_dconf
+  
 
 - name: prereport score
   debug:

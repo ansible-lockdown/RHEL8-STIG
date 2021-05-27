@@ -76,7 +76,9 @@
   notify: dconf update
   when:
       - rhel_08_010050
-      - rhel8stig_dconf_available
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
+      
   tags:
       - RHEL-08-010050
 
@@ -2378,7 +2380,9 @@
         notify: dconf update
   when:
       - rhel_08_020030
-      - rhel8stig_dconf_available
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
+      
   tags:
       - RHEL-08-020030
       - gui
@@ -2513,7 +2517,9 @@
         when: rhel_08_020060_idle_delay_param.stdout | length > 0
   when:
       - rhel_08_020060
-      - rhel8stig_dconf_available
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
+      
   tags:
       - RHEL-08-020060
       - gui
@@ -2551,7 +2557,8 @@
       - /org/gnome/desktop/lockdown/disable-lock-screen
   when:
       - rhel_08_020080
-      # - rhel8stig_dconf_available
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
   tags:
       - RHEL-08-020080
 
