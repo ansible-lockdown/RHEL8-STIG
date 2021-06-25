@@ -2574,7 +2574,7 @@
       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
       - { regexp: '^maprule = {{ rhel8stig_sssd.maprule }}', line: 'maprule = {{ rhel8stig_sssd.maprule }}' }
-      - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains}}' }
+      - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
   notify: restart sssd
   when:
       - "'sssd' in ansible_facts.packages" 
