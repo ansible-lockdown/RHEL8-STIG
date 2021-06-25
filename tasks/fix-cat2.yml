@@ -1893,7 +1893,7 @@
         lineinfile:
             path: "/etc/security/faillock.conf"
             regexp: '^fail_interval =|^\# fail_interval ='
-            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }} }}"
+            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
         with_items:
             - system-auth
             - password-auth
@@ -5380,11 +5380,11 @@
   tags:
       - RHEL-08-040330
 
-- name: "MEDIUM | RHEL-08-040340 | PATCH | Remote X connections for interactive users must be encrypted in RHEL 8."
+- name: "MEDIUM | RHEL-08-040340 | PATCH | RHEL 8 remote X connections for interactive users must be disabled unless to fulfill documented and validated mission requirements."
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
-      line: 'X11Forwarding yes'
+      line: 'X11Forwarding no'
       create: yes
       owner: root
       group: root
