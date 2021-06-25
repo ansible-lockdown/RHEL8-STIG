@@ -439,8 +439,9 @@
 - name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
   lineinfile:
       path: /etc/crypto-policies/back-ends/gnutls.config
-      regexp: '^\+VERS-ALL:'
-      line: "+VERS-ALL:{{ rhel8stig_gnutls_encryption }}"
+      regexp: '^(.*\+VERS-ALL:)'
+      line: '\1{{ rhel8stig_gnutls_encryption }}'
+      backrefs: true
       create: yes
       owner: root
       group: root
