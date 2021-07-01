@@ -57,6 +57,12 @@ Role Variables
 | `rhel8stig_password_complexity.maxrepeat` | `3` | Maximum number of allowed same consecutive characters in a new password. |
 | `rhel8stig_password_complexity.maxclassrepeat` | `4` | Maximum number of allowed same consecutive characters in the same **class** in the new password. |
 | `rhel8stig_password_complexity.minlen` | `15` | Minimum number of characters in a new password. |
+| `rhel8stig_sssd_conf` | [see defaults/main.yml](./defaults/main.yml)  | Default location for sssd.conf |
+| `rhel8stig_sssd_domain` | testing.test | Domain to be used in sssd |
+| `rhel8stig_sssd.certmap` | certmap/{{ rhel8stig_sssd_domain }}/rule_name | certmap rule for sssd |
+| `rhel8stig_sssd.matchrule` | =.*EDIPI@mil | match rule in relationship to domain e.g. CN etc |
+| `rhel8stig_sssd.maprule` | (userCertificate;binary={cert!bin}) | map cert auth requirements into sssd rule |
+| `rhel8stig_sssd.domains` | testing.test | comma seperated list of domains using sssd |
 | `rhel8stig_shell_session_timeout` | `file: /etc/profile` `timeout: 600` | Dictionary of session timeout setting and file (TMOUT setting can be set in multiple files) |
 | `rhel8stig_interactive_uid_start` | `1000` | Interactive user start point (UID_MIN) from /etc/login.defs |
 | `rhel8stig_ntp_server_name: server.name` | `server.name` | The NTP Server Name |

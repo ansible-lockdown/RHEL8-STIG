@@ -263,7 +263,7 @@
       - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
         replace:
             path: "{{ item }}"
-            regexp: 'nullok '
+            regexp: ' nullok'
             replace: ''
         with_items:
             - /etc/pam.d/system-auth
