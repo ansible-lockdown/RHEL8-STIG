@@ -16,6 +16,8 @@
   service:
       name: sssd
       state: restarted
+  when:
+      - "'sssd' in ansible_facts.packages" 
 
 - name: restart snmpd
   service:
@@ -48,6 +50,9 @@
       src: "{{ rhel8stig_grub_cfg_path | dirname }}/{{ item }}"
       dest: "{{ rhel8stig_grub_cfg_path_invalid | dirname }}/{{ item }}"
       remote_src: yes
+      owner: root
+      group: root
+      mode: 0755
   with_items:
       - grub.cfg
       - user.cfg
@@ -107,7 +112,10 @@
 
 - name: dconf update
   command: dconf update
-  when: rhel8stig_has_dconf_command
+  when: 
+  - "'dconf' in ansible_facts.packages"
+  - rhel8stig_always_configure_dconf
+  
 
 - name: prereport score
   debug:
@@ -123,3 +131,4 @@
   shell: sleep 3; reboot
   async: 15
   poll: 0
+  when: not rhel8stig_skip_reboot

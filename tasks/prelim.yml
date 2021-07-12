@@ -1,18 +1,11 @@
 ---
 - name: "PRELIM | dconf"
   block:
-      - name: "PRELIM | Check for dconf availability"
-        command: rpm -q dconf
-        changed_when: no
-        check_mode: no
-        failed_when: rhel8stig_dconf_audit.rc >= 2
-        register: rhel8stig_dconf_audit
-
       - name: "PRELIM | Install dconf"
         dnf:
             name: dconf
         when:
-            - rhel8stig_dconf_audit.rc == 1
+            - "'dconf' not in ansible_facts.packages"
             - rhel8stig_gui
 
       - name: dconf directory structure
@@ -29,7 +22,7 @@
         rhel_08_020060 or
         rhel_08_020080 or
         rhel_08_020090
-        # rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
+  # rhel_08_040180 - removed from section 1 waiting to see if it comes up somewhere else
   tags:
       - rhel_08_010050
       - rhel_08_020030
@@ -56,6 +49,7 @@
   dnf:
       name: grub2-tools
   when:
+      - "'grub2-tools' not in ansible_facts.packages"
       - rhel_08_010020 or
         rhel_08_010140 or
         rhel_08_010150
@@ -108,6 +102,7 @@
   dnf:
       name: cronie
   when:
+      - "'cronie' not in ansible_facts.packages"
       - rhel_08_010360
   tags:
       - cat2
@@ -134,6 +129,8 @@
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  args:
+      warn: no
   register: rhel_08_010690_getent
   changed_when: rhel_08_020680_getent.stdout_lines is defined
   failed_when: false
@@ -163,6 +160,8 @@
 
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
+  args:
+      warn: no
   changed_when: no
   check_mode: no
   register: rhel_08_boot_part
@@ -227,6 +226,7 @@
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
+      - "'aide' not in ansible_facts.packages"
       - rhel_08_010360 or
         rhel_08_010380 or
         rhel_08_040310
@@ -241,11 +241,10 @@
 
 - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
   dnf:
-      name:
-          - libselinux-utils
-          # - policycoreutils-python-utils
-          # - selinux-policy-targeted
+      name: libselinux-utils
+      state: present
   when:
+      - "'libselinux-utils' not in ansible_facts.packages"
       - rhel_08_010170 or
         rhel_08_010450
 
@@ -254,6 +253,9 @@
       - name: "PRELIM | Install SSH"
         dnf:
             name: openssh-server
+            state: present
+        when:
+           - "'openssh-server' not in ansible_facts.packages"
 
       - name: PRELIM | Start SSH
         service:
@@ -274,6 +276,8 @@
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  args:
+      warn: no
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
   changed_when: no
@@ -301,16 +305,33 @@
       - RHEL-08-010770
       - complexity-high
 
-- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
-  shell: find / -name sssd.conf
-  changed_when: false
-  failed_when: false
-  register: rhel8stig_sssd_conf
-  when:
-      - rhel_08_010400 or
-        rhel_08_020090 or
-        rhel_08_020250 or
-        rhel_08_020290
+- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | set sssd.conf location"
+  block:
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
+        stat: 
+            path: "{{ rhel8stig_sssd_conf }}"
+        register: rhel8stig_sssd_conf_present
+        when:
+            - "'sssd' in ansible_facts.packages"
+            - rhel_08_010400 or
+              rhel_08_020090 or
+              rhel_08_020250 or
+              rhel_08_020290
+
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | sssd install status | Warning if not found"
+        debug:
+            msg: "Warning!! The package sssd is found not be be installed, some items will skip"
+        changed_when: true
+        when:
+            -  "'sssd' not in ansible_facts.packages"
+
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
+        debug:
+            msg: "Warning!! The configured sssd config file {{ rhel8stig_sssd_conf }} has not been found, some items will skip"
+        changed_when: true
+        when:
+            - "'sssd' in ansible_facts.packages"
+            -  not rhel8stig_sssd_conf_present.stat.exists
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
@@ -322,7 +343,7 @@
       - name: "PRELIM | Setting the fact"
         set_fact:
             rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
-      
+
 - name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
   find:
       paths: /etc/sysctl.d
@@ -337,8 +358,14 @@
         rhel_08_010375 or
         rhel_08_010376 or
         rhel_08_040280 or
-        rhel_08_040281 or 
+        rhel_08_040281 or
         rhel_08_040282 or
         rhel_08_040283 or
         rhel_08_040284 or
         rhel_08_040285
+
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+  tags:
+  - always

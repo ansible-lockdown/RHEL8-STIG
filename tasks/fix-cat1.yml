@@ -129,12 +129,14 @@
         "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
         "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
   block:
-  # the createuser.cfg task is a workaround for the the ansible bug https://github.com/ansible/ansible/pull/59823
+      # the createuser.cfg task is a workaround for the the ansible bug https://github.com/ansible/ansible/pull/59823
       - name: |
               "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Create user.cfg"
               "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Create user.cfg"
         shell: test -f {{ file_q }} && echo exists || {{ create_cmd }}
-        check_mode: ansible_check_mode is not defined
+        args:
+            warn: no
+        check_mode: "{{ ansible_check_mode is not defined }}"
         register: rhel8stig_create_grub_user_cfg
         changed_when:
             - rhel8stig_create_grub_user_cfg.stdout == "created"
@@ -153,6 +155,9 @@
             create: yes
             regexp: ^GRUB2_PASSWORD=
             line: GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}
+            owner: root
+            group: root
+            mode: 0640
         notify: confirm grub2 user cfg
 
       - name: |
@@ -258,7 +263,7 @@
       - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
         replace:
             path: "{{ item }}"
-            regexp: 'nullok '
+            regexp: ' nullok'
             replace: ''
         with_items:
             - /etc/pam.d/system-auth
@@ -267,7 +272,7 @@
       - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Set PermitEmptyPasswords to no"
         lineinfile:
             path: /etc/ssh/sshd_config
-            regexp: '^.*PermitEmptyPasswords'
+            regexp: '(?i)^#?PermitEmptyPasswords'
             line: 'PermitEmptyPasswords no'
         notify: restart sshd
   when:
@@ -342,17 +347,20 @@
             line: "{{ item.line }}"
             insertafter: "{{ item.insertafter }}"
             create: yes
+            owner: root
+            group: root
+            mode: 0644
         with_items:
             - { regexp: '^\[org/gnome/settings-daemon/plugins/media-keys\]', line: '[org/gnome/settings-daemon/plugins/media-keys]', insertafter: 'EOF' }
             - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }
-        when: rhel_08_040171_logout_settings_status.stdout == ""
+        when: rhel_08_040171_logout_settings_status.stdout | length == 0
 
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
         replace:
             path: "{{ rhel_08_040171_logout_settings_status.stdout }}"
             regexp: '^[L|l]ogout=.*'
             replace: "logout=''"
-        when: rhel_08_040171_logout_settings_status.stdout != ""
+        when: rhel_08_040171_logout_settings_status.stdout | length > 0
   when:
       - rhel_08_040171
   tags:
@@ -387,19 +395,19 @@
         changed_when: false
         failed_when: false
         register: rhel_08_040200_nonroot_uid
-      
+
       - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
         command: "passwd -l {{ item }}"
         with_items:
             - "{{ rhel_08_040200_nonroot_uid.stdout_lines }}"
-        when: rhel_08_040200_nonroot_uid.stdout != ""
+        when: rhel_08_040200_nonroot_uid.stdout | length > 0
 
       - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
         debug:
             msg:
                 - "WARNING!! The following accounts were locked since they had UID of 0 and were not the root user"
                 - " {{ rhel_08_040200_nonroot_uid.stdout_lines }}"
-        when: rhel_08_040200_nonroot_uid.stdout != ""
+        when: rhel_08_040200_nonroot_uid.stdout | length > 0
   when:
       - rhel_08_040200
       - rhel8stig_disruption_high
