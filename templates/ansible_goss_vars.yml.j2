@@ -1,5 +1,5 @@
 # turn the categories on/off
-rhel8stig_cat1: true
+rhel8stig_cat1: {{ rhel8stig_cat1_patch }}
 
 # Some tests may need to scan every filesystem or have an impact on a system 
 # these may need be scheduled to minimise impact
@@ -36,4 +36,5 @@ RHEL_08_040360: {{ rhel_08_040360 }}
 
 
 
-rhel8stig_password_hash: {{ rhel8stig_password_hash }}
+rhel8stig_password_hash: {{ rhel8stig_bootloader_password_hash }}
+rhel8stig_boot_superuser: {{ rhel8stig_boot_superuser }}
