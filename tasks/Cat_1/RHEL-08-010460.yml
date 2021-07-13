@@ -1,0 +1,11 @@
+---
+
+- name: "RHEL-08-010460 | HIGH | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
+  file:
+      path: /etc/ssh/shosts.equiv
+      state: absent
+  when:
+      - rhel_08_010460
+  tags:
+      - RHEL-08-010460
+      - shosts

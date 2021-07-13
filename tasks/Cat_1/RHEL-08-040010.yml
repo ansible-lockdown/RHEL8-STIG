@@ -1,0 +1,10 @@
+---
+
+- name: "RHEL-08-040010 | HIGH | PATCH | RHEL 8 must not have the rsh-server package installed."
+  dnf:
+      name: rsh-server
+      state: absent
+  when:
+      - rhel_08_040010
+  tags:
+      - RHEL-08-040010

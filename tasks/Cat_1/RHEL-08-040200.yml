@@ -1,0 +1,28 @@
+---
+
+- name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
+  block:
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
+        shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040200_nonroot_uid
+
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
+        command: "passwd -l {{ item }}"
+        with_items:
+            - "{{ rhel_08_040200_nonroot_uid.stdout_lines }}"
+        when: rhel_08_040200_nonroot_uid.stdout | length > 0
+
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
+        debug:
+            msg:
+                - "WARNING!! The following accounts were locked since they had UID of 0 and were not the root user"
+                - " {{ rhel_08_040200_nonroot_uid.stdout_lines }}"
+        when: rhel_08_040200_nonroot_uid.stdout | length > 0
+  when:
+      - rhel_08_040200
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-040200
+      - disruption_high

@@ -1,0 +1,25 @@
+---
+
+- name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
+  block:
+      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
+        replace:
+            path: "{{ item }}"
+            regexp: ' nullok'
+            replace: ''
+        with_items:
+            - /etc/pam.d/system-auth
+            - /etc/pam.d/password-auth
+
+      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Set PermitEmptyPasswords to no"
+        lineinfile:
+            path: /etc/ssh/sshd_config
+            regexp: '(?i)^#?PermitEmptyPasswords'
+            line: 'PermitEmptyPasswords no'
+        notify: restart sshd
+  when:
+      - rhel_08_020330
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-020330
+      - disruption_high

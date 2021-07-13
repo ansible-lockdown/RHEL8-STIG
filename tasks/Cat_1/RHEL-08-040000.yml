@@ -1,0 +1,10 @@
+---
+
+- name: "RHEL-08-040000 | HIGH | PATCH | RHEL 8 must not have the telnet-server package installed."
+  dnf:
+      name: telnet-server
+      state: absent
+  when:
+      - rhel_08_040000
+  tags:
+      - RHEL-08-040000

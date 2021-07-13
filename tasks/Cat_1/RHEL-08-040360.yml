@@ -1,0 +1,11 @@
+---
+
+- name: "RHEL-08-040360 | HIGH | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: vsftpd
+      state: absent
+  when:
+      - rhel_08_040360
+  tags:
+      - RHEL-08-040360
+      - ftp

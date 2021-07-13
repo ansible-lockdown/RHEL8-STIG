@@ -1,0 +1,12 @@
+---
+
+- name: "RHEL-08-040172 | HIGH | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
+  lineinfile:
+      path: /etc/systemd/system.conf
+      regexp: '^CtrlAltDelBurstAction=|^#CtrlAltDelBurstAction='
+      line: CtrlAltDelBurstAction=none
+  notify: systemctl daemon-reload
+  when:
+      - rhel_08_040172
+  tags:
+      - RHEL-08-040172

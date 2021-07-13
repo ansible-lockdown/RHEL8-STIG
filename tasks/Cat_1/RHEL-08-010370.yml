@@ -1,0 +1,26 @@
+---
+
+- name: "RHEL-08-010370 | HIGH | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+  block:
+      - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
+        find:
+            paths: /etc/yum.repos.d
+            pattern: '*.repo'
+        register: rhel_08_010370_repos_files_list_full
+
+      - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Flatten result"
+        set_fact:
+            rhel_08_010370_repos_files_list: "{{ rhel_08_010370_repos_files_list_full.files | map(attribute='path') | flatten }}"
+
+      - name: "RHEL-08-010370 | HIGH | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Set gpgcheck"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^gpgcheck'
+            line: gpgcheck=1
+        with_items:
+            - "{{ rhel_08_010370_repos_files_list }}"
+  when:
+      - rhel_08_010370
+  tags:
+      - RHEL-08-010370
+      - yum

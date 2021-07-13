@@ -1,0 +1,22 @@
+---
+
+- name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system."
+  block:
+      - name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
+        find:
+            path: '/'
+            recurse: yes
+            patterns: '*.shosts'
+        register: rhel_08_010470_shost_files
+
+      - name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Remove .shosts files"
+        file:
+            path: "{{ item.path }}"
+            state: absent
+        with_items:
+            - "{{ rhel_08_010470_shost_files.files }}"
+  when:
+      - rhel_08_010470
+  tags:
+      - RHEL-08-010470
+      - shosts

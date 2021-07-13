@@ -1,0 +1,20 @@
+---
+
+- name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
+  block:
+      - name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Mask ctrl-alt-del.target"
+        systemd:
+            name: ctrl-alt-del.target
+            masked: yes
+        notify: systemctl daemon-reload
+
+      - name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
+        file:
+            src: /dev/null
+            dest: /etc/systemd/system/ctrl-alt-del.target
+            state: link
+        notify: systemctl daemon-reload
+  when:
+      - rhel_08_040170
+  tags:
+      - RHEL-08-040170
