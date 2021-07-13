@@ -1,0 +1,20 @@
+---
+
+- name: Include Cat 1 tasks
+  include_tasks: RHEL-08-010000.yml
+  include_tasks: RHEL-08-010020.yml
+  include_tasks: RHEL-08-010140_010150.yml
+  include_tasks: RHEL-08-010370.yml
+  include_tasks: RHEL-08-010371.yml
+  include_tasks: RHEL-08-010460.yml
+  include_tasks: RHEL-08-010470.yml
+  include_tasks: RHEL-08-010820.yml
+  include_tasks: RHEL-08-020330.yml
+  include_tasks: RHEL-08-040000.yml
+  include_tasks: RHEL-08-040010.yml
+  include_tasks: RHEL-08-040170.yml
+  include_tasks: RHEL-08-040171.yml
+  include_tasks: RHEL-08-040172.yml
+  include_tasks: RHEL-08-040190.yml
+  include_tasks: RHEL-08-040200.yml
+  include_tasks: RHEL-08-040360.yml

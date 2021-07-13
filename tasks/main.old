@@ -52,25 +52,25 @@
       - prelim_tasks
 
 - name: Include CAT I patches
-  import_tasks: cat_1/main.yml
-  when: rhel8stig_cat1_patch
+  import_tasks: fix-cat1.yml
+  when: rhel8stig_cat1_patch | bool
   tags:
       - cat1
       - high
 
-#- name: Include CAT II patches
-#  import_tasks: fix-cat2.yml
-#  tags:
-#      - cat2
-##  when: rhel8stig_cat2_patch | bool
-#      - medium
+- name: Include CAT II patches
+  import_tasks: fix-cat2.yml
+  when: rhel8stig_cat2_patch | bool
+  tags:
+      - cat2
+      - medium
 
-#- name: Include CAT III patches
-#  import_tasks: fix-cat3.yml
-#  when: rhel8stig_cat3_patch | bool
-#  tags:
-#      - cat3
-#      - low
+- name: Include CAT III patches
+  import_tasks: fix-cat3.yml
+  when: rhel8stig_cat3_patch | bool
+  tags:
+      - cat3
+      - low
 
 # - name: run the OpenSCAP reporting tool again
 #   import_tasks: audit_oscap_scan_after.yml
