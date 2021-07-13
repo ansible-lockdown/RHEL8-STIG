@@ -25,4 +25,9 @@
       - rhel8stig_disruption_high
   tags:
       - RHEL-08-040200
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230534r627750_rule
+      - V-230534
       - disruption_high

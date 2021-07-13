@@ -34,3 +34,9 @@
       - "'gnome-desktop' in ansible_facts.packages"
   tags:
       - RHEL-08-040171
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230530r646883_rule
+      - V-230530
+      

@@ -9,3 +9,8 @@
       - "'rsh-server' in ansible_facts.packages"
   tags:
       - RHEL-08-040010
+      - CAT1
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230492r627750_rule
+      - V-230492

@@ -10,4 +10,9 @@
       - not rhel8stig_tftp_required
   tags:
       - RHEL-08-040190
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230533r627750_rule
+      - V-230533
       - tftp

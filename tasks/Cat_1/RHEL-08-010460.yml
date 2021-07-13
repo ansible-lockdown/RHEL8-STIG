@@ -8,4 +8,9 @@
       - rhel_08_010460
   tags:
       - RHEL-08-010460
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230283r627750_rule
+      - V-230283
       - shosts

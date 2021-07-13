@@ -33,5 +33,12 @@ name: |
   tags:
       - RHEL-08-010140
       - RHEL-08-010150
+      - CAT1
+      - CCI-000213
+      - SRG-OS-000080-GPOS-00048
+      - SV-230234r627750_rule
+      - SV-230235r627750_rule
+      - V-230234
+      - V-230235
       - grub
       - bootloader
