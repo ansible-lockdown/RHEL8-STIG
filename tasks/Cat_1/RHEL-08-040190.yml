@@ -6,6 +6,7 @@
       state: absent
   when:
       - rhel_08_040190
+      - "'tftp-server' in ansible_facts.packages"
       - not rhel8stig_tftp_required
   tags:
       - RHEL-08-040190

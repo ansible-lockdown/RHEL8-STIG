@@ -31,5 +31,6 @@
         when: rhel_08_040171_logout_settings_status.stdout | length > 0
   when:
       - rhel_08_040171
+      - "'gnome-desktop' in ansible_facts.packages"
   tags:
       - RHEL-08-040171

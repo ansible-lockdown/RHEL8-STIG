@@ -6,5 +6,6 @@
       state: absent
   when:
       - rhel_08_040000
+      - - "'telnet-server' in ansible_facts.packages"
   tags:
       - RHEL-08-040000

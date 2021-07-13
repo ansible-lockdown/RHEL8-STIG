@@ -6,6 +6,7 @@
       state: absent
   when:
       - rhel_08_040360
+      - "'vsftpd' in ansible_facts.packages"
   tags:
       - RHEL-08-040360
       - ftp
