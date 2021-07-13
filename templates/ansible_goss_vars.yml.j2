@@ -1,0 +1,39 @@
+# turn the categories on/off
+rhel8stig_cat1: true
+
+# Some tests may need to scan every filesystem or have an impact on a system 
+# these may need be scheduled to minimise impact
+run_heavy_tests: true
+timeout_ms: 20000
+
+# If using the supplied graphical interface
+rhel8stig_gui: false
+
+# Sets up the system dependant on bootloader
+legacy_boot: {{ rhel8stig_legacy_boot }}
+rhel8stig_bootloader_path: {{ rhel8stig_bootloader_path }}
+
+
+# Cat 1 rules
+RHEL_08_010000: {{ rhel_08_010000 }}
+RHEL_08_010020: {{ rhel_08_010020 }}
+RHEL_08_010140: {{ rhel_08_010140 }}
+RHEL_08_010150: {{ rhel_08_010150 }}
+RHEL_08_010370: {{ rhel_08_010370 }}
+RHEL_08_010371: {{ rhel_08_010371 }}
+RHEL_08_010460: {{ rhel_08_010460 }}
+RHEL_08_010470: {{ rhel_08_010470 }}
+RHEL_08_010820: {{ rhel_08_010820 }}
+RHEL_08_020330: {{ rhel_08_020330 }}
+RHEL_08_040000: {{ rhel_08_040000 }}
+RHEL_08_040010: {{ rhel_08_040010 }}
+RHEL_08_040170: {{ rhel_08_040170 }}
+RHEL_08_040171: {{ rhel_08_040171 }}
+RHEL_08_040172: {{ rhel_08_040172 }}
+RHEL_08_040190: {{ rhel_08_040190 }}
+RHEL_08_040200: {{ rhel_08_040200 }}
+RHEL_08_040360: {{ rhel_08_040360 }}
+
+
+
+rhel8stig_password_hash: {{ rhel8stig_password_hash }}
