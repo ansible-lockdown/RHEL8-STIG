@@ -1,25 +1,25 @@
 ---
 
-name: |
+- name: |
         "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
         "RHEL-08-010150 | HIGH |PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
   block:
       - name: |
-              "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
-              "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
+            "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
+            "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
         lineinfile:
             path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
             create: yes
             regexp: ^GRUB2_PASSWORD=
-            line: "GRUB2_PASSWORD=grub.pbkdf2.sha512.{{ rhel8stig_bootloader_password_hash }}"
+            line: "GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}"
             owner: root
             group: root
             mode: 0640
         notify: confirm grub2 user cfg
 
       - name: |
-              "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
-              "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
+            "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
+            "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
         lineinfile:
             dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
             regexp: '^set superusers'
