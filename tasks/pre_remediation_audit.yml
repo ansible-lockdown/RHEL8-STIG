@@ -3,13 +3,13 @@
 - name: Setup the LE audit
   include_tasks: LE_audit_setup.yml
   when:
-  - rhel8stig_setup_audit
+  - setup_audit
   tags:
   - setup_audit
 
-- name: "Ensure {{ goss_audit_dir }} exists"
+- name: "Ensure {{ audit_conf_dir }} exists"
   file:
-    path: "{{ goss_audit_dir }}"
+    path: "{{ audit_conf_dir }}"
     state: directory
     mode: '0755'
 
@@ -19,13 +19,11 @@
     package:
       name: git
       state: present
-    vars:
-      ansible_python_interpreter: "{{ python2_bin }}"
 
   - name: retrieve audit content files from git
     git:
       repo: "{{ rhel8stig_audit_file_git }}"
-      dest: "{{ goss_audit_dir }}"
+      dest: "{{ audit_conf_dir }}"
       version: "{{ rhel8stig_audit_git_version }}"
   when:
   - rhel8stig_audit_content == 'git'
@@ -33,7 +31,7 @@
 - name: copy to audit content files to server
   copy:
     src: "{{ rhel8stig_audit_local_copy }}"
-    dest: "{{ goss_audit_dir }}"
+    dest: "{{ audit_conf_dir }}"
     mode: 0644
   when:
   - rhel8stig_audit_content == 'copy'
@@ -41,7 +39,7 @@
 - name: get audit content from url
   get_url:
     url: "{{ rhel8stig_audit_files_url }}"
-    dest: "{{ goss_audit_dir }}"
+    dest: "{{ audit_conf_dir }}"
   when:
   - rhel8stig_audit_content == 'get_url'
 
@@ -49,16 +47,16 @@
   block:
   - name: Check for goss file
     stat:
-      path: "{{ goss_bin }}"
+      path: "{{ audit_bin }}"
     register: goss_available
   
   - name: If audit ensure goss is available
     assert:
-      msg: "Audit has been selected: unable to find goss binary at {{ goss_bin }}"
+      msg: "Audit has been selected: unable to find goss binary at {{ audit_bin }}"
     when: 
     - not goss_available.stat.exists
   when:
-  - rhel8stig_run_audit
+  - run_audit
 
 - name: "Check whether machine is UEFI-based"
   stat:
@@ -99,22 +97,24 @@
 
 - name: Copy ansible default vars values to test audit
   template:
-    src: ansible_vars_goss.yml
-    dest: "{{ goss_vars_path }}"
+    src: ansible_vars_goss.yml.j2
+    dest: "{{ audit_vars_path }}"
     mode: 0600
   when:
-  - rhel8stig_run_audit
+  - run_audit
   tags:
   - goss_template
   
 - name: "Run pre_remediation {{ benchmark }} audit"
   goss:
-    goss_path: "{{ goss_bin }}"
-    path: "{{ goss_file }}"
-    vars_path: "{{ goss_vars_path }}"
-    format: "{{ goss_format }}"
-    output_file: "{{ pre_audit_outfile }}"
+      goss_path: "{{ audit_bin }}"
+      path: "{{ goss_file }}"
+      vars_path: "{{ audit_vars_path }}"
+      format: "{{ audit_format }}"
+      output_file: "{{ pre_audit_outfile }}"
   failed_when: false
+  environment:
+      GOSS_FMT_OPTIONS: Pretty
 
 - name: Capture audit data if json format
   block:
@@ -129,7 +129,7 @@
     vars:
       summary: 'summary."summary-line"'
   when:
-  - goss_format == "json"
+  - audit_format == "json"
 
 - name: Capture audit data if documentation format
   block:
@@ -142,4 +142,4 @@
     set_fact:
       pre_audit_summary: "{{ pre_audit.stdout_lines }}"
   when:
-  - goss_format == "documentation"
+  - audit_format == "documentation"

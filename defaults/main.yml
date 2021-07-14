@@ -1,4 +1,8 @@
 ---
+## Benchmark name used by audting control role
+# The audit variable found at the base
+benchmark: RHEL8-STIG
+
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
@@ -34,12 +38,31 @@ rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 # tweak role to run in a non-privileged container
 rhel8stig_system_is_container: false
 
-# rhel8cis is left off the front of this var for consistency in testing pipeline
+# rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
 
 # Whether to skip the reboot
-rhel8stig_skip_reboot: false
+rhel8stig_skip_reboot: true
+
+
+### Goss is required on the remote host
+setup_audit: false
+# How to retrieve audit binary
+# Options are copy or download - detailed settings at the bottom of this file
+# you will need to access to either github or the file already dowmloaded
+get_goss_file: download
+
+# how to get audit files onto host options
+# options are git/copy/get_url other e.g. if you wish to run from already downloaded conf
+rhel8stig_audit_content: git
+
+# enable audits to run - this  runs the audit and get the latest content
+run_audit: false
+
+### End Goss enablements ####
+#### Detailed settings found at the end of this document ####
+
 
 # These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
@@ -441,8 +464,7 @@ rhel8stig_tftp_required: no
 
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
-rhel8stig_bootloader_password: 'Boot1tUp!'
-rhel8stig_bootloader_password_hash: "{{ rhel8stig_bootloader_password | grub2_hash(salt='KeokpkECTJeoDhEA5XtiLQ') }}"
+rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword
 rhel8stig_boot_superuser: root
 
 # AIDE settings
@@ -721,3 +743,51 @@ rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1
 # RHEL-08-020070
 # This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
 rhel8stig_tmux_lock_after_time: 900
+
+#### Goss Configuration Settings ####
+
+### Goss binary settings ###
+goss_version:
+    release: v0.3.16
+    checksum: 'sha256:827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb'
+audit_bin_path: /usr/local/bin/
+audit_bin: "{{ audit_bin_path }}goss"
+audit_format: json
+
+# if get_goss_file == download change accordingly
+goss_url: "https://github.com/aelsabbahy/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
+
+## if get_goss_file - copy the following needs to be updated for your environment
+## it is expected that it will be copied from somewhere accessible to the control node
+## e.g copy from ansible control node to remote host
+copy_goss_from_path: /some/accessible/path
+
+### Goss Audit Benchmark file ###
+## managed by the control rhel8cis_audit_content
+# git
+rhel8cis_audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
+rhel8cis_audit_git_version: main
+
+# copy:
+rhel8cis_audit_local_copy: "some path to copy from"
+
+# get_url:
+rhel8cis_audit_files_url: "some url maybe s3?"
+
+# Where the goss audit configuration will be stored
+rhel8cis_audit_files: "/var/tmp/{{ benchmark }}-Audit/"
+
+## Goss configuration information
+# Where the goss configs and outputs are stored
+audit_out_dir: '/var/tmp'
+audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
+pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+
+## The following should not need changing
+goss_file: "{{ audit_conf_dir }}goss.yml"
+audit_vars_path: "{{ audit_conf_dir }}/vars/{{ ansible_hostname }}.yml"
+audit_results: |
+      The pre remediation results are: {{ pre_audit_summary }}.
+      The post remediation results are: {{ post_audit_summary }}.
+      Full breakdown can be found in {{ audit_out_dir }}

@@ -21,6 +21,16 @@
   tags:
       - always
 
+- name: Check rhel8stig_bootloader_password_hash variable has been changed
+  assert:
+      that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'
+      msg: "This role will not be able to run single user password commands as rhel8stig_bootloader_password_hash variable has not been set"
+
+  when:
+      - not system_is_ec2
+      - rhel_08_010140 or
+        rhel_08_010150
+
 - name: Check if using resolv.conf template settings are changed
   assert:
       that:
@@ -40,16 +50,14 @@
   tags:
   - always
 
-# - name: Install OpenSCAP and run a report
-#   import_tasks: audit_oscap_scan_before.yml
-#   when: rhel8stig_oscap_scan
-#   tags:
-#       - oscapreport
-
 - import_tasks: prelim.yml
   become: yes
   tags:
       - prelim_tasks
+
+- import_tasks: pre_remediation_audit.yml
+  when:
+  - run_audit
 
 - name: Include CAT I patches
   import_tasks: cat_1/main.yml
@@ -72,8 +80,20 @@
 #      - cat3
 #      - low
 
-# - name: run the OpenSCAP reporting tool again
-#   import_tasks: audit_oscap_scan_after.yml
-#   when: rhel8stig_oscap_scan
-#   tags:
-#       - oscapreport
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Reboot system
+  reboot:
+  when:
+  - not rhel8stig_skip_reboot
+
+- import_tasks: post_remediation_audit.yml
+  when:
+  - run_audit
+
+- name: Show Audit Summary
+  debug:
+      msg: "{{ audit_results.split('\n') }}"
+  when:
+  - run_audit
