@@ -7,11 +7,15 @@
             name: dracut-fips
             state: present
         notify: rebuild initramfs
+        when:
+        - not ansible_fips
 
       - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         command: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
+        when:
+        - not ansible_fips
 
       - name: "RHEL-08-010020 | HIGH | AUDIT | Check if prelink package is installed"
         command: rpm -q prelink
