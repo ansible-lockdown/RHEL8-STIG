@@ -871,7 +871,7 @@
       - RHEL-08-010480
       - ssh
 
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
         find:
@@ -884,10 +884,10 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
-            mode: '0640'
+            mode: '0600'
         with_items:
             - "{{ rhel_08_010490_private_host_key_files.files }}"
         notify: restart sshd
