@@ -871,9 +871,11 @@
       - RHEL-08-010480
       - ssh
 
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
+# This control asks for permissions to be set to 0640. However that is the incorrect permission for that file adn will cause issues.
+# The title is left to match the incorrect value to match the STIG but the value is adjusted to needed correct permissions
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
-      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
         find:
             paths: /etc/ssh
             recurse: yes
@@ -884,7 +886,7 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
             mode: '0600'
