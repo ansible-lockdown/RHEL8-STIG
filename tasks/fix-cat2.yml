@@ -871,8 +871,8 @@
       - RHEL-08-010480
       - ssh
 
-# This control asks for permissions to be set to 0640. However that is the incorrect permission for that file adn will cause issues.
-# The title is left to match the incorrect value to match the STIG but the value is adjusted to needed correct permissions
+# This control asks for permissions to be set to 0640. However that is the incorrect permission for that file and will cause issues.
+# The title is left to match the incorrect value in the STIG but the actual value set is adjusted to correct permissions
 - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
