@@ -3591,7 +3591,7 @@
 - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030260
@@ -3769,7 +3769,7 @@
 - name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030330
@@ -4045,8 +4045,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S chown -F auid>={{ rhel8stig_interactive_uid_start }}  -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S chown -F auid>={{ rhel8stig_interactive_uid_start }}  -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S chown -F auid>={{ rhel8stig_interactive_uid_start }}  -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S chown -F auid>={{ rhel8stig_interactive_uid_start }}  -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030480
@@ -4059,8 +4059,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S chmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030490
@@ -4073,8 +4073,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030500
@@ -4087,8 +4087,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S fchownat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S fchownat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S fchownat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fchownat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030510
@@ -4115,8 +4115,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030530
@@ -4129,8 +4129,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030540
@@ -4163,7 +4163,7 @@
 - name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030570
