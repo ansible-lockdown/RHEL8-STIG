@@ -78,7 +78,7 @@
   block:
   - name: "PRELIM | set fact if UEFI boot | RHEL or OEL"
     set_fact:
-      rhel8stig_bootloader_path: /boot/efi/EFI/redhat
+      rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
       rhel8stig_legacy_boot: false
     when:
     - rhel8_efi_boot.stat.exists
