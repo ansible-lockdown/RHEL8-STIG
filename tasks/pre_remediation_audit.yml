@@ -31,26 +31,26 @@
 
   - name: retrieve audit content files from git
     git:
-      repo: "{{ rhel8stig_audit_file_git }}"
+      repo: "{{ audit_file_git }}"
       dest: "{{ audit_conf_dir }}"
-      version: "{{ rhel8stig_audit_git_version }}"
+      version: "{{ audit_git_version }}"
   when:
-  - rhel8stig_audit_content == 'git'
+  - audit_content == 'git'
 
 - name: copy to audit content files to server
   copy:
-    src: "{{ rhel8stig_audit_local_copy }}"
+    src: "{{ audit_local_copy }}"
     dest: "{{ audit_conf_dir }}"
     mode: 0644
   when:
-  - rhel8stig_audit_content == 'copy'
+  - audit_content == 'copy'
 
 - name: get audit content from url
   get_url:
-    url: "{{ rhel8stig_audit_files_url }}"
+    url: "{{ audit_files_url }}"
     dest: "{{ audit_conf_dir }}"
   when:
-  - rhel8stig_audit_content == 'get_url'
+  - audit_content == 'get_url'
 
 - name: Check Goss is available
   block:
