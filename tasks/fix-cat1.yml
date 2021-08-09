@@ -22,14 +22,14 @@
             state: present
         notify: rebuild initramfs
         when:
-        - not ansible_fips
+            - not ansible_fips
 
       - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         command: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
         when:
-        - not ansible_fips
+            - not ansible_fips
 
       - name: "RHEL-08-010020 | HIGH | AUDIT | Check if prelink package is installed"
         command: rpm -q prelink
@@ -190,7 +190,7 @@
             path: /etc/dnf/dnf.conf
             regexp: '^gpgcheck='
             line: gpgcheck=1
-            
+
       - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
         find:
             paths: /etc/yum.repos.d
@@ -415,7 +415,7 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230530r646883_rule
       - V-230530
-      
+
 - name: "RHEL-08-040172 | HIGH | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
   lineinfile:
       path: /etc/systemd/system.conf
