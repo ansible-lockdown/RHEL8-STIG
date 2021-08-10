@@ -226,176 +226,242 @@
       - V-230232
       - disruption_high
 
-# - name: "MEDIUM | RHEL-08-010130 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all created passwords. | Add rounds argument"
-#   pamd:
-#       name: "{{ item }}"
-#       type: password
-#       control: sufficient
-#       module_path: pam_unix.so
-#       module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
-#       state: args_present
-#   with_items:
-#       - password-auth
-#       - system-auth
-#   when:
-#       - rhel_08_010130
-#   tags:
-#       - RHEL-08-010130
+- name: "MEDIUM | RHEL-08-010130 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all created passwords."
+  pamd:
+      name: "{{ item }}"
+      type: password
+      control: sufficient
+      module_path: pam_unix.so
+      module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
+      state: args_present
+  with_items:
+      - password-auth
+      - system-auth
+  when:
+      - rhel_08_010130
+  tags:
+      - RHEL-08-010130
+      - CAT2
+      - CCI-000196
+      - SRG-OS-000073-GPOS-00041
+      - SV-230233r627750_rule
+      - V-230233
+      - pamd
 
-# - name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
-#   lineinfile:
-#       path: /usr/lib/systemd/system/rescue.service
-#       regexp: '^ExecStart='
-#       line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
+- name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
+  lineinfile:
+      path: /usr/lib/systemd/system/rescue.service
+      regexp: '^ExecStart='
+      line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_010151
+  tags:
+      - RHEL-08-010151
+      - CAT2
+      - CCI-000213
+      - SRG-OS-000080-GPOS-00048
+      - SV-230236r627750_rule
+      - V-230236
+      - systemd
 
-#   when:
-#       - rhel_08_010151
-#   tags:
-#       - RHEL-08-010151
-#       - systemd
+- name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
+  pamd:
+      name: "{{ item }}"
+      type: password
+      control: sufficient
+      module_path: pam_unix.so
+      module_arguments: sha512
+      state: args_present
+  with_items:
+      - password-auth
+      - system-auth
+  when:
+      - rhel_08_010160
+  tags:
+      - RHEL-08-010160
+      - CAT2
+      - CCI-000803
+      - SRG-OS-000120-GPOS-00061
+      - SV-230237r627750_rule
+      - V-230237
+      - pamd
 
-# - name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication. | Add sha512 argument"
-#   pamd:
-#       name: "{{ item }}"
-#       type: password
-#       control: sufficient
-#       module_path: pam_unix.so
-#       module_arguments: sha512
-#       state: args_present
-#   with_items:
-#       - password-auth
-#       - system-auth
-#   when:
-#       - rhel_08_010160
-#   tags:
-#       - RHEL-08-010160
+- name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
+  block:
+      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
+        find:
+            path: /
+            patterns: '*.keytab'
+            recurse: yes
+        register: rhel8stig_010161_keytab_files
 
-# - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
-#         find:
-#             path: /
-#             patterns: '*.keytab'
-#             recurse: yes
-#         register: rhel8stig_010161_keytab_files
+      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
+        file:
+            path: "{{ item.path }}"
+            state: absent
+        with_items:
+            - "{{ rhel8stig_010161_keytab_files.files }}"
+        when: rhel8stig_010161_keytab_files.matched > 0
+  when:
+      - rhel_08_010161
+  tags:
+      - RHEL-08-010161
+      - CAT2
+      - CCI-000803
+      - SRG-OS-000120-GPOS-00061
+      - SV-230238r646862_rule
+      - V-230238
+      - kerberos
 
-#       - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
-#         file:
-#             path: "{{ item.path }}"
-#             state: absent
-#         with_items:
-#             - "{{ rhel8stig_010161_keytab_files.files }}"
-#         when: rhel8stig_010161_keytab_files.matched > 0
-#   when:
-#       - rhel_08_010161
-#   tags:
-#       - RHEL-08-010161
-#       - kerberos
+- name: "MEDIUM | RHEL-08-010162 | PATCH | The krb5-workstation package must not be installed on RHEL 8."
+  dnf:
+      name: krb5-workstation
+      state: absent
+  when:
+      - rhel_08_010162
+  tags:
+      - RHEL-08-010162
+      - CAT2
+      - CCI-000803
+      - SRG-OS-000120-GPOS-00061
+      - SV-230239r646864_rule
+      - V-230239
+      - kerberos
 
-# - name: "MEDIUM | RHEL-08-010162 | PATCH | The krb5-workstation package must not be installed on RHEL 8."
-#   dnf:
-#       name: krb5-workstation
-#       state: absent
-#   when:
-#       - rhel_08_010162
-#   tags:
-#       - RHEL-08-010162
-#       - kerberos
+- name: |
+        "MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
+        "MEDIUM | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
+  selinux:
+      state: enforcing
+      policy: targeted
+  check_mode: "{{ ansible_check_mode or rhel8stig_system_is_chroot }}"
+  notify: reboot system
+  when:
+      - rhel_08_010170 or rhel_08_010450
+      - not rhel8stig_system_is_container
+      - rhel8stig_disruption_high
+  tags:
+      - CAT2
+      - RHEL-08-010170
+      - CCI-001084
+      - SRG-OS-000134-GPOS-00068
+      - SV-230240r627750_rule
+      - V-230240
+      - RHEL-08-010450
+      - CCI-002696
+      - SRG-OS-000445-GPOS-00199
+      - SV-230282r627750_rule
+      - V-230282
+      - selinux
+      - disruption_high
 
-# - name: |
-#         "MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
-#         "MEDIUM | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
-#   selinux:
-#       state: enforcing
-#       policy: targeted
-#   check_mode: "{{ ansible_check_mode or rhel8stig_system_is_chroot }}"
-#   notify: reboot system
-#   when:
-#       - rhel_08_010170 or rhel_08_010450
-#       - not rhel8stig_system_is_container
-#       - rhel8stig_disruption_high
-#   tags:
-#       - RHEL-08-010170
-#       - RHEL-08-010450
-#       - selinux
-#       - disruption_high
+- name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
+  block:
+      - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
+        shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010180_public_not_root_owned
 
-# - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
-#         shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010180_public_not_root_owned
+      - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+        with_items:
+            - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
+  when:
+      - rhel_08_010180
+  tags:
+      - RHEL-08-010180
+      - CAT2
+      - CCI-001090
+      - SRG-OS-000138-GPOS-00069
+      - SV-230242r627750_rule
+      - V-230242
+      - permissions
 
-#       - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
-#         file:
-#             path: "{{ item }}"
-#             owner: root
-#             group: root
-#         with_items:
-#             - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
-#   when:
-#       - rhel_08_010180
-#   tags:
-#       - RHEL-08-010180
+- name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
+  block:
+      - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
+        shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010190_world_writable_files
 
-# - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
-#         shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010190_world_writable_files
+      - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
+        file:
+            path: "{{ item }}"
+            mode: '1777'
+        with_items:
+            - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
+  when:
+      - rhel_08_010190
+  tags:
+      - RHEL-08-010190
+      - CAT2
+      - CCI-001090
+      - SRG-OS-000138-GPOS-00069
+      - SV-230243r627750_rule
+      - V-230243
+      - permissions
 
-#       - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
-#         file:
-#             path: "{{ item }}"
-#             mode: '1777'
-#         with_items:
-#             - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
-#   when:
-#       - rhel_08_010190
-#   tags:
-#       - RHEL-08-010190
+- name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  notify: restart sshd
+  with_items:
+      - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
+      - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
+  when:
+      - rhel_08_010200
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010200
+      - CAT2
+      - CCI-001133
+      - SRG-OS-000163-GPOS-00072
+      - SV-230244r627750_rule
+      - V-230244
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#   notify: restart sshd
-#   with_items:
-#       - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
-#       - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
-#   when:
-#       - rhel_08_010200
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010200
-#       - ssh
-
-# - name: |
-#         "MEDIUM | RHEL-08-010210 | PATCH | The RHEL 8 /var/log/messages file must have mode 0640 or less permissive."
-#         "MEDIUM | RHEL-08-010220 | PATCH | The RHEL 8 /var/log/messages file must be owned by root."
-#         "MEDIUM | RHEL-08-010230 | PATCH | The RHEL 8 /var/log/messages file must be group-owned by root."
-#   file:
-#       path: /var/log/messages
-#       owner: root
-#       group: root
-#       mode: '0640'
-#   when:
-#       - rhel_08_010210 or
-#         rhel_08_010220 or
-#         rhel_08_010230
-#   tags:
-#       - RHEL-08-010210
-#       - RHEL-08-010220
-#       - RHEL-08-010230
+- name: |
+        "MEDIUM | RHEL-08-010210 | PATCH | The RHEL 8 /var/log/messages file must have mode 0640 or less permissive."
+        "MEDIUM | RHEL-08-010220 | PATCH | The RHEL 8 /var/log/messages file must be owned by root."
+        "MEDIUM | RHEL-08-010230 | PATCH | The RHEL 8 /var/log/messages file must be group-owned by root."
+  file:
+      path: /var/log/messages
+      owner: root
+      group: root
+      mode: '0640'
+  when:
+      - rhel_08_010210 or
+        rhel_08_010220 or
+        rhel_08_010230
+  tags:
+      - CAT2
+      - RHEL-08-010210
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230245r627750_rule
+      - V-230245
+      - RHEL-08-010220
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230246r627750_rule
+      - V-230246
+      - RHEL-08-010230
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230247r627750_rule
+      - V-230247
+      - permissions
 
 # - name: |
 #         "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
