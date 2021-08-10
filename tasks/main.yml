@@ -54,6 +54,7 @@
   become: yes
   tags:
       - prelim_tasks
+      - run_audit
 
 - import_tasks: pre_remediation_audit.yml
   when:

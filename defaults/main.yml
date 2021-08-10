@@ -60,6 +60,11 @@ audit_content: git
 # enable audits to run - this  runs the audit and get the latest content
 run_audit: false
 
+# Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
+audit_run_heavy_tests: true
+# Timeout for those cmds that take longer to run where timeout set
+audit_cmd_timeout: 30000
+
 ### End Goss enablements ####
 #### Detailed settings found at the end of this document ####
 
@@ -775,13 +780,13 @@ audit_local_copy: "some path to copy from"
 # get_url:
 audit_files_url: "some url maybe s3?"
 
-# Where the goss audit configuration will be stored
-audit_files: "/var/tmp/{{ benchmark }}-Audit/"
-
 ## Goss configuration information
 # Where the goss configs and outputs are stored
 audit_out_dir: '/var/tmp'
+# Where the goss audit configuration will be stored
 audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
+
+# If changed these can affect other products
 pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
 post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
 

@@ -10,15 +10,18 @@ rhel8stig_os_distribution: {{ ansible_distribution | lower }}
 
 rhel8stig_os_version_pre_8_2: {% if ansible_distribution_version >= '8.2' -%}false{% else -%}true{% endif -%}
 
+# Some tests may need to scan every filesystem or have an impact on a system 
+# these may need be scheduled to minimise impact also ability to set a timeout if taking too long
+run_heavy_tests: {{ audit_run_heavy_tests }}
+timeout_ms: {{ audit_cmd_timeout }}
+
+### Remediation Settings
+
 # turn the categories on/off
 rhel8stig_cat1: {{ rhel8stig_cat1_patch }}
 rhel8stig_cat2: {{ rhel8stig_cat2_patch }}
 rhel8stig_cat3: {{ rhel8stig_cat3_patch }}
 
-# Some tests may need to scan every filesystem or have an impact on a system 
-# these may need be scheduled to minimise impact
-run_heavy_tests: true
-timeout_ms: 20000
 
 # If using the supplied graphical interface
 rhel8stig_gui: false
