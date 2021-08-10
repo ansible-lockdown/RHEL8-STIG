@@ -463,110 +463,148 @@
       - V-230247
       - permissions
 
-# - name: |
-#         "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
-#         "MEDIUM | RHEL-08-010250 | PATCH | The RHEL 8 /var/log directory must be owned by root."
-#         "MEDIUM | RHEL-08-010260 | PATCH | The RHEL 8 /var/log directory must be group-owned by root."
-#   file:
-#       path: /var/log
-#       owner: root
-#       group: root
-#       mode: '0755'
-#   when:
-#       - rhel_08_010240 or
-#         rhel_08_010250 or
-#         rhel_08_010260
-#   tags:
-#       - RHEL-08-010240
-#       - RHEL-08-010250
-#       - RHEL-08-010260
+- name: |
+        "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
+        "MEDIUM | RHEL-08-010250 | PATCH | The RHEL 8 /var/log directory must be owned by root."
+        "MEDIUM | RHEL-08-010260 | PATCH | The RHEL 8 /var/log directory must be group-owned by root."
+  file:
+      path: /var/log
+      owner: root
+      group: root
+      mode: '0755'
+  when:
+      - rhel_08_010240 or
+        rhel_08_010250 or
+        rhel_08_010260
+  tags:
+      - CAT2
+      - RHEL-08-010240
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230248r627750_rule
+      - V-230248
+      - RHEL-08-010250
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230249r627750_rule
+      - V-230249
+      - RHEL-08-010260
+      - CCI-001314
+      - SRG-OS-000206-GPOS-00084
+      - SV-230250r627750_rule
+      - V-230250
+      - permissions
 
-# - name: |
-#     "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms."
-#     "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections"
-#   block:
-#       - name: |
-#           "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
-#           "MEDIUM | RHEL-08-010291 | AUDIT | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Get current FIPS mode state"
-#         command: fips-mode-setup --check
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010290_pre_fips_check
+- name: |
+    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
+    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections."
+  block:
+      - name: |
+          "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
+          "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
+        command: fips-mode-setup --check
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010290_pre_fips_check
 
-#       - name: |
-#           "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
-#           "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Enable FIPS"
-#         command: fips-mode-setup --enable
-#         register: rhel_08_010290_fips_enable
-#         notify: reboot system
-#         when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
+      - name: |
+          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
+          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Enable FIPS"
+        command: fips-mode-setup --enable
+        register: rhel_08_010290_fips_enable
+        notify: reboot system
+        when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
 
-#       - name: |
-#           "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) and ciphers employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
-#           "MEDIUM | RHEL-08-010291 | PATCH | RHEL 8 must implement DoD-approved encryption to protect the confidentiality of SSH connections | Add ssh ciphers"
-#         lineinfile:
-#             path: "{{ item.path }}"
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         notify: reboot system
-#         with_items:
-#             - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^MACs', line: "MACs {{ rhel8stig_ssh_macs_settings }}" }
-#             - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
-#   when:
-#       - rhel_08_010290 or
-#         rhel_08_010291
-#   tags:
-#       - RHEL-08-010290
-#       - RHEL-08-010291
-#       - fips
+      - name: |
+          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
+          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
+        lineinfile:
+            path: "{{ item.path }}"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        notify: reboot system
+        with_items:
+            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^MACs', line: "MACs {{ rhel8stig_ssh_macs_settings }}" }
+            - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
+  when:
+      - rhel_08_010290 or
+        rhel_08_010291
+  tags:
+      - CAT2
+      - RHEL-08-010290
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230251r646866_rule
+      - V-230251
+      - RHEL-08-010291
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230252r646869_rule
+      - V-230252
+      - fips
 
-# - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
-#         command: fips-mode-setup --check
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010293_pre_fips_check
+- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
+  block:
+      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
+        command: fips-mode-setup --check
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010293_pre_fips_check
 
-#       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
-#         command: fips-mode-setup --enable
-#         register: rhel_08_010290_fips_enable
-#         notify: reboot system
-#         when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
-#   when:
-#       - rhel_08_010293
-#   tags:
-#       - RHEL-08-010293
-#       - fips
+      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
+        command: fips-mode-setup --enable
+        register: rhel_08_010290_fips_enable
+        notify: reboot system
+        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
+  when:
+      - rhel_08_010293
+  tags:
+      - RHEL-08-010293
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230254r627750_rule
+      - V-230254
+      - fips
 
-# - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
-#   lineinfile:
-#       path: /etc/crypto-policies/back-ends/opensslcnf.config
-#       regexp: '^MinProtocol ='
-#       line: "MinProtocol = TLSv1.2"
-#   notify: reboot system
-#   when:
-#       - rhel_08_010294
-#   tags:
-#       - RHEL-08-010294
-#       - openssl
+- name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/opensslcnf.config
+      regexp: '^MinProtocol ='
+      line: "MinProtocol = TLSv1.2"
+  notify: reboot system
+  when:
+      - rhel_08_010294
+  tags:
+      - RHEL-08-010294
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230255r627750_rule
+      - V-230255
+      - openssl
 
-# - name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
-#   lineinfile:
-#       path: /etc/crypto-policies/back-ends/gnutls.config
-#       regexp: '^(.*\+VERS-ALL:)'
-#       line: '\1{{ rhel8stig_gnutls_encryption }}'
-#       backrefs: true
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0640
-#   notify: reboot system
-#   when:
-#       - rhel_08_010295
-#   tags:
-#       - RHEL-08-010295
-#       - gnutls
+- name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/gnutls.config
+      regexp: '^(.*\+VERS-ALL:)'
+      line: '\1{{ rhel8stig_gnutls_encryption }}'
+      backrefs: true
+      create: yes
+      owner: root
+      group: root
+      mode: 0640
+  notify: reboot system
+  when:
+      - rhel_08_010295
+  tags:
+      - RHEL-08-010295
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230256r627750_rule
+      - V-230256
+      - gnutls
 
 # - name: |
 #         "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
