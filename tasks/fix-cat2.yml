@@ -606,187 +606,235 @@
       - V-230256
       - gnutls
 
-# - name: |
-#         "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
-#         "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root."
-#         "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root."
-#   block:
-#       - name: |
-#               "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 0755 or less permissive. | Get commands less permissive"
-#               "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
-#               "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root. | Get commands no group-owned by root"
-#         shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010300_commands
+- name: |
+        "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive."
+        "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root."
+        "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root or a system account."
+  block:
+      - name: |
+              "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 0755 or less permissive. | Get commands less permissive"
+              "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
+              "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root or a system account. | Get commands no group-owned by root"
+        shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010300_commands
 
-#       - name: |
-#               "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive. | Set permissions"
-#               "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root. | Set permissions"
-#               "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root. | Set permissions"
-#         file:
-#             path: "{{ item }}"
-#             owner: root
-#             group: root
-#             mode: '0755'
-#             force: yes
-#         with_items:
-#             - "{{ rhel_08_010300_commands.stdout_lines }}"
-#   when:
-#       - rhel_08_010300 or
-#         rhel_08_010310 or
-#         rhel_08_010320
-#   tags:
-#       - RHEL-08-010300
-#       - RHEL-08-010310
-#       - RHEL-08-010320
+      - name: |
+              "MEDIUM | RHEL-08-010300 | PATCH | RHEL 8 system commands must have mode 0755 or less permissive. | Set permissions"
+              "MEDIUM | RHEL-08-010310 | PATCH | RHEL 8 system commands must be owned by root. | Set permissions"
+              "MEDIUM | RHEL-08-010320 | PATCH | RHEL 8 system commands must be group-owned by root or a system account. | Set permissions"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+            mode: '0755'
+            force: yes
+        with_items:
+            - "{{ rhel_08_010300_commands.stdout_lines }}"
+  when:
+      - rhel_08_010300 or
+        rhel_08_010310 or
+        rhel_08_010320
+  tags:
+      - CAT2
+      - RHEL-08-010300
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230257r627750_rule
+      - V-230257
+      - RHEL-08-010310
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230258r627750_rule
+      - V-230258
+      - RHEL-08-010320
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230259r627750_rule
+      - V-230259
+      - permissions
 
-# - name: |
-#         "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive."
-#         "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
-#         "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
-#   block:
-#       - name: |
-#               "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
-#               "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
-#               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
-#         shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010330_library_files
+- name: |
+        "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive."
+        "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
+        "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account."
+  block:
+      - name: |
+              "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+              "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+              "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
+        shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010330_library_files
 
-#       - name: |
-#               "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
-#               "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
-#               "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root. | Get library files not group-owned by root"
-#         file:
-#             path: "{{ item }}"
-#             owner: root
-#             group: root
-#             mode: '0755'
-#         with_items:
-#             - "{{ rhel_08_010330_library_files.stdout_lines }}"
-#   when:
-#       - rhel_08_010330 or
-#         rhel_08_010340 or
-#         rhel_08_010350
-#   tags:
-#       - RHEL-08-010330
-#       - RHEL-08-010340
-#       - RHEL-08-010350
+      - name: |
+              "MEDIUM | RHEL-08-010330 | PATCH | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
+              "MEDIUM | RHEL-08-010340 | PATCH | RHEL 8 library files must be owned by root. | Get library files not owned by root"
+              "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
+        file:
+            path: "{{ item }}"
+            owner: root
+            group: root
+            mode: '0755'
+        with_items:
+            - "{{ rhel_08_010330_library_files.stdout_lines }}"
+  when:
+      - rhel_08_010330 or
+        rhel_08_010340 or
+        rhel_08_010350
+  tags:
+      - CAT2
+      - RHEL-08-010330
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230260r627750_rule
+      - V-230260
+      - RHEL-08-010340
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230261r627750_rule
+      - V-230261
+      - RHEL-08-010350
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-230262r627750_rule
+      - V-230262
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
-#   cron:
-#       name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
-#       user: "{{ rhel8stig_aide_cron.user }}"
-#       cron_file: "{{ rhel8stig_aide_cron.cron_file }}"
-#       job: "{{ rhel8stig_aide_cron.job + ((rhel8stig_aide_cron.notify_by_mail) | ternary(rhel8stig_aide_cron.notify_cmd,'')) }}"
-#       minute: "{{ rhel8stig_aide_cron.minute | default((rhel8stig_cron_special_disable and
-#               rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
-#               ternary('0', omit)) | default(omit) }}"
-#       hour: "{{ rhel8stig_aide_cron.hour | default((rhel8stig_cron_special_disable and
-#               rhel8stig_aide_cron.special_time in ['daily', 'weekly', 'monthly']) |
-#               ternary('0', omit)) | default(omit) }}"
-#       weekday: "{{ rhel8stig_aide_cron.weekday | default((rhel8stig_cron_special_disable and
-#               rhel8stig_aide_cron.special_time in ['weekly']) |
-#               ternary('0', omit)) | default(omit) }}"
-#       day: "{{ rhel8stig_aide_cron.day | default((rhel8stig_cron_special_disable and
-#               rhel8stig_aide_cron.special_time in ['monthly']) |
-#               ternary('1', omit)) | default(omit) }}"
-#       special_time: "{{ (rhel8stig_cron_special_disable and
-#               rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
-#               ternary(omit, rhel8stig_aide_cron.special_time) }}"
-#   when:
-#       - rhel_08_010360
-#       - rhel8stig_disruption_high
-#   tags:
-#       - RHEL-08-010360
-#       - aide
+- name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
+  cron:
+      name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
+      user: "{{ rhel8stig_aide_cron.user }}"
+      cron_file: "{{ rhel8stig_aide_cron.cron_file }}"
+      job: "{{ rhel8stig_aide_cron.job + ((rhel8stig_aide_cron.notify_by_mail) | ternary(rhel8stig_aide_cron.notify_cmd,'')) }}"
+      minute: "{{ rhel8stig_aide_cron.minute | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+              ternary('0', omit)) | default(omit) }}"
+      hour: "{{ rhel8stig_aide_cron.hour | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['daily', 'weekly', 'monthly']) |
+              ternary('0', omit)) | default(omit) }}"
+      weekday: "{{ rhel8stig_aide_cron.weekday | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['weekly']) |
+              ternary('0', omit)) | default(omit) }}"
+      day: "{{ rhel8stig_aide_cron.day | default((rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['monthly']) |
+              ternary('1', omit)) | default(omit) }}"
+      special_time: "{{ (rhel8stig_cron_special_disable and
+              rhel8stig_aide_cron.special_time in ['hourly', 'daily', 'weekly', 'monthly']) |
+              ternary(omit, rhel8stig_aide_cron.special_time) }}"
+  when:
+      - rhel_08_010360
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010360
+      - CAT2
+      - CCI-001744
+      - SRG-OS-000363-GPOS-00150
+      - SV-230263r627750_rule
+      - V-230263
+      - aide
 
-# - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if using numbered link files"
-#         lineinfile:
-#             path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#             regexp: '^kernel.kexec_load_disabled ='
-#             line: "kernel.kexec_load_disabled = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched > 0
-#             - rhel8stig_sysctlconf_filename.files[0].islnk
+- name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
+  block:
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.kexec_load_disabled ='
+            line: "kernel.kexec_load_disabled = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
 
-#       - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if no numbered link files"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^kernel.kexec_load_disabled ='
-#             line: "kernel.kexec_load_disabled = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched == 0 or
-#               not rhel8stig_sysctlconf_filename.files[0].islnk
-#   when:
-#       - rhel_08_010372
-#   tags:
-#       - RHEL-08-010372
-#       - sysctl
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.kexec_load_disabled ='
+            line: "kernel.kexec_load_disabled = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010372
+  tags:
+      - RHEL-08-010372
+      - CAT2
+      - CCI-001749
+      - SRG-OS-000366-GPOS-00153
+      - SV-230266r627750_rule
+      - V-230266
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if using numbered link files"
-#         lineinfile:
-#             path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#             regexp: '^fs.protected_symlinks ='
-#             line: "fs.protected_symlinks = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched > 0
-#             - rhel8stig_sysctlconf_filename.files[0].islnk
+- name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
+  block:
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^fs.protected_symlinks ='
+            line: "fs.protected_symlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
 
-#       - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if no numbered link files"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^fs.protected_symlinks ='
-#             line: "fs.protected_symlinks = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched == 0 or
-#               not rhel8stig_sysctlconf_filename.files[0].islnk
-#   when:
-#       - rhel_08_010373
-#   tags:
-#       - RHEL-08-010373
-#       - sysctl
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^fs.protected_symlinks ='
+            line: "fs.protected_symlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010373
+  tags:
+      - RHEL-08-010373
+      - CAT2
+      - CCI-002165
+      - SRG-OS-000312-GPOS-00122
+      - SV-230267r627750_rule
+      - V-230267
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if using numbered link files"
-#         lineinfile:
-#             path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#             regexp: '^fs.protected_hardlinks ='
-#             line: "fs.protected_hardlinks = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched > 0
-#             - rhel8stig_sysctlconf_filename.files[0].islnk
+- name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
+  block:
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^fs.protected_hardlinks ='
+            line: "fs.protected_hardlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
 
-#       - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if no numbered link files"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^fs.protected_hardlinks ='
-#             line: "fs.protected_hardlinks = 1"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched == 0 or
-#               not rhel8stig_sysctlconf_filename.files[0].islnk
-#   when:
-#       - rhel_08_010374
-#   tags:
-#       - RHEL-08-010374
-#       - sysctl
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^fs.protected_hardlinks ='
+            line: "fs.protected_hardlinks = 1"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010374
+  tags:
+      - RHEL-08-010374
+      - CAT2
+      - CCI-002165
+      - SRG-OS-000312-GPOS-00122
+      - SV-230268r627750_rule
+      - V-230268
+      - sysctl
 
 # - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
 #   replace:
