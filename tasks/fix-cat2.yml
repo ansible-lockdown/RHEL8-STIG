@@ -6181,176 +6181,224 @@
       - V-230519
       - mounts
 
-# - name: |
-#       "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-#       "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-#       "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
-#   block:
-#       - name: |
-#             "MEDIUM | RHEL-08-040132 | AUDIT | RHEL 8 must mount /var/tmp with the nodev option"
-#             "MEDIUM | RHEL-08-040133 | AUDIT | RHEL 8 must mount /var/tmp with the nosuid option."
-#             "MEDIUM | RHEL-08-040134 | AUDIT | RHEL 8 must mount /var/tmp with the noexec option."
-#         shell: mount | grep /var/tmp
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_040132_var_tmp_status
+- name: |
+      "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
+      "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
+      "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+  block:
+      - name: |
+            "MEDIUM | RHEL-08-040132 | AUDIT | RHEL 8 must mount /var/tmp with the nodev option"
+            "MEDIUM | RHEL-08-040133 | AUDIT | RHEL 8 must mount /var/tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040134 | AUDIT | RHEL 8 must mount /var/tmp with the noexec option."
+        shell: mount | grep /var/tmp
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040132_var_tmp_status
 
-#       - name: |
-#             "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-#             "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-#             "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
-#         mount:
-#             path: /var/tmp
-#             state: mounted
-#             src: "{{ var_tmp_mount.device }}"
-#             fstype: xfs
-#             opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
-#         vars:
-#             var_tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/var/tmp`] | [0]') }}"
-#         when: rhel8stig_040132_var_tmp_status.stdout | length > 0
-#   when:
-#       - rhel_08_040132 or
-#         rhel_08_040133 or
-#         rhel_08_040134
-#   tags:
-#       - RHEL-08-040132
-#       - RHEL-08-040133
-#       - RHEL-08-040134
-#       - mounts
+      - name: |
+            "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
+            "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+        mount:
+            path: /var/tmp
+            state: mounted
+            src: "{{ var_tmp_mount.device }}"
+            fstype: xfs
+            opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
+        vars:
+            var_tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/var/tmp`] | [0]') }}"
+        when: rhel8stig_040132_var_tmp_status.stdout | length > 0
+  when:
+      - rhel_08_040132 or
+        rhel_08_040133 or
+        rhel_08_040134
+  tags:
+      - CAT2
+      - RHEL-08-040132
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230520r627750_rule
+      - V-230520
+      - RHEL-08-040133
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230521r627750_rule
+      - V-230521
+      - RHEL-08-040134
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230522r627750_rule
+      - V-230522
+      - mounts
 
-# - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
-#   block:
-#       - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Install fapolicy"
-#         dnf:
-#             name: fapolicyd
-#             state: present
+- name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
+  block:
+      - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Install fapolicy"
+        dnf:
+            name: fapolicyd
+            state: present
 
-#       - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy mounts"
-#         shell: mount | egrep '^tmpfs| ext4| ext3| xfs' | awk '{ printf "%s\n", $3 }' >> /etc/fapolicyd/fapolicyd.mounts
-#         changed_when: false
-#         failed_when: false
+      - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy mounts"
+        shell: mount | egrep '^tmpfs| ext4| ext3| xfs' | awk '{ printf "%s\n", $3 }' >> /etc/fapolicyd/fapolicyd.mounts
+        changed_when: false
+        failed_when: false
 
-#       - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Start/enable fapolicy"
-#         service:
-#             name: fapolicyd
-#             state: started
-#             enabled: yes
+      - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Start/enable fapolicy"
+        service:
+            name: fapolicyd
+            state: started
+            enabled: yes
 
-#       - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
-#         lineinfile:
-#             path: /etc/fapolicyd/fapolicyd.rules
-#             line: "{{ item }}"
-#         with_items:
-#             - "{{ rhel8stig_fapolicy_white_list }}"
+      - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
+        lineinfile:
+            path: /etc/fapolicyd/fapolicyd.rules
+            line: "{{ item }}"
+        with_items:
+            - "{{ rhel8stig_fapolicy_white_list }}"
 
-#       - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
-#         lineinfile:
-#             path: /etc/fapolicyd/fapolicyd.conf
-#             regexp: '^permissive ='
-#             line: 'permissive = 0'
-#   when:
-#       - rhel_08_040135
-#   tags:
-#       - RHEL-08-040135
-#       - fapolicyd
+      - name: "MEDIUM | RHEL-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
+        lineinfile:
+            path: /etc/fapolicyd/fapolicyd.conf
+            regexp: '^permissive ='
+            line: 'permissive = 0'
+  when:
+      - rhel_08_040135
+  tags:
+      - RHEL-08-040135
+      - CAT2
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230523r627750_rule
+      - V-230523
+      - fapolicyd
 
-# - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
-#         dnf:
-#             name: usbguard
-#             state: present
+- name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
+  block:
+      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
+        dnf:
+            name: usbguard
+            state: present
 
-#       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
-#         service:
-#             name: usbguard
-#             state: started
-#             enabled: yes
-#   when:
-#       - rhel_08_040140
-#   tags:
-#       - RHEL-08-040140
-#       - usbguard
+      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
+        service:
+            name: usbguard
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040140
+  tags:
+      - RHEL-08-040140
+      - CAT2
+      - CCI-001958
+      - SRG-OS-000378-GPOS-00163
+      - SV-230524r627750_rule
+      - V-230524
+      - usbguard
 
-# - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
-#         dnf:
-#             name: nftables
-#             state: present
+- name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
+  block:
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
+        dnf:
+            name: nftables
+            state: present
 
-#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
-#         service:
-#             name: nftables
-#             state: started
-#             enabled: yes
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
+        service:
+            name: nftables
+            state: started
+            enabled: yes
 
-#       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
-#         lineinfile:
-#             path: /etc/firewalld/firewalld.conf
-#             regexp: '^FirewallBackend='
-#             line: 'FirewallBackend=nftables'
-#   when:
-#       - rhel_08_040150
-#   tags:
-#       - RHEL-08-040150
-#       - firewall
-#       - nftables
+      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
+        lineinfile:
+            path: /etc/firewalld/firewalld.conf
+            regexp: '^FirewallBackend='
+            line: 'FirewallBackend=nftables'
+  when:
+      - rhel_08_040150
+  tags:
+      - RHEL-08-040150
+      - CAT2
+      - CCI-002385
+      - SRG-OS-000420-GPOS-00186
+      - SV-230525r627750_rule
+      - V-230525
+      - firewall
+      - nftables
 
-# - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
-#         dnf:
-#             name: openssh-server
-#             state: present
+- name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
+  block:
+      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
+        dnf:
+            name: openssh-server
+            state: present
 
-#       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
-#         service:
-#             name: sshd
-#             state: started
-#             enabled: yes
-#   when:
-#       - rhel_08_040160
-#   tags:
-#       - rhel_08_040160
-#       - ssh
+      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
+        service:
+            name: sshd
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040160
+  tags:
+      - rhel_08_040160
+      - CAT2
+      - CCI-002418
+      - SRG-OS-000423-GPOS-00187
+      - SV-230526r627750_rule
+      - V-230526
+      - ssh
 
-# - name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?RekeyLimit'
-#       line: 'RekeyLimit 1G 1h'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_040161
-#   tags:
-#       - RHEL-08-040161
-#       - sshd
+- name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
+  notify: restart sshd
+  when:
+      - rhel_08_040161
+  tags:
+      - RHEL-08-040161
+      - CAT2
+      - CCI-000068
+      - RG-OS-000033-GPOS-00014
+      - SV-230527r627750_rule
+      - V-230527
+      - sshd
 
-# - name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
-#   lineinfile:
-#       path: /etc/ssh/ssh_config
-#       regexp: '(?i)^#?RekeyLimit'
-#       line: 'RekeyLimit 1G 1h'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_040162
-#   tags:
-#       - RHEL-08-040162
-#       - sshd
+- name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
+  lineinfile:
+      path: /etc/ssh/ssh_config
+      regexp: '(?i)^#?RekeyLimit'
+      line: 'RekeyLimit 1G 1h'
+  notify: restart sshd
+  when:
+      - rhel_08_040162
+  tags:
+      - RHEL-08-040162
+      - CAT2
+      - CCI-000068
+      - SRG-OS-000033-GPOS-00014
+      - SV-230528r627750_rule
+      - V-230528
+      - sshd
 
-# - name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
-#   systemd:
-#       name: debug-shell.service
-#       state: stopped
-#       enabled: no
-#       masked: yes
-#       daemon_reload: yes
-#   when:
-#       - rhel_08_040180
-#   tags:
-#       - RHEL-08-040180
-#       - debug-shell
+- name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
+  systemd:
+      name: debug-shell.service
+      state: stopped
+      enabled: no
+      masked: yes
+      daemon_reload: yes
+  when:
+      - rhel_08_040180
+  tags:
+      - RHEL-08-040180
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230532r627750_rule
+      - V-230532
+      - debug-shell
 
 # - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
 #   block:
