@@ -3799,148 +3799,199 @@
       - V-230382
       - ssh
 
-# - name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
-#   lineinfile:
-#       path: /etc/login.defs
-#       regexp: ^#?UMASK.*
-#       line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020351
-#   tags:
-#       - RHEL-08-020351
+- name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
+  lineinfile:
+      path: /etc/login.defs
+      regexp: ^#?UMASK.*
+      line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020351
+  tags:
+      - RHEL-08-020351
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00228
+      - SV-230383r627750_rule
+      - V-230383
+      - login
+      - umask
 
-# - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
-#         find:
-#             paths: /home
-#             patterns: '^\.'
-#             contains: 'umask'
-#             recurse: yes
-#             hidden: yes
-#             use_regex: yes
-#         register: rhel8stig_020352_files
+- name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts."
+  block:
+      - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
+        find:
+            paths: /home
+            patterns: '^\.'
+            contains: 'umask'
+            recurse: yes
+            hidden: yes
+            use_regex: yes
+        register: rhel8stig_020352_files
 
-#       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
-#         lineinfile:
-#             path: "{{ item.path }}"
-#             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
-#             state: absent
-#         with_items:
-#             - "{{ rhel8stig_020352_files.files }}"
-#         when: rhel8stig_020352_files.matched > 0
-#   when:
-#       - rhel_08_020352
-#   tags:
-#       - RHEL-08-020352
-#       - umask
+      - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
+        lineinfile:
+            path: "{{ item.path }}"
+            regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
+            state: absent
+        with_items:
+            - "{{ rhel8stig_020352_files.files }}"
+        when: rhel8stig_020352_files.matched > 0
+  when:
+      - rhel_08_020352
+  tags:
+      - RHEL-08-020352
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00228
+      - SV-230384r627750_rule
+      - V-230384
+      - umask
 
-# - name: "MEDIUM | RHEL-08-020353 | PATCH | RHEL 8 must define default permissions for logon and non-logon shells."
-#   replace:
-#       path: "{{ item }}"
-#       regexp: 'umask\s\d\d\d'
-#       replace: "umask {{ rhel8stig_login_defaults.umask | default('077') }}"
-#   with_items:
-#       - /etc/bashrc
-#       - /etc/csh.cshrc
-#   when:
-#       - rhel_08_020353
-#   tags:
-#       - RHEL-08-020353
-#       - umask
+- name: "MEDIUM | RHEL-08-020353 | PATCH | RHEL 8 must define default permissions for logon and non-logon shells."
+  replace:
+      path: "{{ item }}"
+      regexp: 'umask\s\d\d\d'
+      replace: "umask {{ rhel8stig_login_defaults.umask | default('077') }}"
+  with_items:
+      - /etc/bashrc
+      - /etc/csh.cshrc
+  when:
+      - rhel_08_020353
+  tags:
+      - RHEL-08-020353
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230385r627750_rule
+      - V-230385
+      - umask
 
-# - name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#   with_items:
-#       - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv' }
-#       - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv' }
-#       - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv' }
-#       - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv' }
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030000
-#   tags:
-#       - RHEL-08-030000
-#       - auditd
+- name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv' }
+      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv' }
+  notify: restart auditd
+  when:
+      - rhel_08_030000
+  tags:
+      - RHEL-08-030000
+      - CAT2
+      - CCI-002233
+      - SRG-OS-000326-GPOS-00126
+      - SV-230386r627750_rule
+      - V-230386
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030010 | PATCH | Cron logging must be implemented in RHEL 8."
-#   lineinfile:
-#       path: /etc/rsyslog.conf
-#       regexp: '^cron.*'
-#       line: 'cron.*                                                  /var/log/cron'
-#   when:
-#       - rhel_08_030010
-#   tags:
-#       - RHEL-08-030010
-#       - cron
+- name: "MEDIUM | RHEL-08-030010 | PATCH | Cron logging must be implemented in RHEL 8."
+  lineinfile:
+      path: /etc/rsyslog.conf
+      regexp: '^cron.*'
+      line: 'cron.*                                                  /var/log/cron'
+  when:
+      - rhel_08_030010
+  tags:
+      - RHEL-08-030010
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230387r627750_rule
+      - V-230387
+      - cron
 
-# - name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^action_mail_acct ='
-#       line: "action_mail_acct = {{ rhel8stig_auditd_mail_acct }}"
-#   register: rhel_08_030020_action_mail_acct_result
-#   failed_when:
-#       - rhel_08_030020_action_mail_acct_result is failed
-#       - rhel_08_030020_action_mail_acct_result.rc != 257
-#   when:
-#       - rhel_08_030020
-#   tags:
-#       - RHEL-08-030020
-#       - auditd
+- name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^action_mail_acct ='
+      line: "action_mail_acct = {{ rhel8stig_auditd_mail_acct }}"
+  register: rhel_08_030020_action_mail_acct_result
+  failed_when:
+      - rhel_08_030020_action_mail_acct_result is failed
+      - rhel_08_030020_action_mail_acct_result.rc != 257
+  when:
+      - rhel_08_030020
+  tags:
+      - RHEL-08-030020
+      - CAT2
+      - CCI-000139
+      - SRG-OS-000046-GPOS-00022
+      - SV-230388r627750_rule
+      - V-230388
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
-#   lineinfile:
-#       path: /etc/aliases
-#       regexp: '^postmaster:'
-#       line: 'postmaster:     root'
-#   when:
-#       - rhel_08_030030
-#   tags:
-#       - RHEL-08-030030
-#       - aliases
+- name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
+  lineinfile:
+      path: /etc/aliases
+      regexp: '^postmaster:'
+      line: 'postmaster:     root'
+  when:
+      - rhel_08_030030
+  tags:
+      - RHEL-08-030030
+      - CAT2
+      - CCI-000139
+      - SRG-OS-000046-GPOS-00022
+      - SV-230389r627750_rule
+      - V-230389
+      - aliases
 
-# - name: "MEDIUM | RHEL-08-030040 | PATCH | The RHEL 8 System must take appropriate action when an audit processing failure occurs."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^disk_error_action ='
-#       line: "disk_error_action = {{ rhel8stig_auditd_disk_error_action }}"
-#   when:
-#       - rhel_08_030040
-#   tags:
-#       - RHEL-08-030040
-#       - auditd
+- name: "MEDIUM | RHEL-08-030040 | PATCH | The RHEL 8 System must take appropriate action when an audit processing failure occurs."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^disk_error_action ='
+      line: "disk_error_action = {{ rhel8stig_auditd_disk_error_action }}"
+  when:
+      - rhel_08_030040
+  tags:
+      - RHEL-08-030040
+      - CAT2
+      - CCI-000140
+      - SRG-OS-000047-GPOS-00023
+      - SV-230390r627750_rule
+      - V-230390
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030050 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted when the audit storage volume is full."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^max_log_file_action ='
-#       line: "max_log_file_action = {{ rhel8stig_auditd_max_log_file_action }}"
-#   when:
-#       - rhel_08_030050
-#   tags:
-#       - RHEL-08-030050
-#       - auditd
+- name: "MEDIUM | RHEL-08-030050 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted when the audit storage volume is full."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^max_log_file_action ='
+      line: "max_log_file_action = {{ rhel8stig_auditd_max_log_file_action }}"
+  when:
+      - rhel_08_030050
+  tags:
+      - RHEL-08-030050
+      - CAT2
+      - CCI-000140
+      - SRG-OS-000047-GPOS-00023
+      - SV-230391r627750_rule
+      - V-230391
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030060 | PATCH | The RHEL 8 audit system must take appropriate action when the audit storage volume is full."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^disk_full_action ='
-#       line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_030060
-#   tags:
-#       - RHEL-08-030060
-#       - auditd
+- name: "MEDIUM | RHEL-08-030060 | PATCH | The RHEL 8 audit system must take appropriate action when the audit storage volume is full."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^disk_full_action ='
+      line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_030060
+  tags:
+      - RHEL-08-030060
+      - CAT2
+      - SRG-OS-000047-GPOS-00023
+      - SV-230392r627750_rule
+      - V-230392
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030061 | PATCH | The RHEL 8 audit system must audit local events."
 #   lineinfile:
