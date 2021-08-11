@@ -1093,154 +1093,199 @@
       - V-230280
       - sysctl
 
-# - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
-#         find:
-#             paths: /etc/ssh
-#             recurse: yes
-#             file_type: file
-#             patterns: 'ssh_host*_key.pub'
-#             hidden: true
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010480_public_files
+- name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*_key.pub'
+            hidden: true
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010480_public_files
 
-#       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
-#         file:
-#             path: "{{ item.path }}"
-#             mode: '0644'
-#         with_items:
-#             - "{{ rhel_08_010480_public_files.files }}"
-#         notify: restart sshd
-#   when:
-#       - rhel_08_010480
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010480
-#       - ssh
+      - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
+        file:
+            path: "{{ item.path }}"
+            mode: '0644'
+        with_items:
+            - "{{ rhel_08_010480_public_files.files }}"
+        notify: restart sshd
+  when:
+      - rhel_08_010480
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010480
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230286r627750_rule
+      - V-230286
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
-#         find:
-#             paths: /etc/ssh
-#             recurse: yes
-#             file_type: file
-#             patterns: 'ssh_host*key'
-#             hidden: true
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010490_private_host_key_files
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*key'
+            hidden: true
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010490_private_host_key_files
 
-#       - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
-#         file:
-#             path: "{{ item.path }}"
-#             mode: '0640'
-#         with_items:
-#             - "{{ rhel_08_010490_private_host_key_files.files }}"
-#         notify: restart sshd
-#   when:
-#       - rhel_08_010490
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010490
-#       - ssh
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
+        file:
+            path: "{{ item.path }}"
+            mode: '0640'
+        with_items:
+            - "{{ rhel_08_010490_private_host_key_files.files }}"
+        notify: restart sshd
+  when:
+      - rhel_08_010490
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010490
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230287r627750_rule
+      - V-230287
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?StrictModes'
-#       line: 'StrictModes yes'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010500
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010500
-#       - ssh
+- name: "MEDIUM | RHEL-08-010500 | PATCH | The RHEL 8 SSH daemon must perform strict mode checking of home directory configuration files."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?StrictModes'
+      line: 'StrictModes yes'
+  notify: restart sshd
+  when:
+      - rhel_08_010500
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010500
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230288r627750_rule
+      - V-230288
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?Compression'
-#       line: 'Compression {{ rhel8stig_sshd_compression }}'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010510
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010510
-#       - ssh
+- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?Compression'
+      line: 'Compression {{ rhel8stig_sshd_compression }}'
+  notify: restart sshd
+  when:
+      - rhel_08_010510
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010510
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230289r627750_rule
+      - V-230289
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?IgnoreUserKnownHosts'
-#       line: 'IgnoreUserKnownHosts yes'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010520
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010520
-#       - ssh
+- name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?IgnoreUserKnownHosts'
+      line: 'IgnoreUserKnownHosts yes'
+  notify: restart sshd
+  when:
+      - rhel_08_010520
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010520
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230290r627750_rule
+      - V-230290
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow unused methods of authentication."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#   with_items:
-#       - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
-#       - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010521
-#   tags:
-#       - RHEL-08-010521
-#       - ssh
+- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow unused methods of authentication."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
+      - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
+  notify: restart sshd
+  when:
+      - rhel_08_010521
+  tags:
+      - RHEL-08-010521
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230291r627750_rule
+      - V-230291
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
-#   debug:
-#       msg: "WARNING!!!! /tmp is not mounted on a separate partition"
-#   changed_when:
-#       - rhel8stig_audit_complex
-#   when:
-#       - rhel_08_010543
-#       - not rhel8stig_system_is_container
-#       - rhel8stig_complex
-#       - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
-#   tags:
-#       - RHEL-08-010543
-#       - complexity-high
-#       - mount
-#       - tmp
+- name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
+  debug:
+      msg: "WARNING!!!! /tmp is not mounted on a separate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010543
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
+  tags:
+      - RHEL-08-010543
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230295r627750_rule
+      - V-230295
+      - complexity-high
+      - mount
+      - tmp
 
-# - name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?PermitRootLogin'
-#       line: 'PermitRootLogin no'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010550
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-010550
-#       - ssh
+- name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?PermitRootLogin'
+      line: 'PermitRootLogin no'
+  notify: restart sshd
+  when:
+      - rhel_08_010550
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010550
+      - CAT2
+      - CCI-000770
+      - SRG-OS-000109-GPOS-00056
+      - SV-230296r627750_rule
+      - V-230296
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
-#   service:
-#       name: auditd
-#       state: started
-#       enabled: yes
-#   when:
-#       - rhel_08_010560
-#       - not rhel8stig_system_is_container
-#   tags:
-#       - RHEL-08-010560
-#       - auditd
+- name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
+  service:
+      name: auditd
+      state: started
+      enabled: yes
+  when:
+      - rhel_08_010560
+      - not rhel8stig_system_is_container
+  tags:
+      - RHEL-08-010560
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230297r627750_rule
+      - V-230297
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-010561 | PATCH | The rsyslog service must be running in RHEL 8."
 #   service:
