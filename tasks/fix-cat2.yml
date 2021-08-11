@@ -1603,252 +1603,306 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230307r627750_rule
       - V-230307
+      - mounts
       - nfs
 
-# - name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)"
-#   mount:
-#       path: "{{ item }}"
-#       src: "{{ ansible_mounts | json_query(device_query) }}"
-#       fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
-#       opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
-#       state: mounted
-#   vars:
-#       device_query: '[?mount == `{{ item }}`] | [0].device'
-#       fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-#       options_query: '[?mount == `{{ item }}`] | [0].options'
-#   with_items: "{{ rhel8stig_nfs_mounts }}"
-#   when:
-#       - rhel_08_010650
-#       - "'nosuid' not in (ansible_mounts | json_query(options_query))"
-#   tags:
-#       - RHEL-08-010650
+- name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)"
+  mount:
+      path: "{{ item }}"
+      src: "{{ ansible_mounts | json_query(device_query) }}"
+      fstype: "{{ ansible_mounts | json_query(fstype_query) }}"
+      opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
+      state: mounted
+  vars:
+      device_query: '[?mount == `{{ item }}`] | [0].device'
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
+      options_query: '[?mount == `{{ item }}`] | [0].options'
+  with_items: "{{ rhel8stig_nfs_mounts }}"
+  when:
+      - rhel_08_010650
+      - "'nosuid' not in (ansible_mounts | json_query(options_query))"
+  tags:
+      - RHEL-08-010650
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230308r627750_rule
+      - V-230308
+      - mounts
+      - nfs
 
-# - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
-#         shell: find {{ item.mount }} -xdev -type f -perm -002
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010660_world_writable_files
-#         with_items:
-#             - "{{ ansible_mounts }}"
+- name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
+  block:
+      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
+        shell: find {{ item.mount }} -xdev -type f -perm -002
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010660_world_writable_files
+        with_items:
+            - "{{ ansible_mounts }}"
 
-#       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
-#         set_fact:
-#             rhel_08_010660_change_perms: "{{ rhel_08_010660_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
+      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
+        set_fact:
+            rhel_08_010660_change_perms: "{{ rhel_08_010660_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
 
-#       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
-#         include_tasks: audit_homedirinifiles.yml
-#         loop:
-#             - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
-#         loop_control:
-#             loop_var: ini_item
-#         when:
-#             - rhel_08_010660_change_perms != []
+      - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
+        include_tasks: audit_homedirinifiles.yml
+        loop:
+            - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+        loop_control:
+            loop_var: ini_item
+        when:
+            - rhel_08_010660_change_perms != []
 
-#       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
-#         file:
-#             path: "{{ item }}"
-#             mode: '0755'
-#             state: file
-#         with_items:
-#             - "{{ rhel_08_010660_change_perms }}"
-#         when:
-#             - rhel_08_010660_change_perms != []
-#   when:
-#       - rhel_08_010660
-#       - rhel8stig_disruption_high
-#       # - rhel_08_stig_interactive_homedir_inifiles is defined
-#   tags:
-#       - RHEL-08-010660
+      - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
+        file:
+            path: "{{ item }}"
+            mode: '0755'
+            state: file
+        with_items:
+            - "{{ rhel_08_010660_change_perms }}"
+        when:
+            - rhel_08_010660_change_perms != []
+  when:
+      - rhel_08_010660
+      - rhel8stig_disruption_high
+      # - rhel_08_stig_interactive_homedir_inifiles is defined
+  tags:
+      - RHEL-08-010660
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230309r627750_rule
+      - V-230309
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
-#   service:
-#       name: kdump
-#       enabled: no
-#       state: stopped
-#   when:
-#       - rhel_08_010670
-#       - not rhel8stig_kdump_needed
-#   tags:
-#       - RHEL-08-010670
-#       - kdump
+- name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
+  service:
+      name: kdump
+      enabled: no
+      state: stopped
+  when:
+      - rhel_08_010670
+      - not rhel8stig_kdump_needed
+  tags:
+      - RHEL-08-010670
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230310r627750_rule
+      - V-230310
+      - kdump
 
-# - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if using numbered link files"
-#         lineinfile:
-#             path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#             regexp: '^kernel.core_pattern ='
-#             line: "kernel.core_pattern = |/bin/false"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched > 0
-#             - rhel8stig_sysctlconf_filename.files[0].islnk
+- name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
+  block:
+      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if using numbered link files"
+        lineinfile:
+            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+            regexp: '^kernel.core_pattern ='
+            line: "kernel.core_pattern = |/bin/false"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched > 0
+            - rhel8stig_sysctlconf_filename.files[0].islnk
 
-#       - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if no numbered link files"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^kernel.core_pattern ='
-#             line: "kernel.core_pattern = |/bin/false"
-#         notify: sysctl system
-#         when:
-#             - rhel8stig_sysctlconf_filename.matched == 0 or
-#               not rhel8stig_sysctlconf_filename.files[0].islnk
-#   when:
-#       - rhel_08_010671
-#   tags:
-#       - RHEL-08-010671
-#       - sysctl
+      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if no numbered link files"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^kernel.core_pattern ='
+            line: "kernel.core_pattern = |/bin/false"
+        notify: sysctl system
+        when:
+            - rhel8stig_sysctlconf_filename.matched == 0 or
+              not rhel8stig_sysctlconf_filename.files[0].islnk
+  when:
+      - rhel_08_010671
+  tags:
+      - RHEL-08-010671
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230311r627750_rule
+      - V-230311
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-010672 | PATCH | RHEL 8 must disable acquiring, saving, and processing core dumps."
-#   systemd:
-#       name: systemd-coredump.socket
-#       masked: yes
-#       daemon_reload: yes
-#   notify: systemctl daemon-reload
-#   when:
-#       - rhel_08_010672
-#   tags:
-#       - RHEL-08-010672
-#       - systemd
+- name: "MEDIUM | RHEL-08-010672 | PATCH | RHEL 8 must disable acquiring, saving, and processing core dumps."
+  systemd:
+      name: systemd-coredump.socket
+      masked: yes
+      daemon_reload: yes
+  notify: systemctl daemon-reload
+  when:
+      - rhel_08_010672
+  tags:
+      - RHEL-08-010672
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230312r627750_rule
+      - V-230312
+      - systemd
 
-# - name: "MEDIUM | RHEL-08-010673 | PATCH | RHEL 8 must disable core dumps for all users."
-#   lineinfile:
-#       path: /etc/security/limits.conf
-#       regexp: '^\*.*hard.*core'
-#       line: "*               hard    core            0"
-#       insertbefore: '# End of file'
-#   when:
-#       - rhel_08_010673
-#   tags:
-#       - RHEL-08-010673
-#       - security
-#       - limits
+- name: "MEDIUM | RHEL-08-010673 | PATCH | RHEL 8 must disable core dumps for all users."
+  lineinfile:
+      path: /etc/security/limits.conf
+      regexp: '^\*.*hard.*core'
+      line: "*               hard    core            0"
+      insertbefore: '# End of file'
+  when:
+      - rhel_08_010673
+  tags:
+      - RHEL-08-010673
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230313r627750_rul
+      - V-230313
+      - security
+      - limits
 
-# - name: "MEDIUM | RHEL-08-010674 | PATCH | RHEL 8 must disable storing core dumps."
-#   lineinfile:
-#       path: /etc/systemd/coredump.conf
-#       regexp: '^(S|s)torage=|#(S|s)torage='
-#       line: "Storage=none"
-#   when:
-#       - rhel_08_010674
-#   tags:
-#       - RHEL-08-010674
-#       - systemd
+- name: "MEDIUM | RHEL-08-010674 | PATCH | RHEL 8 must disable storing core dumps."
+  lineinfile:
+      path: /etc/systemd/coredump.conf
+      regexp: '^(S|s)torage=|#(S|s)torage='
+      line: "Storage=none"
+  when:
+      - rhel_08_010674
+  tags:
+      - RHEL-08-010674
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230314r627750_rule
+      - V-230314
+      - systemd
 
-# - name: "MEDIUM | RHEL-08-010675 | PATCH | RHEL 8 must disable core dump backtraces."
-#   lineinfile:
-#       path: /etc/systemd/coredump.conf
-#       regexp: '^(P|p)rocess(S|s)ize(M|m)ax=|(P|p)rocess(S|s)ize(M|m)ax='
-#       line: "ProcessSizeMax=0"
-#   when:
-#       - rhel_08_010675
-#   tags:
-#       - RHEL-08-010675
-#       - systemd
+- name: "MEDIUM | RHEL-08-010675 | PATCH | RHEL 8 must disable core dump backtraces."
+  lineinfile:
+      path: /etc/systemd/coredump.conf
+      regexp: '^(P|p)rocess(S|s)ize(M|m)ax=|(P|p)rocess(S|s)ize(M|m)ax='
+      line: "ProcessSizeMax=0"
+  when:
+      - rhel_08_010675
+  tags:
+      - RHEL-08-010675
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230315r627750_rule
+      - V-230315
+      - systemd
 
-# # NOTE: The following does not address that /etc/resolv.conf can be modified by DHCP when running networkmanager, and thus having two DNS servers may be a config setting not on the hosts, but on the DHCP service.
-# - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Audit the /etc/nsswitch.conf"
-#         shell: grep "dns" /etc/nsswitch.conf | grep -v "#"
-#         changed_when: no
-#         failed_when: false
-#         check_mode: no
-#         register: rhel_08_010680_nsswitch_check
+# NOTE: The following does not address that /etc/resolv.conf can be modified by DHCP when running networkmanager, and thus having two DNS servers may be a config setting not on the hosts, but on the DHCP service.
+- name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured."
+  block:
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Audit the /etc/nsswitch.conf"
+        shell: grep "dns" /etc/nsswitch.conf | grep -v "#"
+        changed_when: no
+        failed_when: false
+        check_mode: no
+        register: rhel_08_010680_nsswitch_check
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine if networkmanager is setting /etc/resolv.conf"
-#         command: grep -c "# Generated by NetworkManager" /etc/resolv.conf
-#         changed_when: no
-#         failed_when: false
-#         check_mode: no
-#         register: rhel_08_010680_networkmanager_check
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine if networkmanager is setting /etc/resolv.conf"
+        command: grep -c "# Generated by NetworkManager" /etc/resolv.conf
+        changed_when: no
+        failed_when: false
+        check_mode: no
+        register: rhel_08_010680_networkmanager_check
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine number of nameserver lines in /etc/resolv.conf"
-#         shell: grep -i "nameserver" /etc/resolv.conf | grep -v "#" | wc -l
-#         changed_when: no
-#         failed_when: false
-#         check_mode: no
-#         register: rhel_08_010680_nameserver_count
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine number of nameserver lines in /etc/resolv.conf"
+        shell: grep -i "nameserver" /etc/resolv.conf | grep -v "#" | wc -l
+        changed_when: no
+        failed_when: false
+        check_mode: no
+        register: rhel_08_010680_nameserver_count
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Change resolv.conf if dns is not present in nsswitch.conf"
-#         shell: echo -n > /etc/resolv.conf && chattr +i /etc/resolv.conf
-#         when:
-#             - "'dns' not in rhel_08_010680_nsswitch_check.stdout"
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Change resolv.conf if dns is not present in nsswitch.conf"
+        shell: echo -n > /etc/resolv.conf && chattr +i /etc/resolv.conf
+        when:
+            - "'dns' not in rhel_08_010680_nsswitch_check.stdout"
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
-#         lineinfile:
-#             dest: /etc/resolv.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "nameserver {{ item.line }}"
-#             insertafter: "{{ item.after }}"
-#         with_items:  # Written as lineinfile replaces last found so reverse logic to keep order of servers
-#             - { regexp: ^nameserver, line: '{{ rhel8stig_dns_servers.1 }}', after: ^search }
-#             - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }})', line: '{{ rhel8stig_dns_servers.0 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
-#         #    - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }}|{{ rhel8stig_dns_servers.0 }})', line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
-#         when:
-#             - not rhel8_stig_use_resolv_template
-#             - rhel_08_010680_networkmanager_check.stdout == '0'
-#             - rhel_08_010680_nameserver_count.stdout | int >= 2
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
+        lineinfile:
+            dest: /etc/resolv.conf
+            regexp: "{{ item.regexp }}"
+            line: "nameserver {{ item.line }}"
+            insertafter: "{{ item.after }}"
+        with_items:  # Written as lineinfile replaces last found so reverse logic to keep order of servers
+            - { regexp: ^nameserver, line: '{{ rhel8stig_dns_servers.1 }}', after: ^search }
+            - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }})', line: '{{ rhel8stig_dns_servers.0 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        #    - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }}|{{ rhel8stig_dns_servers.0 }})', line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
+        when:
+            - not rhel8_stig_use_resolv_template
+            - rhel_08_010680_networkmanager_check.stdout == '0'
+            - rhel_08_010680_nameserver_count.stdout | int >= 2
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf using a template when not NetworkManager controlled"
-#         template:
-#             src: resolv.conf.j2
-#             dest: /etc/resolv.conf
-#             owner: root
-#             group: root
-#             mode: 0644
-#         when:
-#             - rhel_08_010680_networkmanager_check.stdout == '0'
-#             - rhel8_stig_use_resolv_template
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf using a template when not NetworkManager controlled"
+        template:
+            src: resolv.conf.j2
+            dest: /etc/resolv.conf
+            owner: root
+            group: root
+            mode: 0644
+        when:
+            - rhel_08_010680_networkmanager_check.stdout == '0'
+            - rhel8_stig_use_resolv_template
 
-#       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | If networkmanager is setting resolv.conf, debug msg to audit/change DNS settings in dhcp."
-#         debug:
-#             msg: "The file /etc/resolv.conf is managed by network manager and/or shows less than two DNS servers configured. Please correct this in your DHCP configurations."
-#         changed_when: true
-#         when:
-#             - rhel_08_010680_networkmanager_check.stdout != '0' or rhel_08_010680_nameserver_count.stdout| int < 2
-#             - not rhel8_stig_use_resolv_template
-#   when:
-#       - rhel_08_010680
-#       - not rhel8stig_system_is_chroot
-#       - not rhel8stig_system_is_container
-#       - not system_is_ec2
-#   tags:
-#       - RHEL-08-010680
+      - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | If networkmanager is setting resolv.conf, debug msg to audit/change DNS settings in dhcp."
+        debug:
+            msg: "The file /etc/resolv.conf is managed by network manager and/or shows less than two DNS servers configured. Please correct this in your DHCP configurations."
+        changed_when: true
+        when:
+            - rhel_08_010680_networkmanager_check.stdout != '0' or rhel_08_010680_nameserver_count.stdout| int < 2
+            - not rhel8_stig_use_resolv_template
+  when:
+      - rhel_08_010680
+      - not rhel8stig_system_is_chroot
+      - not rhel8stig_system_is_container
+      - not system_is_ec2
+  tags:
+      - RHEL-08-010680
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230316r627750_rule
+      - V-230316
+      - dns
 
-# - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010690 | AUDIT | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory. | Find path files"
-#         shell: find "{{ item }}" -maxdepth 1 -type f | xargs grep "PATH=" | cut -d':' -f1 | xargs realpath
-#         with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
-#         register: rhel_08_010690_ini_path_grep_list
-#         changed_when: no
-#         failed_when: false
+- name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
+  block:
+      - name: "MEDIUM | RHEL-08-010690 | AUDIT | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory. | Find path files"
+        shell: find "{{ item }}" -maxdepth 1 -type f | xargs grep "PATH=" | cut -d':' -f1 | xargs realpath
+        with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
+        register: rhel_08_010690_ini_path_grep_list
+        changed_when: no
+        failed_when: false
 
-#       - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
-#         debug:
-#             msg: You will need to audit and correct executable paths set in "{{ item }}" to contain only paths that resolve to the user's home directory.
-#         with_items:
-#             - "{{ rhel_08_010690_ini_path_grep_list.results | map(attribute='stdout_lines') | list }}"
+      - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
+        debug:
+            msg: You will need to audit and correct executable paths set in "{{ item }}" to contain only paths that resolve to the user's home directory.
+        with_items:
+            - "{{ rhel_08_010690_ini_path_grep_list.results | map(attribute='stdout_lines') | list }}"
 
-#       - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
-#         lineinfile:
-#             path: "{{ item }}"
-#             regexp: "^PATH="
-#             line: "{{ rhel_08_010690_user_path }}"
-#         with_items:
-#             - "{{ rhel_08_010690_ini_path_grep_list.results | map(attribute='stdout_lines') | list }}"
-#   when:
-#       - rhel_08_010690
-#       - rhel8stig_disruption_high
-#       - rhel8stig_change_user_path
-#   tags:
-#       - RHEL-08-010690
-#       - complexity-high
+      - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
+        lineinfile:
+            path: "{{ item }}"
+            regexp: "^PATH="
+            line: "{{ rhel_08_010690_user_path }}"
+        with_items:
+            - "{{ rhel_08_010690_ini_path_grep_list.results | map(attribute='stdout_lines') | list }}"
+  when:
+      - rhel_08_010690
+      - rhel8stig_disruption_high
+      - rhel8stig_change_user_path
+  tags:
+      - RHEL-08-010690
+      - CAT2
+      - CCI-000366
+      - SV-230317r627750_rule
+      - V-230317
+      - complexity-high
 
 # - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group."
 #   block:
