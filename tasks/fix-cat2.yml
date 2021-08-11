@@ -6030,117 +6030,156 @@
       - V-230510
       - mounts
 
-# - name: |
-#       "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-#       "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-#       "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
-#   block:
-#       - name: |
-#             "MEDIUM | RHEL-08-040123 | AUDIT | RHEL 8 must mount /tmp with the nodev option."
-#             "MEDIUM | RHEL-08-040124 | AUDIT | RHEL 8 must mount /tmp with the nosuid option."
-#             "MEDIUM | RHEL-08-040125 | AUDIT | RHEL 8 must mount /tmp with the noexec option."
-#         shell: mount | grep /tmp
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_040123_dev_status
+- name: |
+      "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
+      "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
+      "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
+  block:
+      - name: |
+            "MEDIUM | RHEL-08-040123 | AUDIT | RHEL 8 must mount /tmp with the nodev option."
+            "MEDIUM | RHEL-08-040124 | AUDIT | RHEL 8 must mount /tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040125 | AUDIT | RHEL 8 must mount /tmp with the noexec option."
+        shell: mount | grep /tmp
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040123_dev_status
 
-#       - name: |
-#             "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-#             "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-#             "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
-#         mount:
-#             path: /tmp
-#             state: mounted
-#             src: "{{ tmp_mount.device }}"
-#             fstype: xfs
-#             opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
-#         vars:
-#             tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"
-#         when: rhel8stig_040123_dev_status.stdout | length > 0
+      - name: |
+            "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
+            "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
+            "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
+        mount:
+            path: /tmp
+            state: mounted
+            src: "{{ tmp_mount.device }}"
+            fstype: xfs
+            opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
+        vars:
+            tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"
+        when: rhel8stig_040123_dev_status.stdout | length > 0
 
-#   when:
-#       - rhel_08_040123 or
-#         rhel_08_040124 or
-#         rhel_08_040125
-#   tags:
-#       - RHEL-08-040123
-#       - RHEL-08-040124
-#       - RHEL-08-04125
-#       - mounts
+  when:
+      - rhel_08_040123 or
+        rhel_08_040124 or
+        rhel_08_040125
+  tags:
+      - CAT2
+      - RHEL-08-040123
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230511r627750_rule
+      - V-230511
+      - RHEL-08-040124
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230512r627750_rule
+      - V-230512
+      - RHEL-08-04125
+      - CCI-00176
+      - SRG-OS-000368-GPOS-00154
+      - SV-230513r627750_rule
+      - V-230513
+      - mounts
 
-# - name: |
-#       "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-#       "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-#       "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-#   block:
-#       - name: |
-#             "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-#             "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-#             "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-#         shell: mount | grep /var/log
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_040126_var_log_status
+- name: |
+      "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
+      "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+      "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+  block:
+      - name: |
+            "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
+            "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+            "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+        shell: mount | grep /var/log
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040126_var_log_status
 
-#       - name: |
-#             "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-#             "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-#             "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-#         mount:
-#             path: /var/log
-#             state: mounted
-#             src: "{{ var_log_mount.device }}"
-#             fstype: xfs
-#             opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '') }}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
-#         vars:
-#             var_log_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log`] | [0]') }}"
-#         when: rhel8stig_040126_var_log_status.stdout | length > 0
-#   when:
-#       - rhel_08_040126 or
-#         rhel_08_040127 or
-#         rhel_08_040128
-#   tags:
-#       - RHEL-08-040126
-#       - RHEL-08-040127
-#       - RHEL-08-040128
-#       - mounts
+      - name: |
+            "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
+            "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+            "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+        mount:
+            path: /var/log
+            state: mounted
+            src: "{{ var_log_mount.device }}"
+            fstype: xfs
+            opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '') }}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
+        vars:
+            var_log_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log`] | [0]') }}"
+        when: rhel8stig_040126_var_log_status.stdout | length > 0
+  when:
+      - rhel_08_040126 or
+        rhel_08_040127 or
+        rhel_08_040128
+  tags:
+      - CAT2
+      - RHEL-08-040126
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230514r627750_rule
+      - V-230514
+      - RHEL-08-040127
+      - V-230514
+      - SRG-OS-000368-GPOS-00154
+      - SV-230515r627750_rule
+      - V-230515
+      - RHEL-08-040128
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230516r627750_rule
+      - V-230516
+      - mounts
 
-# - name: |
-#       "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-#       "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-#       "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
-#   block:
-#       - name: |
-#             "MEDIUM | RHEL-08-040129 | AUDIT | RHEL 8 must mount /var/log/audit with the nodev option."
-#             "MEDIUM | RHEL-08-040130 | AUDIT | RHEL 8 must mount /var/log/audit with the nosuid option."
-#             "MEDIUM | RHEL-08-040131 | AUDIT | RHEL 8 must mount /var/log/audit with the noexec option."
-#         shell: mount | grep /var/log/audit
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_040129_var_log_audit_status
+- name: |
+      "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
+      "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
+      "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
+  block:
+      - name: |
+            "MEDIUM | RHEL-08-040129 | AUDIT | RHEL 8 must mount /var/log/audit with the nodev option."
+            "MEDIUM | RHEL-08-040130 | AUDIT | RHEL 8 must mount /var/log/audit with the nosuid option."
+            "MEDIUM | RHEL-08-040131 | AUDIT | RHEL 8 must mount /var/log/audit with the noexec option."
+        shell: mount | grep /var/log/audit
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040129_var_log_audit_status
 
-#       - name: |
-#             "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-#             "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-#             "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
-#         mount:
-#             path: /var/log/audit
-#             state: mounted
-#             src: "{{ audit_mount.device }}"
-#             fstype: xfs
-#             opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '') }}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
-#         vars:
-#             audit_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log/audit`] | [0]') }}"
-#         when: rhel8stig_040129_var_log_audit_status.stdout | length > 0
-#   when:
-#       - rhel_08_040129 or
-#         rhel_08_040130 or
-#         rhel_08_040131
-#   tags:
-#       - RHEL-08-040129
-#       - RHEL-08-040130
-#       - RHEL-08-040131
-#       - mounts
+      - name: |
+            "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
+            "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
+            "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
+        mount:
+            path: /var/log/audit
+            state: mounted
+            src: "{{ audit_mount.device }}"
+            fstype: xfs
+            opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '') }}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
+        vars:
+            audit_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log/audit`] | [0]') }}"
+        when: rhel8stig_040129_var_log_audit_status.stdout | length > 0
+  when:
+      - rhel_08_040129 or
+        rhel_08_040130 or
+        rhel_08_040131
+  tags:
+      - CAT2
+      - RHEL-08-040129
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230517r627750_rule
+      - V-230517
+      - RHEL-08-040130
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230518r627750_rule
+      - V-230518
+      - RHEL-08-040131
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230519r627750_rule
+      - V-230519
+      - mounts
 
 # - name: |
 #       "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
