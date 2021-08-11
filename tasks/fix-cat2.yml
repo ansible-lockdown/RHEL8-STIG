@@ -4206,136 +4206,186 @@
       - V-230403
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030130 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/shadow'
-#       line: '-w /etc/shadow -p wa -k identity'
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030130
-#   tags:
-#       - RHEL-08-030130
-#       - auditd
+- name: "MEDIUM | RHEL-08-030130 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/shadow'
+      line: '-w /etc/shadow -p wa -k identity'
+  notify: restart auditd
+  when:
+      - rhel_08_030130
+  tags:
+      - RHEL-08-030130
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230404r627750_rule
+      - V-230404
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030140 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/security/opasswd."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/security/opasswd'
-#       line: -w /etc/security/opasswd -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030140
-#   tags:
-#       - RHEL-08-030140
-#       - auditd
+- name: "MEDIUM | RHEL-08-030140 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/security/opasswd."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/security/opasswd'
+      line: -w /etc/security/opasswd -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030140
+  tags:
+      - RHEL-08-030140
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230405r627750_rule
+      - V-230405
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030150 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/passwd'
-#       line: -w /etc/passwd -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030150
-#   tags:
-#       - RHEL-08-030150
-#       - auditd
+- name: "MEDIUM | RHEL-08-030150 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/passwd'
+      line: -w /etc/passwd -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030150
+  tags:
+      - RHEL-08-030150
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230406r627750_rule
+      - V-230406
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030160 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/gshadow'
-#       line: -w /etc/gshadow -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030160
-#   tags:
-#       - RHEL-08-030160
-#       - auditd
+- name: "MEDIUM | RHEL-08-030160 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/gshadow'
+      line: -w /etc/gshadow -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030160
+  tags:
+      - RHEL-08-030160
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230407r627750_rule
+      - V-230407
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030170 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/group'
-#       line: -w /etc/group -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030170
-#   tags:
-#       - RHEL-08-030170
-#       - auditd
+- name: "MEDIUM | RHEL-08-030170 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/group'
+      line: -w /etc/group -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030170
+  tags:
+      - RHEL-08-030170
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230408r627750_rule
+      - V-230408
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030171 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/sudoers '
-#       line: -w /etc/sudoers -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030171
-#   tags:
-#       - RHEL-08-030171
-#       - auditd
+- name: "MEDIUM | RHEL-08-030171 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/sudoers '
+      line: -w /etc/sudoers -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030171
+  tags:
+      - RHEL-08-030171
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230409r627750_rule
+      - V-230409
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030172 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers.d/."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-w /etc/sudoers.d/'
-#       line: -w /etc/sudoers.d/ -p wa -k identity
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030172
-#   tags:
-#       - RHEL-08-030172
-#       - auditd
+- name: "MEDIUM | RHEL-08-030172 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers.d/."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-w /etc/sudoers.d/'
+      line: -w /etc/sudoers.d/ -p wa -k identity
+  notify: restart auditd
+  when:
+      - rhel_08_030172
+  tags:
+      - RHEL-08-030172
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230410r627750_rule
+      - V-230410
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Install audit"
-#         dnf:
-#             name: audit
-#             state: present
+- name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
+  block:
+      - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Install audit"
+        dnf:
+            name: audit
+            state: present
 
-#       - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Enable and start service"
-#         service:
-#             name: auditd
-#             enabled: yes
-#             state: started
-#   when:
-#       - rhel_08_030180
-#   tags:
-#       - rhel_08_030180
-#       - dnf
-#       - auditd
+      - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Enable and start service"
+        service:
+            name: auditd
+            enabled: yes
+            state: started
+  when:
+      - rhel_08_030180
+  tags:
+      - rhel_08_030180
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230411r646881_rule
+      - V-230411
+      - dnf
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
-#       line: '-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030190
-#   tags:
-#       - RHEL-08-030190
-#       - auditd
+- name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+      line: '-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+  notify: restart auditd
+  when:
+      - rhel_08_030190
+  tags:
+      - RHEL-08-030190
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230412r627750_rule
+      - V-230412
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S lremovexattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S lremovexattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030200
-#   tags:
-#       - RHEL-08-030200
-#       - auditd
+- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S lremovexattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S lremovexattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030200
+  tags:
+      - RHEL-08-030200
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230413r627750_rule
+      - V-230413
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030210 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the removexattr system call."
 #   lineinfile:
