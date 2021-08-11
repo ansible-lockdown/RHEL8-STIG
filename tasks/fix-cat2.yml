@@ -5497,127 +5497,177 @@
       - V-230476
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
-#   dnf:
-#       name: rsyslog
-#       state: present
-#   when:
-#       - rhel_08_030670
-#   tags:
-#       - RHEL-08-030670
-#       - rsyslog
+- name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
+  dnf:
+      name: rsyslog
+      state: present
+  when:
+      - rhel_08_030670
+  tags:
+      - RHEL-08-030670
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230477r627750_rule
+      - V-230477
+      - rsyslog
 
-# - name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
-#   dnf:
-#       name: gnutls
-#       state: present
-#   when:
-#       - rhel_08_030680
-#   tags:
-#       - RHEL-08-030680
-#       - gnutls
+- name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
+  dnf:
+      name: gnutls
+      state: present
+  when:
+      - rhel_08_030680
+  tags:
+      - RHEL-08-030680
+      - CAT2
+      - CCI-00036
+      - SRG-OS-000480-GPOS-00227
+      - SV-230478r627750_rule
+      - V-230478
+      - gnutls
 
-# - name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
-#   lineinfile:
-#       path: /etc/rsyslog.conf
-#       regexp: '^.*\@\@'
-#       line: "*.* @@{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
-#   when:
-#       - rhel_08_030690
-#   tags:
-#       - RHEL-08-030690
-#       - auditd
+- name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
+  lineinfile:
+      path: /etc/rsyslog.conf
+      regexp: '^.*\@\@'
+      line: "*.* @@{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
+  when:
+      - rhel_08_030690
+  tags:
+      - RHEL-08-030690
+      - CAT2
+      - CCI-001851
+      - SRG-OS-000342-GPOS-00133
+      - SV-230479r627750_rule
+      - V-230479
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^overflow_action ='
-#       line: 'overflow_action = {{ rhel8stig_audisp_overflow_action }}'
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030700
-#   tags:
-#       - RHEL-08-030700
-#       - auditd
+- name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^overflow_action ='
+      line: 'overflow_action = {{ rhel8stig_audisp_overflow_action }}'
+  notify: restart auditd
+  when:
+      - rhel_08_030700
+  tags:
+      - RHEL-08-030700
+      - CAT2
+      - CCI-001851
+      - SRG-OS-000342-GPOS-00133
+      - SV-230480r627750_rule
+      - V-230480
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-03710 | PATCH | RHEL 8 must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
-#   lineinfile:
-#       path: /etc/rsyslog.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#   with_items:
-#       - { regexp: '^\$DefaultNetstreamDriver', line: '$DefaultNetstreamDriver gtls' }
-#       - { regexp: '^\$ActionSendStreamDriverMode', line: '$ActionSendStreamDriverMode 1' }
-#   when:
-#       - rhel_08_030710
-#   tags:
-#       - RHEL-08-030710
-#       - auditd
+- name: "MEDIUM | RHEL-08-03710 | PATCH | RHEL 8 must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
+  lineinfile:
+      path: /etc/rsyslog.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '^\$DefaultNetstreamDriver', line: '$DefaultNetstreamDriver gtls' }
+      - { regexp: '^\$ActionSendStreamDriverMode', line: '$ActionSendStreamDriverMode 1' }
+  when:
+      - rhel_08_030710
+  tags:
+      - RHEL-08-030710
+      - CAT2
+      - CCI-001851
+      - SRG-OS-000342-GPOS-00133
+      - SV-230481r627750_rule
+      - V-230481
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
-#   lineinfile:
-#       path: /etc/rsyslog.conf
-#       regexp: '^\$ActionSendStreamDriverAuthMode'
-#       line: "$ActionSendStreamDriverAuthMode x509/name"
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030720
-#   tags:
-#       - rhel_08_030720
-#       - auditd
+- name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
+  lineinfile:
+      path: /etc/rsyslog.conf
+      regexp: '^\$ActionSendStreamDriverAuthMode'
+      line: "$ActionSendStreamDriverAuthMode x509/name"
+  notify: restart auditd
+  when:
+      - rhel_08_030720
+  tags:
+      - rhel_08_030720
+      - CAT2
+      - CCI-001851
+      - SRG-OS-000342-GPOS-00133
+      - SV-230482r627750_rule
+      - V-230482
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#   with_items:
-#       - { regexp: '^space_left =', line: 'space_left = 25%' }
-#       - { regexp: '^space_left_action =', line: 'space_left_action = EMAIL' }
-#   when:
-#       - rhel_08_030730
-#   tags:
-#       - RHEL-08-030730
-#       - auditd
+- name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  with_items:
+      - { regexp: '^space_left =', line: 'space_left = 25%' }
+      - { regexp: '^space_left_action =', line: 'space_left_action = EMAIL' }
+  when:
+      - rhel_08_030730
+  tags:
+      - RHEL-08-030730
+      - CAT2
+      - CCI-001855
+      - SRG-OS-000343-GPOS-00134
+      - SV-230483r627750_rule
+      - V-230483
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
-#   lineinfile:
-#       path: /etc/chrony.conf
-#       regexp: '^server'
-#       line: 'server {{ rhel8stig_ntp_server_name }} iburst maxpoll 16'
-#   notify: restart {{ rhel8stig_time_service }}
-#   when:
-#       - rhel_08_030740
-#   tags:
-#       - RHEL-08-030740
-#       - chronyd
+- name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
+  lineinfile:
+      path: /etc/chrony.conf
+      regexp: '^server'
+      line: 'server {{ rhel8stig_ntp_server_name }} iburst maxpoll 16'
+  notify: restart {{ rhel8stig_time_service }}
+  when:
+      - rhel_08_030740
+  tags:
+      - RHEL-08-030740
+      - CAT2
+      - CCI-001891
+      - SRG-OS-000355-GPOS-00143
+      - SV-230484r627750_rule
+      - V-230484
+      - chronyd
 
-# - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
-#   shell: dnf remove abrt*
-#   failed_when: false
-#   args:
-#       warn: false
-#   when:
-#       - rhel_08_040001
-#   tags:
-#       - RHEL-08-040001
-#       - dnf
-#       - abrt
+- name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
+  shell: dnf remove abrt*
+  failed_when: false
+  args:
+      warn: false
+  when:
+      - rhel_08_040001
+  tags:
+      - RHEL-08-040001
+      - CAT2
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230488r627750_rule
+      - V-230488
+      - dnf
+      - abrt
 
-# - name: "MEDIUM | RHEL-08-040002 | PATCH | RHEL 8 must not have the sendmail package installed."
-#   dnf:
-#       name: sendmail
-#       state: absent
-#   when:
-#       - rhel_08_040002
-#   tags:
-#       - RHEL-08-040002
-#       - dnf
-#       - sendmail
+- name: "MEDIUM | RHEL-08-040002 | PATCH | RHEL 8 must not have the sendmail package installed."
+  dnf:
+      name: sendmail
+      state: absent
+  when:
+      - rhel_08_040002
+  tags:
+      - RHEL-08-040002
+      - CAT2
+      - CCI-00038
+      - SRG-OS-000095-GPOS-00049
+      - SV-230489r627750_rule
+      - V-230489
+      - dnf
+      - sendmail
 
 # - name: |
 #     "MEDIUM | RHEL-08-040003 | PATCH | RHEL 8 must not have the gssproxy package installed."
