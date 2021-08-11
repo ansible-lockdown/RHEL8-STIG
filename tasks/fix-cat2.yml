@@ -4906,130 +4906,175 @@
       - V-230443
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-gpasswd
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030370
-#   tags:
-#       - RHEL-08-030370
-#       - auditd
+- name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-gpasswd
+  notify: restart auditd
+  when:
+      - rhel_08_030370
+  tags:
+      - RHEL-08-030370
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230444r627750_rule
+      - V-230444
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030380 | PATCH | Successful/unsuccessful uses of the finit_module command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-#       - -a always,exit -F arch=b64 -S finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030380
-#   tags:
-#       - RHEL-08-030380
-#       - auditd
+- name: "MEDIUM | RHEL-08-030380 | PATCH | Successful/unsuccessful uses of the finit_module command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+      - -a always,exit -F arch=b64 -S finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+  notify: restart auditd
+  when:
+      - rhel_08_030380
+  tags:
+      - RHEL-08-030380
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230445r627750_rule
+      - V-230445
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-#       - -a always,exit -F arch=b64 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030390
-#   tags:
-#       - RHEL-08-030390
-#       - auditd
+- name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+      - -a always,exit -F arch=b64 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+  notify: restart auditd
+  when:
+      - rhel_08_030390
+  tags:
+      - RHEL-08-030390
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230446r627750_rule
+      - V-230446
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-crontab
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030400
-#   tags:
-#       - RHEL-08-030400
-#       - auditd
+- name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-crontab
+  notify: restart auditd
+  when:
+      - rhel_08_030400
+  tags:
+      - RHEL-08-030400
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230447r627750_rule
+      - V-230447
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k priv_cmd
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030410
-#   tags:
-#       - RHEL-08-030410
-#       - auditd
+- name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k priv_cmd
+  notify: restart auditd
+  when:
+      - rhel_08_030410
+  tags:
+      - RHEL-08-030410
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230448r627750_rule
+      - V-230448
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S truncate -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b32 -S truncate -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S truncate -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030420
-#   tags:
-#       - RHEL-08-030420
-#       - auditd
+- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S truncate -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b32 -S truncate -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S truncate -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+  notify: restart auditd
+  when:
+      - rhel_08_030420
+  tags:
+      - RHEL-08-030420
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230449r627750_rule
+      - V-230449
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030430 | PATCH | Successful/unsuccessful uses of the openat system call in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S openat -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S openat -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b32 -S openat -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S openat -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030430
-#   tags:
-#       - RHEL-08-030430
-#       - auditd
+- name: "MEDIUM | RHEL-08-030430 | PATCH | Successful/unsuccessful uses of the openat system call in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S openat -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S openat -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b32 -S openat -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S openat -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+  notify: restart auditd
+  when:
+      - rhel_08_030430
+  tags:
+      - RHEL-08-030430
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230450r627750_rule
+      - V-230450
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030440 | PATCH | Successful/unsuccessful uses of the open system call in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S open -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S open -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b32 -S open -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S open -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030440
-#   tags:
-#       - RHEL-08-030440
-#       - auditd
+- name: "MEDIUM | RHEL-08-030440 | PATCH | Successful/unsuccessful uses of the open system call in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S open -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S open -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b32 -S open -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S open -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+  notify: restart auditd
+  when:
+      - rhel_08_030440
+  tags:
+      - RHEL-08-030440
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230451r627750_rule
+      - V-230451
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030450 | PATCH | Successful/unsuccessful uses of the open_by_handle_at system call in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#       - -a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030450
-#   tags:
-#       - RHEL-08-030450
-#       - auditd
+- name: "MEDIUM | RHEL-08-030450 | PATCH | Successful/unsuccessful uses of the open_by_handle_at system call in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+      - -a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
+  notify: restart auditd
+  when:
+      - rhel_08_030450
+  tags:
+      - RHEL-08-030450
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230452r627750_rule
+      - V-230452
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030460 | PATCH | Successful/unsuccessful uses of the ftruncate command in RHEL 8 must generate an audit record."
 #   lineinfile:
