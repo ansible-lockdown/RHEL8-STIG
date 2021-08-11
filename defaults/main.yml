@@ -449,6 +449,7 @@ rhel8stig_min_supported_os_ver:
     RedHat: "8.4"
     CentOS: "8.4"
     Rocky: "8.4"
+    AlmaLinux: "8.4"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
