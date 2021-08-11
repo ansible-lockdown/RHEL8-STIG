@@ -6400,239 +6400,289 @@
       - V-230532
       - debug-shell
 
-# - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
-#         sysctl:
-#             name: "{{ item }}"
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
-#         with_items:
-#             - net.ipv4.conf.default.accept_redirects
-#             - net.ipv6.conf.default.accept_redirects
+- name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+  block:
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.default.accept_redirects
+            - net.ipv6.conf.default.accept_redirects
 
-#       - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         with_items:
-#             - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
-#             - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
-#   when:
-#       - rhel_08_040210
-#   tags:
-#       - RHEL-08-040210
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
+            - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
+  when:
+      - rhel_08_040210
+  tags:
+      - RHEL-08-040210
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230535r627750_rule
+      - V-230535
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
-#         sysctl:
-#             name: net.ipv4.conf.all.send_redirects
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
+- name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
+  block:
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
+        sysctl:
+            name: net.ipv4.conf.all.send_redirects
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
-#       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^net.ipv4.conf.all.send_redirects'
-#             line: 'net.ipv4.conf.all.send_redirects=0'
-#   when:
-#       - rhel_08_040220
-#   tags:
-#       - RHEL-08-040220
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.all.send_redirects'
+            line: 'net.ipv4.conf.all.send_redirects=0'
+  when:
+      - rhel_08_040220
+  tags:
+      - RHEL-08-040220
+      - CAT2
+      - CCI-00036
+      - SRG-OS-000480-GPOS-00227
+      - SV-230536r627750_rule
+      - V-230536
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
-#         sysctl:
-#             name: net.ipv4.icmp_echo_ignore_broadcasts
-#             state: present
-#             value: '1'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
+- name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
+  block:
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
+        sysctl:
+            name: net.ipv4.icmp_echo_ignore_broadcasts
+            state: present
+            value: '1'
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
-#       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
-#         lineinfile:
-#             name: /etc/sysctl.conf
-#             regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
-#             line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
-#   when:
-#       - rhel_08_040230
-#   tags:
-#       - RHEL-08-040230
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
+        lineinfile:
+            name: /etc/sysctl.conf
+            regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
+            line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
+  when:
+      - rhel_08_040230
+  tags:
+      - RHEL-08-040230
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230537r627750_rule
+      - V-230537
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
-#         sysctl:
-#             name: "{{ item }}"
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
-#         with_items:
-#             - net.ipv4.conf.all.accept_source_route
-#             - net.ipv6.conf.all.accept_source_route
+- name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
+  block:
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.all.accept_source_route
+            - net.ipv6.conf.all.accept_source_route
 
-#       - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         with_items:
-#             - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
-#             - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
-#   when:
-#       - rhel_08_040240
-#   tags:
-#       - RHEL-08-040240
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
+            - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
+  when:
+      - rhel_08_040240
+  tags:
+      - RHEL-08-040240
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230538r627750_rule
+      - V-230538
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
-#         sysctl:
-#             name: "{{ item }}"
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
-#         with_items:
-#             - net.ipv4.conf.default.accept_source_route
-#             - net.ipv6.conf.default.accept_source_route
+- name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.default.accept_source_route
+            - net.ipv6.conf.default.accept_source_route
 
-#       - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         with_items:
-#             - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
-#             - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
-#   when:
-#       - rhel_08_040250
-#   tags:
-#       - RHEL-08-040250
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
+            - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
+  when:
+      - rhel_08_040250
+  tags:
+      - RHEL-08-040250
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230539r627750_rule
+      - V-230539
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
-#         sysctl:
-#             name: "{{ item }}"
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
-#         with_items:
-#             - net.ipv4.ip_forward
-#             - net.ipv6.conf.all.forwarding
+- name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
+  block:
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.ip_forward
+            - net.ipv6.conf.all.forwarding
 
-#       - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         with_items:
-#             - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
-#             - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
+            - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
 
-#   when:
-#       - rhel_08_040260
-#       - not rhel8stig_system_is_router
-#   tags:
-#       - RHEL-08-040260
-#       - icmp
+  when:
+      - rhel_08_040260
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-0402606
+      - CAT2
+      - CCI-00036
+      - SRG-OS-000480-GPOS-00227
+      - SV-230540r627750_rule
+      - V-230540
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra in sysctl"
-#         sysctl:
-#             name: net.ipv6.conf.all.accept_ra
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
+- name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
+  block:
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra in sysctl"
+        sysctl:
+            name: net.ipv6.conf.all.accept_ra
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
-#       - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^net.ipv6.conf.all.accept_ra'
-#             line: 'net.ipv6.conf.all.accept_ra=0'
-#   when:
-#       - rhel_08_040261
-#       - not rhel8stig_system_is_router
-#   tags:
-#       - RHEL-08-040261
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.all.accept_ra'
+            line: 'net.ipv6.conf.all.accept_ra=0'
+  when:
+      - rhel_08_040261
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040261
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230541r627750_rule
+      - V-230541
+      - icmp
 
-# - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra in sysctl"
-#         sysctl:
-#             name: net.ipv6.conf.default.accept_ra
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
+- name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra in sysctl"
+        sysctl:
+            name: net.ipv6.conf.default.accept_ra
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
-#       - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra to value 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^net.ipv6.conf.default.accept_ra'
-#             line: 'net.ipv6.conf.default.accept_ra=0'
-#   when:
-#       - rhel_08_040262
-#       - not rhel8stig_system_is_router
-#   tags:
-#       - RHEL-08-040262
-#       - icmp
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra to value 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.default.accept_ra'
+            line: 'net.ipv6.conf.default.accept_ra=0'
+  when:
+      - rhel_08_040262
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040262
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230542r627750_rule
+      - V-230542
+      - icmp
 
-# - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
-#   block:
-#       - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
-#         sysctl:
-#             name: net.ipv4.conf.default.send_redirects
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
+- name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
+  block:
+      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
+        sysctl:
+            name: net.ipv4.conf.default.send_redirects
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
 
-#       - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: '^net.ipv4.conf.default.send_redirects'
-#             line: 'net.ipv4.conf.default.send_redirects=0'
-#   when:
-#       - rhel_08_040270
-#   tags:
-#       - RHEL-08-040270
-#       - icmp
+      - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.default.send_redirects'
+            line: 'net.ipv4.conf.default.send_redirects=0'
+  when:
+      - rhel_08_040270
+  tags:
+      - RHEL-08-040270
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230543r627750_rule
+      - V-230543
+      - icmp
 
-# - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
-#   block:
-#       - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
-#         sysctl:
-#             name: "{{ item }}"
-#             state: present
-#             value: '0'
-#             reload: "{{ rhel8stig_sysctl_reload }}"
-#         with_items:
-#             - net.ipv4.conf.all.accept_redirects
-#             - net.ipv6.conf.all.accept_redirects
+- name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
+  block:
+      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
+        sysctl:
+            name: "{{ item }}"
+            state: present
+            value: '0'
+            reload: "{{ rhel8stig_sysctl_reload }}"
+        with_items:
+            - net.ipv4.conf.all.accept_redirects
+            - net.ipv6.conf.all.accept_redirects
 
-#       - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
-#         lineinfile:
-#             path: /etc/sysctl.conf
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#         with_items:
-#             - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
-#             - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
-#   when:
-#       - rhel_08_040280
-#   tags:
-#       - RHEL-08-040280
-#       - icmp
+      - name: "MEDIUM | RHEL-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        with_items:
+            - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
+            - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
+  when:
+      - rhel_08_040280
+  tags:
+      - RHEL-08-040280
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230544r627750_rule
+      - V-230544
+      - icmp
 
 # - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
 #   lineinfile:
