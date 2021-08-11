@@ -836,214 +836,262 @@
       - V-230268
       - sysctl
 
-# - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
-#   replace:
-#       path: "{{ item }}"
-#       regexp: '^([^#].*)NOPASSWD(.*)'
-#       replace: '\1PASSWD\2'
-#   with_items:
-#       - "{{ rhel8stig_sudoers_files.stdout_lines }}"
-#   when:
-#       - rhel_08_010380
-#       - rhel8stig_using_password_auth
-#   tags:
-#       - RHEL-08-010380
-#       - sudoers
+- name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
+  replace:
+      path: "{{ item }}"
+      regexp: '^([^#].*)NOPASSWD(.*)'
+      replace: '\1PASSWD\2'
+  with_items:
+      - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+  when:
+      - rhel_08_010380
+      - rhel8stig_using_password_auth
+  tags:
+      - RHEL-08-010380
+      - CAT2
+      - CCI-002038
+      - SRG-OS-000373-GPOS-00156
+      - SV-230271r627750_rule
+      - V-230271
+      - sudoers
 
-# - name: "MEDIUM | RHEL-08-010381 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation."
-#   replace:
-#       path: "{{ item }}"
-#       regexp: '^([^#].*)!authenticate(.*)'
-#       replace: '\1authenticate\2'
-#   with_items:
-#       - "{{ rhel8stig_sudoers_files.stdout_lines }}"
-#   when:
-#       - rhel_08_010381
-#       - rhel8stig_using_password_auth
-#   tags:
-#       - RHEL-08-010381
-#       - sudoers
+- name: "MEDIUM | RHEL-08-010381 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation."
+  replace:
+      path: "{{ item }}"
+      regexp: '^([^#].*)!authenticate(.*)'
+      replace: '\1authenticate\2'
+  with_items:
+      - "{{ rhel8stig_sudoers_files.stdout_lines }}"
+  when:
+      - rhel_08_010381
+      - rhel8stig_using_password_auth
+  tags:
+      - RHEL-08-010381
+      - CAT2
+      - CCI-002038
+      - SV-230272r627750_rule
+      - V-230272
+      - sudoers
 
-# - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
-#         dnf:
-#             name: esc
-#             state: present
-#         when: rhel8stig_gui
+- name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
+  block:
+      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
+        dnf:
+            name: esc
+            state: present
+        when: rhel8stig_gui
 
-#       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
-#         dnf:
-#             name: openssl-pkcs11
-#             state: present
-#   when:
-#       - rhel_08_010390
-#   tags:
-#       - RHEL-08-010390
-#       - multifactor
+      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
+        dnf:
+            name: openssl-pkcs11
+            state: present
+  when:
+      - rhel_08_010390
+  tags:
+      - RHEL-08-010390
+      - CAT2
+      - CCI-001948
+      - SRG-OS-000375-GPOS-00160
+      - SV-230273r627750_rule
+      - V-230273
+      - multifactor
 
-# - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
-#   lineinfile:
-#       path: '{{ rhel8stig_sssd_conf }}'
-#       regexp: '^certificate_verification = {{ item }}'
-#       state: absent
-#   with_items:
-#       - 'no_ocsp, no_verification'
-#       - no_ocsp
-#       - no_verification
-#   notify: restart sssd
-#   when:
-#       - "'sssd' in ansible_facts.packages" 
-#       - rhel8stig_sssd_conf_present.stat.exists
-#       - rhel_08_010400
-#   tags:
-#       - RHEL-08-010400
+- name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
+  lineinfile:
+      path: '{{ rhel8stig_sssd_conf }}'
+      regexp: '^certificate_verification = {{ item }}'
+      state: absent
+  with_items:
+      - 'no_ocsp, no_verification'
+      - no_ocsp
+      - no_verification
+  notify: restart sssd
+  when:
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
+      - rhel_08_010400
+  tags:
+      - RHEL-08-010400
+      - CAT2
+      - CCI-001948
+      - SRG-OS-000375-GPOS-00160
+      - SV-230274r627750_rule
+      - V-230274
+      - multifactor
 
-# - name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
-#   dnf:
-#       name: opensc
-#       state: present
-#   when:
-#       - rhel_08_010410
-#   tags:
-#       - RHEL-08-010410
-#       - opensc
-#       - piv
+- name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
+  dnf:
+      name: opensc
+      state: present
+  when:
+      - rhel_08_010410
+  tags:
+      - RHEL-08-010410
+      - CAT2
+      - CCI-001953
+      - SV-230275r627750_rule
+      - V-230275
+      - opensc
+      - piv
 
-# - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
-#         shell: dmesg |grep "NX ("
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010420_nx_bit_state
+- name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
+  block:
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
+        shell: dmesg |grep "NX ("
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010420_nx_bit_state
 
-#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX being set"
-#         debug:
-#             msg:
-#                 - "Good News! You are setup with execute disable active."
-#         when: '"(Execute Disable) protection: active" in rhel_08_010420_nx_bit_state.stdout'
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX being set"
+        debug:
+            msg:
+                - "Good News! You are setup with execute disable active."
+        when: '"(Execute Disable) protection: active" in rhel_08_010420_nx_bit_state.stdout'
 
-#       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
-#         debug:
-#             msg:
-#                 - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
-#         when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
-#   when:
-#       - rhel_08_010420
-#   tags:
-#       - RHEL-08-010420
+      - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
+        debug:
+            msg:
+                - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
+        when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
+  when:
+      - rhel_08_010420
+  tags:
+      - RHEL-08-010420
+      - CAT2
+      - CCI-002824
+      - SRG-OS-000433-GPOS-00192
+      - SV-230276r627750_rule
+      - V-230276
 
-# - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
-#         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_010421_grub_cmdline_linux
+- name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks."
+  block:
+      - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010421_grub_cmdline_linux
 
-#       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 as active"
-#         shell: grubby --update-kernel=ALL --args="page_poison=1"
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 as active"
+        shell: grubby --update-kernel=ALL --args="page_poison=1"
 
-#       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if doesn't exist"
-#         lineinfile:
-#             path: /etc/default/grub
-#             regexp: '^GRUB_CMDLINE_LINUX='
-#             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010421_grub_cmdline_linux.stdout }} page_poison=1"'
-#         when: '"page_poison=" not in rhel8stig_010421_grub_cmdline_linux.stdout'
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010421_grub_cmdline_linux.stdout }} page_poison=1"'
+        when: '"page_poison=" not in rhel8stig_010421_grub_cmdline_linux.stdout'
 
-#       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if exists"
-#         replace:
-#             path: /etc/default/grub
-#             regexp: 'page_poison=([^\s|"])+'
-#             replace: "page_poison=1"
-#         when: '"page_poison=" in rhel8stig_010421_grub_cmdline_linux.stdout'
-#   when:
-#       - rhel_08_010421
-#   tags:
-#       - RHEL-08-010421
-#       - grub
+      - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'page_poison=([^\s|"])+'
+            replace: "page_poison=1"
+        when: '"page_poison=" in rhel8stig_010421_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010421
+  tags:
+      - RHEL-08-010421
+      - CAT2
+      - CCI-001084
+      - SRG-OS-000134-GPOS-00068
+      - SV-230277r627750_rule
+      - V-230277
+      - grub
 
-# - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
-#         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_010422_grub_cmdline_linux
+- name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls."
+  block:
+      - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010422_grub_cmdline_linux
 
-#       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
-#         shell: grubby --update-kernel=ALL --args="vsyscall=none"
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
+        shell: grubby --update-kernel=ALL --args="vsyscall=none"
 
-#       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
-#         lineinfile:
-#             path: /etc/default/grub
-#             regexp: '^GRUB_CMDLINE_LINUX='
-#             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010422_grub_cmdline_linux.stdout }} vsyscall=none"'
-#         when: '"vsyscall=" not in rhel8stig_010422_grub_cmdline_linux.stdout'
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010422_grub_cmdline_linux.stdout }} vsyscall=none"'
+        when: '"vsyscall=" not in rhel8stig_010422_grub_cmdline_linux.stdout'
 
-#       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if exists"
-#         replace:
-#             path: /etc/default/grub
-#             regexp: 'vsyscall=([^\s|"])+'
-#             replace: "vsyscall=none"
-#         when: '"vsyscall=" in rhel8stig_010422_grub_cmdline_linux.stdout'
-#   when:
-#       - rhel_08_010422
-#   tags:
-#       - RHEL-08-010422
-#       - grub
+      - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'vsyscall=([^\s|"])+'
+            replace: "vsyscall=none"
+        when: '"vsyscall=" in rhel8stig_010422_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010422
+  tags:
+      - RHEL-08-010422
+      - CAT2
+      - CCI-001084
+      - SV-230278r627750_rule
+      - V-230278
+      - grub
 
-# - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
-#         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_010423_grub_cmdline_linux
+- name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks."
+  block:
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
+        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_010423_grub_cmdline_linux
 
-#       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
-#         shell: grubby --update-kernel=ALL --args="slub_debug=P"
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
+        shell: grubby --update-kernel=ALL --args="slub_debug=P"
 
-#       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
-#         lineinfile:
-#             path: /etc/default/grub
-#             regexp: '^GRUB_CMDLINE_LINUX='
-#             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010423_grub_cmdline_linux.stdout }} slub_debug=P"'
-#         when: '"slub_debug=" not in rhel8stig_010423_grub_cmdline_linux.stdout'
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
+        lineinfile:
+            path: /etc/default/grub
+            regexp: '^GRUB_CMDLINE_LINUX='
+            line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_010423_grub_cmdline_linux.stdout }} slub_debug=P"'
+        when: '"slub_debug=" not in rhel8stig_010423_grub_cmdline_linux.stdout'
 
-#       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if exists"
-#         replace:
-#             path: /etc/default/grub
-#             regexp: 'slub_debug=([^\s|"])+'
-#             replace: "slub_debug=P"
-#         when: '"slub_debug=" in rhel8stig_010423_grub_cmdline_linux.stdout'
-#   when:
-#       - rhel_08_010423
-#   tags:
-#       - RHEL-08-010423
-#       - grub
+      - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if exists"
+        replace:
+            path: /etc/default/grub
+            regexp: 'slub_debug=([^\s|"])+'
+            replace: "slub_debug=P"
+        when: '"slub_debug=" in rhel8stig_010423_grub_cmdline_linux.stdout'
+  when:
+      - rhel_08_010423
+  tags:
+      - RHEL-08-010423
+      - CAT2
+      - CCI-001084
+      - SRG-OS-000134-GPOS-00068
+      - SV-230279r627750_rule
+      - V-230279
+      - grub
 
-# - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
-#   sysctl:
-#       name: kernel.randomize_va_space
-#       value: '2'
-#       state: present
-#       reload: "{{ rhel8stig_sysctl_reload }}"
-#       sysctl_set: yes
-#       ignoreerrors: yes
-#   notify: sysctl system
-#   when:
-#       - rhel_08_010430
-#   tags:
-#       - RHEL-08-010430
-#       - sysctl
+- name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
+  sysctl:
+      name: kernel.randomize_va_space
+      value: '2'
+      state: present
+      reload: "{{ rhel8stig_sysctl_reload }}"
+      sysctl_set: yes
+      ignoreerrors: yes
+  notify: sysctl system
+  when:
+      - rhel_08_010430
+  tags:
+      - RHEL-08-010430
+      - CAT2
+      - CCI-002824
+      - SRG-OS-000433-GPOS-00193
+      - SV-230280r627750_rule
+      - V-230280
+      - sysctl
 
 # - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
 #   block:
