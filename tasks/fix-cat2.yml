@@ -2976,245 +2976,298 @@
       - V-230349
       - tmux
 
-# - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-#         shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020050_removal_action
+- name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
+  block:
+      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+        shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020050_removal_action
 
-#       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-#         shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020050_removal_action_file
+      - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+        shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020050_removal_action_file
 
-#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
-#         lineinfile:
-#             path: /etc/dconf/db/distro.d/20-authselect
-#             create: yes
-#             owner: root
-#             group: root
-#             mode: 0644
-#             line: |
-#                 [org/gnome/settings-daemon/peripherals/smartcard]
-#                 removal-action='lock-screen'
-#         when: rhel_08_020050_removal_action.stdout | length == 0
-#         notify: dconf update
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
+        lineinfile:
+            path: /etc/dconf/db/distro.d/20-authselect
+            create: yes
+            owner: root
+            group: root
+            mode: 0644
+            line: |
+                [org/gnome/settings-daemon/peripherals/smartcard]
+                removal-action='lock-screen'
+        when: rhel_08_020050_removal_action.stdout | length == 0
+        notify: dconf update
 
-#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
-#         lineinfile:
-#             path: "{{ rhel_08_020050_removal_action.stdout }}"
-#             regexp: ^removal-action=
-#             line: removal-action='lock-screen'
-#         when: rhel_08_020050_removal_action.stdout | length > 0
-#         notify: dconf update
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
+        lineinfile:
+            path: "{{ rhel_08_020050_removal_action.stdout }}"
+            regexp: ^removal-action=
+            line: removal-action='lock-screen'
+        when: rhel_08_020050_removal_action.stdout | length > 0
+        notify: dconf update
 
-#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
-#         lineinfile:
-#             path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
-#             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-#         when: rhel_08_020050_removal_action_file.stdout | length > 0
-#         notify: dconf update
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+        lineinfile:
+            path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
+            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        when: rhel_08_020050_removal_action_file.stdout | length > 0
+        notify: dconf update
 
-#       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
-#         lineinfile:
-#             path: /etc/dconf/db/distro.d/locks/20-authselect
-#             create: yes
-#             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-#             owner: root
-#             group: root
-#             mode: 0640
-#         when: rhel_08_020050_removal_action_file.stdout | length == 0
-#         notify: dconf update
-#   when:
-#       - rhel_08_020050
-#   tags:
-#       - RHEL-08-020050
-#       - smartcard
+      - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+        lineinfile:
+            path: /etc/dconf/db/distro.d/locks/20-authselect
+            create: yes
+            line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+            owner: root
+            group: root
+            mode: 0640
+        when: rhel_08_020050_removal_action_file.stdout | length == 0
+        notify: dconf update
+  when:
+      - rhel_08_020050
+  tags:
+      - RHEL-08-020050
+      - CAT2
+      - CCI-000056
+      - SRG-OS-000028-GPOS-00009
+      - SV-230351r627750_rule
+      - V-230351
+      - smartcard
 
-# - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
-#         shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020060_idle_delay_param
+- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
+  block:
+      - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
+        shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020060_idle_delay_param
 
-#       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
-#         lineinfile:
-#             path: /etc/dconf/db/local.d/00-screensaver
-#             create: yes
-#             owner: root
-#             group: root
-#             mode: 0640
-#             regexp: '^idle-delay'
-#             line: |
-#                 [org/gnome/desktop/session]
-#                 # Set the lock time out to 900 seconds before the session is considered idle
-#                 idle-delay=uint32 900
-#         notify: dconf update
-#         when: rhel_08_020060_idle_delay_param.stdout | length == 0
+      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
+        lineinfile:
+            path: /etc/dconf/db/local.d/00-screensaver
+            create: yes
+            owner: root
+            group: root
+            mode: 0640
+            regexp: '^idle-delay'
+            line: |
+                [org/gnome/desktop/session]
+                # Set the lock time out to 900 seconds before the session is considered idle
+                idle-delay=uint32 900
+        notify: dconf update
+        when: rhel_08_020060_idle_delay_param.stdout | length == 0
 
-#       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
-#         lineinfile:
-#             path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
-#             regexp: '^idle-delay='
-#             line: idle-delay=uint32 900
-#             owner: root
-#             group: root
-#             mode: 0640
-#         notify: dconf update
-#         when: rhel_08_020060_idle_delay_param.stdout | length > 0
-#   when:
-#       - rhel_08_020060
-#       - "'dconf' in ansible_facts.packages"
-#       - rhel8stig_always_configure_dconf
+      - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
+        lineinfile:
+            path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
+            regexp: '^idle-delay='
+            line: idle-delay=uint32 900
+            owner: root
+            group: root
+            mode: 0640
+        notify: dconf update
+        when: rhel_08_020060_idle_delay_param.stdout | length > 0
+  when:
+      - rhel_08_020060
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
       
-#   tags:
-#       - RHEL-08-020060
-#       - gui
+  tags:
+      - RHEL-08-020060
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-230352r646876_rule
+      - V-230352
+      - gui
 
-# - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
-#   lineinfile:
-#       path: /etc/tmux.conf
-#       regexp: '^set -g lock-after-time'
-#       line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020070
-#   tags:
-#       - RHEL-08-020070
-#       - tmux
+- name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
+  lineinfile:
+      path: /etc/tmux.conf
+      regexp: '^set -g lock-after-time'
+      line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020070
+  tags:
+      - RHEL-08-020070
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-230353r627750_rule
+      - V-230353
+      - tmux
 
-# - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
-#   lineinfile:
-#       path: /etc/dconf/db/local.d/locks/session
-#       create: yes
-#       line: "{{ item }}"
-#       owner: root
-#       group: root
-#       mode: 0640
-#   with_items:
-#       - /org/gnome/desktop/session/idle-delay
-#       - /org/gnome/desktop/screensaver/lock-enabled
-#       - /org/gnome/desktop/screensaver/lock-delay
-#       - /org/gnome/settings-daemon/plugins/media-keys/logout
-#       - /org/gnome/login-screen/disable-user-list
-#       - /org/gnome/login-screen/banner-message-text
-#       - /org/gnome/login-screen/banner-message-enable
-#       - /org/gnome/desktop/lockdown/disable-lock-screen
-#   when:
-#       - rhel_08_020080
-#       - "'dconf' in ansible_facts.packages"
-#       - rhel8stig_always_configure_dconf
-#   tags:
-#       - RHEL-08-020080
+- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
+  lineinfile:
+      path: /etc/dconf/db/local.d/locks/session
+      create: yes
+      line: "{{ item }}"
+      owner: root
+      group: root
+      mode: 0640
+  with_items:
+      - /org/gnome/desktop/session/idle-delay
+      - /org/gnome/desktop/screensaver/lock-enabled
+      - /org/gnome/desktop/screensaver/lock-delay
+      - /org/gnome/settings-daemon/plugins/media-keys/logout
+      - /org/gnome/login-screen/disable-user-list
+      - /org/gnome/login-screen/banner-message-text
+      - /org/gnome/login-screen/banner-message-enable
+      - /org/gnome/desktop/lockdown/disable-lock-screen
+  when:
+      - rhel_08_020080
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
+  tags:
+      - RHEL-08-020080
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-230354r627750_rule
+      - V-230354
+      - gui
 
-# - name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
-#   lineinfile:
-#       path: "{{ rhel8stig_sssd_conf }}"
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#       owner: root
-#       group: root
-#       mode: 0640
-#   with_items:
-#       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
-#       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
-#       - { regexp: '^maprule = {{ rhel8stig_sssd.maprule }}', line: 'maprule = {{ rhel8stig_sssd.maprule }}' }
-#       - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
-#   notify: restart sssd
-#   when:
-#       - "'sssd' in ansible_facts.packages" 
-#       - rhel8stig_sssd_conf_present.stat.exists
-#       - rhel_08_020090
-#   tags:
-#       - RHEL-08-020090
+- name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
+  lineinfile:
+      path: "{{ rhel8stig_sssd_conf }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      owner: root
+      group: root
+      mode: 0640
+  with_items:
+      - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
+      - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
+      - { regexp: '^maprule = {{ rhel8stig_sssd.maprule }}', line: 'maprule = {{ rhel8stig_sssd.maprule }}' }
+      - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
+  notify: restart sssd
+  when:
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
+      - rhel_08_020090
+  tags:
+      - RHEL-08-020090
+      - CAT2
+      - CCI-000187
+      - SRG-OS-000068-GPOS-00036
+      - SV-230355r627750_rule
+      - V-230355
+      - authentication
 
-# - name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
-#   lineinfile:
-#       path: "{{ item.path }}"
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#       insertafter: '^password'
-#       owner: root
-#       group: root
-#       mode: 0640
-#   with_items:
-#       - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
-#       - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
-#   when:
-#       - rhel_08_020100
-#   tags:
-#       - RHEL-08-020100
+- name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
+  lineinfile:
+      path: "{{ item.path }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: '^password'
+      owner: root
+      group: root
+      mode: 0640
+  with_items:
+      - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+      - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
+  when:
+      - rhel_08_020100
+  tags:
+      - RHEL-08-020100
+      - CAT2
+      - CCI-000192
+      - SRG-OS-000069-GPOS-00037
+      - SV-230356r627750_rule
+      - V-230356
+      - pamd
 
-# - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*ucredit'
-#       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
-#   when:
-#       - rhel_08_020110
-#   tags:
-#       - RHEL-08-020110
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*ucredit'
+      line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
+  when:
+      - rhel_08_020110
+  tags:
+      - RHEL-08-020110
+      - CAT2
+      - CCI-000192
+      - SRG-OS-000069-GPOS-00037
+      - SV-230357r627750_rule
+      - V-230357
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*lcredit'
-#       line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
-#   when:
-#       - rhel_08_020120
-#   tags:
-#       - RHEL-08-020120
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*lcredit'
+      line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
+  when:
+      - rhel_08_020120
+  tags:
+      - RHEL-08-020120
+      - CAT2
+      - CCI-00019
+      - SRG-OS-000070-GPOS-00038
+      - SV-230358r627750_rule
+      - V-230358
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*dcredit'
-#       line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
-#   when:
-#       - rhel_08_020130
-#   tags:
-#       - RHEL-08-020130
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*dcredit'
+      line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
+  when:
+      - rhel_08_020130
+  tags:
+      - RHEL-08-020130
+      - CAT2
+      - CCI-000194
+      - SRG-OS-000071-GPOS-00039
+      - SV-230359r627750_rule
+      - V-230359
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*maxclassrepeat'
-#       line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
-#   when:
-#       - rhel_08_020140
-#   tags:
-#       - RHEL-08-020140
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*maxclassrepeat'
+      line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
+  when:
+      - rhel_08_020140
+  tags:
+      - RHEL-08-020140
+      - CAT2
+      - CCI-000195
+      - SRG-OS-000072-GPOS-00040
+      - SV-230360r627750_rule
+      - V-230360
+      - pwquality
 
 # - name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
 #   lineinfile:
