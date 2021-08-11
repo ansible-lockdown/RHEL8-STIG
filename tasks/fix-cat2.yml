@@ -5283,168 +5283,219 @@
       - V-230463
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030570
-#   tags:
-#       - RHEL-08-030570
-#       - auditd
+- name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+  notify: restart auditd
+  when:
+      - rhel_08_030570
+  tags:
+      - RHEL-08-030570
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230464r627750_rule
+      - V-230464
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030580
-#   tags:
-#       - RHEL-08-030580
-#       - auditd
+- name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules
+  notify: restart auditd
+  when:
+      - rhel_08_030580
+  tags:
+      - RHEL-08-030580
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230465r627750_rule
+      - V-230465
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -w /var/log/faillock -p wa -k logins
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030590
-#   tags:
-#       - RHEL-08-030590
-#       - auditd
+- name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -w /var/log/faillock -p wa -k logins
+  notify: restart auditd
+  when:
+      - rhel_08_030590
+  tags:
+      - RHEL-08-030590
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230466r627750_rule
+      - V-230466
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -w /var/log/lastlog -p wa -k logins
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030600
-#   tags:
-#       - RHEL-08-030600
-#       - auditd
+- name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -w /var/log/lastlog -p wa -k logins
+  notify: restart auditd
+  when:
+      - rhel_08_030600
+  tags:
+      - RHEL-08-030600
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230467r627750_rule
+      - V-230467
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
-#   file:
-#       path: "{{ item }}"
-#       mode: 0640
-#   with_items:
-#       - /etc/audit/rules.d/audit.rules
-#       - /etc/audit/auditd.conf
-#   when:
-#       - rhel_08_030610
-#   tags:
-#       - RHEL-08-030610
-#       - permissions
+- name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
+  file:
+      path: "{{ item }}"
+      mode: 0640
+  with_items:
+      - /etc/audit/rules.d/audit.rules
+      - /etc/audit/auditd.conf
+  when:
+      - rhel_08_030610
+  tags:
+      - RHEL-08-030610
+      - CAT2
+      - CCI-000171
+      - SRG-OS-000063-GPOS-00032
+      - SV-230471r627750_rule
+      - V-230471
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Find toosl with less than 755 perms"
-#         shell: stat -c "%a %n" /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audisp-remote /sbin/audisp-syslog /sbin/augenrules | cut -f2 -d" "
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030620_tools
+- name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Find toosl with less than 755 perms"
+        shell: stat -c "%a %n" /sbin/auditctl /sbin/aureport /sbin/ausearch /sbin/autrace /sbin/auditd /sbin/audisp-remote /sbin/audisp-syslog /sbin/augenrules | cut -f2 -d" "
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030620_tools
 
-#       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
-#         file:
-#             path: "{{ item }}"
-#             mode: 0755
-#         with_items:
-#             - "{{ rhel_08_030620_tools.stdout_lines }}"
-#   when:
-#       - rhel_08_030620
-#   tags:
-#       - RHEL-08-030620
-#       - permissions
+      - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
+        file:
+            path: "{{ item }}"
+            mode: 0755
+        with_items:
+            - "{{ rhel_08_030620_tools.stdout_lines }}"
+  when:
+      - rhel_08_030620
+  tags:
+      - RHEL-08-030620
+      - CAT2
+      - CCI-001493
+      - SRG-OS-000256-GPOS-00097
+      - SV-230472r627750_rule
+      - V-230472
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-030630 | PATCH | RHEL 8 audit tools must be owned by root."
-#   file:
-#       path: "{{ item }}"
-#       owner: root
-#   with_items:
-#       - /sbin/auditctl
-#       - /sbin/aureport
-#       - /sbin/ausearch
-#       - /sbin/autrace
-#       - /sbin/auditd
-#       - /sbin/audisp-remote
-#       - /sbin/audisp-syslog
-#       - /sbin/augenrules
-#   when:
-#       - rhel_08_030630
-#   tags:
-#       - RHEL-08-030630
-#       - permissions
+- name: "MEDIUM | RHEL-08-030630 | PATCH | RHEL 8 audit tools must be owned by root."
+  file:
+      path: "{{ item }}"
+      owner: root
+  with_items:
+      - /sbin/auditctl
+      - /sbin/aureport
+      - /sbin/ausearch
+      - /sbin/autrace
+      - /sbin/auditd
+      - /sbin/audisp-remote
+      - /sbin/audisp-syslog
+      - /sbin/augenrules
+  when:
+      - rhel_08_030630
+  tags:
+      - RHEL-08-030630
+      - CAT2
+      - CCI-001493
+      - SRG-OS-000256-GPOS-00097
+      - SV-230473r627750_rule
+      - V-230473
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-030640 | PATCH | RHEL 8 audit tools must be group-owned by root."
-#   file:
-#       path: "{{ item }}"
-#       owner: root
-#   with_items:
-#       - /sbin/auditctl
-#       - /sbin/aureport
-#       - /sbin/ausearch
-#       - /sbin/autrace
-#       - /sbin/auditd
-#       - /sbin/audisp-remote
-#       - /sbin/audisp-syslog
-#       - /sbin/augenrules
-#   when:
-#       - rhel_08_030640
-#   tags:
-#       - RHEL-08-030640
-#       - permissions
+- name: "MEDIUM | RHEL-08-030640 | PATCH | RHEL 8 audit tools must be group-owned by root."
+  file:
+      path: "{{ item }}"
+      owner: root
+  with_items:
+      - /sbin/auditctl
+      - /sbin/aureport
+      - /sbin/ausearch
+      - /sbin/autrace
+      - /sbin/auditd
+      - /sbin/audisp-remote
+      - /sbin/audisp-syslog
+      - /sbin/augenrules
+  when:
+      - rhel_08_030640
+  tags:
+      - RHEL-08-030640
+      - CAT2
+      - CCI-00149
+      - SRG-OS-000256-GPOS-00097
+      - SV-230474r627750_rule
+      - V-230474
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
-#   lineinfile:
-#       path: /etc/aide.conf
-#       line: "{{ item }}"
-#       owner: root
-#       group: root
-#       mode: 0600
-#   with_items:
-#       - "# Audit Tools"
-#       - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/audisp-remote p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/audisp-syslog p+i+n+u+g+s+b+acl+xattrs+sha512
-#       - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
-#   when:
-#       - rhel_08_030650
-#   tags:
-#       - RHEL-08-030650
-#       - aide
+- name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
+  lineinfile:
+      path: /etc/aide.conf
+      line: "{{ item }}"
+      owner: root
+      group: root
+      mode: 0600
+  with_items:
+      - "# Audit Tools"
+      - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/audisp-remote p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/audisp-syslog p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
+  when:
+      - rhel_08_030650
+  tags:
+      - RHEL-08-030650
+      - CAT2
+      - CCI-001496
+      - SRG-OS-000278-GPOS-00108
+      - SV-230475r627750_rule
+      - V-230475
+      - aide
 
-# - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
-#         shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030660_audit_log_path
+- name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
+  block:
+      - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
+        shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030660_audit_log_path
 
-#       - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get size of audit log partition"
-#         shell: "df -h {{ rhel_08_030660_audit_log_path.stdout }}"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030660_audit_log_partition
+      - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get size of audit log partition"
+        shell: "df -h {{ rhel_08_030660_audit_log_path.stdout }}"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030660_audit_log_partition
 
-#       - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
-#         debug:
-#             msg:
-#                 - "ALERT!!!Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
-#                 - "Path: {{ rhel_08_030660_audit_log_path.stdout }}"
-#                 - "Disk Space: {{ rhel_08_030660_audit_log_partition.stdout }}"
-#   when:
-#       - rhel_08_030660
-#   tags:
-#       - RHEL-08-030660
+      - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
+        debug:
+            msg:
+                - "ALERT!!!Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
+                - "Path: {{ rhel_08_030660_audit_log_path.stdout }}"
+                - "Disk Space: {{ rhel_08_030660_audit_log_partition.stdout }}"
+  when:
+      - rhel_08_030660
+  tags:
+      - RHEL-08-030660
+      - CAT2
+      - CCI-001849
+      - SRG-OS-000341-GPOS-00132
+      - SV-230476r627750_rule
+      - V-230476
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
 #   dnf:
