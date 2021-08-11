@@ -84,11 +84,6 @@
 - name: flush handlers
   meta: flush_handlers
 
-- name: Reboot system
-  reboot:
-  when:
-  - not rhel8stig_skip_reboot
-
 - import_tasks: post_remediation_audit.yml
   when:
   - run_audit
