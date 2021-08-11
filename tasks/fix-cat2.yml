@@ -5684,298 +5684,351 @@
 #       - dnf
 #       - gssproxy
 
-# - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
-#   lineinfile:
-#       path: /etc/modprobe.d/blacklist.conf
-#       create: yes
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#       owner: root
-#       group: root
-#       mode: 0640
-#       insertafter: "{{ item.insertafter }}"
-#   notify: reboot system
-#   with_items:
-#       - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
-#       - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
-#   when:
-#       - rhel_08_040020
-#   tags:
-#       - RHEL-08-040020
-#       - camera
+- name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
+  lineinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      create: yes
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      owner: root
+      group: root
+      mode: 0640
+      insertafter: "{{ item.insertafter }}"
+  notify: reboot system
+  with_items:
+      - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
+      - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
+  when:
+      - rhel_08_040020
+  tags:
+      - RHEL-08-040020
+      - CAT2
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230493r627750_rule
+      - V-230493
+      - camera
 
-# - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Firewalld block"
-#         block:
-#             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
-#               shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
-#               register: rhel8stig_PPSM_CLSA_check_firewalld
-#               changed_when: false
-#               failed_when: false
-#               check_mode: no
-#               when:
-#                   - rhel_08_040030
-#               tags:
-#                   - RHEL-08-040030
-#                   - firewall
+- name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
+  block:
+      - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Firewalld block"
+        block:
+            - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
+              shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
+              register: rhel8stig_PPSM_CLSA_check_firewalld
+              changed_when: false
+              failed_when: false
+              check_mode: no
+              when:
+                  - rhel_08_040030
+              tags:
+                  - RHEL-08-040030
+                  - firewall
 
-#             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
-#               debug:
-#                   msg:
-#                       - "The following output is what firewalld is accepting on service ports to {{ ansible_hostname }}."
-#                       - "{{ rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines }}"
-#               changed_when: true
-#               when:
-#                   - rhel_08_040030
-#                   - rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines is defined
-#               tags:
-#                   - RHEL-08-040030
-#                   - firewall
-#         when:
-#             - rhel_08_040030
-#             - not rhel8stig_system_is_chroot
-#             - not rhel8stig_system_is_container
-#             - rhel8stig_firewall_service == "firewalld"
-#             - rhel8stig_start_firewall_service
-#         tags:
-#             - RHEL-08-040030
-#             - firewall
+            - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
+              debug:
+                  msg:
+                      - "The following output is what firewalld is accepting on service ports to {{ ansible_hostname }}."
+                      - "{{ rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines }}"
+              changed_when: true
+              when:
+                  - rhel_08_040030
+                  - rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines is defined
+              tags:
+                  - RHEL-08-040030
+                  - firewall
+        when:
+            - rhel_08_040030
+            - not rhel8stig_system_is_chroot
+            - not rhel8stig_system_is_container
+            - rhel8stig_firewall_service == "firewalld"
+            - rhel8stig_start_firewall_service
+        tags:
+            - RHEL-08-040030
+            - firewall
 
-#       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | IPTables block"
-#         block:
-#             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
-#               shell: iptables-save | grep -i accept | grep -i input
-#               register: rhel8stig_PPSM_CLSA_check_iptables
-#               changed_when: false
-#               failed_when: false
-#               check_mode: no
-#               when: rhel_08_040030
-#               tags:
-#                   - RHEL-08-040030
-#                   - firewall
+      - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | IPTables block"
+        block:
+            - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
+              shell: iptables-save | grep -i accept | grep -i input
+              register: rhel8stig_PPSM_CLSA_check_iptables
+              changed_when: false
+              failed_when: false
+              check_mode: no
+              when: rhel_08_040030
+              tags:
+                  - RHEL-08-040030
+                  - firewall
 
-#             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
-#               debug:
-#                   msg:
-#                       - "The following output is what iptabes is accepting on service ports to {{ ansible_hostname }}."
-#                       - "{{ rhel8stig_PPSM_CLSA_check_iptables.stdout_lines }}"
-#               changed_when: true
-#               when:
-#                   - rhel_08_040030
-#                   - rhel8stig_PPSM_CLSA_check_iptables.stdout_lines is defined
-#               tags:
-#                   - RHEL-08-040030
-#                   - firewall
-#         when:
-#             - rhel_08_040030
-#             - not rhel8stig_system_is_chroot
-#             - not rhel8stig_system_is_container
-#             - rhel8stig_firewall_service == "iptables"
-#             - rhel8stig_start_firewall_service
-#         tags:
-#             - RHEL-08-040030
-#             - firewall
+            - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
+              debug:
+                  msg:
+                      - "The following output is what iptabes is accepting on service ports to {{ ansible_hostname }}."
+                      - "{{ rhel8stig_PPSM_CLSA_check_iptables.stdout_lines }}"
+              changed_when: true
+              when:
+                  - rhel_08_040030
+                  - rhel8stig_PPSM_CLSA_check_iptables.stdout_lines is defined
+              tags:
+                  - RHEL-08-040030
+                  - firewall
+        when:
+            - rhel_08_040030
+            - not rhel8stig_system_is_chroot
+            - not rhel8stig_system_is_container
+            - rhel8stig_firewall_service == "iptables"
+            - rhel8stig_start_firewall_service
+        tags:
+            - RHEL-08-040030
+            - firewall
 
-#       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Warn no firewall is in use"
-#         debug:
-#             msg: "Your configured firewall service is {{ rhel8stig_firewall_service }}, but you have set the variable rhel8stig_start_firewall_service to false. We cannot audit control RHEL-08-040030 - RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
-#         changed_when: true
-#         when:
-#             - rhel_08_040030
-#             - not rhel8stig_start_firewall_service
-#         tags:
-#             - RHEL-08-040030
-#             - firewall
-#   when:
-#       - rhel_08_040030
-#       - not rhel8stig_system_is_chroot
-#       - not rhel8stig_system_is_container
-#       - rhel8stig_disruptive
-#   tags:
-#       - RHEL-08-040030
-#       - firewall
+      - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Warn no firewall is in use"
+        debug:
+            msg: "Your configured firewall service is {{ rhel8stig_firewall_service }}, but you have set the variable rhel8stig_start_firewall_service to false. We cannot audit control RHEL-08-040030 - RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
+        changed_when: true
+        when:
+            - rhel_08_040030
+            - not rhel8stig_start_firewall_service
+        tags:
+            - RHEL-08-040030
+            - firewall
+  when:
+      - rhel_08_040030
+      - not rhel8stig_system_is_chroot
+      - not rhel8stig_system_is_container
+      - rhel8stig_disruptive
+  tags:
+      - RHEL-08-040030
+      - CAT2
+      - CCI-000382
+      - SRG-OS-000096-GPOS-00050
+      - SV-230500r627750_rule
+      - V-230500
+      - firewall
 
-# - name: "MEDIUM | RHEL-08-040070 | PATCH | The RHEL 8 file system automounter must be disabled unless required."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error"
-#         shell: "systemctl show autofs | grep LoadState | cut -d= -f2"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_040070_autofs_status
+- name: "MEDIUM | RHEL-08-040070 | PATCH | The RHEL 8 file system automounter must be disabled unless required."
+  block:
+      - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error"
+        shell: "systemctl show autofs | grep LoadState | cut -d= -f2"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040070_autofs_status
 
-#       - name: "MEDIUM | RHEL-08-040070 | PATCH | The RHEL 8 file system automounter must be disabled unless required. | Disable autofs if exists"
-#         service:
-#             name: autofs
-#             state: stopped
-#             enabled: no
-#         when: rhel_08_040070_autofs_status.stdout == "loaded"
-#   when:
-#       - rhel_08_040070
-#   tags:
-#       - RHEL-08-040070
-#       - autofs
+      - name: "MEDIUM | RHEL-08-040070 | PATCH | The RHEL 8 file system automounter must be disabled unless required. | Disable autofs if exists"
+        service:
+            name: autofs
+            state: stopped
+            enabled: no
+        when: rhel_08_040070_autofs_status.stdout == "loaded"
+  when:
+      - rhel_08_040070
+  tags:
+      - RHEL-08-040070
+      - CAT2
+      - CCI-000778
+      - SRG-OS-000114-GPOS-00059
+      - SV-230502r627750_rule
+      - V-230502
+      - autofs
 
-# - name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
-#   lineinfile:
-#       path: "{{ item.path }}"
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0640
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#       insertafter: "{{ item.insertafter }}"
-#   with_items:
-#       - { path: /etc/modprobe.d/usb-storage.conf, regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
-#       - { path: /etc/modprobe.d/blacklist.conf, regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
-#   when:
-#       - rhel_08_040080
-#   tags:
-#       - RHEL-08-040080
-#       - usb_devices
+- name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
+  lineinfile:
+      path: "{{ item.path }}"
+      create: yes
+      owner: root
+      group: root
+      mode: 0640
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+  with_items:
+      - { path: /etc/modprobe.d/usb-storage.conf, regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
+      - { path: /etc/modprobe.d/blacklist.conf, regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
+  when:
+      - rhel_08_040080
+  tags:
+      - RHEL-08-040080
+      - CAT2
+      - CCI-000778
+      - SRG-OS-000114-GPOS-00059
+      - SV-230503r627750_rule
+      - V-230503
+      - usb_devices
 
-# - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
-#         dnf:
-#             name: firewalld
-#             state: present
-#         when: rhel8stig_firewall_service == "firewalld"
+- name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
+  block:
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
+        dnf:
+            name: firewalld
+            state: present
+        when: rhel8stig_firewall_service == "firewalld"
 
-#       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install IPTables"
-#         dnf:
-#             name: iptables-services
-#             state: present
-#         when: rhel8stig_firewall_service == "iptables"
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install IPTables"
+        dnf:
+            name: iptables-services
+            state: present
+        when: rhel8stig_firewall_service == "iptables"
 
-#       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Start and enable service"
-#         service:
-#             name: "{{ rhel8stig_firewall_service }}"
-#             state: started
-#             enabled: yes
-#   when:
-#       - rhel_08_040100
-#   tags:
-#       - RHEL-08-040100
-#       - firewall
-#       - "{{ rhel8stig_firewall_service }}"
+      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Start and enable service"
+        service:
+            name: "{{ rhel8stig_firewall_service }}"
+            state: started
+            enabled: yes
+  when:
+      - rhel_08_040100
+  tags:
+      - RHEL-08-040100
+      - CAT2
+      - CCI-002314
+      - SRG-OS-000297-GPOS-00115
+      - SV-230505r627750_rule
+      - V-230505
+      - firewall
+      - "{{ rhel8stig_firewall_service }}"
 
-# - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone"
-#         firewalld:
-#             zone: "{{ rhel8stig_custom_firewall_zone }}"
-#             permanent: true
-#             state: present
+- name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
+  block:
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone"
+        firewalld:
+            zone: "{{ rhel8stig_custom_firewall_zone }}"
+            permanent: true
+            state: present
 
-#       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Allow internet and ssh"
-#         firewalld:
-#             zone: "{{ rhel8stig_custom_firewall_zone }}"
-#             permanent: true
-#             state: enabled
-#             service: "{{ item }}"
-#         with_items:
-#             - "{{ rhel8stig_white_list_services }}"
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Allow internet and ssh"
+        firewalld:
+            zone: "{{ rhel8stig_custom_firewall_zone }}"
+            permanent: true
+            state: enabled
+            service: "{{ item }}"
+        with_items:
+            - "{{ rhel8stig_white_list_services }}"
 
-#       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
-#         command: firewall-cmd --reload
-#         changed_when: rhel_08_040090_zone_reload.rc == 0
-#         failed_when: rhel_08_040090_zone_reload.rc >= 2
-#         register: rhel_08_040090_zone_reload
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
+        command: firewall-cmd --reload
+        changed_when: rhel_08_040090_zone_reload.rc == 0
+        failed_when: rhel_08_040090_zone_reload.rc >= 2
+        register: rhel_08_040090_zone_reload
 
-#       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone as default"
-#         command: "firewall-cmd --set-default-zone={{ rhel8stig_custom_firewall_zone }}"
-#         changed_when: rhel_08_040090_default_zone_set.rc == 0
-#         failed_when: rhel_08_040090_default_zone_set.rc >= 2
-#         register: rhel_08_040090_default_zone_set
-#   when:
-#       - rhel_08_040090
-#   tags:
-#       - RHEL-08-040090
-#       - firewall
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone as default"
+        command: "firewall-cmd --set-default-zone={{ rhel8stig_custom_firewall_zone }}"
+        changed_when: rhel_08_040090_default_zone_set.rc == 0
+        failed_when: rhel_08_040090_default_zone_set.rc >= 2
+        register: rhel_08_040090_default_zone_set
+  when:
+      - rhel_08_040090
+  tags:
+      - RHEL-08-040090
+      - CAT2
+      - CCI-002314
+      - SRG-OS-000297-GPOS-00115
+      - SV-230504r627750_rule
+      - V-230504
+      - firewall
 
-# - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"
-#         command: rpm -q NetworkManager
-#         args:
-#             warn: no
-#         check_mode: no
-#         changed_when: no
-#         register: rhel_08_nmcli_available
-#         failed_when: no
+- name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled."
+  block:
+      - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"
+        command: rpm -q NetworkManager
+        args:
+            warn: no
+        check_mode: no
+        changed_when: no
+        register: rhel_08_nmcli_available
+        failed_when: no
 
-#       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
-#         command: nmcli radio wifi
-#         args:
-#             warn: no
-#         register: rhel_08_wifi_enabled
-#         check_mode: no
-#         changed_when: rhel_08_wifi_enabled.stdout != "disabled"
-#         when: rhel_08_nmcli_available.rc == 0
+      - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
+        command: nmcli radio wifi
+        args:
+            warn: no
+        register: rhel_08_wifi_enabled
+        check_mode: no
+        changed_when: rhel_08_wifi_enabled.stdout != "disabled"
+        when: rhel_08_nmcli_available.rc == 0
 
-#       - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
-#         command: nmcli radio wifi off
-#         when: rhel_08_wifi_enabled is changed
-#   when:
-#       - rhel_08_040110
-#   tags:
-#       - RHEL-08-040110
-#       - wifi
+      - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
+        command: nmcli radio wifi off
+        when: rhel_08_wifi_enabled is changed
+  when:
+      - rhel_08_040110
+  tags:
+      - RHEL-08-040110
+      - CAT2
+      - CCI-001444
+      - SRG-OS-000299-GPOS-00117
+      - SV-230506r627750_rule
+      - V-23050
+      - wifi
 
-# - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
-#   lineinfile:
-#       path: /etc/modprobe.d/bluetooth.conf
-#       regexp: '^install bluetooth '
-#       line: "install bluetooth /bin/true"
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0640
-#   notify: reboot system
-#   when:
-#       - rhel_08_040111
-#   tags:
-#       - RHEL-08-040111
-#       - bluetooth
+- name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
+  lineinfile:
+      path: /etc/modprobe.d/bluetooth.conf
+      regexp: '^install bluetooth '
+      line: "install bluetooth /bin/true"
+      create: yes
+      owner: root
+      group: root
+      mode: 0640
+  notify: reboot system
+  when:
+      - rhel_08_040111
+  tags:
+      - RHEL-08-040111
+      - CAT2
+      - CCI-001443
+      - SRG-OS-000300-GPOS-00118
+      - SV-230507r627750_rule
+      - V-230507
+      - bluetooth
 
-# - name: |
-#       "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
-#       "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
-#       "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-#   block:
-#       - name: |
-#             "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
-#             "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
-#             "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
-#         shell: mount | grep /dev/shm
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_040120_dev_shm_status
+- name: |
+      "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
+      "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
+      "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
+  block:
+      - name: |
+            "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
+            "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
+            "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
+        shell: mount | grep /dev/shm
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040120_dev_shm_status
 
-#       - name: |
-#             "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
-#             "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
-#             "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-#         mount:
-#             path: /dev/shm
-#             state: mounted
-#             src: tmpfs
-#             fstype: tmpfs
-#             opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
-#         when: rhel8stig_040120_dev_shm_status.stdout | length > 0
-#   when:
-#       - rhel_08_040120 or
-#         rhel_08_040121 or
-#         rhel_08_040122
-#   tags:
-#       - RHEL-08-040120
-#       - RHEL-08-040121
-#       - RHEL-08-040122
-#       - mounts
+      - name: |
+            "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
+            "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
+            "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
+        mount:
+            path: /dev/shm
+            state: mounted
+            src: tmpfs
+            fstype: tmpfs
+            opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
+        when: rhel8stig_040120_dev_shm_status.stdout | length > 0
+  when:
+      - rhel_08_040120 or
+        rhel_08_040121 or
+        rhel_08_040122
+  tags:
+      - CAT2
+      - RHEL-08-040120
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230508r627750_rule
+      - V-230508
+      - RHEL-08-040121
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230509r627750_rule
+      - V-230509
+      - RHEL-08-040122
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230510r627750_rule
+      - V-230510
+      - mounts
 
 # - name: |
 #       "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
