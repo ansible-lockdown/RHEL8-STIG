@@ -3993,156 +3993,218 @@
       - V-230392
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030061 | PATCH | The RHEL 8 audit system must audit local events."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^local_events ='
-#       line: "local_events = yes"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_030061
-#   tags:
-#       - RHEL-08-030061
-#       - auditd
+- name: "MEDIUM | RHEL-08-030061 | PATCH | The RHEL 8 audit system must audit local events."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^local_events ='
+      line: "local_events = yes"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_030061
+  tags:
+      - RHEL-08-030061
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230393r627750_rule
+      - V-230393
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030062 | PATCH | RHEL 8 must label all off-loaded audit logs before sending them to the central log server."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^name_format ='
-#       line: "name_format = hostname"
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030062
-#   tags:
-#       - RHEL-08-030062
-#       - auditd
+- name: "MEDIUM | RHEL-08-030062 | PATCH | RHEL 8 must label all off-loaded audit logs before sending them to the central log server."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^name_format ='
+      line: "name_format = hostname"
+  notify: restart auditd
+  when:
+      - rhel_08_030062
+  tags:
+      - RHEL-08-030062
+      - CAT2
+      - CCI-001851
+      - SRG-OS-000342-GPOS-00133
+      - SV-230394r627750_rule
+      - V-230394
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030070 | PATCH | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access."
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^log_group ='
-#       line: "log_group = root"
-#       mode: 0600
-#   when:
-#       - rhel_08_030070
-#   tags:
-#       - RHEL-08-030070
+- name: "MEDIUM | RHEL-08-030070 | PATCH | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^log_group ='
+      line: "log_group = root"
+      mode: 0600
+  when:
+      - rhel_08_030070
+  tags:
+      - RHEL-08-030070
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230396r627750_rule
+      - V-230396
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
-#         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
-#         changed_when: false
-#         failed_when: false
-#         register: rhel8stig_030080_audit_log_file
+- name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access."
+  block:
+      - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
+        shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_030080_audit_log_file
 
-#       - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Set audit log owner"
-#         file:
-#             path: "{{ rhel8stig_030080_audit_log_file.stdout }}"
-#             owner: root
-#         when: rhel8stig_030080_audit_log_file.stdout | length > 0
-#   when:
-#       - rhel_08_030080
-#   tags:
-#       - RHEL-08-030080
+      - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Set audit log owner"
+        file:
+            path: "{{ rhel8stig_030080_audit_log_file.stdout }}"
+            owner: root
+        when: rhel8stig_030080_audit_log_file.stdout | length > 0
+  when:
+      - rhel_08_030080
+  tags:
+      - RHEL-08-030080
+      -  CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230397r627750_rule
+      - V-230397
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030090 | PATCH | RHEL 8 audit logs must be group-owned by root to prevent unauthorized read access. | Set audit log group"
-#   lineinfile:
-#       path: /etc/audit/auditd.conf
-#       regexp: '^log_group'
-#       line: "log_group = root"
-#   when:
-#       - rhel_08_030090
-#   tags:
-#       - RHEL-08-030090
+- name: "MEDIUM | RHEL-08-030090 | PATCH | RHEL 8 audit logs must be group-owned by root to prevent unauthorized read access."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^log_group'
+      line: "log_group = root"
+  when:
+      - rhel_08_030090
+  tags:
+      - RHEL-08-030090
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230398r627750_rule
+      - V-230398
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
-#         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030100_audit_log_dir
+- name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access."
+  block:
+      - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
+        shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030100_audit_log_dir
 
-#       - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Set audit log dir owner"
-#         file:
-#             path: "{{ rhel_08_030100_audit_log_dir.stdout }}"
-#             owner: root
-#             state: directory
-#         when: rhel_08_030100_audit_log_dir.stdout | length > 0
-#         tags:
-#             - skip_ansible_lint
-#   when:
-#       - rhel_08_030100
-#   tags:
-#       - RHEL-08-030100
+      - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Set audit log dir owner"
+        file:
+            path: "{{ rhel_08_030100_audit_log_dir.stdout }}"
+            owner: root
+            state: directory
+        when: rhel_08_030100_audit_log_dir.stdout | length > 0
+        tags:
+            - skip_ansible_lint
+  when:
+      - rhel_08_030100
+  tags:
+      - RHEL-08-030100
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230399r627750_rule
+      - V-230399
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
-#         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030110_audit_log_dir
+- name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access."
+  block:
+      - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
+        shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030110_audit_log_dir
 
-#       - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Set audit log dir group"
-#         file:
-#             path: "{{ rhel_08_030110_audit_log_dir.stdout }}"
-#             group: root
-#             state: directory
-#         when: rhel_08_030110_audit_log_dir.stdout | length > 0
-#         tags:
-#             - skip_ansible_lint
-#   when:
-#       - rhel_08_030110
-#   tags:
-#       - skip_ansible_lint
-#       - RHEL-08-030110
+      - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Set audit log dir group"
+        file:
+            path: "{{ rhel_08_030110_audit_log_dir.stdout }}"
+            group: root
+            state: directory
+        when: rhel_08_030110_audit_log_dir.stdout | length > 0
+        tags:
+            - skip_ansible_lint
+  when:
+      - rhel_08_030110
+  tags:
+      - skip_ansible_lint
+      - RHEL-08-030110
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230400r627750_rule
+      - V-230400
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
-#   block:
-#       - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
-#         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_030120_audit_log_dir
+- name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
+  block:
+      - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
+        shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_030120_audit_log_dir
 
-#       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
-#         file:
-#             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-#             mode: 0700
-#             state: directory
-#         when: rhel_08_030120_audit_log_dir.stdout | length > 0
-#   when:
-#       - rhel_08_030120
-#   tags:
-#       - RHEL-08-030120
+      - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
+        file:
+            path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
+            mode: 0700
+            state: directory
+        when: rhel_08_030120_audit_log_dir.stdout | length > 0
+  when:
+      - rhel_08_030120
+  tags:
+      - RHEL-08-030120
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230401r627750_rule
+      - V-230401
+      - permissions
+      - log
 
-# - name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^-e '
-#       line: "-e 2"
-#   when:
-#       - rhel_08_030121
-#   tags:
-#       - RHEL-08-030121
-#       - auditd
+- name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^-e '
+      line: "-e 2"
+  when:
+      - rhel_08_030121
+  tags:
+      - RHEL-08-030121
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230402r627750_rule
+      - V-230402
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030122 | PATCH | RHEL 8 audit system must protect logon UIDs from unauthorized change."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       regexp: '^--loginuid-'
-#       line: "--loginuid-immutable"
-#   when:
-#       - rhel_08_030122
-#   tags:
-#       - RHEL-08-030122
-#       - auditd
+- name: "MEDIUM | RHEL-08-030122 | PATCH | RHEL 8 audit system must protect logon UIDs from unauthorized change."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      regexp: '^--loginuid-'
+      line: "--loginuid-immutable"
+  when:
+      - rhel_08_030122
+  tags:
+      - RHEL-08-030122
+      - CAT2
+      - CCI-000162
+      - SRG-OS-000057-GPOS-00027
+      - SV-230403r627750_rule
+      - V-230403
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030130 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
 #   lineinfile:
