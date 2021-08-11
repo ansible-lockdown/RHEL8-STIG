@@ -1904,185 +1904,241 @@
       - V-230317
       - complexity-high
 
-# - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Get directories"
-#         command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -uid +999
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010700_world_writable_directories
+- name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group."
+  block:
+      - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Get directories"
+        command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -uid +999
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010700_world_writable_directories
 
-#       - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Set permissions"
-#         file:
-#             path: "{{ item }}"
-#             owner: root
-#         with_items:
-#             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
-#         when: rhel_08_010700_world_writable_directories.stdout | length > 0
-#   when:
-#       - rhel_08_010700
-#   tags:
-#       - RHEL-08-010700
+      - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Set permissions"
+        file:
+            path: "{{ item }}"
+            owner: root
+        with_items:
+            - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
+        when: rhel_08_010700_world_writable_directories.stdout | length > 0
+  when:
+      - rhel_08_010700
+  tags:
+      - RHEL-08-010700
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230318r627750_rule
+      - V-230318
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010710 | AUDIT | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Get directories"
-#         command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -gid +999
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010710_world_writable_directories
+- name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group."
+  block:
+      - name: "MEDIUM | RHEL-08-010710 | AUDIT | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Get directories"
+        command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -gid +999
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010710_world_writable_directories
 
-#       - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Set permissions"
-#         file:
-#             path: "{{ item }}"
-#             group: root
-#         with_items:
-#             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
-#         when: rhel_08_010710_world_writable_directories.stdout | length > 0
-#   when:
-#       - rhel_08_010710
-#   tags:
-#       - RHEL-08-010710
+      - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Set permissions"
+        file:
+            path: "{{ item }}"
+            group: root
+        with_items:
+            - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
+        when: rhel_08_010710_world_writable_directories.stdout | length > 0
+  when:
+      - rhel_08_010710
+  tags:
+      - RHEL-08-010710
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230319r627750_rule
+      - V-230319
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get users with no home directory"
-#         shell: pwck -r | grep user | cut -f2 -d"'"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010720_users_no_home_dir
+- name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file."
+  block:
+      - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get users with no home directory"
+        shell: pwck -r | grep user | cut -f2 -d"'"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010720_users_no_home_dir
 
-#       - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get interactive users with no home directory"
-#         shell: grep vboxadd /etc/passwd | awk -F ":" '$3>{{ rhel8stig_interactive_uid_start }} {print $1}'
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010720_user_list
+      - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get interactive users with no home directory"
+        shell: grep vboxadd /etc/passwd | awk -F ":" '$3>{{ rhel8stig_interactive_uid_start }} {print $1}'
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010720_user_list
 
-#       - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Message out user list"
-#         debug:
-#             msg:
-#                 - "WARNING!!!!The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
-#                 - "{{ rhel_08_010720_user_list.stdout_lines }}"
-#         when: rhel_08_010720_user_list.stdout | length > 0
-#   when:
-#       - rhel_08_010720
-#   tags:
-#       - RHEL-08-010720
+      - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Message out user list"
+        debug:
+            msg:
+                - "WARNING!!!!The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
+                - "{{ rhel_08_010720_user_list.stdout_lines }}"
+        when: rhel_08_010720_user_list.stdout | length > 0
+  when:
+      - rhel_08_010720
+  tags:
+      - RHEL-08-010720
+      - CAT2
+      - CCI-000366
+      - SV-230320r627750_rule
+      - V-230320
 
-# - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010730 | AUDIT | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-#         shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010730_home_directories
+- name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010730 | AUDIT | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
+        shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010730_home_directories
 
-#       - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-#         file:
-#             path: "{{ item }}"
-#             mode: 0750
-#         with_items:
-#             - "{{ rhel_08_010730_home_directories.stdout_lines }}"
-#         when: rhel_08_010730_home_directories.stdout | length > 0
-#   when:
-#       - rhel_08_010730
-#   tags:
-#       - RHEL-08-010730
+      - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
+        file:
+            path: "{{ item }}"
+            mode: 0750
+        with_items:
+            - "{{ rhel_08_010730_home_directories.stdout_lines }}"
+        when: rhel_08_010730_home_directories.stdout | length > 0
+  when:
+      - rhel_08_010730
+  tags:
+      - RHEL-08-010730
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230321r627750_rule
+      - V-230321
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010740 | PATCH | All RHEL 8 local interactive user home directories must be group-owned by the home directory owner’s primary group."
-#   file:
-#       path: "{{ item.dir }}"
-#       group: "{{ item.gid }}"
-#       state: directory
-#   with_items: "{{ rhel8stig_passwd }}"
-#   loop_control:
-#       label: "{{ rhel8stig_passwd_label }}"
-#   when:
-#       - rhel_08_010740
-#       - item.uid >= rhel8stig_interactive_uid_start
-#   tags:
-#       - skip_ansible_lint
-#       - RHEL-08-010740
+- name: "MEDIUM | RHEL-08-010740 | PATCH | All RHEL 8 local interactive user home directories must be group-owned by the home directory owner’s primary group."
+  file:
+      path: "{{ item.dir }}"
+      group: "{{ item.gid }}"
+      state: directory
+  with_items: "{{ rhel8stig_passwd }}"
+  loop_control:
+      label: "{{ rhel8stig_passwd_label }}"
+  when:
+      - rhel_08_010740
+      - item.uid >= rhel8stig_interactive_uid_start
+  tags:
+      - skip_ansible_lint
+      - RHEL-08-010740
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230322r627750_rule
+      - V-230322
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
-#   file:
-#       path: "{{ item.dir }}"
-#       state: directory
-#   with_items: "{{ rhel8stig_passwd }}"
-#   loop_control:
-#       label: "{{ rhel8stig_passwd_label }}"
-#   when:
-#       - rhel_08_010750
-#       - item.uid >= rhel8stig_interactive_uid_start
-#   tags:
-#       - skip_ansible_lint
-#       - RHEL-08-010750
+- name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
+  file:
+      path: "{{ item.dir }}"
+      state: directory
+  with_items: "{{ rhel8stig_passwd }}"
+  loop_control:
+      label: "{{ rhel8stig_passwd_label }}"
+  when:
+      - rhel_08_010750
+      - item.uid >= rhel8stig_interactive_uid_start
+  tags:
+      - skip_ansible_lint
+      - RHEL-08-010750
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230323r627750_rule
+      - V-230323
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
-#   lineinfile:
-#       path: /etc/login.defs
-#       regexp: '.*?CREATE_HOME.*'
-#       line: CREATE_HOME     yes
-#   when:
-#       - rhel_08_010760
-#   tags:
-#       - RHEL-08-010760
-#       - login
-#       - home
+- name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
+  lineinfile:
+      path: /etc/login.defs
+      regexp: '.*?CREATE_HOME.*'
+      line: CREATE_HOME     yes
+  when:
+      - rhel_08_010760
+  tags:
+      - RHEL-08-010760
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230324r627750_rule
+      - V-230324
+      - login
+      - home
 
-# - name: "MEDIUM | RHEL-08-010770 | PATCH | All RHEL 8 local initialization files must have mode 0740 or less permissive."
-#   file:
-#       path: "{{ item }}"
-#       mode: 0740
-#   with_items:
-#       - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
-#   when:
-#       - rhel_08_010770
-#       - rhel8stig_disruption_high
-#       - rhel_08_stig_interactive_homedir_inifiles is defined
-#   tags:
-#       - RHEL-08-010770
-#       - complexity-high
+- name: "MEDIUM | RHEL-08-010770 | PATCH | All RHEL 8 local initialization files must have mode 0740 or less permissive."
+  file:
+      path: "{{ item }}"
+      mode: 0740
+  with_items:
+      - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+  when:
+      - rhel_08_010770
+      - rhel8stig_disruption_high
+      - rhel_08_stig_interactive_homedir_inifiles is defined
+  tags:
+      - RHEL-08-010770
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230325r627750_rule
+      - V-230325
+      - complexity-high
 
-# - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
-#         shell: find / -nouser
-#         args:
-#             warn: no
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010780_nouser_files
+- name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner."
+  block:
+      - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
+        shell: find / -nouser
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010780_nouser_files
 
-#       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Alert nouser files"
-#         debug:
-#             msg:
-#                 - "ALERT!!! There are files with no user assigned. Please review files listed below and assign owner"
-#                 - "{{ rhel_08_010780_nouser_files.stdout_lines }}"
-#         when: rhel_08_010780_nouser_files.stdout | length > 0
-#   when:
-#       - rhel_08_010780
-#   tags:
-#       - RHEL-08-010780
+      - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Alert nouser files"
+        debug:
+            msg:
+                - "ALERT!!! There are files with no user assigned. Please review files listed below and assign owner"
+                - "{{ rhel_08_010780_nouser_files.stdout_lines }}"
+        when: rhel_08_010780_nouser_files.stdout | length > 0
+  when:
+      - rhel_08_010780
+  tags:
+      - RHEL-08-010780
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230326r627750_rule
+      - V-230326
+      - permissions
 
-# - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner."
-#   block:
-#       - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Get nogroup files"
-#         shell: find / -nogroup
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_010790_nogroup_files
+- name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner."
+  block:
+      - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Get nogroup files"
+        shell: find / -nogroup
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010790_nogroup_files
 
-#       - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Alert nogroup files"
-#         debug:
-#             msg:
-#                 - "ALERT!!!! There are files with no group assigned. Please review files listed below and assign group"
-#                 - "{{ rhel_08_010790_nogroup_files.stdout_lines }}"
-#         when: rhel_08_010790_nogroup_files.stdout | length > 0
-#   when:
-#       - rhel_08_010790
-#   tags:
-#       - RHEL-08-010790
+      - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Alert nogroup files"
+        debug:
+            msg:
+                - "ALERT!!!! There are files with no group assigned. Please review files listed below and assign group"
+                - "{{ rhel_08_010790_nogroup_files.stdout_lines }}"
+        when: rhel_08_010790_nogroup_files.stdout | length > 0
+  when:
+      - rhel_08_010790
+  tags:
+      - RHEL-08-010790
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230327r627750_rule
+      - V-230327
+      - permissions
 
 # - name: "MEDIUM | RHEL-08-010800 | PATCH | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
 #   debug:
