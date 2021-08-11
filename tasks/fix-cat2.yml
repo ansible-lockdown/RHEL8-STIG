@@ -6684,144 +6684,198 @@
       - V-230544
       - icmp
 
-# - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
-#   lineinfile:
-#       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#       regexp: '^kernel.unprivileged_bpf_disabled'
-#       line: 'kernel.unprivileged_bpf_disabled = 1'
-#       owner: root
-#       group: root
-#       mode: 0640
-#   notify: sysctl system
-#   when:
-#       - rhel_08_040281
-#   tags:
-#       - RHEL-08-040281
-#       - sysctl
+- name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.unprivileged_bpf_disabled'
+      line: 'kernel.unprivileged_bpf_disabled = 1'
+      owner: root
+      group: root
+      mode: 0640
+  notify: sysctl system
+  when:
+      - rhel_08_040281
+  tags:
+      - RHEL-08-040281
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230545r627750_rule
+      - V-230545
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
-#   lineinfile:
-#       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#       regexp: '^kernel.yama.ptrace_scope'
-#       line: 'kernel.yama.ptrace_scope = 1'
-#   notify: sysctl system
-#   when:
-#       - rhel_08_040282
-#   tags:
-#       - RHEL-08-040282
-#       - sysctl
+- name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.yama.ptrace_scope'
+      line: 'kernel.yama.ptrace_scope = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040282
+  tags:
+      - RHEL-08-040282
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230546r627750_rule
+      - V-230546
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
-#   lineinfile:
-#       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#       regexp: '^kernel.kptr_restrict'
-#       line: 'kernel.kptr_restrict = 1'
-#       owner: root
-#       group: root
-#       mode: 0640
-#   notify: sysctl system
-#   when:
-#       - rhel_08_040283
-#   tags:
-#       - RHEL-08-040283
-#       - sysctl
+- name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^kernel.kptr_restrict'
+      line: 'kernel.kptr_restrict = 1'
+      owner: root
+      group: root
+      mode: 0640
+  notify: sysctl system
+  when:
+      - rhel_08_040283
+  tags:
+      - RHEL-08-040283
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230547r627750_rule
+      - V-230547
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
-#   lineinfile:
-#       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#       regexp: '^user.max_user_namespaces'
-#       line: 'user.max_user_namespaces = 0'
-#   notify: sysctl system
-#   when:
-#       - rhel_08_040284
-#   tags:
-#       - RHEL-08-040284
-#       - sysctl
+- name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^user.max_user_namespaces'
+      line: 'user.max_user_namespaces = 0'
+  notify: sysctl system
+  when:
+      - rhel_08_040284
+  tags:
+      - RHEL-08-040284
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230548r627750_rule
+      - V-230548
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
-#   lineinfile:
-#       path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-#       regexp: '^net.ipv4.conf.all.rp_filter'
-#       line: 'net.ipv4.conf.all.rp_filter = 1'
-#   notify: sysctl system
-#   when:
-#       - rhel_08_040285
-#   tags:
-#       - RHEL-08-040285
-#       - sysctl
+- name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
+  lineinfile:
+      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
+      regexp: '^net.ipv4.conf.all.rp_filter'
+      line: 'net.ipv4.conf.all.rp_filter = 1'
+  notify: sysctl system
+  when:
+      - rhel_08_040285
+  tags:
+      - RHEL-08-040285
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230549r627750_rule
+      - V-230549
+      - sysctl
 
-# - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
-#   block:
-#       - name: "MEDIUM | RHEL-08-040290 | AUDIT | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
-#         command: rpm -q postfix
-#         failed_when: no
-#         check_mode: no
-#         changed_when: no
-#         register: rhel_08_040290_rpm_audit
+- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
+  block:
+      - name: "MEDIUM | RHEL-08-040290 | AUDIT | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
+        command: rpm -q postfix
+        failed_when: no
+        check_mode: no
+        changed_when: no
+        register: rhel_08_040290_rpm_audit
 
-#       - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
-#         command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
-#         check_mode: no
-#         when: '"postfix-" in rhel_08_040290_rpm_audit.stdout'
-#   when:
-#       - rhel_08_040290
-#   tags:
-#       - RHEL-08-040290
+      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+        command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
+        check_mode: no
+        when: '"postfix-" in rhel_08_040290_rpm_audit.stdout'
+  when:
+      - rhel_08_040290
+  tags:
+      - RHEL-08-040290
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230550r627750_rule
+      - V-230550
+      - mail
 
-# - name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
-#   package:
-#       name: xorg-x11-server-common
-#       state: absent
-#   when:
-#       - rhel_08_040320
-#       - not rhel8stig_gui
+- name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
+  package:
+      name: xorg-x11-server-common
+      state: absent
+  when:
+      - rhel_08_040320
+      - not rhel8stig_gui
+  tags:
+      - RHEL-08-040320
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230553r646886_rule
+      - V-230553
+      - gui
 
-# - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
-#   block:
-#       - name: "MEDIUM | RHEL-040330 | AUDIT | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
-#         shell: "ip link | grep -i promisc | cut -d ':' -f 2"
-#         check_mode: no
-#         failed_when: no
-#         changed_when: rhel_08_040670_promisc_check.stdout != ''
-#         ignore_errors: yes
-#         register: rhel_08_040670_promisc_check
+- name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
+  block:
+      - name: "MEDIUM | RHEL-040330 | AUDIT | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
+        shell: "ip link | grep -i promisc | cut -d ':' -f 2"
+        check_mode: no
+        failed_when: no
+        changed_when: rhel_08_040670_promisc_check.stdout != ''
+        ignore_errors: yes
+        register: rhel_08_040670_promisc_check
 
-#       - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
-#         shell: "ip link set dev {{ item }} promisc off"
-#         with_items: "{{ rhel_08_040670_promisc_check.stdout_lines }}"
-#   when:
-#       - rhel_08_040330
-#       - not rhel8stig_net_promisc_mode_required
-#   tags:
-#       - RHEL-08-040330
+      - name: "MEDIUM | RHEL-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
+        shell: "ip link set dev {{ item }} promisc off"
+        with_items: "{{ rhel_08_040670_promisc_check.stdout_lines }}"
+  when:
+      - rhel_08_040330
+      - not rhel8stig_net_promisc_mode_required
+  tags:
+      - RHEL-08-040330
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230554r627750_rule
+      - V-230554
+      - network
 
-# - name: "MEDIUM | RHEL-08-040340 | PATCH | RHEL 8 remote X connections for interactive users must be disabled unless to fulfill documented and validated mission requirements."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?X11Forwarding'
-#       line: 'X11Forwarding no'
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0640
-#   notify: restart sshd
-#   when:
-#       - rhel_08_040340
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-040340
-#       - ssh
+- name: "MEDIUM | RHEL-08-040340 | PATCH | RHEL 8 remote X connections for interactive users must be disabled unless to fulfill documented and validated mission requirements."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?X11Forwarding'
+      line: 'X11Forwarding no'
+      create: yes
+      owner: root
+      group: root
+      mode: 0640
+  notify: restart sshd
+  when:
+      - rhel_08_040340
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-040340
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230555r627750_rule
+      - V-230555
+      - ssh
 
-# - name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?X11UseLocalhost'
-#       line: 'X11UseLocalhost yes'
-#   when:
-#       - rhel_08_040341
-#   tags:
-#       - RHEL-08-040341
-#       - ssh
+- name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?X11UseLocalhost'
+      line: 'X11UseLocalhost yes'
+  when:
+      - rhel_08_040341
+  tags:
+      - RHEL-08-040341
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230556r627750_rule
+      - ssh
 
 # - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
 #   lineinfile:
