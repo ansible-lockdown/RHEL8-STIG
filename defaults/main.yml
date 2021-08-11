@@ -109,6 +109,7 @@ rhel_08_010151: true
 rhel_08_010160: true
 rhel_08_010161: true
 rhel_08_010162: true
+rhel_08_010163: true
 rhel_08_010170: true
 rhel_08_010180: true
 rhel_08_010190: true
@@ -136,6 +137,8 @@ rhel_08_010373: true
 rhel_08_010374: true
 rhel_08_010380: true
 rhel_08_010381: true
+rhel_08_010382: true
+rhel_08_010383: true
 rhel_08_010390: true
 rhel_08_010400: true
 rhel_08_010410: true
@@ -750,6 +753,11 @@ rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1
 # RHEL-08-020070
 # This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
 rhel8stig_tmux_lock_after_time: 900
+
+# RHEL-08-010384
+# The value given to Defaults timestamp timeout= in the sudo file.
+# Value must be greater than 0 to conform to STIG standards
+rhel8stig_sudo_timestamp_timeout: 1
 
 #### Goss Configuration Settings ####
 

@@ -5669,20 +5669,21 @@
       - dnf
       - sendmail
 
-# - name: |
-#     "MEDIUM | RHEL-08-040003 | PATCH | RHEL 8 must not have the gssproxy package installed."
-#     "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
-#   dnf:
-#       name: gssproxy
-#       state: absent
-#   when:
-#       - rhel_08_040003 or
-#         rhel_08_040370
-#   tags:
-#       - RHEL-08-040003
-#       - RHEL-08-040370
-#       - dnf
-#       - gssproxy
+- name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: gssproxy
+      state: absent
+  when:
+      -rhel_08_040370
+  tags:
+      - RHEL-08-040370
+      - CAT2
+      - CCI-000381
+      - SRG-OS-000480-GPOS-00227
+      - SV-230559r646887_rule
+      - V-230559
+      - dnf
+      - gssproxy
 
 - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
   lineinfile:
@@ -6877,41 +6878,210 @@
       - SV-230556r627750_rule
       - ssh
 
-# - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
-#   lineinfile:
-#       path: /etc/xinetd.d/tftp
-#       regexp: "(?i)^.*server_args.*="
-#       line: "\tserver_args\t\t= -s /var/lib/tftpboot"
-#       insertafter: "\tserver\t\t\t="
-#       state: present
-#   register: result
-#   failed_when:
-#       - result is failed
-#       - result.rc != 257
-#   when:
-#       - rhel_08_040350
-#       - rhel8stig_tftp_required
-#   tags:
-#       - skip_ansible_lint
-#       - RHEL-08-040350
-#       - tftp
+- name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
+  lineinfile:
+      path: /etc/xinetd.d/tftp
+      regexp: "(?i)^.*server_args.*="
+      line: "\tserver_args\t\t= -s /var/lib/tftpboot"
+      insertafter: "\tserver\t\t\t="
+      state: present
+  register: result
+  failed_when:
+      - result is failed
+      - result.rc != 257
+  when:
+      - rhel_08_040350
+      - rhel8stig_tftp_required
+  tags:
+      - skip_ansible_lint
+      - RHEL-08-040350
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230557r627750_rule
+      - V-230557
+      - tftp
 
-# - name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
-#   dnf:
-#       name: iprutils
-#       state: absent
-#   when:
-#       - rhel_08_040380
-#   tags:
-#       - RHEL-08-040380
-#       - iprutils
+- name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: iprutils
+      state: absent
+  when:
+      - rhel_08_040380
+  tags:
+      - RHEL-08-040380
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230560r627750_rule
+      - V-230560
+      - iprutils
 
-# - name: "MEDIUM | RHEL-08-040390 | PATCH | The tuned package must not be installed unless mission essential on RHEL 8."
-#   dnf:
-#       name: tuned
-#       state: absent
-#   when:
-#       - rhel_08_040390
-#   tags:
-#       - RHEL-08-040390
-#       - tuned
+- name: "MEDIUM | RHEL-08-040390 | PATCH | The tuned package must not be installed unless mission essential on RHEL 8."
+  dnf:
+      name: tuned
+      state: absent
+  when:
+      - rhel_08_040390
+  tags:
+      - RHEL-08-040390
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230561r627750_rule
+      - -230561
+      - tuned
+
+- name: "MEDIUM | RHEL-08-010163 | PATCH | The krb5-server package must not be installed on RHEL 8."
+  dnf:
+      name: krb5-server
+      state: absent
+  when:
+      - rhel_08_010163
+  tags:
+      - RHEL-08-010163
+      - CAT2
+      - CCI-000803
+      - SRG-OS-000120-GPOS-00061
+      - SV-237640r646890_rule
+      - V-237640
+      - krb5
+
+- name: "MEDIUM | RHEL-08-010382 | PATCH | RHEL 8 must restrict privilege elevation to authorized personnel."
+  block:
+      - name: "MEDIUM | RHEL-08-010382 | AUDIT | RHEL 8 must restrict privilege elevation to authorized personnel. | Get ALL settings"
+        shell: grep -iws 'ALL' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010382_sudoers_all
+
+      - name: "MEDIUM | RHEL-08-010382 | PATCH | RHEL 8 must restrict privilege elevation to authorized personnel. | Remove format 1"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'ALL ALL=(ALL) ALL'
+            state: absent
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010382_sudoers_all.stdout_lines }}"
+        when: rhel_08_010382_sudoers_all.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010382 | PATCH | RHEL 8 must restrict privilege elevation to authorized personnel. | Remove format 2"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'ALL ALL=(ALL:ALL) ALL'
+            state: absent
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010382_sudoers_all.stdout_lines }}"
+        when: rhel_08_010382_sudoers_all.stdout | length > 0
+  when:
+      - rhel_08_010382
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010382
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-237641r646893_rule
+      - V-237641
+      - sudo
+
+- name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo"."
+  block:
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Get privilege escalation"
+        shell: egrep -is '(!rootpw|!targetpw|!runaspw)' /etc/sudoers /etc/sudoers.d/* | grep -v '#' | cut -d":" -f1 | sort --unique
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010383_priv_escalation
+
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for no findings"
+        lineinfile:
+            path: /etc/sudoers
+            line: "{{ item }}"
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - Defaults !targetpw
+            - Defaults !rootpw
+            - Defaults !runaspw
+        when: rhel_08_010383_priv_escalation.stdout | length == 0
+
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for targetpw with findings"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'Defaults !targetpw'
+            line: 'Defaults !targetpw'
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010383_priv_escalation.stdout_lines }}"
+        when:
+            - rhel_08_010383_priv_escalation.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for rootpw with findings"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'Defaults !rootpw'
+            line: 'Defaults !rootpw'
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010383_priv_escalation.stdout_lines }}"
+        when:
+            - rhel_08_010383_priv_escalation.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for runaspw with findings"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'Defaults !runaspw'
+            line: 'Defaults !runaspw'
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010383_priv_escalation.stdout_lines }}"
+        when:
+            - rhel_08_010383_priv_escalation.stdout | length > 0
+  when:
+      - rhel_08_010383
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010383
+      - CAT2
+      - CCI-002227
+      - SRG-OS-000480-GPOS-00227
+      - SV-237642r646896_rule
+      - V-237642
+      - sudo
+
+- name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command."
+  block:
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Get files with timeout set"
+        shell: grep -is 'timestamp_timeout' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010384_timeout_files
+
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Set value if no results"
+        lineinfile:
+            path: /etc/sudoers
+            regexp: 'Defaults timestamp_timeout='
+            line: "Defaults timestamp_timeout={{ rhel8stig_sudo_timestamp_timeout }}"
+            validate: '/usr/sbin/visudo -cf %s'
+        when: rhel_08_010384_timeout_files.stdout | length == 0
+
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Set value if has results"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: 'Defaults timestamp_timeout='
+            line: "Defaults timestamp_timeout={{ rhel8stig_sudo_timestamp_timeout }}"
+            validate: '/usr/sbin/visudo -cf %s'
+        with_items:
+            - "{{ rhel_08_010384_timeout_files.stdout_lines }}"
+        when: rhel_08_010384_timeout_files.stdout | length > 0
+  when:
+      - rhel_08_010384
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010384
+      - CAT2
+      - CCI-002038
+      - SRG-OS-000373-GPOS-00156
+      - SV-237643r646899_rule
+      - V-237643
+      - sudo
