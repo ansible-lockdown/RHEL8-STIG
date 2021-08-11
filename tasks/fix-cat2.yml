@@ -4584,104 +4584,149 @@
       - V-230425
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/umount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030301
-#   tags:
-#       - RHEL-08-030301
-#       - auditd
+- name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/umount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+  notify: restart auditd
+  when:
+      - rhel_08_030301
+  tags:
+      - RHEL-08-030301
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230424r627750_rule
+      - V-230424
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030310
-#   tags:
-#       - RHEL-08-030310
-#       - auditd
+- name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030310
+  tags:
+      - RHEL-08-030310
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230426r627750_rule
+      - V-230426
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030311
-#   tags:
-#       - RHEL-08-030311
-#       - auditd
+- name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030311
+  tags:
+      - RHEL-08-030311
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230427r627750_rule
+      - V-230427
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030312
-#   tags:
-#       - RHEL-08-030312
-#       - auditd
+- name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030312
+  tags:
+      - RHEL-08-030312
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230428r627750_rule
+      - V-230428
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030313
-#   tags:
-#       - RHEL-08-030313
-#       - auditd
+- name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030313
+  tags:
+      - RHEL-08-030313
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230429r627750_rule
+      - V-230429
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030314
-#   tags:
-#       - RHEL-08-030314
-#       - auditd
+- name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030314
+  tags:
+      - RHEL-08-030314
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230430r627750_rule
+      - V-230430
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-03015 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030315
-#   tags:
-#       - RHEL-08-030315
-#       - auditd
+- name: "MEDIUM | RHEL-08-03015 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030315
+  tags:
+      - RHEL-08-030315
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230431r627750_rule
+      - V-230431
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030316
-#   tags:
-#       - RHEL-08-030316
-#       - auditd
+- name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030316
+  tags:
+      - RHEL-08-030316
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230432r627750_rule
+      - V-230432
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030317
-#   tags:
-#       - RHEL-08-030317
-#       - auditd
+- name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  notify: restart auditd
+  when:
+      - rhel_08_030317
+  tags:
+      - RHEL-08-030317
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230433r627750_rule
+      - V-230433
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
 #   lineinfile:
