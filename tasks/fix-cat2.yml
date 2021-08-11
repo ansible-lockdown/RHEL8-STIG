@@ -2140,351 +2140,403 @@
       - V-230327
       - permissions
 
-# - name: "MEDIUM | RHEL-08-010800 | PATCH | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
-#   debug:
-#       msg: "WARNING!!!! /home is not mounted on a separate partition"
-#   changed_when:
-#       - rhel8stig_audit_complex
-#   when:
-#       - rhel_08_010800
-#       - not rhel8stig_system_is_container
-#       - rhel8stig_complex
-#       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
-#   tags:
-#       - RHEL-08-010800
-#       - complexity-high
-#       - mount
-#       - home
+- name: "MEDIUM | RHEL-08-010800 | PATCH | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
+  debug:
+      msg: "WARNING!!!! /home is not mounted on a separate partition"
+  changed_when:
+      - rhel8stig_audit_complex
+  when:
+      - rhel_08_010800
+      - not rhel8stig_system_is_container
+      - rhel8stig_complex
+      - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
+  tags:
+      - RHEL-08-010800
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230328r627750_rule
+      - V-23032
+      - complexity-high
+      - mount
+      - home
 
-# - name: "MEDIUM | RHEL-08-010830 | PATCH |Unattended or automatic logon to RHEL 8 via ssh must not be allowed."
-#   lineinfile:
-#       path: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?PermitUserEnvironment'
-#       line: 'PermitUserEnvironment no'
-#   notify: restart sshd
-#   when:
-#       - rhel_08_010830
-#       - rhel8stig_disruption_high
-#   tags:
-#       - RHEL-08-010830
-#       - ssh
-#       - disruption_high
+- name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?PermitUserEnvironment'
+      line: 'PermitUserEnvironment no'
+  notify: restart sshd
+  when:
+      - rhel_08_010830
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-010830
+      - CAT2
+      - V-230330
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00229
+      - SV-230330r646870_rule
+      - V-230330
+      - ssh
+      - disruption_high
 
-# - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-#   debug:
-#       msg:
-#           - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
-#           - "To do this please run sudo chage -l account_name for the accounts you need to check"
-#           - "The results will display the Account Expires information"
-#           - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
-#   when:
-#       - rhel_08_020000
-#   tags:
-#       - RHEL-08-020000
+- name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+  debug:
+      msg:
+          - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
+          - "To do this please run sudo chage -l account_name for the accounts you need to check"
+          - "The results will display the Account Expires information"
+          - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
+  when:
+      - rhel_08_020000
+  tags:
+      - RHEL-08-020000
+      - CAT2
+      - CCI-000016
+      - SRG-OS-000002-GPOS-00002
+      - SV-230331r627750_rule
+      - V-230331
+      - accounts
 
-# - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
-#   block:
-#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock  unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock  unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020010
-#   tags:
-#       - RHEL-08-020010
-#       - pamd
+      - name: "MEDIUM | RHEL-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020010
+  tags:
+      - RHEL-08-020010
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230332r627750_rule
+      - V-230332
+      - pamd
 
-# - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
-#   block:
-#       - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  block:
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set deny in faillock.conf"
-#         lineinfile:
-#             path: "/etc/security/faillock.conf"
-#             regexp: '^deny =|^\# deny ='
-#             line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
-#   when:
-#       - rhel_08_020011
-#   tags:
-#       - RHEL-08-020011
-#       - pamd
+      - name: "MEDIUM | RHEL-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set deny in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^deny =|^\# deny ='
+            line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
+  when:
+      - rhel_08_020011
+  tags:
+      - RHEL-08-020011
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230333r627750_rule
+      - V-230333
+      - pamd
 
-# - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
-#   block:
-#       - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020012
-#   tags:
-#       - RHEL-08-020012
-#       - pamd
+      - name: "MEDIUM | RHEL-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020012
+  tags:
+      - RHEL-08-020012
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230334r627750_rule
+      - V-230334
+      - pamd
 
-# - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
-#   block:
-#       - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set fail_interval in faillock.conf"
-#         lineinfile:
-#             path: "/etc/security/faillock.conf"
-#             regexp: '^fail_interval =|^\# fail_interval ='
-#             line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020013
-#   tags:
-#       - RHEL-08-020013
-#       - pamd
+      - name: "MEDIUM | RHEL-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set fail_interval in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^fail_interval =|^\# fail_interval ='
+            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020013
+  tags:
+      - RHEL-08-020013
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230335r627750_rule
+      - V-230335
+      - pamd
 
-# - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
-#   block:
-#       - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020013
-#   tags:
-#       - RHEL-08-020013
-#       - pamd
+      - name: "MEDIUM | RHEL-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020013
+  tags:
+      - RHEL-08-020013
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230336r627750_rule
+      - V-230336
+      - pamd
 
-# - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
-#   block:
-#       - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  block:
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020015 | PATCH |RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020015 | PATCH |RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set unlock_time in faillock.conf"
-#         lineinfile:
-#             path: "/etc/security/faillock.conf"
-#             regexp: '^unlock_time =|^\# unlock_time ='
-#             line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020015
-#   tags:
-#       - RHEL-08-020015
-#       - pamd
+      - name: "MEDIUM | RHEL-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set unlock_time in faillock.conf"
+        lineinfile:
+            path: "/etc/security/faillock.conf"
+            regexp: '^unlock_time =|^\# unlock_time ='
+            line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020015
+  tags:
+      - RHEL-08-020015
+      - CAT2
+      - CCI-000044
+      - RG-OS-000021-GPOS-00005
+      - SV-230337r627750_rule
+      - V-230337
+      - pamd
 
-# - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
-#   block:
-#       - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so preauth'
-#             line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+- name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
+  block:
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir=/var/log/faillock silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^auth       required pam_faillock.so authfail'
-#             line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-#             insertafter: '^auth'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir=/var/log/faillock nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
 
-#       - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
-#         lineinfile:
-#             path: "/etc/pam.d/{{ item }}"
-#             regexp: '^account    required pam_faillock.so'
-#             line: 'account    required pam_faillock.so'
-#             insertafter: '^account'
-#         notify: restart sssd
-#         with_items:
-#             - system-auth
-#             - password-auth
-#   when:
-#       - rhel_08_020016
-#   tags:
-#       - RHEL-08-020016
-#       - pamd
+      - name: "MEDIUM | RHEL-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
+        lineinfile:
+            path: "/etc/pam.d/{{ item }}"
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+        with_items:
+            - system-auth
+            - password-auth
+  when:
+      - rhel_08_020016
+  tags:
+      - RHEL-08-020016
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-230338r627750_rule
+      - V-230338
+      - pamd
 
 # - name: "MEDIUM | RHEL-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
 #   block:
