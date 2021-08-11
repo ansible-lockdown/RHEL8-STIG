@@ -3269,198 +3269,247 @@
       - V-230360
       - pwquality
 
-# - name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*maxrepeat'
-#       line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
-#   when:
-#       - rhel_08_020150
-#   tags:
-#       - RHEL-08-020150
-#       - pwquality
+- name: "MEDIUM | RHEL-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*maxrepeat'
+      line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
+  when:
+      - rhel_08_020150
+  tags:
+      - RHEL-08-020150
+      - CAT2
+      - CCI-000195
+      - SRG-OS-000072-GPOS-00040
+      - SV-230361r627750_rule
+      - V-230361
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*minclass'
-#       line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
-#   when:
-#       - rhel_08_020160
-#   tags:
-#       - RHEL-08-020160
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*minclass'
+      line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
+  when:
+      - rhel_08_020160
+  tags:
+      - RHEL-08-020160
+      - CAT2
+      - CCI-000195
+      - SRG-OS-000072-GPOS-00040
+      - SV-230362r627750_rule
+      - V-230362
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*difok'
-#       line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
-#   when:
-#       - rhel_08_020170
-#   tags:
-#       - RHEL-08-020170
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*difok'
+      line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
+  when:
+      - rhel_08_020170
+  tags:
+      - RHEL-08-020170
+      - CAT2
+      - CCI-000195
+      - SRG-OS-000072-GPOS-00040
+      - SV-230363r627750_rule
+      - V-230363
+      - pwquality
 
-# - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
-#   block:
-#       - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
-#         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020180_users
+- name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+  block:
+      - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
+        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020180_users
 
-#       - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
-#         command: chage -m 1 {{ item }}
-#         with_items: "{{ rhel_08_020180_users.stdout_lines }}"
-#   when:
-#       - rhel_08_020180
-#   tags:
-#       - RHEL8-08-020180
-#       - password
+      - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
+        command: chage -m 1 {{ item }}
+        with_items: "{{ rhel_08_020180_users.stdout_lines }}"
+  when:
+      - rhel_08_020180
+  tags:
+      - RHEL8-08-020180
+      - CAT2
+      - CCI-000198
+      - SRG-OS-000075-GPOS-00043
+      - SV-230364r627750_rule
+      - V-230364
+      - password
 
-# - name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
-#   lineinfile:
-#       path: /etc/login.defs
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: ^#?PASS_MIN_DAYS
-#       line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
-#   when:
-#       - rhel_08_020190
-#   tags:
-#       - RHEL-08-020190
-#       - login
+- name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
+  lineinfile:
+      path: /etc/login.defs
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: ^#?PASS_MIN_DAYS
+      line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
+  when:
+      - rhel_08_020190
+  tags:
+      - RHEL-08-020190
+      - CAT2
+      - CCI-000198
+      - SRG-OS-000075-GPOS-00043
+      - SV-230365r627750_rule
+      - V-230365
+      - login
 
-# - name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
-#   lineinfile:
-#       path: /etc/login.defs
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: ^#?PASS_MAX_DAYS
-#       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
-#   when:
-#       - rhel_08_020200
-#   tags:
-#       - RHEL-08-020200
-#       - login
+- name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
+  lineinfile:
+      path: /etc/login.defs
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: ^#?PASS_MAX_DAYS
+      line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
+  when:
+      - rhel_08_020200
+  tags:
+      - RHEL-08-020200
+      - CAT2
+      - CCI-000199
+      - SRG-OS-000076-GPOS-00044
+      - SV-230366r646878_rule
+      - V-230366
+      - login
 
-# - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
-#         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
-#         check_mode: no
-#         changed_when: rhel_08_020210_users.stdout | length > 0
-#         register: rhel_08_020210_users
+- name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
+  block:
+      - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
+        command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
+        check_mode: no
+        changed_when: rhel_08_020210_users.stdout | length > 0
+        register: rhel_08_020210_users
 
-#       - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
-#         command: chage -d '-1 day' {{ item }}
-#         check_mode: "{{ rhel8stig_disruptive_check_mode }}"
-#         with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
+        command: chage -d '-1 day' {{ item }}
+        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
 
-#       - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
-#         command: chage -M 60 {{ item }}
-#         check_mode: "{{ rhel8stig_disruptive_check_mode }}"
-#         with_items: "{{ rhel_08_020210_users.stdout_lines }}"
-#   when:
-#       - rhel_08_020210
-#       - rhel8stig_disruption_high
-#   tags:
-#       - RHEL-08-020210
-#       - disruption-high
-#       - password
+      - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
+        command: chage -M 60 {{ item }}
+        check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+        with_items: "{{ rhel_08_020210_users.stdout_lines }}"
+  when:
+      - rhel_08_020210
+      - rhel8stig_disruption_high
+  tags:
+      - RHEL-08-020210
+      - CAT2
+      - CCI-000199
+      - SRG-OS-000076-GPOS-00044
+      - SV-230367r627750_rule
+      - V-230367
+      - disruption-high
+      - password
 
-# - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
-#         pamd:
-#             name: "{{ item }}"
-#             state: before
-#             type: password
-#             control: sufficient
-#             module_path: pam_unix.so
-#             new_type: password
-#             new_control: required
-#             new_module_path: pam_pwhistory.so
-#         with_items:
-#             - "system-auth"
-#             - "password-auth"
+- name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations."
+  block:
+      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
+        pamd:
+            name: "{{ item }}"
+            state: before
+            type: password
+            control: sufficient
+            module_path: pam_unix.so
+            new_type: password
+            new_control: required
+            new_module_path: pam_pwhistory.so
+        with_items:
+            - "system-auth"
+            - "password-auth"
 
-#       # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
-#       - name: "MEDIUM | RHEL-08-020220 | AUDIT | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Check for existing password history reuse settings"
-#         command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/{{ item }}"
-#         check_mode: no
-#         changed_when: no
-#         failed_when: rhel_08_020220_pw_hist_settings.rc > 1
-#         register: rhel_08_020220_pw_hist_settings
-#         with_items:
-#             - "system-auth"
-#             - "password-auth"
+      # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
+      - name: "MEDIUM | RHEL-08-020220 | AUDIT | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Check for existing password history reuse settings"
+        command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/{{ item }}"
+        check_mode: no
+        changed_when: no
+        failed_when: rhel_08_020220_pw_hist_settings.rc > 1
+        register: rhel_08_020220_pw_hist_settings
+        with_items:
+            - "system-auth"
+            - "password-auth"
 
-#       # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
-#       - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
-#         pamd:
-#             name: "{{ item.item }}"
-#             state: updated
-#             type: password
-#             control: required
-#             module_path: pam_pwhistory.so
-#             module_arguments:
-#                 - use_authtok
-#                 - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
-#                 - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
-#         with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
-#         when: item.rc == 1
-#   when:
-#       - rhel_08_020220
-#   tags:
-#       - RHEL-08-020220
-#       - pamd
+      # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
+      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 passwords must be prohibited from reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
+        pamd:
+            name: "{{ item.item }}"
+            state: updated
+            type: password
+            control: required
+            module_path: pam_pwhistory.so
+            module_arguments:
+                - use_authtok
+                - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
+                - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
+        with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
+        when: item.rc == 1
+  when:
+      - rhel_08_020220
+  tags:
+      - RHEL-08-020220
+      - CAT2
+      - CCI-000200
+      - SRG-OS-000077-GPOS-00045
+      - SV-230368r627750_rule
+      - V-230368
+      - pamd
 
-# - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       owner: root
-#       group: root
-#       mode: 0644
-#       regexp: '^#?\s*minlen'
-#       line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
-#   when:
-#       - rhel_08_020230
-#   tags:
-#       - RHEL-08-020230
-#       - pwquality
+- name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+      regexp: '^#?\s*minlen'
+      line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
+  when:
+      - rhel_08_020230
+  tags:
+      - RHEL-08-020230
+      - CCI-000205
+      - SRG-OS-000078-GPOS-00046
+      - SV-230369r627750_rule
+      - V-230369
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020231 | PATCH | RHEL 8 passwords for new users must have a minimum of 15 characters."
-#   lineinfile:
-#       path: /etc/login.defs
-#       regexp: '^PASS_MIN_LEN|^#PASS_MIN_LEN'
-#       line: "PASS_MIN_LEN 15"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020231
-#   tags:
-#       - RHEL-08-020231
-#       - passwords
+- name: "MEDIUM | RHEL-08-020231 | PATCH | RHEL 8 passwords for new users must have a minimum of 15 characters."
+  lineinfile:
+      path: /etc/login.defs
+      regexp: '^PASS_MIN_LEN|^#PASS_MIN_LEN'
+      line: "PASS_MIN_LEN 15"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020231
+  tags:
+      - RHEL-08-020231
+      - CAT2
+      - CCI-000205
+      - SRG-OS-000078-GPOS-00046
+      - SV-230370r627750_rule
+      -V-230370
+      - passwords
 
 # - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
 #   block:
