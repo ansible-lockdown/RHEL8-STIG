@@ -4387,148 +4387,202 @@
       - V-230413
       - auditd
 
-# - name: "MEDIUM | RHEL-08-030210 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the removexattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S removexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S removexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S removexattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S removexattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030210
-#   tags:
-#       - RHEL-08-030210
-#       - auditd
+- name: "MEDIUM | RHEL-08-030210 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the removexattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S removexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S removexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S removexattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S removexattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030210
+  tags:
+      - RHEL-08-030210
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230414r627750_rule
+      - V-230414
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030220 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lsetxattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S lsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S lsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S lsetxattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S lsetxattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030220
-#   tags:
-#       - RHEL-08-030220
-#       - auditd
+- name: "MEDIUM | RHEL-08-030220 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lsetxattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S lsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S lsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S lsetxattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S lsetxattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030220
+  tags:
+      - RHEL-08-030220
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230415r627750_rule
+      - V-230415
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030230 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the fsetxattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S fsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S fsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S fsetxattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S fsetxattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030230
-#   tags:
-#       - RHEL-08-030230
-#       - auditd
+- name: "MEDIUM | RHEL-08-030230 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the fsetxattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S fsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fsetxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S fsetxattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S fsetxattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030230
+  tags:
+      - RHEL-08-030230
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230416r627750_rule
+      - V-230416
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030240 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the fremovexattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S fremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S fremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S fremovexattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S fremovexattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030240
-#   tags:
-#       - RHEL-08-030240
-#       - auditd
+- name: "MEDIUM | RHEL-08-030240 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the fremovexattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S fremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S fremovexattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S fremovexattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030240
+  tags:
+      - RHEL-08-030240
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230417r627750_rule
+      - V-230417
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/chage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-chage
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030250
-#   tags:
-#       - RHEL-08-030250
-#       - auditd
+- name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/chage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-chage
+  notify: restart auditd
+  when:
+      - rhel_08_030250
+  tags:
+      - RHEL-08-030250
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230418r627750_rule
+      - V-230418
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030260
-#   tags:
-#       - RHEL-08-030260
-#       - auditd
+- name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+  notify: restart auditd
+  when:
+      - rhel_08_030260
+  tags:
+      - RHEL-08-030260
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230419r627750_rule
+      - V-230419
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030270 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the setxattr system call."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F arch=b32 -S setxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b64 -S setxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-#       - -a always,exit -F arch=b32 -S setxattr -F auid=0 -k perm_mod
-#       - -a always,exit -F arch=b64 -S setxattr -F auid=0 -k perm_mod
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030270
-#   tags:
-#       - RHEL-08-030270
-#       - auditd
+- name: "MEDIUM | RHEL-08-030270 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the setxattr system call."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F arch=b32 -S setxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S setxattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b32 -S setxattr -F auid=0 -k perm_mod
+      - -a always,exit -F arch=b64 -S setxattr -F auid=0 -k perm_mod
+  notify: restart auditd
+  when:
+      - rhel_08_030270
+  tags:
+      - RHEL-08-030270
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230420r627750_rule
+      - V-230420
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030280
-#   tags:
-#       - RHEL-08-030280
-#       - auditd
+- name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
+  notify: restart auditd
+  when:
+      - rhel_08_030280
+  tags:
+      - RHEL-08-030280
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230421r627750_rule
+      - V-230421
+      - auditd
 
-# - name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: -a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-passwd
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030290
-#   tags:
-#       - RHEL-08-030290
-#       - auditd
+- name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: -a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-passwd
+  notify: restart auditd
+  when:
+      - rhel_08_030290
+  tags:
+      - RHEL-08-030290
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230422r627750_rule
+      - V-230422
+      - auditd
 
-# - name: |
-#     "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
-#     "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
-#   lineinfile:
-#       path: /etc/audit/rules.d/audit.rules
-#       line: "{{ item }}"
-#   with_items:
-#       - -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-#       - -a always,exit -F arch=b32 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-#       - -a always,exit -F arch=b64 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-#   notify: restart auditd
-#   when:
-#       - rhel_08_030300 or
-#         rhel_08_030302
-#   tags:
-#       - RHEL-08-030300
-#       - RHEL-08-030302
-#       - auditd
+- name: |
+    "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
+    "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
+  lineinfile:
+      path: /etc/audit/rules.d/audit.rules
+      line: "{{ item }}"
+  with_items:
+      - -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+      - -a always,exit -F arch=b32 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+      - -a always,exit -F arch=b64 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+  notify: restart auditd
+  when:
+      - rhel_08_030300 or
+        rhel_08_030302
+  tags:
+      - CAT2
+      - RHEL-08-030300
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230423r627750_rule
+      - V-230423
+      - RHEL-08-030302
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230425r627750_rule
+      - V-230425
+      - auditd
 
 # - name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
 #   lineinfile:
