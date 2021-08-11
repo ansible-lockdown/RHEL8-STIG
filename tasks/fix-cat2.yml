@@ -3486,6 +3486,7 @@
       - rhel_08_020230
   tags:
       - RHEL-08-020230
+      - CAT2
       - CCI-000205
       - SRG-OS-000078-GPOS-00046
       - SV-230369r627750_rule
@@ -3508,242 +3509,295 @@
       - CCI-000205
       - SRG-OS-000078-GPOS-00046
       - SV-230370r627750_rule
-      -V-230370
+      - V-230370
       - passwords
 
-# - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
-#         command: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020240_duplicate_uid_users
+- name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
+  block:
+      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
+        command: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020240_duplicate_uid_users
 
-#       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
-#         debug:
-#             msg:
-#                 - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
-#                 - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
-#   when:
-#       - rhel_08_020240
-#   tags:
-#       - RHEL-08-020240
+      - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
+        debug:
+            msg:
+                - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+                - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
+  when:
+      - rhel_08_020240
+  tags:
+      - RHEL-08-020240
+      - CAT2
+      - CCI-000764
+      - SRG-OS-000104-GPOS-00051
+      - SV-230371r627750_rule
+      - V-230371
+      - user
 
-# - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
-#         shell: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020250_sc_auth_sss
+- name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
+  block:
+      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
+        shell: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020250_sc_auth_sss
 
-#       - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
-#         shell: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020250_system_auth_sss
+      - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
+        shell: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020250_system_auth_sss
 
-#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
-#         lineinfile:
-#             path: "{{ rhel8stig_sssd_conf }}"
-#             regexp: "{{ item.regexp }}"
-#             line: "{{ item.line }}"
-#             insertafter: "{{ item.insertafter }}"
-#             owner: root
-#             group: root
-#             mode: 0640
-#         notify: restart sssd
-#         with_items:
-#             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
-#             - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
+        lineinfile:
+            path: "{{ rhel8stig_sssd_conf }}"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            insertafter: "{{ item.insertafter }}"
+            owner: root
+            group: root
+            mode: 0640
+        notify: restart sssd
+        with_items:
+            - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+            - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
 
-#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
-#         lineinfile:
-#             path: /etc/pam.d/smartcard-auth
-#             line: auth       sufficient pam_sss.so try_cert_auth
-#             owner: root
-#             group: root
-#             mode: 0644
-#         notify: restart sssd
-#         when: rhel_08_020250_sc_auth_sss.stdout | length == 0
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
+        lineinfile:
+            path: /etc/pam.d/smartcard-auth
+            line: auth       sufficient pam_sss.so try_cert_auth
+            owner: root
+            group: root
+            mode: 0644
+        notify: restart sssd
+        when: rhel_08_020250_sc_auth_sss.stdout | length == 0
 
-#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
-#         pamd:
-#             name: /etc/pam.d/smartcard-auth
-#             state: updated
-#             type: auth
-#             control: sufficient
-#             module_path: pam_sss.so
-#             module_arguments: 'try_cert_auth'
-#         notify: restart sssd
-#         when: rhel_08_020250_sc_auth_sss.stdout | length > 0
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
+        pamd:
+            name: /etc/pam.d/smartcard-auth
+            state: updated
+            type: auth
+            control: sufficient
+            module_path: pam_sss.so
+            module_arguments: 'try_cert_auth'
+        notify: restart sssd
+        when: rhel_08_020250_sc_auth_sss.stdout | length > 0
 
-#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
-#         pamd:
-#             name: /etc/pam.d/system-auth
-#             state: after
-#             type: auth
-#             control: required
-#             module_path: pam_env.so
-#             new_type: auth
-#             new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
-#             new_module_path: pam_sss.so
-#             module_arguments: try_cert_auth
-#         notify: restart sssd
-#         when: rhel_08_020250_system_auth_sss.stdout | length == 0
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
+        pamd:
+            name: /etc/pam.d/system-auth
+            state: after
+            type: auth
+            control: required
+            module_path: pam_env.so
+            new_type: auth
+            new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+            new_module_path: pam_sss.so
+            module_arguments: try_cert_auth
+        notify: restart sssd
+        when: rhel_08_020250_system_auth_sss.stdout | length == 0
 
-#       - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
-#         pamd:
-#             name: /etc/pam.d/system-auth
-#             state: updated
-#             type: auth
-#             control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
-#             module_path: pam_env.so
-#             module_arguments: try_cert_auth
-#         notify: restart sssd
-#         when: rhel_08_020250_system_auth_sss.stdout | length > 0
-#   when:
-#       - "'sssd' in ansible_facts.packages" 
-#       - rhel8stig_sssd_conf_present.stat.exists
-#       - rhel_08_020250
-#   tags:
-#       - RHEL-08-020250
-#       - pamd
+      - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
+        pamd:
+            name: /etc/pam.d/system-auth
+            state: updated
+            type: auth
+            control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+            module_path: pam_env.so
+            module_arguments: try_cert_auth
+        notify: restart sssd
+        when: rhel_08_020250_system_auth_sss.stdout | length > 0
+  when:
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
+      - rhel_08_020250
+  tags:
+      - RHEL-08-020250
+      - CAT2
+      - CCI-000765
+      - SRG-OS-000105-GPOS-00052
+      - SV-230372r627750_rule
+      - V-230372
+      - pamd
 
-# - name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
-#   command: useradd -D -f 35
-#   when:
-#       - rhel_08_020260
-#   tags:
-#       - RHEL-08-020260
-#       - useradd
+- name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
+  command: useradd -D -f 35
+  when:
+      - rhel_08_020260
+  tags:
+      - RHEL-08-020260
+      - CAT2
+      - CCI-000795
+      - SRG-OS-000118-GPOS-00060
+      - SV-230373r627750_rule
+      - V-230373
+      - useradd
 
-# - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-#         command: "awk -F: '{if ($3 <= {{ rhel8stig_interactive_uid_start }}) { print $1 }}' /etc/passwd"
-#         changed_when: false
-#         failed_when: false
-#         register: rhel_08_020270_system_users
+- name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+  block:
+      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+        command: "awk -F: '{if ($3 <= {{ rhel8stig_interactive_uid_start }}) { print $1 }}' /etc/passwd"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020270_system_users
 
-#       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
-#         debug:
-#             msg:
-#                 - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
-#                 - "{{ rhel_08_020270_system_users.stdout_lines }}"
-#   when:
-#       - rhel_08_020270
-#   tags:
-#       - RHEL-08-020270
+      - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
+        debug:
+            msg:
+                - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+                - "{{ rhel_08_020270_system_users.stdout_lines }}"
+  when:
+      - rhel_08_020270
+  tags:
+      - RHEL-08-020270
+      - CAT2
+      - CCI-001682
+      - SRG-OS-000123-GPOS-00064
+      - SV-230374r627750_rule
+      - V-230374
+      - user
 
-# - name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       regexp: '^#?\s*ocredit'
-#       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020280
-#   tags:
-#       - RHEL-08-020280
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*ocredit'
+      line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020280
+  tags:
+      - RHEL-08-020280
+      - CAT2
+      - CCI-001619
+      - SRG-OS-000266-GPOS-00101
+      - SV-230375r627750_rule
+      - V-230375
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
-#   lineinfile:
-#       path: "{{ rhel8stig_sssd_conf }}"
-#       regexp: "{{ item.regexp }}"
-#       line: "{{ item.line }}"
-#       insertafter: "{{ item.insertafter }}"
-#       owner: root
-#       group: root
-#       mode: 0640
-#   with_items:
-#       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
-#       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
-#   when:
-#       - "'sssd' in ansible_facts.packages" 
-#       - rhel8stig_sssd_conf_present.stat.exists
-#       - rhel_08_020290
-#   tags:
-#       - RHEL-08-020290
-#       - sssd
+- name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
+  lineinfile:
+      path: "{{ rhel8stig_sssd_conf }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+      owner: root
+      group: root
+      mode: 0640
+  with_items:
+      - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+      - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
+  when:
+      - "'sssd' in ansible_facts.packages" 
+      - rhel8stig_sssd_conf_present.stat.exists
+      - rhel_08_020290
+  tags:
+      - RHEL-08-020290
+      - CAT2
+      - CCI-002007
+      - SRG-OS-000383-GPOS-00166
+      - SV-230376r627750_rule
+      - V-230376
+      - sssd
 
-# - name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
-#   lineinfile:
-#       path: /etc/security/pwquality.conf
-#       create: yes
-#       regexp: '^#?\s*dictcheck'
-#       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020300
-#   tags:
-#       - RHEL-08-020300
-#       - pwquality
+- name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      create: yes
+      regexp: '^#?\s*dictcheck'
+      line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020300
+  tags:
+      - RHEL-08-020300
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00225
+      - SV-230377r627750_rule
+      - V-230377
+      - pwquality
 
-# - name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
-#   lineinfile:
-#       dest: /etc/login.defs
-#       regexp: ^#?FAIL_DELAY
-#       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
-#       owner: root
-#       group: root
-#       mode: 0644
-#   when:
-#       - rhel_08_020310
-#   tags:
-#       - RHEL-08-020310
-#       - login
+- name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
+  lineinfile:
+      dest: /etc/login.defs
+      regexp: ^#?FAIL_DELAY
+      line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_020310
+  tags:
+      - RHEL-08-020310
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00226
+      - SV-230378r627750_rule
+      - V-230378
+      - login
 
-# - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
-#   block:
-#       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
-#         command: "grep '^{{ item }}:' /etc/passwd"
-#         check_mode: no
-#         failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
-#         changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
-#         register: rhel_08_020320_unnecessary_accounts_found
-#         with_items: "{{ rhel8stig_unnecessary_accounts }}"
+- name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
+  block:
+      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
+        command: "grep '^{{ item }}:' /etc/passwd"
+        check_mode: no
+        failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
+        changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
+        register: rhel_08_020320_unnecessary_accounts_found
+        with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
-#       - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
-#         user:
-#             name: "{{ item }}"
-#             state: absent
-#             remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
-#         register: rhel_08_020320_accounts_removed
-#         with_items: "{{ rhel8stig_unnecessary_accounts }}"
+      - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
+        user:
+            name: "{{ item }}"
+            state: absent
+            remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
+        register: rhel_08_020320_accounts_removed
+        with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
-#       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
-#         include_tasks: parse_etc_passwd.yml
-#         vars:
-#             rhel8stig_passwd_tasks: "RHEL-08-020320"
-#         when: rhel_08_020320_accounts_removed is changed
-#   when:
-#       - rhel_08_020320
-#   tags:
-#       - RHEL-08-020320
+      - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
+        include_tasks: parse_etc_passwd.yml
+        vars:
+            rhel8stig_passwd_tasks: "RHEL-08-020320"
+        when: rhel_08_020320_accounts_removed is changed
+  when:
+      - rhel_08_020320
+  tags:
+      - RHEL-08-020320
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230379r627750_rule
+      - V-230379
+      - accounts
 
-# - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
-#   lineinfile:
-#       dest: /etc/ssh/sshd_config
-#       regexp: '(?i)^#?PrintLastLog'
-#       line: 'PrintLastLog yes'
-#       validate: /usr/sbin/sshd -t -f %s
-#       owner: root
-#       group: root
-#       mode: 0644
-#   notify: restart sshd
-#   when:
-#       - rhel_08_020350
-#       - rhel8stig_ssh_required
-#   tags:
-#       - RHEL-08-020350
-#       - ssh
+- name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: '(?i)^#?PrintLastLog'
+      line: 'PrintLastLog yes'
+      validate: /usr/sbin/sshd -t -f %s
+      owner: root
+      group: root
+      mode: 0644
+  notify: restart sshd
+  when:
+      - rhel_08_020350
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-020350
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230382r627750_rule
+      - V-230382
+      - ssh
 
 # - name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
 #   lineinfile:
