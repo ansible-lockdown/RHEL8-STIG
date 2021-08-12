@@ -108,15 +108,12 @@
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
   lineinfile:
-      path: /etc/rsyslog.d/50-default.conf
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
+      path: /etc/rsyslog.conf
+      # regexp: "{{ item.regexp }}"
+      line: "auth.*;authpriv.*;daemon.* /var/log/secure"
       create: yes
       mode: '0644'
   notify: restart rsyslog
-  with_items:
-      - { regexp: '^auth.*', line: 'auth.*,authpriv.* /var/log/secure' }
-      - { regexp: '^daemon.*', line: 'daemon.* /var/log/messages' }
   when:
       - rhel_08_010070
   tags:
