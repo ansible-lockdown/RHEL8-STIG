@@ -4487,7 +4487,7 @@
 - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030260
@@ -4744,7 +4744,7 @@
 - name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      line: -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030330
