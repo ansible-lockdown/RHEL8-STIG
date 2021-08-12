@@ -6776,20 +6776,10 @@
       - V-230549
       - sysctl
 
-- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
-  block:
-      - name: "MEDIUM | RHEL-08-040290 | AUDIT | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Check if postfix is installed."
-        command: rpm -q postfix
-        failed_when: no
-        check_mode: no
-        changed_when: no
-        register: rhel_08_040290_rpm_audit
-
-      - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
-        command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
-        check_mode: no
-        when: '"postfix-" in rhel_08_040290_rpm_audit.stdout'
+- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+  command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
   when:
+      - "'postfix' in ansible_facts.packages"
       - rhel_08_040290
   tags:
       - RHEL-08-040290
