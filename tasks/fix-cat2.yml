@@ -6986,15 +6986,15 @@
       - V-237641
       - sudo
 
-- name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo"."
+- name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo."
   block:
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Get privilege escalation"
-        shell: egrep -is '(!rootpw|!targetpw|!runaspw)' /etc/sudoers /etc/sudoers.d/* | grep -v '#' | cut -d":" -f1 | sort --unique
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Get privilege escalation"
+        shell: egrep -is '(!rootpw|!targetpw|!runaspw)' /etc/sudoers /etc/sudoers.d/* | grep -v '#' | cut -d ':' -f1 | sort --uniq
         changed_when: false
         failed_when: false
         register: rhel_08_010383_priv_escalation
 
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for no findings"
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Set privilege escalation for no findings"
         lineinfile:
             path: /etc/sudoers
             line: "{{ item }}"
@@ -7005,7 +7005,7 @@
             - Defaults !runaspw
         when: rhel_08_010383_priv_escalation.stdout | length == 0
 
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for targetpw with findings"
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Set privilege escalation for targetpw with findings"
         lineinfile:
             path: "{{ item }}"
             regexp: 'Defaults !targetpw'
@@ -7016,7 +7016,7 @@
         when:
             - rhel_08_010383_priv_escalation.stdout | length > 0
 
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for rootpw with findings"
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Set privilege escalation for rootpw with findings"
         lineinfile:
             path: "{{ item }}"
             regexp: 'Defaults !rootpw'
@@ -7027,7 +7027,7 @@
         when:
             - rhel_08_010383_priv_escalation.stdout | length > 0
 
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using "sudo". | Set privilege escalation for runaspw with findings"
+      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Set privilege escalation for runaspw with findings"
         lineinfile:
             path: "{{ item }}"
             regexp: 'Defaults !runaspw'
@@ -7049,15 +7049,15 @@
       - V-237642
       - sudo
 
-- name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command."
+- name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command."
   block:
-      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Get files with timeout set"
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command. | Get files with timeout set"
         shell: grep -is 'timestamp_timeout' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
         changed_when: false
         failed_when: false
         register: rhel_08_010384_timeout_files
 
-      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Set value if no results"
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command. | Set value if no results"
         lineinfile:
             path: /etc/sudoers
             regexp: 'Defaults timestamp_timeout='
@@ -7065,7 +7065,7 @@
             validate: '/usr/sbin/visudo -cf %s'
         when: rhel_08_010384_timeout_files.stdout | length == 0
 
-      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the "sudo" command. | Set value if has results"
+      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command. | Set value if has results"
         lineinfile:
             path: "{{ item }}"
             regexp: 'Defaults timestamp_timeout='
