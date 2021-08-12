@@ -58,7 +58,10 @@
 
 - import_tasks: pre_remediation_audit.yml
   when:
-  - run_audit
+      - run_audit
+      - setup_audit
+  tags:
+      - run_audit
 
 - name: Include CAT I patches
   import_tasks: cat_1/main.yml
