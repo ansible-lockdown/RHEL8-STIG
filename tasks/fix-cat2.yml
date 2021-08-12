@@ -5234,8 +5234,8 @@
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
   with_items:
-      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
-      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_chng
+      - -a always,exit -F arch=b32 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+      - -a always,exit -F arch=b64 -S fchmod -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
   notify: restart auditd
   when:
       - rhel_08_030540
