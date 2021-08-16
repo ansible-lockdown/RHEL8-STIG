@@ -19,6 +19,9 @@
       - name: RHEL-08-010020 | HIGH | AUDIT | Check if fips is active in grub"
         shell: grub2-editenv -- list | grep -Ec 'fips=1|^fips=0'
         register: rhel_08_010020_fips_active
+        changed_when: false
+        when:
+            - not ansible_fips
 
       - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
         package:
