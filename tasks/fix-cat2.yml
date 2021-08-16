@@ -6359,7 +6359,7 @@
       - V-230526
       - ssh
 
-- name: "MEDIUM | RHEL-0-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
+- name: "MEDIUM | RHEL-08-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?RekeyLimit'
@@ -6418,7 +6418,6 @@
             name: "{{ item }}"
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
         with_items:
             - net.ipv4.conf.default.accept_redirects
@@ -6450,7 +6449,6 @@
             name: net.ipv4.conf.all.send_redirects
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
@@ -6476,7 +6474,6 @@
             name: net.ipv4.icmp_echo_ignore_broadcasts
             state: present
             value: '1'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
@@ -6502,7 +6499,6 @@
             name: "{{ item }}"
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
         with_items:
             - net.ipv4.conf.all.accept_source_route
@@ -6534,7 +6530,6 @@
             name: "{{ item }}"
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
         with_items:
             - net.ipv4.conf.default.accept_source_route
@@ -6566,7 +6561,6 @@
             name: "{{ item }}"
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
         with_items:
             - net.ipv4.ip_forward
@@ -6600,7 +6594,6 @@
             name: net.ipv6.conf.all.accept_ra
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
@@ -6627,7 +6620,6 @@
             name: net.ipv6.conf.default.accept_ra
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra to value 0"
@@ -6654,7 +6646,6 @@
             name: net.ipv4.conf.default.send_redirects
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
@@ -6680,7 +6671,6 @@
             name: "{{ item }}"
             state: present
             value: '0'
-            # reload: "{{ rhel8stig_sysctl_reload }}"
         notify: change_requires_reboot
         with_items:
             - net.ipv4.conf.all.accept_redirects
