@@ -74,7 +74,7 @@ Role Variables
 | `rhel8stig_dns_servers` | `8.8.8.8 and 8.8.4.4` | To conform to STIG standards you need two DNS servers, parameter is in list form |
 | `rhel8stig_nfs_mounts` | `vars` | NFS file system mounts pull automatcially with prelim task |
 | `rhel8stig_nfs_mounts_query` | `[?starts_with(fstype, 'nfs')].mount` | The query for mounts |
-| `rhel8stig_skip_reboot` | `false` | Whether or not to skip the reboot |
+| `rhel8stig_skip_reboot` | `true` | Whether or not to skip the reboot |
 
 
 Example Playbook
