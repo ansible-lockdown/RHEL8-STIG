@@ -6907,7 +6907,7 @@
       state: absent
   when:
       - rhel_08_040380
-      - "'iprutils' not ansible_facts.packages"
+      - "'iprutils' in ansible_facts.packages"
   tags:
       - RHEL-08-040380
       - CAT2
