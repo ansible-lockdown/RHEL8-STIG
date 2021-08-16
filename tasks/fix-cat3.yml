@@ -301,7 +301,8 @@
         shell: grubby --update-kernel=ALL --args="audit=1"
         args:
             warn: no
-        when: ansible_proc_cmdline.audit != '1'
+        when: (ansible_proc_cmdline.audit is defined and ansible_proc_cmdline.audit != '1') or
+              (ansible_proc_cmdline is not defined)
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if doesnt exist"
         lineinfile:

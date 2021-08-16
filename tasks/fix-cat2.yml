@@ -1009,7 +1009,9 @@
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
         shell: grubby --update-kernel=ALL --args="vsyscall=none"
-        when: ansible_proc_cmdline.vsyscall != 'none'
+        when: 
+        - (ansible_proc_cmdline.vsyscall is defined and ansible_proc_cmdline.vsyscall != 'none') or
+          (ansible_proc_cmdline.vsyscall is not defined)
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
         lineinfile:
@@ -1046,7 +1048,9 @@
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
         shell: grubby --update-kernel=ALL --args="slub_debug=P"
-        when: ansible_proc_cmdline.slub_debug != 'P'
+        when: 
+        - (ansible_proc_cmdline.slub_debug is defined and ansible_proc_cmdline.slub_debug != 'P') or
+          (ansible_proc_cmdline.slub_debug is not defined)
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
         lineinfile:
