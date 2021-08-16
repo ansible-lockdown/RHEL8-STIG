@@ -297,10 +297,17 @@
         failed_when: false
         register: rhel8stig_030601_grub_cmdline_linux
 
+      - name: "LOW | RHEL-08-030601 | AUDIT | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Get GRUB active settings"
+        shell: grub2-editenv -- list | grep -c audit=1
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_030601_grub_active
+
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit to 1 as active"
         shell: grubby --update-kernel=ALL --args="audit=1"
         args:
             warn: no
+        when: rhel8stig_030601_grub_active.stdout != '1'
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if doesnt exist"
         lineinfile:
@@ -334,10 +341,17 @@
         failed_when: false
         register: rhel8stig_030602_grub_cmdline_linux
 
+      - name: "LOW | RHEL-08-030602 | AUDIT | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Get  grub active settings"
+        shell:  grub2-editenv -- list | grep -c audit_backlog_limit=8192
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_030602_grub_active
+
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | set audit_backlog_limit active"
         shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
         args:
             warn: no
+        when: rhel8stig_030602_grub_active.stdout != '1'
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if doesn't exist"
         lineinfile:
@@ -416,7 +430,21 @@
 
 - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
   block:
-      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
+      - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get active grub settings"
+        shell: grub2-editenv -- list | grep -c pti=on
+        args:
+            warn: no
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_040004_grub_active
+    
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
+        shell: grubby --update-kernel=ALL --args="pti=on"
+        args:
+            warn: no
+        when: rhel8stig_040004_grub_active.stdout != '1'
+
+      - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
             warn: no
@@ -424,24 +452,19 @@
         failed_when: false
         register: rhel8stig_040004_grub_cmdline_linux
 
-      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
-        shell: grubby --update-kernel=ALL --args="pti=on"
-        args:
-            warn: no
-
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti if doesn't exist"
         lineinfile:
             path: /etc/default/grub
             regexp: '^GRUB_CMDLINE_LINUX='
             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_040004_grub_cmdline_linux.stdout }} pti=on"'
-        when: '"pti=" not in rhel8stig_040004_grub_cmdline_linux.stdout'
+        when: '"pti=on" not in rhel8stig_040004_grub_cmdline_linux.stdout'
 
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti exists"
         replace:
             path: /etc/default/grub
             regexp: 'pti=([^\s|"])+'
             replace: "pti=on"
-        when: '"pti=" in rhel8stig_040004_grub_cmdline_linux.stdout'
+        when: '"pti=on" in rhel8stig_040004_grub_cmdline_linux.stdout'
   when:
       - rhel_08_040004
   tags:
