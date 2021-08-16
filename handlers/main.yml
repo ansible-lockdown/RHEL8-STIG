@@ -126,7 +126,6 @@
       msg: "Post-run OpenSCAP score is {{ rhel8stig_postscanresults.Benchmark.TestResult.score['#text'] }}"
   when: rhel8stig_oscap_scan
 
-- name: reboot system
-  reboot:
-  when:
-  - not rhel8stig_skip_reboot
+- name: change_requires_reboot
+  set_fact:
+    change_requires_reboot: true

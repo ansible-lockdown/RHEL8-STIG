@@ -336,7 +336,7 @@
       state: enforcing
       policy: targeted
   check_mode: "{{ ansible_check_mode or rhel8stig_system_is_chroot }}"
-  notify: reboot system
+  notify: change_requires_reboot
   when:
       - rhel_08_010170 or rhel_08_010450
       - not rhel8stig_system_is_container
@@ -509,7 +509,7 @@
           "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Enable FIPS"
         command: fips-mode-setup --enable
         register: rhel_08_010290_fips_enable
-        notify: reboot system
+        notify: change_requires_reboot
         when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
 
       - name: |
@@ -519,7 +519,7 @@
             path: "{{ item.path }}"
             regexp: "{{ item.regexp }}"
             line: "{{ item.line }}"
-        notify: reboot system
+        notify: change_requires_reboot
         with_items:
             - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^MACs', line: "MACs {{ rhel8stig_ssh_macs_settings }}" }
             - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
@@ -551,7 +551,7 @@
       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
         command: fips-mode-setup --enable
         register: rhel_08_010290_fips_enable
-        notify: reboot system
+        notify: change_requires_reboot
         when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
   when:
       - rhel_08_010293
@@ -569,7 +569,7 @@
       path: /etc/crypto-policies/back-ends/opensslcnf.config
       regexp: '^MinProtocol ='
       line: "MinProtocol = TLSv1.2"
-  notify: reboot system
+  notify: change_requires_reboot
   when:
       - rhel_08_010294
   tags:
@@ -591,7 +591,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   when:
       - rhel_08_010295
   tags:
@@ -884,6 +884,7 @@
             state: present
   when:
       - rhel_08_010390
+      - "'openssl-pkcs11' not in ansible_facts.packages"
   tags:
       - RHEL-08-010390
       - CAT2
@@ -5506,6 +5507,7 @@
       state: present
   when:
       - rhel_08_030670
+      - "'rsyslog' not in ansible_facts.packages"
   tags:
       - RHEL-08-030670
       - CAT2
@@ -5521,6 +5523,7 @@
       state: present
   when:
       - rhel_08_030680
+      - "'gnutls' not in ansible_facts.packages"
   tags:
       - RHEL-08-030680
       - CAT2
@@ -5662,6 +5665,7 @@
       state: absent
   when:
       - rhel_08_040002
+      - "'sendmail' in ansible_facts.packages"
   tags:
       - RHEL-08-040002
       - CAT2
@@ -5677,7 +5681,8 @@
       name: gssproxy
       state: absent
   when:
-      -rhel_08_040370
+      - rhel_08_040370
+      - "'gssproxy' in ansible_facts.packages"
   tags:
       - RHEL-08-040370
       - CAT2
@@ -5698,7 +5703,7 @@
       group: root
       mode: 0640
       insertafter: "{{ item.insertafter }}"
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
       - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
@@ -5972,7 +5977,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   when:
       - rhel_08_040111
   tags:
@@ -6800,6 +6805,7 @@
   when:
       - rhel_08_040320
       - not rhel8stig_gui
+      - "'xorg-x11-server-common' in ansible_facts.packages"
   tags:
       - RHEL-08-040320
       - CAT2
@@ -6901,6 +6907,7 @@
       state: absent
   when:
       - rhel_08_040380
+      - "'iprutils' not ansible_facts.packages"
   tags:
       - RHEL-08-040380
       - CAT2
@@ -6916,6 +6923,7 @@
       state: absent
   when:
       - rhel_08_040390
+      - "'tuned' in ansible_facts.packages"
   tags:
       - RHEL-08-040390
       - CAT2
@@ -6931,6 +6939,7 @@
       state: absent
   when:
       - rhel_08_010163
+      - "'krb5-server' in ansible_facts.packages"
   tags:
       - RHEL-08-010163
       - CAT2
