@@ -16,44 +16,27 @@
 
 - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
   block:
-      - name: RHEL-08-010020 | HIGH | AUDIT | Check if fips is active in grub"
-        shell: grub2-editenv -- list | grep -Ec 'fips=1|^fips=0'
-        register: rhel_08_010020_fips_active
-        changed_when: false
-        when:
-            - not ansible_fips
 
-      - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
+      - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | install FIPS"
         package:
             name: dracut-fips
             state: present
         notify: rebuild initramfs
-        when:
-            - not ansible_fips
+        when: "'dracut-fips' not in ansible_facts.packages"
 
       - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         command: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
         when:
-            - not ansible_fips
-            - rhel_08_010020_fips_active.stdout != '1'
-
-      - name: "RHEL-08-010020 | HIGH | AUDIT | Check if prelink package is installed"
-        command: rpm -q prelink
-        args:
-            warn: no
-        changed_when: no
-        failed_when: no
-        check_mode: no
-        register: rhel_08_010020_prelink_installed
+            - ansible_proc_cmdline.fips != '1'
 
       - name: "RHEL-08-010020 | HIGH | PATCH | Disable prelinking."
         lineinfile:
             dest: /etc/sysconfig/prelink
             regexp: ^#?PRELINKING
             line: PRELINKING=no
-        when: rhel_08_010020_prelink_installed.rc == 0
+        when: "'prelink' in ansible_facts.packages"
         notify: undo existing prelinking
 
       - name: "RHEL-08-010020 | HIGH | AUDIT | Check for GRUB_CMDLINE_LINUX in /etc/default/grub"
@@ -336,7 +319,7 @@
       state: absent
   when:
       - rhel_08_040000
-      - - "'telnet-server' in ansible_facts.packages"
+      - "'telnet-server' in ansible_facts.packages"
   tags:
       - RHEL-08-040000
       - CAT1

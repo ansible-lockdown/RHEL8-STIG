@@ -1009,6 +1009,7 @@
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
         shell: grubby --update-kernel=ALL --args="vsyscall=none"
+        when: ansible_proc_cmdline.vsyscall != 'none'
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
         lineinfile:
@@ -1045,6 +1046,7 @@
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
         shell: grubby --update-kernel=ALL --args="slub_debug=P"
+        when: ansible_proc_cmdline.slub_debug != 'P'
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
         lineinfile:
@@ -3776,7 +3778,7 @@
 
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   lineinfile:
-      dest: /etc/ssh/sshd_config1
+      dest: /etc/ssh/sshd_config
       regexp: '(?i)^(#PrintLastLog yes?|^#?.rintLastLog no)'
       line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
