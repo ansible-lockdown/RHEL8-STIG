@@ -152,6 +152,7 @@
   when:
       - rhel_08_010070 or
         rhel_08_030010
+      - "'rsyslog' not in ansible_facts.packages"
   tags:
       - cat2
       - medium
@@ -180,6 +181,7 @@
         rhel_08_030630 or
         rhel_08_030640 or
         rhel_08_030650
+      - "'audispd-plugins' not in ansible_facts.packages"
   tags:
       - cat2
       - medium
@@ -217,6 +219,8 @@
             name: aide
             state: present
         notify: "{{ rhel8stig_aide_handler }}"
+        when:
+            - "'aide' not in ansible_facts.packages"
 
       - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Check for existing AIDE database"
         stat:
@@ -226,7 +230,6 @@
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
-      - "'aide' not in ansible_facts.packages"
       - rhel_08_010360 or
         rhel_08_010380 or
         rhel_08_040310
