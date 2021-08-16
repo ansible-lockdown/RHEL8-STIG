@@ -4834,7 +4834,7 @@
       - V-230439
       - auditd
 
-- name: "MEDIUM | RHEL-0-030362 | PATCH | Successful/unsuccessful uses of the renameat command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030362 | PATCH | Successful/unsuccessful uses of the renameat command in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
       line: "{{ item }}"
