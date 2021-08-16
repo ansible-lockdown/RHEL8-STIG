@@ -3776,8 +3776,8 @@
 
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: '(?i)^#?PrintLastLog'
+      dest: /etc/ssh/sshd_config1
+      regexp: '(?i)^(#PrintLastLog yes?|^#?.rintLastLog no)'
       line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
       owner: root
@@ -6301,7 +6301,7 @@
             state: present
 
       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
-        service:
+        systemd:
             name: nftables
             state: started
             enabled: yes
