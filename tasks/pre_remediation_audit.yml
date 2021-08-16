@@ -29,11 +29,11 @@
       ansible_python_interpreter: "{{ python2_bin }}"
     when: ansible_distribution_major_version == 7
 
-  - name: Pre Audit Setup | retrieve audit content files from git
-    git:
-      repo: "{{ audit_file_git }}"
-      dest: "{{ audit_conf_dir }}"
-      version: "{{ audit_git_version }}"
+- name: Pre Audit Setup | retrieve audit content files from git
+  git:
+    repo: "{{ audit_file_git }}"
+    dest: "{{ audit_conf_dir }}"
+    version: "{{ audit_git_version }}"
   when:
   - audit_content == 'git'
 
