@@ -1404,7 +1404,7 @@
       state: mounted
       src: "{{ home_mount.device }}"
       fstype: "{{ home_mount.fstype }}"
-      opts: "{{ home_mount.options }},noexec"
+      opts: "{{ home_mount.options }},{% if rhel_08_010570 is sameas true %}nosuid,{% endif %}noexec"
   when:
       - rhel_08_010590
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
