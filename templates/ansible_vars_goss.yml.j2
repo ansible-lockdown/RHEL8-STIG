@@ -31,7 +31,7 @@ rhel8stig_gui: false
 rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
 
 # Discovered items to assist with skips some audit checks
-skip_sssd_check: {% if 'sssd-common' not in ansible_facts.packages %}True{% else %}False{% endif %}
+skip_sssd_check: {% if rhel8stig_sssd_conf_present.stat.exists %}False{% else %}True{% endif %}
 
 skip_postfix_check: {% if 'postfix' not in ansible_facts.packages %}True{% else %}False{% endif %}
 
