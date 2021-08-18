@@ -343,8 +343,8 @@
 
       - name: "PRELIM | Setting the fact"
         set_fact:
-            rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | str }}"
-            rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | str }}"
+            rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | string }}"
+            rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | string }}"
 
 - name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
   find:
