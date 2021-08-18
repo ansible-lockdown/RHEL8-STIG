@@ -398,6 +398,11 @@ RHEL_08_040310: {{ rhel_08_040310 }}
 rhel8stig_password_hash: {{ rhel8stig_bootloader_password_hash }}
 rhel8stig_boot_superuser: {{ rhel8stig_boot_superuser }}
 
+# RHEL_08_101120 & Auditd controls
+MIN_UID: {{ rhel8stig_interactive_uid_start }}
+MAX_UID: {{ rhel8stig_interactive_uid_stop }}
+
+
 # RHEL_08_010040-010050-010060
 rhel8stig_banner_file: /etc/issue
 rhel8stig_logon_banner:
