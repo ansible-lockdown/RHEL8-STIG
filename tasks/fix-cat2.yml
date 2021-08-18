@@ -897,15 +897,15 @@
 - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
   lineinfile:
       path: '{{ rhel8stig_sssd_conf }}'
-      regexp: '^certificate_verification = {{ item }}'
-      state: absent
+      regexp: '^certificate_verification = {{ item.regexp }}'
+      state: "{{ item.state }}"
   with_items:
-      - 'no_ocsp, no_verification'
-      - no_ocsp
-      - no_verification
+      - { regexp: 'no_ocsp, no_verification', state: absent }
+      - { regexp: 'no_ocsp', state: absent }
+      - { regexp: 'no_verification', state: absent }
+      - { regexp: 'ocsp_dgst=sha1', state: present }
   notify: restart sssd
   when:
-      - "'sssd-common' in ansible_facts.packages" 
       - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_010400
   tags:
@@ -3152,7 +3152,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: 0640
+      mode: 0600
   with_items:
       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
@@ -3160,7 +3160,6 @@
       - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
   notify: restart sssd
   when:
-      - "'sssd-common' in ansible_facts.packages" 
       - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020090
   tags:
@@ -3564,7 +3563,7 @@
             insertafter: "{{ item.insertafter }}"
             owner: root
             group: root
-            mode: 0640
+            mode: 0600
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -3616,7 +3615,6 @@
         notify: restart sssd
         when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
-      - "'sssd-common' in ansible_facts.packages" 
       - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020250
   tags:
@@ -3693,12 +3691,11 @@
       insertafter: "{{ item.insertafter }}"
       owner: root
       group: root
-      mode: 0640
+      mode: 0600
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
-      - "'sssd-common' in ansible_facts.packages" 
       - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020290
   tags:
