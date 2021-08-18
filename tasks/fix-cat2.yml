@@ -1,7 +1,7 @@
 ---
 
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
-  dnf:
+  package:
       name: "*"
       state: latest
   when:
@@ -315,7 +315,7 @@
       - kerberos
 
 - name: "MEDIUM | RHEL-08-010162 | PATCH | The krb5-workstation package must not be installed on RHEL 8."
-  dnf:
+  package:
       name: krb5-workstation
       state: absent
   when:
@@ -873,13 +873,13 @@
 - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
   block:
       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
-        dnf:
+        package:
             name: esc
             state: present
         when: rhel8stig_gui
 
       - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
-        dnf:
+        package:
             name: openssl-pkcs11
             state: present
   when:
@@ -918,7 +918,7 @@
       - multifactor
 
 - name: "MEDIUM | RHEL-08-010410 | PATCH | RHEL 8 must accept Personal Identity Verification (PIV) credentials."
-  dnf:
+  package:
       name: opensc
       state: present
   when:
@@ -2942,7 +2942,7 @@
 - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
   block:
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
-        dnf:
+        package:
             name: tmux
             state: present
 
@@ -4331,7 +4331,7 @@
 - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
   block:
       - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Install audit"
-        dnf:
+        package:
             name: audit
             state: present
 
@@ -5501,7 +5501,7 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
-  dnf:
+  package:
       name: rsyslog
       state: present
   when:
@@ -5517,7 +5517,7 @@
       - rsyslog
 
 - name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
-  dnf:
+  package:
       name: gnutls
       state: present
   when:
@@ -5659,7 +5659,7 @@
       - abrt
 
 - name: "MEDIUM | RHEL-08-040002 | PATCH | RHEL 8 must not have the sendmail package installed."
-  dnf:
+  package:
       name: sendmail
       state: absent
   when:
@@ -5676,7 +5676,7 @@
       - sendmail
 
 - name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
-  dnf:
+  package:
       name: gssproxy
       state: absent
   when:
@@ -5866,13 +5866,13 @@
 - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
   block:
       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
-        dnf:
+        package:
             name: firewalld
             state: present
         when: rhel8stig_firewall_service == "firewalld"
 
       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install IPTables"
-        dnf:
+        package:
             name: iptables-services
             state: present
         when: rhel8stig_firewall_service == "iptables"
@@ -6242,7 +6242,7 @@
 - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
   block:
       - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Install fapolicy"
-        dnf:
+        package:
             name: fapolicyd
             state: present
 
@@ -6283,9 +6283,12 @@
 - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
   block:
       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
-        dnf:
+        package:
             name: usbguard
             state: present
+
+      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | generate policy"
+        shell: usbguard generate-policy > /etc/usbguard/rules.conf
 
       - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
         service:
@@ -6306,7 +6309,7 @@
 - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
   block:
       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
-        dnf:
+        package:
             name: nftables
             state: present
 
@@ -6336,7 +6339,7 @@
 - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
   block:
       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
-        dnf:
+        package:
             name: openssh-server
             state: present
 
@@ -6901,7 +6904,7 @@
       - tftp
 
 - name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
-  dnf:
+  package:
       name: iprutils
       state: absent
   when:
@@ -6917,7 +6920,7 @@
       - iprutils
 
 - name: "MEDIUM | RHEL-08-040390 | PATCH | The tuned package must not be installed unless mission essential on RHEL 8."
-  dnf:
+  package:
       name: tuned
       state: absent
   when:
@@ -6933,7 +6936,7 @@
       - tuned
 
 - name: "MEDIUM | RHEL-08-010163 | PATCH | The krb5-server package must not be installed on RHEL 8."
-  dnf:
+  package:
       name: krb5-server
       state: absent
   when:
