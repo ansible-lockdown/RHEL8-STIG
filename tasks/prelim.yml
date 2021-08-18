@@ -330,13 +330,21 @@
 - name: "PRELIM | Gather interactive user ID min"
   block:
       - name: "PRELIM | Gather interactive user ID min"
-        shell: grep UID_MIN /etc/login.defs | grep -v SYS_UID_MIN | awk '{ print $2}'
+        shell: grep ^UID_MIN /etc/login.defs | awk '{print $2}'
         changed_when: false
         failed_when: false
-        register: rhel8stig_interactive
+        register: rhel8stig_min_uid
+
+      - name: "PRELIM | Gather interactive user ID max"
+        shell: grep ^UID_MAX /etc/login.defs | awk '{print $2}'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_max_uid
+
       - name: "PRELIM | Setting the fact"
         set_fact:
-            rhel8stig_interactive_uid_min: "{{ rhel8stig_interactive.stdout | int }}"
+            rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | str }}"
+            rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | str }}"
 
 - name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
   find:

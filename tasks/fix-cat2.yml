@@ -2027,7 +2027,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010740
-      - item.uid >= rhel8stig_interactive_uid_start
+      - (item.uid >= rhel8stig_interactive_uid_start|int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010740
@@ -2047,7 +2047,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010750
-      - item.uid >= rhel8stig_interactive_uid_start
+      - (item.uid >= rhel8stig_interactive_uid_start|int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010750
