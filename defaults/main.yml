@@ -710,7 +710,7 @@ rhel8stig_path_to_sshkey: "/root/.ssh/"
 # rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
 rhel8stig_sshd_compression: "no"
 
-# !!!!!!!!!!------------ I added a prelim task to grab the MIN_UID value but I can't use it in some tasks. Review and fix
+# now in prelim
 rhel8stig_interactive_uid_start: 1000
 
 # RHEL-08-030740
