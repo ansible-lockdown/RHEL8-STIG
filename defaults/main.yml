@@ -45,6 +45,9 @@ system_is_ec2: false
 # Whether to skip the reboot
 rhel8stig_skip_reboot: true
 
+# Defined will change if control requires
+change_requires_reboot: false
+
 
 ### Goss is required on the remote host
 setup_audit: false
