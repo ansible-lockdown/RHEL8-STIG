@@ -521,7 +521,7 @@
             line: "{{ item.line }}"
         notify: change_requires_reboot
         with_items:
-            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^MACs', line: "MACs {{ rhel8stig_ssh_macs_settings }}" }
+            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^Ciphers', line: "Ciphers {{ rhel8stig_ssh_cipher_settings }}" }
             - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
   when:
       - rhel_08_010290 or
