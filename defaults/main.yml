@@ -1,4 +1,8 @@
 ---
+## Benchmark name used by audting control role
+# The audit variable found at the base
+benchmark: RHEL8-STIG
+
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
@@ -34,12 +38,39 @@ rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 # tweak role to run in a non-privileged container
 rhel8stig_system_is_container: false
 
-# rhel8cis is left off the front of this var for consistency in testing pipeline
+# rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
 
 # Whether to skip the reboot
-rhel8stig_skip_reboot: false
+rhel8stig_skip_reboot: true
+
+# Defined will change if control requires
+change_requires_reboot: false
+
+
+### Goss is required on the remote host
+setup_audit: false
+# How to retrieve audit binary
+# Options are copy or download - detailed settings at the bottom of this file
+# you will need to access to either github or the file already dowmloaded
+get_goss_file: download
+
+# how to get audit files onto host options
+# options are git/copy/get_url other e.g. if you wish to run from already downloaded conf
+audit_content: git
+
+# enable audits to run - this  runs the audit and get the latest content
+run_audit: false
+
+# Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
+audit_run_heavy_tests: true
+# Timeout for those cmds that take longer to run where timeout set
+audit_cmd_timeout: 60000
+
+### End Goss enablements ####
+#### Detailed settings found at the end of this document ####
+
 
 # These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
@@ -81,6 +112,7 @@ rhel_08_010151: true
 rhel_08_010160: true
 rhel_08_010161: true
 rhel_08_010162: true
+rhel_08_010163: true
 rhel_08_010170: true
 rhel_08_010180: true
 rhel_08_010190: true
@@ -108,6 +140,9 @@ rhel_08_010373: true
 rhel_08_010374: true
 rhel_08_010380: true
 rhel_08_010381: true
+rhel_08_010382: true
+rhel_08_010383: true
+rhel_08_010384: true
 rhel_08_010390: true
 rhel_08_010400: true
 rhel_08_010410: true
@@ -418,8 +453,10 @@ rhel8stig_change_user_path: false
 # These are the minimum supported releases.
 # (Red Hat has support for older versions if you pay extra for it.)
 rhel8stig_min_supported_os_ver:
-    RedHat: "8.0"
-    CentOS: "8.0"
+    RedHat: "8.4"
+    CentOS: "8.4"
+    Rocky: "8.4"
+    AlmaLinux: "8.4"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -441,8 +478,7 @@ rhel8stig_tftp_required: no
 
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
-rhel8stig_bootloader_password: 'Boot1tUp!'
-rhel8stig_bootloader_password_hash: "{{ rhel8stig_bootloader_password | grub2_hash(salt='KeokpkECTJeoDhEA5XtiLQ') }}"
+rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword
 rhel8stig_boot_superuser: root
 
 # AIDE settings
@@ -677,7 +713,7 @@ rhel8stig_path_to_sshkey: "/root/.ssh/"
 # rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
 rhel8stig_sshd_compression: "no"
 
-# !!!!!!!!!!------------ I added a prelim task to grab the MIN_UID value but I can't use it in some tasks. Review and fix
+# now in prelim
 rhel8stig_interactive_uid_start: 1000
 
 # RHEL-08-030740
@@ -706,18 +742,70 @@ rhel8stig_white_list_services:
 # This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
 # to conform to STIG standard control RHEL-08-010290 this variable must include hmac-sha2-512,hmac-sha2-256
 # to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_macs_settings: "hmac-sha2-256-etm@openssh.com,hmac-sha1-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha1,hmac-sha2-512
-GSSAPIKeyExchange no"
+rhel8stig_ssh_cipher_settings: "aes256-ctr,aes192-ctr,aes128-ctr"
 # This will be the CRYPTO_POLICY settings in the opensshserver.conf file. It will be a string for the entirety of the setting
 # to conform to STIG standard control RHEL-08-010290 this variable must contain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256 settings
 # to conform to STIG standard control RHEL-08-010291 this variable must cotnain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-gcm@openssh.com,aes256-ctr,aes192-ctr,aes256-cbc,aes128-gcm@openssh.com,aes128-ctr,aes128-cbc -oMACs=hmac-sha2-256-etm@openssh.com,hmac-sha1-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha2-256,hmac-sha1,hmac-sha2-512 -oGSSAPIKeyExchange=no -oKexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512 -oHostKeyAlgorithms=ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp384,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp521,ecdsa-sha2-nistp521-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-512-cert-v01@openssh.com -oPubkeyAcceptedKeyTypes=ecdsa-sha2-nistp256,ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp384,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp521,ecdsa-sha2-nistp521-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-512-cert-v01@openssh.com -oCASignatureAlgorithms=ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,rsa-sha2-256,rsa-sha2-512"
+rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256"
 
 # RHEL-08-010295
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
-# to conform to STIG standards this variable must contain -VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
-rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
+# to conform to STIG standards this variable must contain +VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
+rhel8stig_gnutls_encryption: "+VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
 
 # RHEL-08-020070
 # This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
 rhel8stig_tmux_lock_after_time: 900
+
+# RHEL-08-010384
+# The value given to Defaults timestamp timeout= in the sudo file.
+# Value must be greater than 0 to conform to STIG standards
+rhel8stig_sudo_timestamp_timeout: 1
+
+#### Goss Configuration Settings ####
+
+### Goss binary settings ###
+goss_version:
+    release: v0.3.16
+    checksum: 'sha256:827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb'
+audit_bin_path: /usr/local/bin/
+audit_bin: "{{ audit_bin_path }}goss"
+audit_format: json
+
+# if get_goss_file == download change accordingly
+goss_url: "https://github.com/aelsabbahy/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
+
+## if get_goss_file - copy the following needs to be updated for your environment
+## it is expected that it will be copied from somewhere accessible to the control node
+## e.g copy from ansible control node to remote host
+copy_goss_from_path: /some/accessible/path
+
+### Goss Audit Benchmark file ###
+## managed by the control audit_content
+# git
+audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
+audit_git_version: main
+
+# copy:
+audit_local_copy: "some path to copy from"
+
+# get_url:
+audit_files_url: "some url maybe s3?"
+
+## Goss configuration information
+# Where the goss configs and outputs are stored
+audit_out_dir: '/var/tmp'
+# Where the goss audit configuration will be stored
+audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
+
+# If changed these can affect other products
+pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+
+## The following should not need changing
+goss_file: "{{ audit_conf_dir }}goss.yml"
+audit_vars_path: "{{ audit_conf_dir }}/vars/{{ ansible_hostname }}.yml"
+audit_results: |
+      The pre remediation results are: {{ pre_audit_summary }}.
+      The post remediation results are: {{ post_audit_summary }}.
+      Full breakdown can be found in {{ audit_out_dir }}

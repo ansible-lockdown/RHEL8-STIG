@@ -17,7 +17,7 @@
       name: sssd
       state: restarted
   when:
-      - "'sssd' in ansible_facts.packages" 
+      - "'sssd' in ansible_facts.packages"
 
 - name: restart snmpd
   service:
@@ -112,10 +112,9 @@
 
 - name: dconf update
   command: dconf update
-  when: 
-  - "'dconf' in ansible_facts.packages"
-  - rhel8stig_always_configure_dconf
-  
+  when:
+      - "'dconf' in ansible_facts.packages"
+      - rhel8stig_always_configure_dconf
 
 - name: prereport score
   debug:
@@ -127,8 +126,6 @@
       msg: "Post-run OpenSCAP score is {{ rhel8stig_postscanresults.Benchmark.TestResult.score['#text'] }}"
   when: rhel8stig_oscap_scan
 
-- name: reboot system
-  shell: sleep 3; reboot
-  async: 15
-  poll: 0
-  when: not rhel8stig_skip_reboot
+- name: change_requires_reboot
+  set_fact:
+      change_requires_reboot: true

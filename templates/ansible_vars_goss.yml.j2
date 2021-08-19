@@ -1,0 +1,436 @@
+## metadata for Audit benchmark
+rhel8stig_benchmark:
+- "type: STIG"
+- "version: '1.2'"
+- "os: RHEL 8"
+- "epoch: {{ ansible_date_time.epoch }}"
+- "hostname: {{ ansible_hostname }}"
+
+rhel8stig_os_distribution: {{ ansible_distribution | lower }}
+
+rhel8stig_os_version_pre_8_2: {% if ansible_distribution_version >= '8.2' %}false{% else %}true{% endif %}
+
+
+# Some tests may need to scan every filesystem or have an impact on a system 
+# these may need be scheduled to minimise impact also ability to set a timeout if taking too long
+run_heavy_tests: {{ audit_run_heavy_tests }}
+timeout_ms: {{ audit_cmd_timeout }}
+
+### Remediation Settings
+
+# turn the categories on/off
+rhel8stig_cat1: {{ rhel8stig_cat1_patch }}
+rhel8stig_cat2: {{ rhel8stig_cat2_patch }}
+rhel8stig_cat3: {{ rhel8stig_cat3_patch }}
+
+
+# If using the supplied graphical interface
+rhel8stig_gui: false
+
+# system acts or requires router networking options
+rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
+
+# Discovered items to assist with skips some audit checks
+skip_sssd_check: {% if rhel8stig_sssd_conf_present.stat.exists %}False{% else %}True{% endif %}
+
+skip_postfix_check: {% if 'postfix' not in ansible_facts.packages %}True{% else %}False{% endif %}
+
+skip_tftp_check: {% if rhel8stig_tftp_required %}False{% else %}True{% endif %}
+
+
+# Sets up the system dependant on bootloader
+legacy_boot: {{ rhel8stig_legacy_boot }}
+rhel8stig_bootloader_path: {{ rhel8stig_bootloader_path }}
+
+
+# Cat 1 rules
+RHEL_08_010000: {{ rhel_08_010000 }}
+RHEL_08_010020: {{ rhel_08_010020 }}
+RHEL_08_010140: {{ rhel_08_010140 }}
+RHEL_08_010150: {{ rhel_08_010150 }}
+RHEL_08_010370: {{ rhel_08_010370 }}
+RHEL_08_010371: {{ rhel_08_010371 }}
+RHEL_08_010460: {{ rhel_08_010460 }}
+RHEL_08_010470: {{ rhel_08_010470 }}
+RHEL_08_010820: {{ rhel_08_010820 }}
+RHEL_08_020330: {{ rhel_08_020330 }}
+RHEL_08_040000: {{ rhel_08_040000 }}
+RHEL_08_040010: {{ rhel_08_040010 }}
+RHEL_08_040170: {{ rhel_08_040170 }}
+RHEL_08_040171: {{ rhel_08_040171 }}
+RHEL_08_040172: {{ rhel_08_040172 }}
+RHEL_08_040190: {{ rhel_08_040190 }}
+RHEL_08_040200: {{ rhel_08_040200 }}
+RHEL_08_040360: {{ rhel_08_040360 }}
+
+# Cat 2 rules
+RHEL_08_010010: {{ rhel_08_010010 }}
+RHEL_08_010030: {{ rhel_08_010030 }}
+RHEL_08_010040: {{ rhel_08_010040 }}  # Variable options below
+RHEL_08_010050: {{ rhel_08_010050 }}  # Variable options below
+RHEL_08_010060: {{ rhel_08_010060 }}  # Variable options below
+RHEL_08_010070: {{ rhel_08_010070 }}
+RHEL_08_010090: {{ rhel_08_010090 }}
+RHEL_08_010100: {{ rhel_08_010100 }}
+RHEL_08_010110: {{ rhel_08_010110 }}
+RHEL_08_010120: {{ rhel_08_010120 }}
+RHEL_08_010130: {{ rhel_08_010130 }}
+RHEL_08_010151: {{ rhel_08_010151 }}
+RHEL_08_010160: {{ rhel_08_010160 }}
+RHEL_08_010161: {{ rhel_08_010161 }}
+RHEL_08_010162: {{ rhel_08_010162 }}
+RHEL_08_010163: {{ rhel_08_010162 }} ### to be fixed as not yet written for V1r2
+RHEL_08_010170: {{ rhel_08_010170 }}
+RHEL_08_010180: {{ rhel_08_010180 }}
+RHEL_08_010190: {{ rhel_08_010190 }}
+RHEL_08_010200: {{ rhel_08_010200 }}
+RHEL_08_010210: {{ rhel_08_010210 }}
+RHEL_08_010220: {{ rhel_08_010220 }}
+RHEL_08_010230: {{ rhel_08_010230 }}
+RHEL_08_010240: {{ rhel_08_010240 }}
+RHEL_08_010250: {{ rhel_08_010250 }}
+RHEL_08_010260: {{ rhel_08_010260 }}
+RHEL_08_010290: {{ rhel_08_010290 }}
+RHEL_08_010291: {{ rhel_08_010291 }}
+RHEL_08_010293: {{ rhel_08_010293 }}
+RHEL_08_010294: {{ rhel_08_010294 }}
+RHEL_08_010295: {{ rhel_08_010295 }}
+RHEL_08_010300: {{ rhel_08_010300 }}
+RHEL_08_010310: {{ rhel_08_010310 }}
+RHEL_08_010320: {{ rhel_08_010320 }}
+RHEL_08_010330: {{ rhel_08_010330 }}
+RHEL_08_010340: {{ rhel_08_010340 }}
+RHEL_08_010350: {{ rhel_08_010350 }}
+RHEL_08_010360: {{ rhel_08_010360 }}
+RHEL_08_010372: {{ rhel_08_010372 }}
+RHEL_08_010373: {{ rhel_08_010373 }}
+RHEL_08_010374: {{ rhel_08_010374 }}
+RHEL_08_010380: {{ rhel_08_010380 }}
+RHEL_08_010381: {{ rhel_08_010380 }}
+RHEL_08_010382: {{ rhel_08_010382 }}
+RHEL_08_010383: {{ rhel_08_010383 }}
+RHEL_08_010384: {{ rhel_08_010384 }}
+RHEL_08_010390: {{ rhel_08_010390 }}
+RHEL_08_010400: {{ rhel_08_010400 }}
+RHEL_08_010410: {{ rhel_08_010410 }}
+RHEL_08_010420: {{ rhel_08_010420 }}
+RHEL_08_010421: {{ rhel_08_010421 }}
+RHEL_08_010422: {{ rhel_08_010422 }}
+RHEL_08_010423: {{ rhel_08_010423 }}
+RHEL_08_010430: {{ rhel_08_010430 }}
+RHEL_08_010450: {{ rhel_08_010450 }}
+RHEL_08_010480: {{ rhel_08_010480 }}
+RHEL_08_010490: {{ rhel_08_010490 }}
+RHEL_08_010500: {{ rhel_08_010500 }}
+RHEL_08_010510: {{ rhel_08_010510 }}
+RHEL_08_010520: {{ rhel_08_010520 }}
+RHEL_08_010521: {{ rhel_08_010521 }}
+RHEL_08_010543: {{ rhel_08_010543 }}
+RHEL_08_010550: {{ rhel_08_010550 }}
+RHEL_08_010560: {{ rhel_08_010560 }}
+RHEL_08_010561: {{ rhel_08_010561 }}
+RHEL_08_010570: {{ rhel_08_010570 }}
+RHEL_08_010571: {{ rhel_08_010171 }}
+RHEL_08_010580: {{ rhel_08_010580 }}
+RHEL_08_010590: {{ rhel_08_010590 }}
+RHEL_08_010600: {{ rhel_08_010600 }}
+RHEL_08_010610: {{ rhel_08_010610 }}
+RHEL_08_010620: {{ rhel_08_010620 }}
+RHEL_08_010630: {{ rhel_08_010630 }}
+RHEL_08_010640: {{ rhel_08_010640 }}
+RHEL_08_010650: {{ rhel_08_010650 }}
+RHEL_08_010660: {{ rhel_08_010660 }}
+RHEL_08_010670: {{ rhel_08_010670 }}
+RHEL_08_010671: {{ rhel_08_010671 }}
+RHEL_08_010672: {{ rhel_08_010672 }}
+RHEL_08_010673: {{ rhel_08_010673 }}
+RHEL_08_010674: {{ rhel_08_010674 }}
+RHEL_08_010675: {{ rhel_08_010675 }}
+RHEL_08_010680: {{ rhel_08_010680 }}
+RHEL_08_010690: {{ rhel_08_010690 }}
+RHEL_08_010700: {{ rhel_08_010700 }}
+RHEL_08_010710: {{ rhel_08_010710 }}
+RHEL_08_010720: {{ rhel_08_010720 }}
+RHEL_08_010730: {{ rhel_08_010730 }}
+RHEL_08_010740: {{ rhel_08_010740 }}
+RHEL_08_010750: {{ rhel_08_010750 }}
+RHEL_08_010760: {{ rhel_08_010760 }}
+RHEL_08_010770: {{ rhel_08_010770 }}
+RHEL_08_010780: {{ rhel_08_010780 }}
+RHEL_08_010790: {{ rhel_08_010790 }}
+RHEL_08_010800: {{ rhel_08_010800 }}
+RHEL_08_010830: {{ rhel_08_010830 }}
+
+RHEL_08_020000: {{ rhel_08_020000 }}
+RHEL_08_020010: {{ rhel_08_020010 }}
+RHEL_08_020011: {{ rhel_08_020011 }}
+RHEL_08_020012: {{ rhel_08_020012 }}
+RHEL_08_020013: {{ rhel_08_020013 }}
+RHEL_08_020014: {{ rhel_08_020014 }}
+RHEL_08_020015: {{ rhel_08_020015 }}
+RHEL_08_020016: {{ rhel_08_020016 }}
+RHEL_08_020017: {{ rhel_08_020017 }}
+RHEL_08_020018: {{ rhel_08_020018 }}
+RHEL_08_020019: {{ rhel_08_020019 }}
+RHEL_08_020020: {{ rhel_08_020020 }}
+RHEL_08_020021: {{ rhel_08_020021 }}
+RHEL_08_020022: {{ rhel_08_020022 }}
+RHEL_08_020023: {{ rhel_08_020023 }}
+RHEL_08_020030: {{ rhel_08_020024 }}
+RHEL_08_020040: {{ rhel_08_020040 }}
+RHEL_08_020041: {{ rhel_08_020041 }}
+RHEL_08_020050: {{ rhel_08_020050 }}
+RHEL_08_020060: {{ rhel_08_020060 }}
+RHEL_08_020070: {{ rhel_08_020070 }}
+RHEL_08_020080: {{ rhel_08_020080 }}
+RHEL_08_020090: {{ rhel_08_020090 }}  # TODO
+RHEL_08_020100: {{ rhel_08_020100 }}
+RHEL_08_020110: {{ rhel_08_020110 }}
+RHEL_08_020120: {{ rhel_08_020120 }}
+RHEL_08_020130: {{ rhel_08_020130 }}
+RHEL_08_020140: {{ rhel_08_020140 }}
+RHEL_08_020150: {{ rhel_08_020150 }}
+RHEL_08_020160: {{ rhel_08_020160 }}
+RHEL_08_020170: {{ rhel_08_020170 }}
+RHEL_08_020180: {{ rhel_08_020180 }}
+RHEL_08_020190: {{ rhel_08_020190 }}
+RHEL_08_020200: {{ rhel_08_020200 }}
+RHEL_08_020210: {{ rhel_08_020210 }}
+RHEL_08_020220: {{ rhel_08_020220 }}
+RHEL_08_020230: {{ rhel_08_020230 }}
+RHEL_08_020231: {{ rhel_08_020231 }}
+RHEL_08_020240: {{ rhel_08_020240 }}
+RHEL_08_020250: {{ rhel_08_020250 }}
+RHEL_08_020260: {{ rhel_08_020260 }}
+RHEL_08_020270: {{ rhel_08_020270 }}
+RHEL_08_020280: {{ rhel_08_020280 }}
+RHEL_08_020290: {{ rhel_08_020290 }}
+RHEL_08_020300: {{ rhel_08_020300 }}
+RHEL_08_020310: {{ rhel_08_020310 }}
+RHEL_08_020320: {{ rhel_08_020320 }}
+RHEL_08_020350: {{ rhel_08_020350 }}
+RHEL_08_020351: {{ rhel_08_020351 }}
+RHEL_08_020352: {{ rhel_08_020352 }}
+RHEL_08_020353: {{ rhel_08_020353 }}
+RHEL_08_030000: {{ rhel_08_030000 }}
+RHEL_08_030010: {{ rhel_08_030010 }}
+RHEL_08_030020: {{ rhel_08_030020 }}
+RHEL_08_030030: {{ rhel_08_030030 }}
+RHEL_08_030040: {{ rhel_08_030040 }}
+RHEL_08_030050: {{ rhel_08_030050 }}
+RHEL_08_030060: {{ rhel_08_030060 }}
+RHEL_08_030061: {{ rhel_08_030061 }}
+RHEL_08_030062: {{ rhel_08_030062 }}
+RHEL_08_030070: {{ rhel_08_030070 }}
+RHEL_08_030080: {{ rhel_08_030080 }}
+RHEL_08_030090: {{ rhel_08_030090 }}
+RHEL_08_030100: {{ rhel_08_030100 }}
+RHEL_08_030110: {{ rhel_08_030110 }}
+RHEL_08_030120: {{ rhel_08_030120 }}
+RHEL_08_030121: {{ rhel_08_030121 }}
+RHEL_08_030122: {{ rhel_08_030122 }}
+RHEL_08_030130: {{ rhel_08_030130 }}
+RHEL_08_030140: {{ rhel_08_030140 }}
+RHEL_08_030150: {{ rhel_08_030150 }}
+RHEL_08_030160: {{ rhel_08_030160 }}
+RHEL_08_030170: {{ rhel_08_030170 }}
+RHEL_08_030171: {{ rhel_08_030171 }}
+RHEL_08_030172: {{ rhel_08_030172 }}
+RHEL_08_030180: {{ rhel_08_030180 }}
+RHEL_08_030190: {{ rhel_08_030190 }}
+RHEL_08_030200: {{ rhel_08_030200 }}
+RHEL_08_030210: {{ rhel_08_030210 }}
+RHEL_08_030220: {{ rhel_08_030220 }}
+RHEL_08_030230: {{ rhel_08_030230 }}
+RHEL_08_030240: {{ rhel_08_030240 }}
+RHEL_08_030250: {{ rhel_08_030250 }}
+RHEL_08_030260: {{ rhel_08_030260 }}
+RHEL_08_030270: {{ rhel_08_030270 }}
+RHEL_08_030280: {{ rhel_08_030280 }}
+RHEL_08_030290: {{ rhel_08_030290 }}
+RHEL_08_030300: {{ rhel_08_030300 }}
+RHEL_08_030301: {{ rhel_08_030301 }}
+RHEL_08_030302: {{ rhel_08_030302 }}
+RHEL_08_030310: {{ rhel_08_030310 }}
+RHEL_08_030311: {{ rhel_08_030311 }}
+RHEL_08_030312: {{ rhel_08_030312 }}
+RHEL_08_030313: {{ rhel_08_030313 }}
+RHEL_08_030314: {{ rhel_08_030314 }}
+RHEL_08_030315: {{ rhel_08_030315 }}
+RHEL_08_030316: {{ rhel_08_030316 }}
+RHEL_08_030317: {{ rhel_08_030317 }}
+RHEL_08_030320: {{ rhel_08_030320 }}
+RHEL_08_030330: {{ rhel_08_030330 }}
+RHEL_08_030340: {{ rhel_08_030340 }}
+RHEL_08_030350: {{ rhel_08_030350 }}
+RHEL_08_030360: {{ rhel_08_030360 }}
+RHEL_08_030361: {{ rhel_08_030361 }}
+RHEL_08_030362: {{ rhel_08_030362 }}
+RHEL_08_030363: {{ rhel_08_030363 }}
+RHEL_08_030364: {{ rhel_08_030364 }}
+RHEL_08_030365: {{ rhel_08_030365 }}
+RHEL_08_030370: {{ rhel_08_030370 }}
+RHEL_08_030380: {{ rhel_08_030380 }}
+RHEL_08_030390: {{ rhel_08_030390 }}
+RHEL_08_030400: {{ rhel_08_030400 }}
+RHEL_08_030410: {{ rhel_08_030410 }}
+RHEL_08_030420: {{ rhel_08_030420 }}
+RHEL_08_030430: {{ rhel_08_030430 }}
+RHEL_08_030440: {{ rhel_08_030440 }}
+RHEL_08_030450: {{ rhel_08_030450 }}
+RHEL_08_030460: {{ rhel_08_030460 }}
+RHEL_08_030470: {{ rhel_08_030470 }}
+RHEL_08_030480: {{ rhel_08_030480 }}
+RHEL_08_030490: {{ rhel_08_030490 }}
+RHEL_08_030500: {{ rhel_08_030500 }}
+RHEL_08_030510: {{ rhel_08_030510 }}
+RHEL_08_030520: {{ rhel_08_030520 }}
+RHEL_08_030530: {{ rhel_08_030530 }}
+RHEL_08_030540: {{ rhel_08_030540 }}
+RHEL_08_030550: {{ rhel_08_030550 }}
+RHEL_08_030560: {{ rhel_08_030560 }}
+RHEL_08_030570: {{ rhel_08_030570 }}
+RHEL_08_030580: {{ rhel_08_030580 }}
+RHEL_08_030590: {{ rhel_08_030590 }}
+RHEL_08_030600: {{ rhel_08_030600 }}
+RHEL_08_030610: {{ rhel_08_030610 }}
+RHEL_08_030620: {{ rhel_08_030620 }}
+RHEL_08_030630: {{ rhel_08_030630 }}
+RHEL_08_030640: {{ rhel_08_030640 }}
+RHEL_08_030650: {{ rhel_08_030650 }}
+RHEL_08_030660: {{ rhel_08_030660 }}
+RHEL_08_030670: {{ rhel_08_030370 }}
+RHEL_08_030680: {{ rhel_08_030380 }}
+RHEL_08_030690: {{ rhel_08_030090 }}
+RHEL_08_030700: {{ rhel_08_030700 }}
+RHEL_08_030710: {{ rhel_08_030710 }}
+RHEL_08_030720: {{ rhel_08_030720 }}
+RHEL_08_030730: {{ rhel_08_030730 }}
+RHEL_08_030740: {{ rhel_08_030740 }}
+RHEL_08_040001: {{ rhel_08_040001 }}
+RHEL_08_040002: {{ rhel_08_040002 }}
+RHEL_08_040020: {{ rhel_08_040020 }}
+RHEL_08_040030: {{ rhel_08_040030 }}
+RHEL_08_040070: {{ rhel_08_040070 }}
+RHEL_08_040080: {{ rhel_08_040080 }}
+RHEL_08_040090: {{ rhel_08_040090 }}
+RHEL_08_040100: {{ rhel_08_040100 }}
+RHEL_08_040110: {{ rhel_08_040110 }}
+RHEL_08_040111: {{ rhel_08_040111 }}
+RHEL_08_040120: {{ rhel_08_040120 }}
+RHEL_08_040121: {{ rhel_08_040121 }}
+RHEL_08_040122: {{ rhel_08_040122 }}
+RHEL_08_040123: {{ rhel_08_040123 }}
+RHEL_08_040124: {{ rhel_08_040124 }}
+RHEL_08_040125: {{ rhel_08_040125 }}
+RHEL_08_040126: {{ rhel_08_040126 }}
+RHEL_08_040127: {{ rhel_08_040127 }}
+RHEL_08_040128: {{ rhel_08_040128 }}
+RHEL_08_040129: {{ rhel_08_040129 }}
+RHEL_08_040130: {{ rhel_08_040130 }}
+RHEL_08_040131: {{ rhel_08_040131 }}
+RHEL_08_040132: {{ rhel_08_040132 }}
+RHEL_08_040133: {{ rhel_08_040133 }}
+RHEL_08_040134: {{ rhel_08_040134 }}
+RHEL_08_040135: {{ rhel_08_040135 }}
+RHEL_08_040140: {{ rhel_08_040140 }}
+RHEL_08_040150: {{ rhel_08_040150 }}
+RHEL_08_040160: {{ rhel_08_040160 }}
+RHEL_08_040161: {{ rhel_08_040161 }}
+RHEL_08_040162: {{ rhel_08_040162 }}
+RHEL_08_040180: {{ rhel_08_040180 }}
+RHEL_08_040210: {{ rhel_08_040210 }}
+RHEL_08_040220: {{ rhel_08_040220 }}
+RHEL_08_040230: {{ rhel_08_040230 }}
+RHEL_08_040240: {{ rhel_08_040240 }}
+RHEL_08_040250: {{ rhel_08_040250 }}
+RHEL_08_040260: {{ rhel_08_040260 }}
+RHEL_08_040261: {{ rhel_08_040261 }}
+RHEL_08_040262: {{ rhel_08_040262 }}
+RHEL_08_040270: {{ rhel_08_040270 }}
+RHEL_08_040280: {{ rhel_08_040280 }}
+RHEL_08_040281: {{ rhel_08_040281 }}
+RHEL_08_040282: {{ rhel_08_040282 }}
+RHEL_08_040283: {{ rhel_08_040283 }}
+RHEL_08_040284: {{ rhel_08_040284 }}
+RHEL_08_040285: {{ rhel_08_040285 }}
+RHEL_08_040290: {{ rhel_08_040290 }}
+RHEL_08_040320: {{ rhel_08_040320 }}
+RHEL_08_040330: {{ rhel_08_040330 }}
+RHEL_08_040340: {{ rhel_08_040340 }}
+RHEL_08_040341: {{ rhel_08_040341 }}
+RHEL_08_040350: {{ rhel_08_040350 }}
+RHEL_08_040370: {{ rhel_08_040370 }}
+RHEL_08_040380: {{ rhel_08_040380 }}
+RHEL_08_040390: {{ rhel_08_040390 }}
+
+# Cat 3 controls
+RHEL_08_010171: {{ rhel_08_010171 }}
+RHEL_08_010292: {{ rhel_08_010292 }}
+RHEL_08_010375: {{ rhel_08_010375 }}
+RHEL_08_010376: {{ rhel_08_010376 }}
+RHEL_08_010440: {{ rhel_08_010440 }}
+RHEL_08_010471: {{ rhel_08_010471 }}
+RHEL_08_010540: {{ rhel_08_010540 }}
+RHEL_08_010541: {{ rhel_08_010541 }}
+RHEL_08_010542: {{ rhel_08_010542 }}
+RHEL_08_020024: {{ rhel_08_020024 }}
+RHEL_08_020042: {{ rhel_08_020042 }}
+RHEL_08_020340: {{ rhel_08_020340 }}
+RHEL_08_030063: {{ rhel_08_030063 }}
+RHEL_08_030601: {{ rhel_08_030601 }}
+RHEL_08_030602: {{ rhel_08_030602 }}
+RHEL_08_030603: {{ rhel_08_030603 }}
+RHEL_08_030741: {{ rhel_08_030741 }}
+RHEL_08_030742: {{ rhel_08_030742 }}
+RHEL_08_040004: {{ rhel_08_040004 }}
+RHEL_08_040021: {{ rhel_08_040021 }}
+RHEL_08_040022: {{ rhel_08_040022 }}
+RHEL_08_040023: {{ rhel_08_040023 }}
+RHEL_08_040024: {{ rhel_08_040024 }}
+RHEL_08_040025: {{ rhel_08_040025 }}
+RHEL_08_040026: {{ rhel_08_040026 }}
+RHEL_08_040300: {{ rhel_08_040300 }}
+RHEL_08_040310: {{ rhel_08_040310 }}
+
+# Variables
+
+rhel8stig_password_hash: {{ rhel8stig_bootloader_password_hash }}
+rhel8stig_boot_superuser: {{ rhel8stig_boot_superuser }}
+
+# RHEL_08_101120 & Auditd controls
+MIN_UID: {{ rhel8stig_interactive_uid_start }}
+MAX_UID: {{ rhel8stig_interactive_uid_stop }}
+
+
+# RHEL_08_010040-010050-010060
+rhel8stig_banner_file: /etc/issue
+rhel8stig_logon_banner:
+- 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.'
+- 'By using this IS (which includes any device attached to this IS), you consent to the following conditions:'
+- '-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.'
+- '-At any time, the USG may inspect and seize data stored on this IS.'
+- '-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.'
+- '-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.'
+- '-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'
+
+# RHEL_08_010680 to change if using hostfile only - seperate checks
+rhel8stig_uses_dns: true
+
+# RHEL_08_010360 if run via ansible it is placed in cron.d setting as manually set in cron.daily
+rhel8stig_aide_cron_file: /etc/cron.d/aide
+
+# RHEL_08_030040 - Options are SYSLOG, SINGLE, and HALT to fit STIG standards
+rhel8stig_auditd_disk_error_action: {{ rhel8stig_auditd_disk_error_action }}
+
+# RHEL_08_030050 - Options are SYSLOG or KEEP_LOGS to fit STIG standards
+rhel8stig_auditd_max_log_file_action: {{ rhel8stig_auditd_max_log_file_action }}
+
+# RHEL_08_030060 - Options are SYSLOG, HALT, and SINGLE to fit STIG standards
+rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
+
+# RHEL_08_030690 if using remote syslog server
+rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
+rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
+
+# RHEL_08_040260-62
