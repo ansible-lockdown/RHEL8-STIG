@@ -404,7 +404,6 @@
 
 - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
   block:
-   
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
         shell: grubby --update-kernel=ALL --args="pti=on"
         args:

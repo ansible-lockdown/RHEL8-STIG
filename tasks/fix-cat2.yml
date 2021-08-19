@@ -1010,9 +1010,9 @@
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none as active"
         shell: grubby --update-kernel=ALL --args="vsyscall=none"
-        when: 
-        - (ansible_proc_cmdline.vsyscall is defined and ansible_proc_cmdline.vsyscall != 'none') or
-          (ansible_proc_cmdline.vsyscall is not defined)
+        when:
+            - (ansible_proc_cmdline.vsyscall is defined and ansible_proc_cmdline.vsyscall != 'none') or
+              (ansible_proc_cmdline.vsyscall is not defined)
 
       - name: "MEDIUM | RHEL-08-010422 | PATCH | RHEL 8 must disable virtual syscalls. | Set vsyscall none for kernel updates if doesn't exist"
         lineinfile:
@@ -1049,9 +1049,9 @@
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P as active"
         shell: grubby --update-kernel=ALL --args="slub_debug=P"
-        when: 
-        - (ansible_proc_cmdline.slub_debug is defined and ansible_proc_cmdline.slub_debug != 'P') or
-          (ansible_proc_cmdline.slub_debug is not defined)
+        when:
+            - (ansible_proc_cmdline.slub_debug is defined and ansible_proc_cmdline.slub_debug != 'P') or
+              (ansible_proc_cmdline.slub_debug is not defined)
 
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Set slub_debug to P for kernel updates if doesn't exist"
         lineinfile:
@@ -2929,7 +2929,6 @@
       - rhel_08_020030
       - "'dconf' in ansible_facts.packages"
       - rhel8stig_always_configure_dconf
-      
   tags:
       - RHEL-08-020030
       - CAT2
@@ -3086,7 +3085,6 @@
       - rhel_08_020060
       - "'dconf' in ansible_facts.packages"
       - rhel8stig_always_configure_dconf
-      
   tags:
       - RHEL-08-020060
       - CAT2
@@ -4067,7 +4065,7 @@
       - rhel_08_030080
   tags:
       - RHEL-08-030080
-      -  CAT2
+      - CAT2
       - CCI-000162
       - SRG-OS-000057-GPOS-00027
       - SV-230397r627750_rule
