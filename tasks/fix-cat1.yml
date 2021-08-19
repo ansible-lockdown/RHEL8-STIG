@@ -20,15 +20,19 @@
         package:
             name: dracut-fips
             state: present
-        notify: rebuild initramfs
+        notify: 
+        - rebuild initramfs
+        - change_requires_reboot
         when: "'dracut-fips' not in ansible_facts.packages"
 
       - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         command: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
+        notify: change_requires_reboot
         when:
-            - ansible_proc_cmdline.fips != '1'
+            - ansible_proc_cmdline.fips is not defined or
+              (ansible_proc_cmdline.fips is defined and ansible_proc_cmdline.fips != '1')
 
       - name: "RHEL-08-010020 | HIGH | PATCH | Disable prelinking."
         lineinfile:
@@ -79,6 +83,7 @@
               rhel_08_010020_default_grub_missing_audit is not changed
         notify:
             - confirm grub2 user cfg
+            - change_requires_reboot
 
       - name: "RHEL-08-010020 | HIGH | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
         replace:
