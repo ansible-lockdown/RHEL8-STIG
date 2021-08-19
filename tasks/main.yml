@@ -21,6 +21,16 @@
   tags:
       - always
 
+- name: Check rhel8stig_bootloader_password_hash variable has been changed
+  assert:
+      that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'
+      msg: "This role will not be able to run single user password commands as rhel8stig_bootloader_password_hash variable has not been set"
+
+  when:
+      - not system_is_ec2
+      - rhel_08_010140 or
+        rhel_08_010150
+
 - name: Check if using resolv.conf template settings are changed
   assert:
       that:
@@ -36,44 +46,77 @@
 
 - name: Gather the package facts
   package_facts:
-    manager: auto
+      manager: auto
   tags:
-  - always
-
-# - name: Install OpenSCAP and run a report
-#   import_tasks: audit_oscap_scan_before.yml
-#   when: rhel8stig_oscap_scan
-#   tags:
-#       - oscapreport
+      - always
 
 - import_tasks: prelim.yml
   become: yes
   tags:
       - prelim_tasks
+      - run_audit
+
+- import_tasks: pre_remediation_audit.yml
+  when:
+      - run_audit
+      - setup_audit
+  tags:
+      - run_audit
 
 - name: Include CAT I patches
   import_tasks: fix-cat1.yml
-  when: rhel8stig_cat1_patch | bool
+  when: rhel8stig_cat1_patch
   tags:
-      - cat1
+      - CAT1
       - high
 
 - name: Include CAT II patches
   import_tasks: fix-cat2.yml
-  when: rhel8stig_cat2_patch | bool
+  when: rhel8stig_cat2_patch
   tags:
-      - cat2
+      - CAT2
       - medium
 
 - name: Include CAT III patches
   import_tasks: fix-cat3.yml
   when: rhel8stig_cat3_patch | bool
   tags:
-      - cat3
+      - CAT3
       - low
 
-# - name: run the OpenSCAP reporting tool again
-#   import_tasks: audit_oscap_scan_after.yml
-#   when: rhel8stig_oscap_scan
-#   tags:
-#       - oscapreport
+- name: flush handlers
+  meta: flush_handlers
+  tags:
+      - CAT1
+      - CAT2
+      - CAT3
+
+- name: reboot system if changes require it and not skipped
+  block:
+      - name: reboot system if changes require it and not skipped
+        reboot:
+        when:
+            - change_requires_reboot
+            - not rhel8stig_skip_reboot
+
+      - name: Warning a reboot required but skip option set
+        debug:
+            msg: "Warning!! changes have been made that require a reboot to be implemented but skip reboot was set - Can affect compliance check results"
+        changed_when: true
+        when:
+            - change_requires_reboot
+            - rhel8stig_skip_reboot
+  tags:
+      - CAT1
+      - CAT2
+      - CAT3
+
+- import_tasks: post_remediation_audit.yml
+  when:
+      - run_audit
+
+- name: Show Audit Summary
+  debug:
+      msg: "{{ audit_results.split('\n') }}"
+  when:
+      - run_audit

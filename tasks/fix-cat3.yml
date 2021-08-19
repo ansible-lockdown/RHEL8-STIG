@@ -6,6 +6,11 @@
       - rhel_08_010171
   tags:
       - RHEL-08-010171
+      - CAT3
+      - CCI-001084
+      - SRG-OS-000134-GPOS-00068
+      - SV-230241r627750_rule
+      - V-230241
       - policycoreutils
 
 - name: "LOW | RHEL-08-010292 | PATCH | RHEL 8 must ensure the SSH server uses strong entropy."
@@ -18,6 +23,11 @@
       - rhel_08_010292
   tags:
       - RHEL-08-010292
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230253r627750_rule
+      - V-230253
       - sshd
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
@@ -45,6 +55,11 @@
       - rhel_08_010375
   tags:
       - RHEL-08-010375
+      - CAT3
+      - CCI-001090
+      - SRG-OS-000138-GPOS-00069
+      - SV-230269r627750_rule
+      - V-230269
       - sysctl
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
@@ -72,6 +87,11 @@
       - rhel_08_010376
   tags:
       - RHEL-08-010376
+      - CAT3
+      - CCI-001090
+      - SRG-OS-000138-GPOS-00069
+      - SV-230270r627750_rule
+      - V-230270
       - sysctl
 
 - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8."
@@ -98,6 +118,11 @@
       - rhel_08_010440
   tags:
       - RHEL-08-010440
+      - CAT3
+      - CCI-002617
+      - SRG-OS-000437-GPOS-00194
+      - SV-230281r627750_rule
+      - V-230281
 
 - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
   systemd:
@@ -108,6 +133,11 @@
       - rhel_08_010471
   tags:
       - RHEL-08-010471
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230285r627750_rule
+      - V-230285
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
@@ -121,6 +151,11 @@
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
       - RHEL-08-010540
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230292r627750_rule
+      - V-230292
       - complexity-high
       - mount
       - var
@@ -138,6 +173,11 @@
       - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
       - RHEL-08-010541
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230293r627750_rule
+      - V-230293
       - complexity_high
       - mount
       - auditd
@@ -155,6 +195,11 @@
       - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
       - RHEL-08-010542
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230294r627750_rule
+      - V-230294
       - complexity_high
       - mount
       - auditd
@@ -173,6 +218,11 @@
       - rhel_08_020024
   tags:
       - RHEL-08-020024
+      - CAT3
+      - CCI-000054
+      - SRG-OS-000027-GPOS-00008
+      - SV-230346r627750_rule
+      - V-230346
 
 - name: "LOW | RHEL-08-020042 | PATCH | RHEL 8 must prevent users from disabling session control mechanisms."
   lineinfile:
@@ -183,34 +233,28 @@
       - rhel_08_020042
   tags:
       - RHEL-08-020042
+      - CAT3
+      - CCI-000056
+      - SRG-OS-000028-GPOS-00009
+      - SV-230350r627750_rule
+      - V-230350
       - tmux
 
 - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
-  block:
-      - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon. | Set session required for pam_lastlog.so"
-        pamd:
-            name: postlogin
-            type: session
-            control: optional
-            new_control: required
-            module_path: pam_lastlog.so
-            state: updated
-
-      - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon. | Remove default=1 and optional control"
-        pamd:
-            name: postlogin
-            type: session
-            state: args_absent
-            control: "{{ item }}"
-            module_path: pam_lastlog.so
-            module_arguments: silent
-        with_items:
-            - '[default=1]'
-            - required
+  lineinfile:
+      path: /etc/pam.d/postlogin
+      regexp: 'session.*required.*pam_lastlog\.so.*showfailed'
+      line: "session     required                   pam_lastlog.so showfailed"
+      insertbefore: BOF
   when:
       - rhel_08_020340
   tags:
       - RHEL-08-020340
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230381r627750_rule
+      - V-230381
 
 - name: "LOW | RHEL-08-030063 | PATCH | RHEL 8 must resolve audit information before writing to disk."
   lineinfile:
@@ -222,6 +266,11 @@
       - rhel_08_030063
   tags:
       - RHEL-08-030063
+      - CAT3
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230395r627750_rule
+      - V-230395
       - auditd
 
 - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon."
@@ -236,6 +285,8 @@
         shell: grubby --update-kernel=ALL --args="audit=1"
         args:
             warn: no
+        when: (ansible_proc_cmdline.audit is defined and ansible_proc_cmdline.audit != '1') or
+              (ansible_proc_cmdline.audit is not defined)
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if doesnt exist"
         lineinfile:
@@ -254,6 +305,11 @@
       - rhel_08_030601
   tags:
       - RHEL-08-030601
+      - CAT3
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230468r627750_rule
+      - V-230468
       - grub
 
 - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon."
@@ -268,6 +324,8 @@
         shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
         args:
             warn: no
+        when: (ansible_proc_cmdline.audit_backlog_limit is defined and ansible_proc_cmdline.audit_backlog_limit != '8192') or
+              (ansible_proc_cmdline.audit_backlog_limit is not defined)
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if doesn't exist"
         lineinfile:
@@ -286,6 +344,10 @@
       - rhel_08_030602
   tags:
       - RHEL-08-030602
+      - CAT3
+      - CCI-001849
+      - SV-230469r627750_rule
+      - V-230469
       - grub
 
 - name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
@@ -301,6 +363,11 @@
       - rhel_08_030603
   tags:
       - RHEL-08-030603
+      - CAT3
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230470r627750_rule
+      - V-230470
       - usb
 
 - name: "LOW | RHEL-08-030741 | PATCH | RHEL 8 must disable the chrony daemon from acting as a server."
@@ -312,6 +379,11 @@
       - rhel_08_030741
   tags:
       - RHEL-08-030741
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230485r627750_rule
+      - V-230485
       - chrony
 
 - name: "LOW | RHEL-08-030742 | PATCH | RHEL 8 must disable network management of the chrony daemon."
@@ -323,11 +395,23 @@
       - rhel_08_030742
   tags:
       - RHEL-08-030742
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230486r627750_rule
+      - V-230486
       - chrony
 
 - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
   block:
-      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
+      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
+        shell: grubby --update-kernel=ALL --args="pti=on"
+        args:
+            warn: no
+        when: (ansible_proc_cmdline.pti is defined and ansible_proc_cmdline.pti != 'on') or
+              (ansible_proc_cmdline.pti is not defined )
+
+      - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
             warn: no
@@ -335,28 +419,28 @@
         failed_when: false
         register: rhel8stig_040004_grub_cmdline_linux
 
-      - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
-        shell: grubby --update-kernel=ALL --args="pti=on"
-        args:
-            warn: no
-
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti if doesn't exist"
         lineinfile:
             path: /etc/default/grub
             regexp: '^GRUB_CMDLINE_LINUX='
             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_040004_grub_cmdline_linux.stdout }} pti=on"'
-        when: '"pti=" not in rhel8stig_040004_grub_cmdline_linux.stdout'
+        when: '"pti=on" not in rhel8stig_040004_grub_cmdline_linux.stdout'
 
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti exists"
         replace:
             path: /etc/default/grub
             regexp: 'pti=([^\s|"])+'
             replace: "pti=on"
-        when: '"pti=" in rhel8stig_040004_grub_cmdline_linux.stdout'
+        when: '"pti=on" in rhel8stig_040004_grub_cmdline_linux.stdout'
   when:
       - rhel_08_040004
   tags:
       - RHEL-08-040004
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230491r627750_rule
+      - V-230491
       - grub
 
 - name: "LOW | RHEL-08-040021 | PATCH | RHEL 8 must disable the asynchronous transfer mode (ATM) protocol."
@@ -369,7 +453,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install ATM', line: 'install ATM /bin/true', insertafter: 'EOF' }
       - { regexp: '^blacklist ATM', line: 'blacklist ATM', insertafter: '^install ATM /bin/true' }
@@ -377,6 +461,11 @@
       - rhel_08_040021
   tags:
       - RHEL-08-040021
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230494r627750_rule
+      - V-230494
       - modprobe
       - atm
 
@@ -390,7 +479,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install CAN', line: 'install CAN /bin/true', insertafter: 'EOF' }
       - { regexp: 'blacklist CAN', line: 'blacklist CAN', insertafter: '^install CAN /bin/true' }
@@ -398,6 +487,11 @@
       - rhel_08_040022
   tags:
       - RHEL-08-040022
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230495r627750_rule
+      - V-230495
       - modprobe
       - can
 
@@ -411,7 +505,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install SCTP', line: 'install SCTP /bin/true', insertafter: 'EOF' }
       - { regexp: '^blacklist SCTP', line: 'blacklist SCTP', insertafter: '^install SCTP' }
@@ -419,6 +513,11 @@
       - rhel_08_040023
   tags:
       - RHEL-08-040023
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230496r627750_rule
+      - V-230496
       - modprobe
       - sctp
 
@@ -432,7 +531,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install TIPC', line: 'install TIPC /bin/true', insertafter: 'EOF' }
       - { regexp: '^blacklist TIPC', line: 'blacklist TIPC', insertafter: '^install TIPC' }
@@ -440,6 +539,11 @@
       - rhel_08_040024
   tags:
       - RHEL-08-040024
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230497r627750_rule
+      - V-230497
       - modprobe
       - tipc
 
@@ -453,7 +557,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install cramfs', line: 'install cramfs /bin/true', insertafter: 'EOF' }
       - { regexp: 'blacklist cramfs', line: 'blacklist cramfs', insertafter: '^install cramfs' }
@@ -461,6 +565,11 @@
       - rhel_08_040025
   tags:
       - RHEL-08-040025
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230498r627750_rule
+      - V-230498
       - modprobe
       - cramfs
 
@@ -474,7 +583,7 @@
       owner: root
       group: root
       mode: 0640
-  notify: reboot system
+  notify: change_requires_reboot
   with_items:
       - { regexp: '^install firewire-core', line: 'install firewire-core /bin/true', insertafter: 'EOF' }
       - { regexp: '^blacklist firewire-core', line: 'blacklist firewire-core', insertafter: '^install firewire-core' }
@@ -482,6 +591,11 @@
       - rhel_08_040026
   tags:
       - RHEL-08-040026
+      - CAT3
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230499r627750_rule
+      - V-230499
       - modprobe
       - firewire
 
@@ -498,6 +612,15 @@
       - rhel_08_040300
       - rhel_08_040310
   tags:
+      - CAT3
       - RHEL-08-040300
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230551r627750_rule
+      - V-230551
       - RHEL-08-040310
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230552r627750_rule
+      - V-230552
       - aide

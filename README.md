@@ -1,16 +1,60 @@
 RHEL 8 DISA STIG
 ================
 
-[![pipeline status](https://gitlab.com/mindpointgroup/lockdown-enterprise/rhel-8-stig/badges/master/pipeline.svg)](https://gitlab.com/mindpointgroup/lockdown-enterprise/rhel-8-stig/commits/master)
+![Build Status](https://img.shields.io/github/workflow/status/ansible-lockdown/RHEL8-STIG/CommunityToDevel?label=Devel%20Build%20Status&style=plastic)
+![Build Status](https://img.shields.io/github/workflow/status/ansible-lockdown/RHEL8-STIG/DevelToMain?label=Main%20Build%20Status&style=plastic)
+![Release](https://img.shields.io/github/v/release/ansible-lockdown/RHEL8-STIG?style=plastic)
 
 Configure a RHEL 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 1 released on  January 5, 2021](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R1_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 2 released on  April 23, 2021](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R2_STIG.zip).
+
+Updating
+--------
+
+Coming from a previous release.
+
+As with all releases and updates, It is suggested to test and align controls.
+This contains rewrites and ID reference changes as per STIG documentation.
+
+Auditing (new)
+--------------
+
+This can be turned on or off within the defaults/main.yml file with the variable rhel8stig_run_audit. The value is false by default, please refer to the wiki for more details.
+
+This is a much quicker, very lightweight, checking (where possible) config compliance and live/running settings.
+
+A new form of auditing has been develeoped, by using a small (12MB) go binary called [goss](https://github.com/aelsabbahy/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
+This audit will not only check the config has the correct setting but aims to capture if it is running with that configuration also trying to remove [false positives](https://www.mindpointgroup.com/blog/is-compliance-scanning-still-relevant/) in the process.
+
+Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit).
 
 Requirements
 ------------
 
 RHEL 8 or CentOS 8 - Other versions are not supported.
+Access to download or add the goss binary and content to the system if using auditing. options are available on how to get the content to the system.
+
+**General:**
+
+- Basic knowledge of Ansible, below are some links to the Ansible documentation to help get started if you are unfamiliar with Ansible
+
+  - [Main Ansible documentation page](https://docs.ansible.com)
+  - [Ansible Getting Started](https://docs.ansible.com/ansible/latest/user_guide/intro_getting_started.html)
+  - [Tower User Guide](https://docs.ansible.com/ansible-tower/latest/html/userguide/index.html)
+  - [Ansible Community Info](https://docs.ansible.com/ansible/latest/community/index.html)
+- Functioning Ansible and/or Tower Installed, configured, and running. This includes all of the base Ansible/Tower configurations, needed packages installed, and infrastructure setup.
+- Please read through the tasks in this role to gain an understanding of what each control is doing. Some of the tasks are disruptive and can have unintended consiquences in a live production system. Also familiarize yourself with the variables in the defaults/main.yml file or the [Main Variables Wiki Page](https://github.com/ansible-lockdown/RHEL8-STIG/wiki/Main-Variables).
+
+Documentation
+-------------
+
+- [Repo GitHub Page](https://ansible-lockdown.github.io/RHEL8-STIG/)
+- [Getting Started](https://www.lockdownenterprise.com/docs/getting-started-with-lockdown)
+- [Customizing Roles](https://www.lockdownenterprise.com/docs/customizing-lockdown-enterprise)
+- [Per-Host Configuration](https://www.lockdownenterprise.com/docs/per-host-lockdown-enterprise-configuration)
+- [Getting the Most Out of the Role](https://www.lockdownenterprise.com/docs/get-the-most-out-of-lockdown-enterprise)
+- [Wiki](https://github.com/ansible-lockdown/RHEL8-STIG/wiki)
 
 Dependencies
 ------------
@@ -27,62 +71,59 @@ Package 'python-xmltodict' is required if you enable the OpenSCAP tool installat
 Role Variables
 --------------
 
-- some found below
-- please refer to defaults/main.yml for a full breakdown
+This role is designed that the end user should not have to edit the tasks themselves. All customizing should be done via the defaults/main.yml file or with extra vars within the project, job, workflow, etc. These variables can be found [here](https://github.com/ansible-lockdown/RHEL8-STIG/wiki/Main-Variables) in the Main Variables Wiki page. All variables are listed there along with descriptions.
 
-| Name              | Default Value       | Description          |
-|-------------------|---------------------|----------------------|
-| `rhel8stig_oscap_scan` | `no` | Install and run an OpenSCAP report before and after the application of this role        |
-| `rhel8stig_cat1_patch` | `yes` | Correct CAT I findings        |
-| `rhel8stig_cat2_patch` | `yes`  | Correct CAT II findings       |
-| `rhel8stig_cat3_patch` | `yes`  | Correct CAT III findings      |
-| `rhel_08_######` | [see defaults/main.yml](./defaults/main.yml)  | Individual variables to enable/disable each STIG ID. |
-| `rhel8stig_gui` | `no` | Whether or not to run tasks related to auditing/patching the desktop environment |
-| `rhel8stig_system_is_router` | `no` | Run tasks that disable router functions. |
-| `rhel8stig_time_service` | `chronyd` | Set to `ntpd` or `chronyd`. |
-| `rhel8stig_firewall_service` | `firewalld` | Set to `firewalld` or `iptables`. |
-| `rhel8stig_tftp_required` | `no` | If set to `no`, remove `tftp` client and server packages. |
-| `rhel8stig_bootloader_password` | `Boot1tUp!` | GRUB2 bootloader password. This should be stored in an Ansible Vault. |
-| `rhel8stig_boot_superuser` | `root` | Used to set the boot superuser in the GRUB2 config. |
-| `rhel8stig_aide_cron` | [see defaults/main.yml](./defaults/main.yml) | AIDE Cron settings |
-| `rhel8stig_maxlogins` | `10` | Set maximum number of simultaneous system logins (RHEL-07-040000) |
-| `rhel8stig_logon_banner` | [see defaults/main.yml](./defaults/main.yml) | Logon banner displayed when logging in to the system. Defaults to nicely formatted standard logon banner. |
-| `rhel8stig_password_complexity` | see below for specific settings | Dictionary of password complexity settings |
-| `rhel8stig_password_complexity.ucredit` | `-1` | Minimum number of upper-case characters to be set in a new password - expressed as a negative number.  |
-| `rhel8stig_password_complexity.lcredit` | `-1` | Minimum number of lower-case characters to be set in a new password - expressed as a negative number.  |
-| `rhel8stig_password_complexity.dcredit` | `-1` | Minimum number of numeric characters to be set in a new password - expressed as a negative number.  |
-| `rhel8stig_password_complexity.ocredit` | `-1` | Minimum number of special characters to be set in a new password - expressed as a negative number.  |
-| `rhel8stig_password_complexity.difok` | `8` | Minimum number of characters in new password that must not be present in the old password.  |
-| `rhel8stig_password_complexity.minclass` | `4` | Minimum number of required classes of characters for the new password. (digits, upper, lower, other)  |
-| `rhel8stig_password_complexity.maxrepeat` | `3` | Maximum number of allowed same consecutive characters in a new password. |
-| `rhel8stig_password_complexity.maxclassrepeat` | `4` | Maximum number of allowed same consecutive characters in the same **class** in the new password. |
-| `rhel8stig_password_complexity.minlen` | `15` | Minimum number of characters in a new password. |
-| `rhel8stig_sssd_conf` | [see defaults/main.yml](./defaults/main.yml)  | Default location for sssd.conf |
-| `rhel8stig_sssd_domain` | testing.test | Domain to be used in sssd |
-| `rhel8stig_sssd.certmap` | certmap/{{ rhel8stig_sssd_domain }}/rule_name | certmap rule for sssd |
-| `rhel8stig_sssd.matchrule` | =.*EDIPI@mil | match rule in relationship to domain e.g. CN etc |
-| `rhel8stig_sssd.maprule` | (userCertificate;binary={cert!bin}) | map cert auth requirements into sssd rule |
-| `rhel8stig_sssd.domains` | testing.test | comma seperated list of domains using sssd |
-| `rhel8stig_shell_session_timeout` | `file: /etc/profile` `timeout: 600` | Dictionary of session timeout setting and file (TMOUT setting can be set in multiple files) |
-| `rhel8stig_interactive_uid_start` | `1000` | Interactive user start point (UID_MIN) from /etc/login.defs |
-| `rhel8stig_ntp_server_name: server.name` | `server.name` | The NTP Server Name |
-| `rhel8stig_custom_firewall_zone` | `new_fw_zone` | The name of the new firewalld zone created to meet STIG requirements |
-| `rhel8stig_fapolicy_white_list` | `LIST` | This is a list of the whitelist for the fapolicy controls, must end with deny all all |
-| `rhel8stig_sshd_compression` | `no` | The Compression parameter in /etc/ssh/sshd_config needs to be set to no or delayed |
-| `rhel8stig_path_to_sshkey` | `/root/.ssh/` | Custom path to the ssh key |
-| `rhel8stig_hashing_rounds` | `5000` | The rounds parameter goes into pamd configs and needs to be set to now lower than 5000 |
-| `rhel8stig_dns_servers` | `8.8.8.8 and 8.8.4.4` | To conform to STIG standards you need two DNS servers, parameter is in list form |
-| `rhel8stig_nfs_mounts` | `vars` | NFS file system mounts pull automatcially with prelim task |
-| `rhel8stig_nfs_mounts_query` | `[?starts_with(fstype, 'nfs')].mount` | The query for mounts |
-| `rhel8stig_skip_reboot` | `false` | Whether or not to skip the reboot |
+Tags
+----
 
+There are many tags available for added control precision. Each control has it's own set of tags noting the control number as well as what parts of the system that control addresses.
 
-Example Playbook
-----------------
+Below is an example of the tag section from a control within this role. Using this example if you set your run to skip all controls with the tag ssh, this task will be skipped. The
+opposite can also happen where you run only controls tagged with ssh.
 
-    - hosts: servers
-      roles:
-          - role: rhel-8-stig
-            when:
-                - ansible_os_family == 'RedHat'
-                - ansible_distribution_major_version | version_compare('8', '=')
+```sh
+tags:
+    - RHEL-08-010050
+    - ssh
+    - dod_logon_banner
+```
+
+Example Audit Summary
+---------------------
+
+This is based on a vagrant image with selections enabled. e.g. No Gui or firewall.
+Note: More tests are run during audit as we check config and running state.
+
+```sh
+ok: [rhel8test] => {
+    "msg": [
+        "The pre remediation results are: Count: 308, Failed: 156, Duration: 44.108s.",
+        "The post remediation results are: Count: 308, Failed: 14, Duration: 37.647s.",
+        "Full breakdown can be found in /var/tmp",
+        ""
+    ]
+}
+  ]
+}
+PLAY RECAP ****************************************************************************************************************
+rhel8test         : ok=369  changed=192  unreachable=0  failed=0  skipped=125  rescued=0  ignored=0  
+```
+
+Branches
+-------
+
+- **devel** - This is the default branch and the working development branch. Community pull requests will pull into this branch
+- **main** - This is the release branch
+- **reports** - This is a protected branch for our scoring reports, no code should ever go here
+- **gh_pages** - github pages
+- **all other branches** - Individual community member branches
+
+Community Contribution
+----------------------
+
+We encourage you (the community) to contribute to this role. Please read the rules below.
+
+- Your work is done in your own individual branch. Make sure to Signed-off and GPG sign all commits you intend to merge.
+- All community Pull Requests are pulled into the devel branch
+- Pull Requests into devel will confirm your commits have a GPG signature, Signed-off, and a functional test before being approved
+- Once your changes are merged and a more detailed review is complete, an authorized member will merge your changes into the main branch for a new release.

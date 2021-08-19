@@ -1,5 +1,6 @@
 ---
-- name: "HIGH | RHEL-08-010000 | AUDIT | The RHEL 8 must be a vendor-supported release."
+
+- name: "RHEL-08-010000 | HIGH | AUDIT | The RHEL 8 must be a vendor-supported release."
   debug:
       msg: Minimum supported version of {{ ansible_distribution }} is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
   changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
@@ -7,45 +8,48 @@
       - rhel_08_010000
   tags:
       - RHEL-08-010000
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230221r627750_rule
+      - V-230221
 
-- name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
+- name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
   block:
-      - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
-        dnf:
+      - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | install FIPS"
+        package:
             name: dracut-fips
             state: present
-        notify: rebuild initramfs
+        notify: 
+        - rebuild initramfs
+        - change_requires_reboot
+        when: "'dracut-fips' not in ansible_facts.packages"
 
-      - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
+      - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         command: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
+        notify: change_requires_reboot
+        when:
+            - ansible_proc_cmdline.fips is not defined or
+              (ansible_proc_cmdline.fips is defined and ansible_proc_cmdline.fips != '1')
 
-      - name: "HIGH | RHEL-08-010020 | AUDIT | Check if prelink package is installed"
-        command: rpm -q prelink
-        args:
-            warn: no
-        changed_when: no
-        failed_when: no
-        check_mode: no
-        register: rhel_08_010020_prelink_installed
-
-      - name: "HIGH | RHEL-08-010020 | PATCH | Disable prelinking."
+      - name: "RHEL-08-010020 | HIGH | PATCH | Disable prelinking."
         lineinfile:
             dest: /etc/sysconfig/prelink
             regexp: ^#?PRELINKING
             line: PRELINKING=no
-        when: rhel_08_010020_prelink_installed.rc == 0
+        when: "'prelink' in ansible_facts.packages"
         notify: undo existing prelinking
 
-      - name: "HIGH | RHEL-08-010020 | AUDIT | Check for GRUB_CMDLINE_LINUX in /etc/default/grub"
+      - name: "RHEL-08-010020 | HIGH | AUDIT | Check for GRUB_CMDLINE_LINUX in /etc/default/grub"
         command: grep -P '^\s*GRUB_CMDLINE_LINUX=".*"$' /etc/default/grub
         check_mode: no
         failed_when: no
         changed_when: rhel_08_010020_default_grub_missing_audit.rc > 0
         register: rhel_08_010020_default_grub_missing_audit
 
-      - name: "HIGH | RHEL-08-010020 | AUDIT | parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
+      - name: "RHEL-08-010020 | HIGH | AUDIT | parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
         command: grep -oP ' ro \K.*?(?= ?LANG=)' /proc/cmdline
         check_mode: no
         changed_when: no
@@ -53,7 +57,7 @@
         when: rhel_08_010020_default_grub_missing_audit is changed
         register: rhel_08_010020_grub_cmdline_linux_audit
 
-      - name: "HIGH | RHEL-08-010020 | PATCH | Copy over a sane /etc/default/grub"
+      - name: "RHEL-08-010020 | HIGH | PATCH | Copy over a sane /etc/default/grub"
         template:
             src: etc_default_grub.j2
             dest: /etc/default/grub
@@ -64,7 +68,7 @@
             grub_cmdline_linux: "{{ rhel_08_010020_grub_cmdline_linux_audit.stdout }}"
         when: rhel_08_010020_default_grub_missing_audit is changed
 
-      - name: "HIGH | RHEL-08-010020 | PATCH | fips=1 must be in /etc/default/grub"
+      - name: "RHEL-08-010020 | HIGH | PATCH | fips=1 must be in /etc/default/grub"
         replace:
             path: /etc/default/grub
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
@@ -79,8 +83,9 @@
               rhel_08_010020_default_grub_missing_audit is not changed
         notify:
             - confirm grub2 user cfg
+            - change_requires_reboot
 
-      - name: "HIGH | RHEL-08-010020 | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
+      - name: "RHEL-08-010020 | HIGH | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
         replace:
             path: /etc/default/grub
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
@@ -100,7 +105,7 @@
         notify: confirm grub2 user cfg
         register: result
 
-      - name: "HIGH | RHEL-08-010020 | AUDIT | Verify kernel parameters in /etc/default/grub"
+      - name: "RHEL-08-010020 | HIGH | AUDIT | Verify kernel parameters in /etc/default/grub"
         command: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ]){{ item | regex_escape }}(?=[" ]).*"$' /etc/default/grub
         check_mode: no
         with_items:
@@ -124,45 +129,32 @@
   when: rhel_08_010020
   tags:
       - RHEL-08-010020
+      - CAT1
+      - CCI-000068
+      - SRG-OS-000033-GPOS-00014
+      - SV-230223r627750_rule
+      - V-230223
 
 - name: |
-        "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
-        "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
+        "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
+        "RHEL-08-010150 | HIGH |PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
   block:
-      # the createuser.cfg task is a workaround for the the ansible bug https://github.com/ansible/ansible/pull/59823
       - name: |
-              "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Create user.cfg"
-              "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Create user.cfg"
-        shell: test -f {{ file_q }} && echo exists || {{ create_cmd }}
-        args:
-            warn: no
-        check_mode: "{{ ansible_check_mode is not defined }}"
-        register: rhel8stig_create_grub_user_cfg
-        changed_when:
-            - rhel8stig_create_grub_user_cfg.stdout == "created"
-        failed_when:
-            - rhel8stig_create_grub_user_cfg.stdout != "created"
-            - rhel8stig_create_grub_user_cfg.stdout != "exists"
-        vars:
-            file_q: "{{ (rhel8stig_grub_cfg_path | dirname ~ '/user.cfg') | quote }}"
-            create_cmd: "({{ ansible_check_mode | ternary('', 'touch ' ~ file_q ~ ' && ') }}echo created)"
-
-      - name: |
-              "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
-              "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
+            "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
+            "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
         lineinfile:
             path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
             create: yes
             regexp: ^GRUB2_PASSWORD=
-            line: GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}
+            line: "GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}"
             owner: root
             group: root
             mode: 0640
         notify: confirm grub2 user cfg
 
       - name: |
-              "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
-              "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
+            "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
+            "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
         lineinfile:
             dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
             regexp: '^set superusers'
@@ -176,22 +168,35 @@
   tags:
       - RHEL-08-010140
       - RHEL-08-010150
+      - CAT1
+      - CCI-000213
+      - SRG-OS-000080-GPOS-00048
+      - SV-230234r627750_rule
+      - SV-230235r627750_rule
+      - V-230234
+      - V-230235
       - grub
       - bootloader
 
-- name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+- name: "RHEL-08-010370 | HIGH | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
-      - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
+      - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Dnf Default"
+        lineinfile:
+            path: /etc/dnf/dnf.conf
+            regexp: '^gpgcheck='
+            line: gpgcheck=1
+
+      - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
         find:
             paths: /etc/yum.repos.d
             pattern: '*.repo'
         register: rhel_08_010370_repos_files_list_full
 
-      - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Flatten result"
+      - name: "RHEL-08-010370 | HIGH | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Flatten result"
         set_fact:
             rhel_08_010370_repos_files_list: "{{ rhel_08_010370_repos_files_list_full.files | map(attribute='path') | flatten }}"
 
-      - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Set gpgcheck"
+      - name: "RHEL-08-010370 | HIGH | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Set gpgcheck"
         lineinfile:
             path: "{{ item }}"
             regexp: '^gpgcheck'
@@ -202,9 +207,14 @@
       - rhel_08_010370
   tags:
       - RHEL-08-010370
+      - CAT1
+      - CCI-001749
+      - SRG-OS-000366-GPOS-00153
+      - SV-230264r627750_rule
+      - V-230264
       - yum
 
-- name: "HIGH | RHEL-08-010371 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+- name: "RHEL-08-010371 | HIGH | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   lineinfile:
       path: /etc/dnf/dnf.conf
       regexp: '^localpkg_gpgcheck='
@@ -213,9 +223,14 @@
       - rhel_08_010371
   tags:
       - RHEL-08-010371
+      - CAT1
+      - CCI-001749
+      - SRG-OS-000366-GPOS-00153
+      - SV-230265r627750_rule
+      - V-230265
       - dnf
 
-- name: "HIGH | RHEL-08-010460 | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
+- name: "RHEL-08-010460 | HIGH | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
   file:
       path: /etc/ssh/shosts.equiv
       state: absent
@@ -223,18 +238,23 @@
       - rhel_08_010460
   tags:
       - RHEL-08-010460
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230283r627750_rule
+      - V-230283
       - shosts
 
-- name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system."
+- name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system."
   block:
-      - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
+      - name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
         find:
             path: '/'
             recurse: yes
             patterns: '*.shosts'
         register: rhel_08_010470_shost_files
 
-      - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Remove .shosts files"
+      - name: "RHEL-08-010470 | HIGH | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Remove .shosts files"
         file:
             path: "{{ item.path }}"
             state: absent
@@ -244,9 +264,14 @@
       - rhel_08_010470
   tags:
       - RHEL-08-010470
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230284r627750_rule
+      - V-230284
       - shosts
 
-- name: "HIGH | RHEL-08-010820 | PATCH | Unattended or automatic logon via the RHEL 8 graphical user interface must not be allowed."
+- name: "RHEL-08-010820 | HIGH | PATCH | Unattended or automatic logon via the RHEL 8 graphical user interface must not be allowed."
   lineinfile:
       path: /etc/gdm/custom.conf
       regexp: (?i)automaticloginenable
@@ -257,10 +282,15 @@
       - rhel_08_010820
   tags:
       - RHEL-08-010820
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00229
+      - SV-230329r627750_rule
+      - V-230329
 
-- name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
+- name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
   block:
-      - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
+      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
         replace:
             path: "{{ item }}"
             regexp: ' nullok'
@@ -269,7 +299,7 @@
             - /etc/pam.d/system-auth
             - /etc/pam.d/password-auth
 
-      - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Set PermitEmptyPasswords to no"
+      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Set PermitEmptyPasswords to no"
         lineinfile:
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?PermitEmptyPasswords'
@@ -280,48 +310,52 @@
       - rhel8stig_disruption_high
   tags:
       - RHEL-08-020330
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230380r627750_rule
+      - V-230380
       - disruption_high
 
-- name: "HIGH | RHEL-08-040000 | PATCH | RHEL 8 must not have the telnet-server package installed."
-  dnf:
+- name: "RHEL-08-040000 | HIGH | PATCH | RHEL 8 must not have the telnet-server package installed."
+  package:
       name: telnet-server
       state: absent
   when:
       - rhel_08_040000
+      - "'telnet-server' in ansible_facts.packages"
   tags:
       - RHEL-08-040000
+      - CAT1
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230487r627750_rule
+      - V-230487
 
-- name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not have the rsh-server package installed."
-  dnf:
+- name: "RHEL-08-040010 | HIGH | PATCH | RHEL 8 must not have the rsh-server package installed."
+  package:
       name: rsh-server
       state: absent
   when:
       - rhel_08_040010
+      - "'rsh-server' in ansible_facts.packages"
   tags:
       - RHEL-08-040010
+      - CAT1
+      - CCI-000381
+      - SRG-OS-000095-GPOS-00049
+      - SV-230492r627750_rule
+      - V-230492
 
-- name: "HIGH | RHEL-08-040060 | PATCH | RHEL 8 must enforce SSHv2 for network access to all accounts."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '^.*Protocol'
-      line: 'Protocol 2'
-  notify: restart sshd
-  when:
-      - rhel_08_040060
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-040060
-      - ssh
-
-- name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
+- name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
   block:
-      - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Mask ctrl-alt-del.target"
+      - name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Mask ctrl-alt-del.target"
         systemd:
             name: ctrl-alt-del.target
             masked: yes
         notify: systemctl daemon-reload
 
-      - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
+      - name: "RHEL-08-040170 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
         file:
             src: /dev/null
             dest: /etc/systemd/system/ctrl-alt-del.target
@@ -331,16 +365,21 @@
       - rhel_08_040170
   tags:
       - RHEL-08-040170
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230529r627750_rule
+      - V-230529
 
-- name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
+- name: "RHEL-08-040171 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   block:
-      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
+      - name: "RHEL-08-040171 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
         command: grep -s logout /etc/dconf/db/local.d/*
         changed_when: false
         failed_when: false
         register: rhel_08_040171_logout_settings_status
 
-      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Add if missing"
+      - name: "RHEL-08-040171 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Add if missing"
         lineinfile:
             path: /etc/dconf/db/local.d/00-disable-CAD
             regexp: "{{ item.regexp }}"
@@ -355,7 +394,7 @@
             - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }
         when: rhel_08_040171_logout_settings_status.stdout | length == 0
 
-      - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
+      - name: "RHEL-08-040171 | HIGH | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
         replace:
             path: "{{ rhel_08_040171_logout_settings_status.stdout }}"
             regexp: '^[L|l]ogout=.*'
@@ -363,10 +402,16 @@
         when: rhel_08_040171_logout_settings_status.stdout | length > 0
   when:
       - rhel_08_040171
+      - "'gnome-desktop' in ansible_facts.packages"
   tags:
       - RHEL-08-040171
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230530r646883_rule
+      - V-230530
 
-- name: "HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
+- name: "RHEL-08-040172 | HIGH | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
   lineinfile:
       path: /etc/systemd/system.conf
       regexp: '^CtrlAltDelBurstAction=|^#CtrlAltDelBurstAction='
@@ -376,33 +421,44 @@
       - rhel_08_040172
   tags:
       - RHEL-08-040172
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230531r627750_rule
+      - V-230531
 
-- name: "HIGH | RHEL-08-040190 | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
-  dnf:
+- name: "RHEL-08-040190 | HIGH | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
+  package:
       name: tftp-server
       state: absent
   when:
       - rhel_08_040190
+      - "'tftp-server' in ansible_facts.packages"
       - not rhel8stig_tftp_required
   tags:
       - RHEL-08-040190
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230533r627750_rule
+      - V-230533
       - tftp
 
-- name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
+- name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
   block:
-      - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
         shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
         changed_when: false
         failed_when: false
         register: rhel_08_040200_nonroot_uid
 
-      - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
         command: "passwd -l {{ item }}"
         with_items:
             - "{{ rhel_08_040200_nonroot_uid.stdout_lines }}"
         when: rhel_08_040200_nonroot_uid.stdout | length > 0
 
-      - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
+      - name: "RHEL-08-040200 | HIGH | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
         debug:
             msg:
                 - "WARNING!! The following accounts were locked since they had UID of 0 and were not the root user"
@@ -413,14 +469,25 @@
       - rhel8stig_disruption_high
   tags:
       - RHEL-08-040200
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230534r627750_rule
+      - V-230534
       - disruption_high
 
-- name: "HIGH | RHEL-08-040360 | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
-  dnf:
+- name: "RHEL-08-040360 | HIGH | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
+  package:
       name: vsftpd
       state: absent
   when:
       - rhel_08_040360
+      - "'vsftpd' in ansible_facts.packages"
   tags:
       - RHEL-08-040360
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230558r627750_rule
+      - V-230558
       - ftp
