@@ -2796,7 +2796,7 @@
       - V-230343
       - pamd
 
-- name: "MEDIUM | RHEL-08-020022| PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+- name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   block:
       - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
         lineinfile:
