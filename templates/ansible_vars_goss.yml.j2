@@ -450,5 +450,4 @@ rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
 # RHEL-08-020021
 # RHEL-08-020022
 # RHEL-08-020023
-rhel8stig_pam_faillock:
-    dir: /var/run/faillock
+rhel8stig_pam_faillock_dir: {{ rhel8stig_pam_faillock.dir }}
