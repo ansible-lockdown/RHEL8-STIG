@@ -601,11 +601,13 @@ rhel8stig_pam_pwhistory:
 # RHEL-08-020012
 # RHEL-08-020013
 # pam_faillock settings - accounts must be locked for max time period after 3 unsuccessful attempts within 15 minutes.
+# dir: is set to /var/run/faillock which does not match the control. We think the control is a typo since their path does not work with SELinux, so we variablized the value
 rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
     unlock_time: 0
     fail_for_root: yes
+    dir: /var/run/faillock
 
 # RHEL-08-030670
 # rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards

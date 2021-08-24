@@ -2211,7 +2211,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2222,7 +2222,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2256,7 +2256,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2267,7 +2267,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2307,7 +2307,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2318,7 +2318,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2352,7 +2352,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2363,7 +2363,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2406,7 +2406,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2417,7 +2417,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2451,7 +2451,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2462,7 +2462,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2505,7 +2505,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2516,7 +2516,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2550,7 +2550,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2561,7 +2561,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2583,7 +2583,7 @@
         lineinfile:
             path: "/etc/security/faillock.conf"
             regexp: '^dir =|^\# dir ='
-            line: "dir = /var/log/faillock"
+            line: "dir = {{ rhel8stig_pam_faillock.dir }}"
         with_items:
             - system-auth
             - password-auth
@@ -2604,7 +2604,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2615,7 +2615,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2649,7 +2649,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2660,7 +2660,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2703,7 +2703,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2714,7 +2714,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2748,7 +2748,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2759,7 +2759,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2802,7 +2802,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2813,7 +2813,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2847,7 +2847,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2858,7 +2858,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
