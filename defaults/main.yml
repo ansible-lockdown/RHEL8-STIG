@@ -607,7 +607,7 @@ rhel8stig_pam_faillock:
     interval: 900
     unlock_time: 0
     fail_for_root: yes
-    dir: /var/run/faillock
+    dir: /var/log/faillock
 
 # RHEL-08-030670
 # rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards

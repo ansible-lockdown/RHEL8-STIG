@@ -5319,7 +5319,7 @@
 - name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
   lineinfile:
       path: /etc/audit/rules.d/audit.rules
-      line: -w /var/log/faillock -p wa -k logins
+      line: "-w {{ rhel8stig_pam_faillock.dir }} -p wa -k logins"
   notify: restart auditd
   when:
       - rhel_08_030590
