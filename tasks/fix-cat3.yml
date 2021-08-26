@@ -125,10 +125,19 @@
       - V-230281
 
 - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
-  systemd:
-      name: rngd.service
-      state: started
-      enabled: yes
+  block:
+      - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service. | Check for the rng-tools package"
+        shell: rpm -q rng-tools
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010471_rng_tools_status
+
+      - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service. | Enable and start service"
+        systemd:
+            name: rngd.service
+            state: started
+            enabled: yes
+        when: "'rng-tools-' in rhel_08_010471_rng_tools_status.stdout"
   when:
       - rhel_08_010471
   tags:
