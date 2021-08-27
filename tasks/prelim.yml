@@ -408,3 +408,34 @@
             msg:
                 - "bootloader path set to {{ rhel8stig_bootloader_path }}"
                 - "legacy boot equals {{ rhel8stig_legacy_boot }}"
+
+- name: "PRELIM | RHEL-08-020017 | If using selinux set up system prereqs"
+  block:
+      - name: "PRELIM | RHEL-08-020017 | Install policycoreutils-python-utils"
+        package:
+            name: policycoreutils-python-utils
+            state: present
+        when: "'policycoreutils-python-utils' not in ansible_facts.packages"
+
+      - name: "PRELIM | RHEL-08-020017 | create faillock dir if rhel_08_020017"
+        file:
+            path: "{{ rhel8stig_pam_faillock.dir }}"
+            state: directory
+            mode: 0755
+            owner: root
+            group: root
+
+      - name: "PRELIM | RHEL-08-020017 | Set faillock directory context"
+        sefcontext:
+            target: "{{ rhel8stig_pam_faillock.dir }}"
+            ftype: d
+            setype: faillog_t
+            seuser: system_u  # not really required added for continuity
+            state: present
+        register: faillock_dir_context
+
+      - name: "PRELIM | RHEL-08-020017 | Set faillock directory selinux context immediately"
+        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
+        when: faillock_dir_context.changed
+  when:
+      - rhel_08_020017
