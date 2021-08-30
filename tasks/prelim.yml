@@ -408,3 +408,49 @@
             msg:
                 - "bootloader path set to {{ rhel8stig_bootloader_path }}"
                 - "legacy boot equals {{ rhel8stig_legacy_boot }}"
+
+- name: "PRELIM | RHEL-08-020017 | If using selinux set up system prereqs"
+  block:
+      - name: "PRELIM | RHEL-08-020017 | Install policycoreutils-python-utils"
+        package:
+            name: policycoreutils-python-utils
+            state: present
+        when: "'policycoreutils-python-utils' not in ansible_facts.packages"
+
+      - name: "PRELIM | RHEL-08-020017 | create faillock dir if rhel_08_020017"
+        file:
+            path: "{{ rhel8stig_pam_faillock.dir }}"
+            state: directory
+            mode: 0755
+            owner: root
+            group: root
+        register: faillock_dir
+
+      - name: "PRELIM | RHEL-08-020017 | Add permenant secontext"
+        sefcontext:
+            target: "{{ rhel8stig_pam_faillock.dir }}"
+            ftype: d
+            setype: faillog_t
+            state: present
+        register: add_faillock_secontext
+        when: faillock_dir.changed
+
+      - name: "PRELIM | RHEL-08-020017 | Set faillock directory selinux context immediately"
+        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
+
+      - name: "PRELIM | RHEL-08-020017 | Capture secontext"
+        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
+        register: faillock_secontext
+        changed_when: false
+        failed_when: false
+
+      - name: "PRELIM | RHEL-08-020017 | Modify context of not correct"
+        shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
+        register: modify_secontext
+        when: faillock_secontext.stdout != '1'
+      
+      - name: "PRELIM | RHEL-08-020017 | Set {{ rhel8stig_pam_faillock.dir }} selinux context"
+        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
+        when: modify_secontext.changed
+  when:
+      - rhel_08_020017

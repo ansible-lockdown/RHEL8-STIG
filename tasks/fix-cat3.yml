@@ -131,6 +131,7 @@
       enabled: yes
   when:
       - rhel_08_010471
+      - "'rng-tools' in ansible_facts.packages"
   tags:
       - RHEL-08-010471
       - CAT3
