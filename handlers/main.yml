@@ -33,16 +33,17 @@
 
 - name: confirm grub2 user cfg
   stat:
-      path: /boot/grub2/user.cfg
+      path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
   register: rhel8stig_grub2_user_cfg
+  changed_when: rhel8stig_grub2_user_cfg.stat.exists
   notify: make grub2 config
 
 - name: make grub2 config
   command: /usr/sbin/grub2-mkconfig --output={{ rhel8stig_grub_cfg_path }}
   when:
-      - rhel7stig_grub2_user_cfg.stat.exists
-      - not rhel7stig_skip_for_travis
-      - not rhel7stig_system_is_container
+      - rhel8stig_grub2_user_cfg.stat.exists
+      - not rhel8stig_skip_for_travis
+      - not rhel8stig_system_is_container
 
 - name: copy grub2 config to BIOS/UEFI to satisfy benchmark
   listen: make grub2 config
