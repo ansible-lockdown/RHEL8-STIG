@@ -78,8 +78,8 @@ audit_cmd_timeout: 60000
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
-rhel_08_010140: true
-rhel_08_010150: true
+rhel_08_010140: false
+rhel_08_010150: false
 rhel_08_010370: true
 rhel_08_010371: true
 rhel_08_010460: true
