@@ -1,5 +1,5 @@
 ---
-- hosts: app1
+- hosts: all
   become: true
   vars:
       is_container: false
