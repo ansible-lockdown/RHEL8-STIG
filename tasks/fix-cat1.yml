@@ -152,15 +152,15 @@
             mode: 0640
         notify: confirm grub2 user cfg
 
-      - name: |
-            "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
-            "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
-        lineinfile:
-            dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
-            regexp: '^set superusers'
-            line: 'set superusers="{{ rhel8stig_boot_superuser }}"'
-            insertafter: '### BEGIN /etc/grub.d/01_users ###'
-        notify: confirm grub2 user cfg
+      # - name: |
+      #       "RHEL-08-010140 | HIGH | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set UEFI superusers"
+      #       "RHEL-08-010150 | HIGH | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set UEFI superusers"
+      #   lineinfile:
+      #       dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
+      #       regexp: '^set superusers'
+      #       line: 'set superusers="{{ rhel8stig_boot_superuser }}"'
+      #       insertafter: '### BEGIN /etc/grub.d/01_users ###'
+      #   notify: confirm grub2 user cfg
   when:
       - not system_is_ec2
       - rhel_08_010140 or
@@ -289,22 +289,11 @@
       - V-230329
 
 - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
-  block:
-      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Remove nullok"
-        replace:
-            path: "{{ item }}"
-            regexp: ' nullok'
-            replace: ''
-        with_items:
-            - /etc/pam.d/system-auth
-            - /etc/pam.d/password-auth
-
-      - name: "RHEL-08-020330 | HIGH | PATCH | RHEL 8 must not have accounts configured with blank or null passwords. | Set PermitEmptyPasswords to no"
-        lineinfile:
-            path: /etc/ssh/sshd_config
-            regexp: '(?i)^#?PermitEmptyPasswords'
-            line: 'PermitEmptyPasswords no'
-        notify: restart sshd
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?PermitEmptyPasswords'
+      line: 'PermitEmptyPasswords no'
+  notify: restart sshd
   when:
       - rhel_08_020330
       - rhel8stig_disruption_high
@@ -316,6 +305,39 @@
       - SV-230380r627750_rule
       - V-230380
       - disruption_high
+
+- name: "RHEL-08-020331 | HIGH | PATCH | RHEL 8 must not allow blank or null passwords in the system-auth file."
+  replace:
+      path: etc/pam.d/system-auth
+      regexp: ' nullok'
+      replace: ''
+  with_items:
+      - /etc/pam.d/system-auth
+      - /etc/pam.d/password-auth
+  when:
+      - rhel_08_020331
+  tags:
+      - RHEL-08-020331
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244540r743869_rule
+      - V-244540
+
+- name: "RHEL-08-020332 | HIGH | RHEL 8 must not allow blank or null passwords in the password-auth file."
+  replace:
+      path: etc/pam.d/password-auth
+      regexp: ' nullok'
+      replace: ''
+  when:
+      - rhel_08_020332
+  tags:
+      - RHEL-08-020332
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244541r743872_rule
+      - V-244541
 
 - name: "RHEL-08-040000 | HIGH | PATCH | RHEL 8 must not have the telnet-server package installed."
   package:
