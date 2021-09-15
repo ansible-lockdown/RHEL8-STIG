@@ -11,7 +11,7 @@
       - CAT1
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230221r627750_rule
+      - SV-230221r743913_rule
       - V-230221
 
 - name: "RHEL-08-010020 | HIGH | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
@@ -126,7 +126,8 @@
             - rhel_08_010020_audit is failed
             - not ansible_check_mode or
               rhel_08_010020_audit.rc > 1
-  when: rhel_08_010020
+  when:
+      - rhel_08_010020
   tags:
       - RHEL-08-010020
       - CAT1
@@ -171,8 +172,8 @@
       - CAT1
       - CCI-000213
       - SRG-OS-000080-GPOS-00048
-      - SV-230234r627750_rule
-      - SV-230235r627750_rule
+      - SV-230234r743922_rule
+      - SV-230235r743925_rule
       - V-230234
       - V-230235
       - grub
@@ -302,7 +303,7 @@
       - CAT1
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230380r627750_rule
+      - SV-230380r743993_rule
       - V-230380
       - disruption_high
 
