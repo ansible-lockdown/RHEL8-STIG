@@ -1,4 +1,5 @@
 ---
+
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
   dnf:
       name: policycoreutils
@@ -124,21 +125,39 @@
       - SV-230281r627750_rule
       - V-230281
 
-- name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
-  systemd:
-      name: rngd.service
-      state: started
-      enabled: yes
+- name: |
+    "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service.
+     LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+  block:
+      - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service
+        package:
+            name: rng-tools
+            state: present
+        when:
+            - rhel_08_010472
+            - "'rng-tools' not in ansible_facts.packages"
+
+      - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
+        systemd:
+            name: rngd.service
+            state: started
+            enabled: yes
+        when:
+            - rhel_08_010471
+            - "'rng-tools' in ansible_facts.packages"
   when:
-      - rhel_08_010471
-      - "'rng-tools' in ansible_facts.packages"
+      - rhel_08_010471 or
+        rhel_08_010472
   tags:
       - RHEL-08-010471
+      - RHEL-08-010472
       - CAT3
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
       - SV-230285r627750_rule
+      - SV-244527r743830_rule
       - V-230285
+      - V-244527
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
@@ -347,7 +366,8 @@
       - RHEL-08-030602
       - CAT3
       - CCI-001849
-      - SV-230469r627750_rule
+      - SRG-OS-000341-GPOS-00132
+      - SV-230469r744004_rule
       - V-230469
       - grub
 
@@ -367,7 +387,7 @@
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230470r627750_rule
+      - SV-230470r744006_rule
       - V-230470
       - usb
 
@@ -517,7 +537,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r627750_rule
+      - SV-230496r744017_rule
       - V-230496
       - modprobe
       - sctp
@@ -615,13 +635,11 @@
   tags:
       - CAT3
       - RHEL-08-040300
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230551r627750_rule
-      - V-230551
       - RHEL-08-040310
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
+      - SV-230551r627750_rule
       - SV-230552r627750_rule
+      - V-230551
       - V-230552
       - aide
