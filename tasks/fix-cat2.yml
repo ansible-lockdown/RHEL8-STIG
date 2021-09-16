@@ -71,22 +71,22 @@
         tags:
             - CAT2
             - RHEL-08-010040
-            - CCI-000048
-            - SRG-OS-000023-GPOS-00006
-            - SV-230226r627750_rule
-            - V-230226
             - RHEL-08-010060
             - CCI-000048
             - SRG-OS-000023-GPOS-00006
+            - SV-230225r627750_rule
             - SV-230227r627750_rule
+            - V-230225
             - V-230227
 
+
+# !!!!!!!REMOVE Banner-message-enable part. That moves to 010049
 - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
   copy:
       dest: /etc/dconf/db/local.d/01-banner-message
       content: |
           [org/gnome/login-screen]
-          banner-message-enable=true
+          # banner-message-enable=true
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
       mode: '0644'
       owner: root
@@ -103,7 +103,7 @@
       - CAT2
       - CCI-000048
       - SRG-OS-000023-GPOS-00006
-      - SV-230226r627750_rule
+      - SV-230226r743916_rule
       - V-230226
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
@@ -223,17 +223,18 @@
       - V-230232
       - disruption_high
 
-- name: "MEDIUM | RHEL-08-010130 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all created passwords."
+# !!!!!!!!!remove with items. Leaveing that there for 010131 referrence. 
+- name: "MEDIUM | RHEL-08-010130 | PATCH | The RHEL 8 password-auth file must be configured to use a sufficient number of hashing rounds."
   pamd:
-      name: "{{ item }}"
+      name: password-auth
       type: password
       control: sufficient
       module_path: pam_unix.so
       module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
       state: args_present
-  with_items:
-      - password-auth
-      - system-auth
+  # with_items:
+  #     - password-auth
+  #     - system-auth
   when:
       - rhel_08_010130
   tags:
@@ -241,7 +242,7 @@
       - CAT2
       - CCI-000196
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r627750_rule
+      - SV-230233r743919_rule
       - V-230233
       - pamd
 
@@ -261,21 +262,22 @@
       - CAT2
       - CCI-000213
       - SRG-OS-000080-GPOS-00048
-      - SV-230236r627750_rule
+      - SV-230236r743928_rule
       - V-230236
       - systemd
 
+# !!!!!!!!!!Remove with_items. Left there for reference in 010159
 - name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
   pamd:
-      name: "{{ item }}"
+      name: password-auth"
       type: password
       control: sufficient
       module_path: pam_unix.so
       module_arguments: sha512
       state: args_present
-  with_items:
-      - password-auth
-      - system-auth
+  # with_items:
+  #     - password-auth
+  #     - system-auth
   when:
       - rhel_08_010160
   tags:
@@ -283,13 +285,13 @@
       - CAT2
       - CCI-000803
       - SRG-OS-000120-GPOS-00061
-      - SV-230237r627750_rule
+      - SV-230237r743931_rule
       - V-230237
       - pamd
 
 - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
   block:
-      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
+      - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
         find:
             path: /
             patterns: '*.keytab'
@@ -344,14 +346,14 @@
   tags:
       - CAT2
       - RHEL-08-010170
-      - CCI-001084
-      - SRG-OS-000134-GPOS-00068
-      - SV-230240r627750_rule
-      - V-230240
       - RHEL-08-010450
+      - CCI-001084
       - CCI-002696
+      - SRG-OS-000134-GPOS-00068
       - SRG-OS-000445-GPOS-00199
+      - SV-230240r627750_rule
       - SV-230282r627750_rule
+      - V-230240
       - V-230282
       - selinux
       - disruption_high
@@ -407,15 +409,16 @@
       - V-230243
       - permissions
 
+# !!!!! Remove with_items. Keeping as reference for 010201
 - name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
+      regexp: '(?i)^#?ClientAliveCountMax.*'
+      line: ClientAliveCountMax 0
   notify: restart sshd
-  with_items:
-      - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
-      - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
+  # with_items:
+  #     - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
+  #     - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
   when:
       - rhel_08_010200
       - rhel8stig_ssh_required
@@ -424,7 +427,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r627750_rule
+      - SV-230244r743934_rule
       - V-230244
       - ssh
 
@@ -436,7 +439,7 @@
       path: /var/log/messages
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_var_log_messages_perm }}"
   when:
       - rhel_08_010210 or
         rhel_08_010220 or
@@ -444,19 +447,15 @@
   tags:
       - CAT2
       - RHEL-08-010210
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230245r627750_rule
-      - V-230245
       - RHEL-08-010220
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230246r627750_rule
-      - V-230246
       - RHEL-08-010230
       - CCI-001314
       - SRG-OS-000206-GPOS-00084
+      - SV-230245r627750_rule
+      - SV-230246r627750_rule
       - SV-230247r627750_rule
+      - V-230245
+      - V-230246
       - V-230247
       - permissions
 
@@ -468,7 +467,7 @@
       path: /var/log
       owner: root
       group: root
-      mode: '0755'
+      mode: "{{ rhel8stig_var_log_perm }}"
   when:
       - rhel_08_010240 or
         rhel_08_010250 or
@@ -476,22 +475,19 @@
   tags:
       - CAT2
       - RHEL-08-010240
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230248r627750_rule
-      - V-230248
       - RHEL-08-010250
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230249r627750_rule
-      - V-230249
       - RHEL-08-010260
       - CCI-001314
       - SRG-OS-000206-GPOS-00084
+      - SV-230248r627750_rule
+      - SV-230249r627750_rule
       - SV-230250r627750_rule
+      - V-230248
+      - V-230249
       - V-230250
       - permissions
 
+# !!!!!!!!Remove with_items. Leaving for reference if needed 
 - name: |
     "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
     "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections."
@@ -516,27 +512,25 @@
           "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
           "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
         lineinfile:
-            path: "{{ item.path }}"
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
+            path: /etc/crypto-policies/back-ends/opensshserver.config
+            regexp: '^CRYPTO_POLICY='
+            line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
         notify: change_requires_reboot
-        with_items:
-            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^Ciphers', line: "Ciphers {{ rhel8stig_ssh_cipher_settings }}" }
-            - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
+        # with_items:
+            # - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^Ciphers', line: "Ciphers {{ rhel8stig_ssh_cipher_settings }}" }
+            # - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
   when:
       - rhel_08_010290 or
         rhel_08_010291
   tags:
       - CAT2
       - RHEL-08-010290
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230251r646866_rule
-      - V-230251
       - RHEL-08-010291
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230252r646869_rule
+      - SV-230251r743937_rule
+      - SV-230252r743940_rule
+      - V-230251
       - V-230252
       - fips
 
@@ -627,7 +621,7 @@
             path: "{{ item }}"
             owner: root
             group: root
-            mode: '0755'
+            mode: "{{ rhel8stig_sys_commands_perm }}"
             force: yes
         with_items:
             - "{{ rhel_08_010300_commands.stdout_lines }}"
@@ -638,19 +632,15 @@
   tags:
       - CAT2
       - RHEL-08-010300
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230257r627750_rule
-      - V-230257
       - RHEL-08-010310
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230258r627750_rule
-      - V-230258
       - RHEL-08-010320
       - CCI-001499
       - SRG-OS-000259-GPOS-00100
+      - SV-230257r627750_rule
+      - SV-230258r627750_rule
       - SV-230259r627750_rule
+      - V-230257
+      - V-230258
       - V-230259
       - permissions
 
@@ -678,7 +668,7 @@
             path: "{{ item }}"
             owner: root
             group: root
-            mode: '0755'
+            mode: "{{ rhel8stig_lib_file_perm }}"
         with_items:
             - "{{ rhel_08_010330_library_files.stdout_lines }}"
   when:
@@ -688,19 +678,15 @@
   tags:
       - CAT2
       - RHEL-08-010330
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230260r627750_rule
-      - V-230260
       - RHEL-08-010340
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230261r627750_rule
-      - V-230261
       - RHEL-08-010350
       - CCI-001499
       - SRG-OS-000259-GPOS-00100
+      - SV-230260r627750_rule
+      - SV-230261r627750_rule
       - SV-230262r627750_rule
+      - V-230260
+      - V-230261
       - V-230262
       - permissions
 
@@ -866,22 +852,24 @@
       - RHEL-08-010381
       - CAT2
       - CCI-002038
+      - SRG-OS-000373-GPOS-00156
       - SV-230272r627750_rule
       - V-230272
       - sudoers
 
+# !!!!!New version does not have GUI packages included in fix text. I removed it for now but I might add it back later
 - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
-  block:
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
-        package:
-            name: esc
-            state: present
-        when: rhel8stig_gui
+  # block:
+  #     - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
+  #       package:
+  #           name: esc
+  #           state: present
+  #       when: rhel8stig_gui
 
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
-        package:
-            name: openssl-pkcs11
-            state: present
+  #     - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
+  package:
+      name: openssl-pkcs11
+      state: present
   when:
       - rhel_08_010390
       - "'openssl-pkcs11' not in ansible_facts.packages"
@@ -890,7 +878,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230273r627750_rule
+      - SV-230273r743943_rule
       - V-230273
       - multifactor
 
@@ -913,7 +901,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230274r627750_rule
+      - SV-230274r743945_rule
       - V-230274
       - multifactor
 
@@ -927,6 +915,7 @@
       - RHEL-08-010410
       - CAT2
       - CCI-001953
+      - SRG-OS-000376-GPOS-00161
       - SV-230275r627750_rule
       - V-230275
       - opensc
@@ -1033,7 +1022,8 @@
       - RHEL-08-010422
       - CAT2
       - CCI-001084
-      - SV-230278r627750_rule
+      - SRG-OS-000134-GPOS-00068
+      - SV-230278r743948_rule
       - V-230278
       - grub
 
@@ -1113,7 +1103,7 @@
       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
-            mode: '0644'
+            mode: "{{ rhel8stig_ssh_pub_key_perm }}"
         with_items:
             - "{{ rhel_08_010480_public_files.files }}"
         notify: restart sshd
@@ -1129,9 +1119,7 @@
       - V-230286
       - ssh
 
-# This control asks for permissions to be set to 0640. However that is the incorrect permission for that file and will cause issues.
-# The title is left to match the incorrect value in the STIG but the actual value set is adjusted to correct permissions
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
         find:
@@ -1144,10 +1132,10 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
-            mode: '0600'
+            mode: "{{ rhel8stig_ssh_priv_key_perm }}"
         with_items:
             - "{{ rhel_08_010490_private_host_key_files.files }}"
         notify: restart sshd
@@ -1159,7 +1147,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230287r627750_rule
+      - SV-230287r743951_rule
       - V-230287
       - ssh
 
@@ -1195,7 +1183,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230289r627750_rule
+      - SV-230289r743954_rule
       - V-230289
       - ssh
 
@@ -1217,14 +1205,15 @@
       - V-230290
       - ssh
 
-- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow unused methods of authentication."
+# !!!!!!!!!!Remove wtih_items. leaveing as a referecne for when I create 010522
+- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow Kerberos authentication, except to fulfill documented and validated mission requirements."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-  with_items:
-      - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
-      - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
+      regexp: '(?i)^#?KerberosAuthentication'
+      line: "KerberosAuthentication no"
+  # with_items:
+  #     - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
+  #     - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -1233,7 +1222,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230291r627750_rule
+      - SV-230291r743957_rule
       - V-230291
       - ssh
 
@@ -1349,7 +1338,8 @@
       - RHEL-08-010571
       - CAT2
       - CCI-000366
-      - SV-230300r627750_rule
+      - SRG-OS-000480-GPOS-00227
+      - SV-230300r743959_rule
       - V-230300
       - mounts
       - boot
@@ -1763,7 +1753,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230313r627750_rul
+      - SV-230313r627750_rule
       - V-230313
       - security
       - limits
@@ -1921,7 +1911,7 @@
       - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Set permissions"
         file:
             path: "{{ item }}"
-            owner: root
+            owner: "{{ rhel8stig_ww_dir_owner }}"
         with_items:
             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
         when: rhel_08_010700_world_writable_directories.stdout | length > 0
@@ -1932,7 +1922,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230318r627750_rule
+      - SV-230318r743960_rule
       - V-230318
       - permissions
 
@@ -1947,7 +1937,7 @@
       - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Set permissions"
         file:
             path: "{{ item }}"
-            group: root
+            group: "{{ rhel8stig_ww_dir_grpowner }}"
         with_items:
             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
         when: rhel_08_010710_world_writable_directories.stdout | length > 0
@@ -1958,7 +1948,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230319r627750_rule
+      - SV-230319r743961_rule
       - V-230319
       - permissions
 
@@ -2002,7 +1992,7 @@
       - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
         file:
             path: "{{ item }}"
-            mode: 0750
+            mode: "{{ rhel8stig_local_int_home_perms }}"
         with_items:
             - "{{ rhel_08_010730_home_directories.stdout_lines }}"
         when: rhel_08_010730_home_directories.stdout | length > 0
@@ -2034,7 +2024,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230322r627750_rule
+      - SV-230322r743963_rule
       - V-230322
       - permissions
 
@@ -2078,7 +2068,7 @@
 - name: "MEDIUM | RHEL-08-010770 | PATCH | All RHEL 8 local initialization files must have mode 0740 or less permissive."
   file:
       path: "{{ item }}"
-      mode: 0740
+      mode: "{{ rhel8stig_local_int_perm }}"
   with_items:
       - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
   when:

@@ -478,12 +478,63 @@ rhel8stig_smartcard: false
 # Configure your smartcard driver
 rhel8stig_smartcarddriver: cackey
 
+# RHEL-08-010210
+# rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
+# To conform to STIG standards this needs to be 0640 or more restrictive
+rhel8stig_var_log_messages_perm: 0640
+
+# RHEL-08-010240
+# rhel8stig_var_log_perm is the permissions the /var/log file is set to.
+# To conform to STIG standards this needs to be 0755 or more restrictive
+rhel8stig_var_log_perm: 0755
+
+# RHEL-08-010300
+# rhel8stig_sys_commands_perm is the permissions the system comments will have
+# To conform to STIG standards this needs to be set to 0755 or more restrictive
+rhel8stig_sys_commands_perm: 0755
+
+# RHEL-08-010330
+# rhel8stig_lib_file_perm is the permissions teh library files will be set to
+# To conform to STIG standards this needs to be set to 0755 or more restrictive
+rhel8stig_lib_file_perm: 0755
+
+# RHEL-08-010480
+# rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
+# To conform to STIG standards this needs to be set to 0644 or less permissive
+rhel8stig_ssh_pub_key_perm: 0644
+
+# RHEL-08-010490
+# rhel8stig_ssh_priv_key_perm are the permssions set to the SSH private host keys
+# To conform to STIG standards this needs to be set to 0600 or less permissive
+rhel8stig_ssh_priv_key_perm: 0600
+
 # RHEL-08-010690
 # Set standard user paths here
 # Also set whether we should automatically remediate paths in user ini files.
 # rhel_08_020720_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
+
+
+# RHEL-08-010700
+# rhel8stig_ww_dir_owner is the owenr of all world-writable directories
+# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
+rhel8stig_ww_dir_owner: root
+
+# RHEL-08-010710
+# rhel8stig_ww_dir_grpowner is the owenr of all world-writable directories
+# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
+rhel8stig_ww_dir_grpowner: root
+
+# RHEL-08-010730
+# rhel8stig_local_int_home_perms is the permissions set to local interactive user home directories
+# To conform to STIG standards this needs to be set to 0750 more less permissive
+rhel8stig_local_int_home_perms: 0750
+
+# RHEL-08-010770
+# rhel8stig_local_int_perm is the permissions set to the local initialization files
+# To connform to STIG standards this needs to be set to 0740 or less permissive
+rhel8stig_local_int_perm: 0740
 
 # RHEL-08-020250
 # This is a check for a "supported release"
