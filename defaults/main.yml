@@ -478,6 +478,9 @@ rhel8stig_smartcard: false
 # Configure your smartcard driver
 rhel8stig_smartcarddriver: cackey
 
+# IPv6 required
+rhel8stig_ipv6_required: true
+
 # RHEL-08-010210
 # rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
 # To conform to STIG standards this needs to be 0640 or more restrictive
@@ -530,6 +533,12 @@ rhel8stig_ww_dir_grpowner: root
 # rhel8stig_local_int_home_perms is the permissions set to local interactive user home directories
 # To conform to STIG standards this needs to be set to 0750 more less permissive
 rhel8stig_local_int_home_perms: 0750
+
+# RHEL-08-010731
+# rhel8stig_local_int_home_file_perms is the permissions set to files in the local interactive
+# user home directories. These are only set when rhel8stig_disruption_high is set to true
+# All files users home directories that are less restrictive than 0750 will be set to this value
+rhel8stig_local_int_home_file_perms: 750
 
 # RHEL-08-010770
 # rhel8stig_local_int_perm is the permissions set to the local initialization files
@@ -814,7 +823,7 @@ rhel8stig_interactive_uid_start: 1000
 # rhel8stig_ntp_server_name is the name of the NTP server
 rhel8stig_ntp_server_name: server.name
 
-# RHEL-08-040130
+# RHEL-08-040137
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
 rhel8stig_fapolicy_white_list:
     - deny all all

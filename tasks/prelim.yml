@@ -454,3 +454,7 @@
         when: modify_secontext.changed
   when:
       - rhel_08_020017
+
+- name: "PRELIM | Section 1.1 | Create list of mount points"
+  set_fact:
+      mount_names: "{{ ansible_mounts | map(attribute='mount') | list }}"
