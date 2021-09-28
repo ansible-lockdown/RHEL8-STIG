@@ -7598,3 +7598,144 @@
       - SV-244546r743887_rule
       - V-244546
       - fapolicy
+
+- name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+  block:
+      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects value 0 active"
+        sysctl:
+            name: net.ipv4.conf.default.accept_redirect
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects default value to 0 config"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.default.accept_redirect='
+            line: 'net.ipv4.conf.default.accept_redirect=0'
+      when:
+          - rhel_08_040209
+          - CAT2
+          - CI-000366
+          - SRG-OS-000480-GPOS-00227
+          - SV-244550r743899_rule
+          - V-244550
+          - ipv4
+
+- name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
+  block:
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route in sysctl"
+        sysctl:
+            name: net.ipv4.conf.all.accept_source_route
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.all.accept_source_routes='
+            line: 'net.ipv4.conf.all.accept_source_route=0'
+  when:
+      - rhel_08_040239
+  tags:
+      - RHEL-08-040239
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244551r743902_rule
+      - V-244551
+      - ip4
+
+- name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route in sysctl"
+        sysctl:
+            name: net.ipv4.conf.default.accept_source_route
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.default.accept_source_route='
+            line: 'net.ipv4.conf.default.accept_source_route=0'
+  when:
+      - rhel_08_040249
+  tags:
+      - RHEL-08-040249
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244552r743905_rule
+      - V-244552
+      - ipv4
+
+- name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
+  block:
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects in sysctl"
+        sysctl:
+            name: net.ipv4.conf.all.accept_redirects
+            state: present
+            value: '0'
+
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.all.accept_redirects='
+            line: 'net.ipv4.conf.all.accept_redirects=0'
+  when:
+      - rhel_08_040279
+  tags:
+      - RHEL-08-040279
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244553r743908_rule
+      - V-244553
+      - ipv4
+
+- name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
+  lineinfile:
+      path: /etc/sysctl.conf
+      regexp: '^net.core.bpf_jit_harden='
+      line: 'net.core.bpf_jit_harden=2'
+  notify: sysctl system
+  when:
+      - rhel_08_040286
+  tags:
+      - RHEL-08-040286
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244554r743911_rule
+      - V-244554
+
+- name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
+  block:
+      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
+        debug:
+            msg:
+                - "ALERT! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
+                - "McAfee is the suggested by STIG"
+        when:
+            - "'mcafeetp' not in ansible_facts.packages or
+              "'mfetpd' not in ansible_facts.packages
+
+      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
+        debug:
+            msg: "Congratulations! You have McAfee installed"
+        when:
+            - "'mcafeetp' in ansible_facts.packages or
+              "'mfetpd' in ansible_facts.packages
+  when:
+      - rhel_08_040286
+      - rhel8stig_av_sftw == 'mcafee'
+  tags:
+      - RHEL-08-010001
+      - CAT2
+      - CCI-001233
+      - SRG-OS-000191-GPOS-00080
+      - SV-245540r754730_rule
+      - V-245540

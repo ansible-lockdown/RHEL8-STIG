@@ -481,6 +481,11 @@ rhel8stig_smartcarddriver: cackey
 # IPv6 required
 rhel8stig_ipv6_required: true
 
+# RHEL-08-010001
+# rhel8stig_av_sftw is the AV software package. When set to mcafee it enables the check for these packages
+# When set to anything other than mcafee it will skip this control assuming localized threat prevention management
+rhel8stig_av_sftw: mcafee
+
 # RHEL-08-010210
 # rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
 # To conform to STIG standards this needs to be 0640 or more restrictive
