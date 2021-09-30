@@ -448,7 +448,7 @@
         shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
         register: modify_secontext
         when: faillock_secontext.stdout != '1'
-      
+
       - name: "PRELIM | RHEL-08-020017 | Set {{ rhel8stig_pam_faillock.dir }} selinux context"
         shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
         when: modify_secontext.changed
