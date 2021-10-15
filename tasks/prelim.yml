@@ -114,7 +114,8 @@
   vars:
       rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
   when:
-      - rhel_08_010740 or
+      - rhel_08_010731 or
+        rhel_08_010740 or
         rhel_08_010750 or
         rhel_08_020320
   tags:

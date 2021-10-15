@@ -393,7 +393,7 @@
 
 - name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
   pamd:
-      name: password-auth"
+      name: password-auth
       type: password
       control: sufficient
       module_path: pam_unix.so
@@ -2380,7 +2380,7 @@
         failed_when: false
         register: rhel_08_010731_files
         with_items:
-            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
+            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start|int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
 
       - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
         file:
@@ -2436,9 +2436,12 @@
       state: directory
       recurse: true
   with_items: "{{ rhel8stig_passwd }}"
+  loop_control:
+      label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010741
       - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - item.uid != 65534
   tags:
       - RHEL-08-010741
       - CAT2
@@ -6597,7 +6600,7 @@
   block:
       - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects value 0 active"
         sysctl:
-            name: net.ipv4.conf.default.accept_redirect
+            name: net.ipv4.conf.default.accept_redirects
             state: present
             value: '0'
         notify: change_requires_reboot
@@ -6605,8 +6608,8 @@
       - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects default value to 0 config"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.default.accept_redirect='
-            line: 'net.ipv4.conf.default.accept_redirect=0'
+            regexp: '^net.ipv4.conf.default.accept_redirects='
+            line: 'net.ipv4.conf.default.accept_redirects=0'
   when:
       - rhel_08_040209
   tags:

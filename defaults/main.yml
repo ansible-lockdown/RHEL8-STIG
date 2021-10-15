@@ -697,10 +697,6 @@ rhel8stig_pam_pwhistory:
     remember: 5
     retries: 3
 
-# !!!!!!!!! 020011 no longer uses dir, fail_for_root, interval, and unlock time. It only uses attempts, adjust these vars as needed
-# !!!!!!!!! 020013 no longer uses attempts, unlock_time, fail_for_root, and dir. It only uses interval
-# !!!!!!!!! 020015 no longer uses attempts, interval, fail_for_root, and dir. It only uses unlock_time
-# !!!!!!!!! 020017 no longer uses attempts, interval, unlock_time, and fail_for_root. It only uses dir
 # RHEL-08-020010
 # RHEL-08-020011
 # RHEL-08-020012
@@ -821,7 +817,7 @@ rhel8stig_path_to_sshkey: "/root/.ssh/"
 rhel8stig_sshd_compression: "no"
 
 # now in prelim
-rhel8stig_interactive_uid_start: 1000
+# rhel8stig_interactive_uid_start: '1000'
 
 # RHEL-08-030740
 # rhel8stig_ntp_server_name is the name of the NTP server
