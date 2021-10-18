@@ -1194,11 +1194,12 @@
       path: '{{ rhel8stig_sssd_conf }}'
       regexp: '^certificate_verification = {{ item.regexp }}'
       state: "{{ item.state }}"
+      line: "{{ item.line | default(omit) }}"
   with_items:
       - { regexp: 'no_ocsp, no_verification', state: absent }
       - { regexp: 'no_ocsp', state: absent }
       - { regexp: 'no_verification', state: absent }
-      - { regexp: 'ocsp_dgst=sha1', state: present }
+      - { regexp: 'ocsp_dgst=sha1', state: present, line: 'certificate_verification = ocsp_dgst=sha1' }
   notify: restart sssd
   when:
       - rhel8stig_sssd_conf_present.stat.exists
@@ -1269,6 +1270,9 @@
 
       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 as active"
         shell: grubby --update-kernel=ALL --args="page_poison=1"
+        when:
+            - (ansible_proc_cmdline.page_poison is defined and ansible_proc_cmdline.page_poison != '1') or
+              (ansible_proc_cmdline.page_poison is not defined)
 
       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if doesn't exist"
         lineinfile:
@@ -5618,8 +5622,7 @@
       - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
-      - /usr/sbin/audisp-remote p+i+n+u+g+s+b+acl+xattrs+sha512
-      - /usr/sbin/audisp-syslog p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
   when:
       - rhel_08_030650
