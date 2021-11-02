@@ -309,7 +309,7 @@
 
 - name: "RHEL-08-020331 | HIGH | PATCH | RHEL 8 must not allow blank or null passwords in the system-auth file."
   replace:
-      path: etc/pam.d/system-auth
+      path: /etc/pam.d/system-auth
       regexp: ' nullok'
       replace: ''
   with_items:
