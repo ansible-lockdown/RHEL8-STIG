@@ -6316,6 +6316,7 @@
             name: nftables
             state: started
             enabled: yes
+            masked: no
 
       - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
         lineinfile:
