@@ -836,7 +836,7 @@
 - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
   replace:
       path: "{{ item }}"
-      regexp: '^([^#].*)NOPASSWD(.*)'
+      regexp: '^([^#|{% if system_is_ec2 %}ec2-user{% endif %}].*)NOPASSWD(.*)'
       replace: '\1PASSWD\2'
   with_items:
       - "{{ rhel8stig_sudoers_files.stdout_lines }}"
