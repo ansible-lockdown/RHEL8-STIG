@@ -6374,23 +6374,6 @@
       - V-230527
       - sshd
 
-- name: "MEDIUM | RHEL-08-040162 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections by the client."
-  lineinfile:
-      path: /etc/ssh/ssh_config
-      regexp: '(?i)^#?RekeyLimit'
-      line: 'RekeyLimit 1G 1h'
-  notify: restart sshd
-  when:
-      - rhel_08_040162
-  tags:
-      - RHEL-08-040162
-      - CAT2
-      - CCI-000068
-      - SRG-OS-000033-GPOS-00014
-      - SV-230528r627750_rule
-      - V-230528
-      - sshd
-
 - name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
   systemd:
       name: debug-shell.service
