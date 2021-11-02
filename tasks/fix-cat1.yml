@@ -327,7 +327,7 @@
 
 - name: "RHEL-08-020332 | HIGH | RHEL 8 must not allow blank or null passwords in the password-auth file."
   replace:
-      path: etc/pam.d/password-auth
+      path: /etc/pam.d/password-auth
       regexp: ' nullok'
       replace: ''
   when:
