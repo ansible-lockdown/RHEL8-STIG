@@ -1,5 +1,31 @@
 ---
 
+- name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
+  block:
+      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
+        debug:
+            msg:
+                - "ALERT! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
+                - "McAfee is the suggested by STIG"
+        when:
+            - "'mcafeetp' or 'mfetpd' not in ansible_facts.packages"
+
+      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
+        debug:
+            msg: "Congratulations! You have McAfee installed"
+        when:
+            - "'mcafeetp' or 'mfetpd' in ansible_facts.packages"
+  when:
+      - rhel_08_040286
+      - rhel8stig_av_sftw == 'mcafee'
+  tags:
+      - RHEL-08-010001
+      - CAT2
+      - CCI-001233
+      - SRG-OS-000191-GPOS-00080
+      - SV-245540r754730_rule
+      - V-245540
+
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
   package:
       name: "*"
@@ -71,22 +97,41 @@
         tags:
             - CAT2
             - RHEL-08-010040
-            - CCI-000048
-            - SRG-OS-000023-GPOS-00006
-            - SV-230226r627750_rule
-            - V-230226
             - RHEL-08-010060
             - CCI-000048
             - SRG-OS-000023-GPOS-00006
+            - SV-230225r627750_rule
             - SV-230227r627750_rule
+            - V-230225
             - V-230227
+
+- name: "MEDIUM | RHEL-08-010049 | PATCH | RHEL 8 must display a banner before granting local or remote access to the system via a graphical user logon"
+  lineinfile:
+      path: /etc/dconf/db/local.d/01-banner-message
+      regexp: 'banner-message-enabled='
+      line: banner-message-enable=true
+      create: true
+      mode: '0644'
+      owner: root
+      group: root
+      insertafter: '[org/gnome/login-screen]'
+  notify: dconf update
+  when:
+      - rhel_08_010049
+  tags:
+      - RHEL-08-010049
+      - CAT2
+      - CCI-000048
+      - SRG-OS-000023-GPOS-00006
+      - SV-244519r743806_rule
+      - V-244519
+      - banner
 
 - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
   copy:
       dest: /etc/dconf/db/local.d/01-banner-message
       content: |
           [org/gnome/login-screen]
-          banner-message-enable=true
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
       mode: '0644'
       owner: root
@@ -103,13 +148,12 @@
       - CAT2
       - CCI-000048
       - SRG-OS-000023-GPOS-00006
-      - SV-230226r627750_rule
+      - SV-230226r743916_rule
       - V-230226
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
   lineinfile:
       path: /etc/rsyslog.conf
-      # regexp: "{{ item.regexp }}"
       line: "auth.*;authpriv.*;daemon.* /var/log/secure"
       create: yes
       mode: '0644'
@@ -223,17 +267,14 @@
       - V-230232
       - disruption_high
 
-- name: "MEDIUM | RHEL-08-010130 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all created passwords."
+- name: "MEDIUM | RHEL-08-010130 | PATCH | The RHEL 8 password-auth file must be configured to use a sufficient number of hashing rounds."
   pamd:
-      name: "{{ item }}"
+      name: password-auth
       type: password
       control: sufficient
       module_path: pam_unix.so
       module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
       state: args_present
-  with_items:
-      - password-auth
-      - system-auth
   when:
       - rhel_08_010130
   tags:
@@ -241,9 +282,55 @@
       - CAT2
       - CCI-000196
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r627750_rule
+      - SV-230233r743919_rule
       - V-230233
       - pamd
+
+- name: "MEDIUM | RHEL-08-010131 | PATCH | The RHEL 8 system-auth file must be configured to use a sufficient number of hashing rounds."
+  pamd:
+      name: system-auth
+      type: password
+      control: sufficient
+      module_path: pam_unix.so
+      module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
+      state: args_present
+  when:
+      - rhel_08_010131
+  tags:
+      - RHEL-08-010131
+      - CAT2
+      - CCI-000196
+      - SRG-OS-000073-GPOS-00041
+      - SV-244520r743809_rule
+      - V-244520
+      - pamd
+
+- name: |
+    "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
+    "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
+  lineinfile:
+      dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
+  notify: confirm grub2 user cfg
+  with_items:
+      - { regexp: '^set superusers', line: 'set superusers="{{ rhel8stig_boot_superuser }}"', insertafter: '### BEGIN /etc/grub.d/01_users ###' }
+      - { regexp: '^export superusers', line: 'export superusers', insertafter: '^set superusers' }
+      - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
+  when:
+      - rhel_08_010141 or
+        rhel_08_010141
+  tags:
+      - RHEL-08-010141
+      - RHEL-08-010149
+      - CAT2
+      - CCI-000213
+      - SRG-OS-000080-GPOS-00048
+      - SV-244521r743812_rule
+      - SV-244522r743815_rule
+      - V-244521
+      - V-244522
 
 - name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
   lineinfile:
@@ -261,21 +348,57 @@
       - CAT2
       - CCI-000213
       - SRG-OS-000080-GPOS-00048
-      - SV-230236r627750_rule
+      - SV-230236r743928_rule
       - V-230236
       - systemd
 
-- name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
+- name: "MEDIUM | RHEL-08-010152 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency mode."
+  lineinfile:
+      path: /usr/lib/systemd/system/emergency.service
+      regexp: '^ExecStart='
+      line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency"
+      create: yes
+      owner: root
+      group: root
+      mode: 0644
+  when:
+      - rhel_08_010152
+  tags:
+      - RHEL-08-010152
+      - CAT2
+      - CCI-000213
+      - SRG-OS-000080-GPOS-00048
+      - SV-244523r743818_rule
+      - V-244523
+      - systemd
+
+- name: "MEDIUM | RHEL-08-010159 | PATCH | The RHEL 8 pam_unix.so module must be configured in the system-auth file to use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
   pamd:
-      name: "{{ item }}"
+      name: system-auth
       type: password
       control: sufficient
       module_path: pam_unix.so
       module_arguments: sha512
       state: args_present
-  with_items:
-      - password-auth
-      - system-auth
+  when:
+      - rhel_08_010159
+  tags:
+      - RHEL-08-010159
+      - CAT2
+      - CCI-000803
+      - SRG-OS-000120-GPOS-00061
+      - SV-244524r743821_rule
+      - V-244524
+      - pamd
+
+- name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
+  pamd:
+      name: password-auth
+      type: password
+      control: sufficient
+      module_path: pam_unix.so
+      module_arguments: sha512
+      state: args_present
   when:
       - rhel_08_010160
   tags:
@@ -283,13 +406,13 @@
       - CAT2
       - CCI-000803
       - SRG-OS-000120-GPOS-00061
-      - SV-230237r627750_rule
+      - SV-230237r743931_rule
       - V-230237
       - pamd
 
 - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
   block:
-      - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
+      - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
         find:
             path: /
             patterns: '*.keytab'
@@ -344,14 +467,14 @@
   tags:
       - CAT2
       - RHEL-08-010170
-      - CCI-001084
-      - SRG-OS-000134-GPOS-00068
-      - SV-230240r627750_rule
-      - V-230240
       - RHEL-08-010450
+      - CCI-001084
       - CCI-002696
+      - SRG-OS-000134-GPOS-00068
       - SRG-OS-000445-GPOS-00199
+      - SV-230240r627750_rule
       - SV-230282r627750_rule
+      - V-230240
       - V-230282
       - selinux
       - disruption_high
@@ -410,12 +533,9 @@
 - name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
+      regexp: '(?i)^#?ClientAliveCountMax.*'
+      line: ClientAliveCountMax 0
   notify: restart sshd
-  with_items:
-      - { regexp: '(?i)^#?ClientAliveInterval.*', line: 'ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}'}
-      - { regexp: '(?i)^#?ClientAliveCountMax.*', line: 'ClientAliveCountMax 0' }
   when:
       - rhel_08_010200
       - rhel8stig_ssh_required
@@ -424,8 +544,26 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r627750_rule
+      - SV-230244r743934_rule
       - V-230244
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010201 | PATCH | The RHEL 8 SSH daemon must be configured with a timeout interval"
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?ClientAliveInterval.*'
+      line: ClientAliveCountMax 0
+  notify: restart sshd
+  when:
+      - rhel_08_010201
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-010201
+      - CAT2
+      - CCI-001133
+      - SRG-OS-000163-GPOS-00072
+      - SV-244525r743824_rule
+      - V-244525
       - ssh
 
 - name: |
@@ -436,7 +574,7 @@
       path: /var/log/messages
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_var_log_messages_perm }}"
   when:
       - rhel_08_010210 or
         rhel_08_010220 or
@@ -444,21 +582,146 @@
   tags:
       - CAT2
       - RHEL-08-010210
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230245r627750_rule
-      - V-230245
       - RHEL-08-010220
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230246r627750_rule
-      - V-230246
       - RHEL-08-010230
       - CCI-001314
       - SRG-OS-000206-GPOS-00084
+      - SV-230245r627750_rule
+      - SV-230246r627750_rule
       - SV-230247r627750_rule
+      - V-230245
+      - V-230246
       - V-230247
       - permissions
+
+- name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
+  block:
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"
+        lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set authfail"
+        lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set account faillock"
+        lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+  when:
+      - rhel_08_020025
+  tags:
+      - RHEL-08-020025
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-244533r743848_rule
+      - V-244533
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
+  block:
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"
+        lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^auth       required pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set authfail"
+        lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^auth       required pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set account faillock"
+        lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^account    required pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertafter: '^account'
+        notify: restart sssd
+  when:
+      - rhel_08_020026
+  tags:
+      - RHEL-08-020026
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-244534r743851_rule
+      - V-244534
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020031 | PATCH | RHEL 8 must initiate a session lock for graphical user interfaces when the screensaver is activated."
+  copy:
+      dest: /etc/dconf/db/local.d/00-screensaver_rhel_08_020031
+      content: |
+          [org/gnome/desktop/screensaver]
+          lock-delay=uint32 5
+      mode: '0644'
+  notify: dconf update
+  when:
+      - rhel_08_020031
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020031
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-244535r743854_rule
+      - V-244535
+      - dconf
+
+- name: "MEDIUM | RHEL-08-020032 | PATCH | RHEL 8 must disable the user list at logon for graphical user interfaces."
+  copy:
+      dest: /etc/dconf/db/local.d/02-login-screen_rhel_08_020032
+      content: |
+          [org/gnome/login-screen]
+          disable-user-list=true
+      mode: '0644'
+  when:
+      - rhel_08_020032
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020032
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244536r743857_rule
+      - V-244536
+      - dconf
+
+- name: "MEDIUM | RHEL-08-020039 | PATCH | RHEL 8 must have the tmux package installed."
+  package:
+      name: tmux
+      state: present
+  when:
+      - rhel_08_020032
+      - "'tmux' not in ansible_facts.packages"
+  tags:
+      - RHEL-08-020039
+      - CAT2
+      - CCI-000056
+      - SRG-OS-000028-GPOS-00009
+      - SV-244537r743860_rule
+      - V-244537
+      - tmux
 
 - name: |
         "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
@@ -468,7 +731,7 @@
       path: /var/log
       owner: root
       group: root
-      mode: '0755'
+      mode: "{{ rhel8stig_var_log_perm }}"
   when:
       - rhel_08_010240 or
         rhel_08_010250 or
@@ -476,21 +739,73 @@
   tags:
       - CAT2
       - RHEL-08-010240
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230248r627750_rule
-      - V-230248
       - RHEL-08-010250
-      - CCI-001314
-      - SRG-OS-000206-GPOS-00084
-      - SV-230249r627750_rule
-      - V-230249
       - RHEL-08-010260
       - CCI-001314
       - SRG-OS-000206-GPOS-00084
+      - SV-230248r627750_rule
+      - SV-230249r627750_rule
       - SV-230250r627750_rule
+      - V-230248
+      - V-230249
       - V-230250
       - permissions
+
+- name: "MEDIUM | RHEL-08-020081 | PATCH | RHEL 8 must prevent a user from overriding the session idle-delay setting for the graphical user interface."
+  copy:
+      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020081
+      content: |
+          /org/gnome/desktop/session/idle-delay
+      mode: '0644'
+  notify: dconf update
+  when:
+      - rhel_08_020081
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020081
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-244538r743863_rule
+      - V-244538
+
+- name: "MEDIUM | RHEL-08-020082 | PATCH | RHEL 8 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
+  copy:
+      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020082
+      content: |
+          /org/gnome/desktop/screensaver/lock-enabled
+      mode: '0644'
+  notify: dconf update
+  when:
+      - rhel_08_020082
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020082
+      - CAT2
+      - CCI-000057
+      - SRG-OS-000029-GPOS-00010
+      - SV-244539r743866_rule
+      - V-244539
+      - dconf
+
+- name: "MEDIUM | RHEL-08-010287 | PATCH | The RHEL 8 SSH daemon must be configured to use system-wide crypto policies."
+  lineinfile:
+      path: /etc/sysconfig/sshd
+      regexp: '^CRYPTO_POLICY='
+      line: '# CRYPTO_POLICY='
+  notify: change_requires_reboot
+  when:
+      - rhel_08_010287
+  tags:
+      - RHEL-08-010287
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-244526r743827_rule
+      - V-244526
+      - ssh
 
 - name: |
     "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
@@ -516,27 +831,22 @@
           "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
           "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
         lineinfile:
-            path: "{{ item.path }}"
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
+            path: /etc/crypto-policies/back-ends/opensshserver.config
+            regexp: '^CRYPTO_POLICY='
+            line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
         notify: change_requires_reboot
-        with_items:
-            - { path: /etc/crypto-policies/back-ends/openssh.config, regexp: '^Ciphers', line: "Ciphers {{ rhel8stig_ssh_cipher_settings }}" }
-            - { path: /etc/crypto-policies/back-ends/opensshserver.config, regexp: '^CRYPTO_POLICY=', line: "CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'" }
   when:
       - rhel_08_010290 or
         rhel_08_010291
   tags:
       - CAT2
       - RHEL-08-010290
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230251r646866_rule
-      - V-230251
       - RHEL-08-010291
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230252r646869_rule
+      - SV-230251r743937_rule
+      - SV-230252r743940_rule
+      - V-230251
       - V-230252
       - fips
 
@@ -627,7 +937,7 @@
             path: "{{ item }}"
             owner: root
             group: root
-            mode: '0755'
+            mode: "{{ rhel8stig_sys_commands_perm }}"
             force: yes
         with_items:
             - "{{ rhel_08_010300_commands.stdout_lines }}"
@@ -638,19 +948,15 @@
   tags:
       - CAT2
       - RHEL-08-010300
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230257r627750_rule
-      - V-230257
       - RHEL-08-010310
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230258r627750_rule
-      - V-230258
       - RHEL-08-010320
       - CCI-001499
       - SRG-OS-000259-GPOS-00100
+      - SV-230257r627750_rule
+      - SV-230258r627750_rule
       - SV-230259r627750_rule
+      - V-230257
+      - V-230258
       - V-230259
       - permissions
 
@@ -678,7 +984,7 @@
             path: "{{ item }}"
             owner: root
             group: root
-            mode: '0755'
+            mode: "{{ rhel8stig_lib_file_perm }}"
         with_items:
             - "{{ rhel_08_010330_library_files.stdout_lines }}"
   when:
@@ -688,19 +994,15 @@
   tags:
       - CAT2
       - RHEL-08-010330
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230260r627750_rule
-      - V-230260
       - RHEL-08-010340
-      - CCI-001499
-      - SRG-OS-000259-GPOS-00100
-      - SV-230261r627750_rule
-      - V-230261
       - RHEL-08-010350
       - CCI-001499
       - SRG-OS-000259-GPOS-00100
+      - SV-230260r627750_rule
+      - SV-230261r627750_rule
       - SV-230262r627750_rule
+      - V-230260
+      - V-230261
       - V-230262
       - permissions
 
@@ -866,22 +1168,15 @@
       - RHEL-08-010381
       - CAT2
       - CCI-002038
+      - SRG-OS-000373-GPOS-00156
       - SV-230272r627750_rule
       - V-230272
       - sudoers
 
 - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
-  block:
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install GUI related packages"
-        package:
-            name: esc
-            state: present
-        when: rhel8stig_gui
-
-      - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed. | Install non-GUI related packages"
-        package:
-            name: openssl-pkcs11
-            state: present
+  package:
+      name: openssl-pkcs11
+      state: present
   when:
       - rhel_08_010390
       - "'openssl-pkcs11' not in ansible_facts.packages"
@@ -890,7 +1185,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230273r627750_rule
+      - SV-230273r743943_rule
       - V-230273
       - multifactor
 
@@ -899,11 +1194,12 @@
       path: '{{ rhel8stig_sssd_conf }}'
       regexp: '^certificate_verification = {{ item.regexp }}'
       state: "{{ item.state }}"
+      line: "{{ item.line | default(omit) }}"
   with_items:
       - { regexp: 'no_ocsp, no_verification', state: absent }
       - { regexp: 'no_ocsp', state: absent }
       - { regexp: 'no_verification', state: absent }
-      - { regexp: 'ocsp_dgst=sha1', state: present }
+      - { regexp: 'ocsp_dgst=sha1', state: present, line: 'certificate_verification = ocsp_dgst=sha1' }
   notify: restart sssd
   when:
       - rhel8stig_sssd_conf_present.stat.exists
@@ -913,7 +1209,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230274r627750_rule
+      - SV-230274r743945_rule
       - V-230274
       - multifactor
 
@@ -927,6 +1223,7 @@
       - RHEL-08-010410
       - CAT2
       - CCI-001953
+      - SRG-OS-000376-GPOS-00161
       - SV-230275r627750_rule
       - V-230275
       - opensc
@@ -973,6 +1270,9 @@
 
       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 as active"
         shell: grubby --update-kernel=ALL --args="page_poison=1"
+        when:
+            - (ansible_proc_cmdline.page_poison is defined and ansible_proc_cmdline.page_poison != '1') or
+              (ansible_proc_cmdline.page_poison is not defined)
 
       - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Set page poison 1 for kernel updates if doesn't exist"
         lineinfile:
@@ -1033,7 +1333,8 @@
       - RHEL-08-010422
       - CAT2
       - CCI-001084
-      - SV-230278r627750_rule
+      - SRG-OS-000134-GPOS-00068
+      - SV-230278r743948_rule
       - V-230278
       - grub
 
@@ -1113,7 +1414,7 @@
       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
-            mode: '0644'
+            mode: "{{ rhel8stig_ssh_pub_key_perm }}"
         with_items:
             - "{{ rhel_08_010480_public_files.files }}"
         notify: restart sshd
@@ -1129,9 +1430,7 @@
       - V-230286
       - ssh
 
-# This control asks for permissions to be set to 0640. However that is the incorrect permission for that file and will cause issues.
-# The title is left to match the incorrect value in the STIG but the actual value set is adjusted to correct permissions
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
         find:
@@ -1144,10 +1443,10 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
-            mode: '0600'
+            mode: "{{ rhel8stig_ssh_priv_key_perm }}"
         with_items:
             - "{{ rhel_08_010490_private_host_key_files.files }}"
         notify: restart sshd
@@ -1159,7 +1458,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230287r627750_rule
+      - SV-230287r743951_rule
       - V-230287
       - ssh
 
@@ -1195,7 +1494,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230289r627750_rule
+      - SV-230289r743954_rule
       - V-230289
       - ssh
 
@@ -1217,14 +1516,11 @@
       - V-230290
       - ssh
 
-- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow unused methods of authentication."
+- name: "MEDIUM | RHEL-08-010521 | PATCH | The RHEL 8 SSH daemon must not allow Kerberos authentication, except to fulfill documented and validated mission requirements."
   lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-  with_items:
-      - { regexp: '(?i)^#?KerberosAuthentication', line: "KerberosAuthentication no" }
-      - { regexp: '(?i)^#?GSSAPIAuthentication', line: "GSSAPIAuthentication no" }
+      regexp: '(?i)^#?KerberosAuthentication'
+      line: "KerberosAuthentication no"
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -1233,8 +1529,24 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230291r627750_rule
+      - SV-230291r743957_rule
       - V-230291
+      - ssh
+
+- name: "MEDIUM | RHEL-08-010522 | PATCH | The RHEL 8 SSH daemon must not allow GSSAPI authentication, except to fulfill documented and validated mission requirements."
+  lineinfile:
+      path: /etc/ssh/sshd_config
+      regexp: '(?i)^#?GSSAPIAuthentication'
+      line: "GSSAPIAuthentication no"
+  when:
+      - rhel_08_010522
+  tags:
+      - RHEL-08-010522
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244528r743833_rule
+      - V-244528
       - ssh
 
 - name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
@@ -1257,6 +1569,30 @@
       - complexity-high
       - mount
       - tmp
+
+- name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp."
+  block:
+      - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp. | Alert on missing mount"
+        debug:
+            msg: "Warning! /var/tmp does not exist, /var/tmp needs to use a sperate file system. This is a manual task"
+        register: var_tmp_mount_absent
+        changed_when: var_tmp_mount_absent.skipped is defined
+        when: "'/var/tmp' not in mount_names"
+
+      - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp. | Mount is present"
+        debug:
+            msg: "Congratulations: /var/tmp does exist."
+        when: "'/var/tmp' in mount_names"
+  when:
+      - rhel_08_010544
+  tags:
+      - RHEL-08-010544
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244529r743836_rule
+      - V-244529
+      - mounts
 
 - name: "MEDIUM | RHEL-08-010550 | PATCH | The RHEL 8 must not permit direct logons to the root account using remote access via SSH."
   lineinfile:
@@ -1349,10 +1685,34 @@
       - RHEL-08-010571
       - CAT2
       - CCI-000366
-      - SV-230300r627750_rule
+      - SRG-OS-000480-GPOS-00227
+      - SV-230300r743959_rule
       - V-230300
       - mounts
       - boot
+
+- name: "MEDIUM | RHEL-08-010572 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory."
+  mount:
+      path: /boot/efi
+      state: mounted
+      src: "{{ boot_efi_mount.device }}"
+      fstype: "{{ boot_efi_mount.fstype }}"
+      opts: "{{ boot_efi_mount.options }},nosuid"
+  when:
+      - rhel_08_010572
+      - ansible_mounts | selectattr('mount', 'match', '^/boot/efi$') | list | length != 0
+      - "'nosuid' not in boot_efi_mount.options"
+  vars:
+      boot_efi_mount: "{{ ansible_mounts | json_query('[?mount == `/boot/efi`] | [0]') }}"
+  tags:
+      - RHEL-08-010572
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244530r743839_rule
+      - V-244530
+      - mounts
+      - efi
 
 - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions."
   block:
@@ -1763,7 +2123,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230313r627750_rul
+      - SV-230313r627750_rule
       - V-230313
       - security
       - limits
@@ -1838,7 +2198,6 @@
         with_items:  # Written as lineinfile replaces last found so reverse logic to keep order of servers
             - { regexp: ^nameserver, line: '{{ rhel8stig_dns_servers.1 }}', after: ^search }
             - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }})', line: '{{ rhel8stig_dns_servers.0 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
-        #    - { regexp: '^nameserver (?!{{ rhel8stig_dns_servers.1 }}|{{ rhel8stig_dns_servers.0 }})', line: '{{ rhel8stig_dns_servers.2 }}', after: '^nameserver {{ rhel8stig_dns_servers.1 }}' }
         when:
             - not rhel8_stig_use_resolv_template
             - rhel_08_010680_networkmanager_check.stdout == '0'
@@ -1921,7 +2280,7 @@
       - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Set permissions"
         file:
             path: "{{ item }}"
-            owner: root
+            owner: "{{ rhel8stig_ww_dir_owner }}"
         with_items:
             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
         when: rhel_08_010700_world_writable_directories.stdout | length > 0
@@ -1932,7 +2291,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230318r627750_rule
+      - SV-230318r743960_rule
       - V-230318
       - permissions
 
@@ -1947,7 +2306,7 @@
       - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Set permissions"
         file:
             path: "{{ item }}"
-            group: root
+            group: "{{ rhel8stig_ww_dir_grpowner }}"
         with_items:
             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
         when: rhel_08_010710_world_writable_directories.stdout | length > 0
@@ -1958,7 +2317,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230319r627750_rule
+      - SV-230319r743961_rule
       - V-230319
       - permissions
 
@@ -2002,7 +2361,7 @@
       - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
         file:
             path: "{{ item }}"
-            mode: 0750
+            mode: "{{ rhel8stig_local_int_home_perms }}"
         with_items:
             - "{{ rhel_08_010730_home_directories.stdout_lines }}"
         when: rhel_08_010730_home_directories.stdout | length > 0
@@ -2015,6 +2374,42 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230321r627750_rule
       - V-230321
+      - permissions
+
+- name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Find out of compliance files"
+        shell: "find {{ item }} -perm -750 ! -perm 750"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010731_files
+        with_items:
+            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start|int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
+
+      - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
+        file:
+            path: "{{ item }}"
+            mode: "{{ rhel8stig_local_int_home_file_perms }}"
+        with_items:
+            - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+        when: rhel8stig_disruption_high
+
+      - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Alert on out of compliance files"
+        debug:
+            msg:
+                - "Alert! Below are the files that are in interactive user folders but permissiosn less restrictiv than 0750."
+                - "Please review the files to bring into STIG compliance"
+                - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+        when: not rhel8stig_disruption_high
+  when:
+      - rhel_08_010731
+  tags:
+      - RHEL-08-010731
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244531r743842_rule
+      - V-244531
       - permissions
 
 - name: "MEDIUM | RHEL-08-010740 | PATCH | All RHEL 8 local interactive user home directories must be group-owned by the home directory owner’s primary group."
@@ -2034,8 +2429,30 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230322r627750_rule
+      - SV-230322r743963_rule
       - V-230322
+      - permissions
+
+- name: "MEDIUM | RHEL-08-010741 | PATCH | RHEL 8 must be configured so that all files and directories contained in local interactive user home directories are group-owned by a group of which the home directory owner is a member."
+  file:
+      path: "{{ item.dir }}"
+      group: "{{ item.gid }}"
+      state: directory
+      recurse: true
+  with_items: "{{ rhel8stig_passwd }}"
+  loop_control:
+      label: "{{ rhel8stig_passwd_label }}"
+  when:
+      - rhel_08_010741
+      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - item.uid != 65534
+  tags:
+      - RHEL-08-010741
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244532r743845_rule
+      - V-244532
       - permissions
 
 - name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
@@ -2078,7 +2495,7 @@
 - name: "MEDIUM | RHEL-08-010770 | PATCH | All RHEL 8 local initialization files must have mode 0740 or less permissive."
   file:
       path: "{{ item }}"
-      mode: 0740
+      mode: "{{ rhel8stig_local_int_perm }}"
   with_items:
       - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
   when:
@@ -2251,45 +2668,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
-  block:
-      - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set deny in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^deny =|^\# deny ='
-            line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^deny =|^\# deny ='
+      line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
   when:
       - rhel_08_020011
   tags:
@@ -2297,7 +2679,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230333r627750_rule
+      - SV-230333r743966_rule
       - V-230333
       - pamd
 
@@ -2347,48 +2729,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
-  block:
-      - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set fail_interval in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^fail_interval =|^\# fail_interval ='
-            line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^fail_interval =|^\# fail_interval ='
+      line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
   when:
       - rhel_08_020013
   tags:
@@ -2396,7 +2740,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230335r627750_rule
+      - SV-230335r743969_rule
       - V-230335
       - pamd
 
@@ -2446,56 +2790,18 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
-  block:
-      - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020015 | PATCH |RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set unlock_time in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^unlock_time =|^\# unlock_time ='
-            line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^unlock_time =|^\# unlock_time ='
+      line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
   when:
       - rhel_08_020015
   tags:
       - RHEL-08-020015
       - CAT2
       - CCI-000044
-      - RG-OS-000021-GPOS-00005
-      - SV-230337r627750_rule
+      - SRG-OS-000021-GPOS-00005
+      - SV-230337r743972_rule
       - V-230337
       - pamd
 
@@ -2545,48 +2851,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
-  block:
-      - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist. | Set dir in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^dir =|^\# dir ='
-            line: "dir = {{ rhel8stig_pam_faillock.dir }}"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^dir =|^\# dir ='
+      line: "dir = {{ rhel8stig_pam_faillock.dir }}"
   when:
       - rhel_08_020017
   tags:
@@ -2594,7 +2862,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230339r627750_rule
+      - SV-230339r743975_rule
       - V-230339
       - pamd
 
@@ -2644,48 +2912,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020019| PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
-  block:
-      - name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set silent in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^silent|^\# silent'
-            line: "silent"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^silent|^\# silent'
+      line: "silent"
   when:
       - rhel_08_020019
   tags:
@@ -2693,7 +2923,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230341r627750_rule
+      - SV-230341r743978_rule
       - V-230341
       - pamd
 
@@ -2743,48 +2973,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020021| PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
-  block:
-      - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set audit in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^audit|^\# audit'
-            line: "audit"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^audit|^\# audit'
+      line: "audit"
   when:
       - rhel_08_020021
   tags:
@@ -2792,7 +2984,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230343r627750_rule
+      - SV-230343r743981_rule
       - V-230343
       - pamd
 
@@ -2842,48 +3034,10 @@
       - pamd
 
 - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
-  block:
-      - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
-        lineinfile:
-            path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertafter: '^account'
-        notify: restart sssd
-        with_items:
-            - system-auth
-            - password-auth
-
-      - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set audit in faillock.conf"
-        lineinfile:
-            path: "/etc/security/faillock.conf"
-            regexp: '^even_deny_root|^\# even_deny_root'
-            line: "even_deny_root"
-        with_items:
-            - system-auth
-            - password-auth
+  lineinfile:
+      path: "/etc/security/faillock.conf"
+      regexp: '^even_deny_root|^\# even_deny_root'
+      line: "even_deny_root"
   when:
       - rhel_08_020023
   tags:
@@ -2891,7 +3045,7 @@
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
-      - SV-230345r627750_rule
+      - SV-230345r743984_rule
       - V-230345
       - pamd
 
@@ -2944,6 +3098,7 @@
         package:
             name: tmux
             state: present
+        when: "'tmux' not in ansible_facts.packages"
 
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
@@ -2960,8 +3115,8 @@
       - RHEL-08-020040
       - CAT2
       - CCI-000056
-      - RG-OS-000028-GPOS-00009
-      - SV-230348r627750_rule
+      - SRG-OS-000028-GPOS-00009
+      - SV-230348r743987_rule
       - V-230348
       - tmux
 
@@ -3095,13 +3250,21 @@
       - gui
 
 - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
-  lineinfile:
-      path: /etc/tmux.conf
-      regexp: '^set -g lock-after-time'
-      line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
-      owner: root
-      group: root
-      mode: 0644
+  block:
+      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Install tmux if needed"
+        package:
+            name: tmux
+            state: present
+        when: "'tmux' not in ansible_facts.packages"
+
+      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Set tmux settings"
+        lineinfile:
+            path: /etc/tmux.conf
+            regexp: '^set -g lock-after-time'
+            line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
+            owner: root
+            group: root
+            mode: 0644
   when:
       - rhel_08_020070
   tags:
@@ -3117,19 +3280,10 @@
   lineinfile:
       path: /etc/dconf/db/local.d/locks/session
       create: yes
-      line: "{{ item }}"
+      line: /org/gnome/desktop/screensaver/lock-delay
       owner: root
       group: root
       mode: 0640
-  with_items:
-      - /org/gnome/desktop/session/idle-delay
-      - /org/gnome/desktop/screensaver/lock-enabled
-      - /org/gnome/desktop/screensaver/lock-delay
-      - /org/gnome/settings-daemon/plugins/media-keys/logout
-      - /org/gnome/login-screen/disable-user-list
-      - /org/gnome/login-screen/banner-message-text
-      - /org/gnome/login-screen/banner-message-enable
-      - /org/gnome/desktop/lockdown/disable-lock-screen
   when:
       - rhel_08_020080
       - "'dconf' in ansible_facts.packages"
@@ -3139,7 +3293,7 @@
       - CAT2
       - CCI-000057
       - SRG-OS-000029-GPOS-00010
-      - SV-230354r627750_rule
+      - SV-230354r743990_rule
       - V-230354
       - gui
 
@@ -3904,7 +4058,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230387r627750_rule
+      - SV-230387r743996_rule
       - V-230387
       - cron
 
@@ -3972,7 +4126,7 @@
       - CAT2
       - CCI-000140
       - SRG-OS-000047-GPOS-00023
-      - SV-230391r627750_rule
+      - SV-230391r743998_rule
       - V-230391
       - auditd
 
@@ -3989,6 +4143,7 @@
   tags:
       - RHEL-08-030060
       - CAT2
+      - CCI-000140
       - SRG-OS-000047-GPOS-00023
       - SV-230392r627750_rule
       - V-230392
@@ -4326,14 +4481,14 @@
       - V-230410
       - auditd
 
-- name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
+- name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed."
   block:
-      - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Install audit"
+      - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed. | Install audit"
         package:
             name: audit
             state: present
 
-      - name: "MEDIUM | RHEL-08-030180 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events. | Enable and start service"
+      - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed. | Enable and start service"
         service:
             name: auditd
             enabled: yes
@@ -4345,9 +4500,25 @@
       - CAT2
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230411r646881_rule
+      - SV-230411r744000_rule
       - V-230411
       - dnf
+      - auditd
+
+- name: "MEDIUM | RHEL-08-030181 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
+  service:
+      name: auditd
+      state: started
+      enabled: true
+  when:
+      - rhel_08_030181
+  tags:
+      - RHEL-08-030181
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-244542r743875_rule
+      - V-244542
       - auditd
 
 - name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
@@ -4574,14 +4745,12 @@
   tags:
       - CAT2
       - RHEL-08-030300
-      - CCI-000169
-      - SRG-OS-000062-GPOS-00031
-      - SV-230423r627750_rule
-      - V-230423
       - RHEL-08-030302
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
+      - SV-230423r627750_rule
       - SV-230425r627750_rule
+      - V-230423
       - V-230425
       - auditd
 
@@ -4741,7 +4910,7 @@
       - CAT2
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230434r627750_rule
+      - SV-230434r744002_rule
       - V-230434
       - auditd
 
@@ -5411,7 +5580,7 @@
       - CAT2
       - CCI-001493
       - SRG-OS-000256-GPOS-00097
-      - SV-230473r627750_rule
+      - SV-230473r744008_rule
       - V-230473
       - permissions
 
@@ -5453,8 +5622,7 @@
       - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
-      - /usr/sbin/audisp-remote p+i+n+u+g+s+b+acl+xattrs+sha512
-      - /usr/sbin/audisp-syslog p+i+n+u+g+s+b+acl+xattrs+sha512
+      - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
       - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
   when:
       - rhel_08_030650
@@ -5516,7 +5684,7 @@
 
 - name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
   package:
-      name: gnutls
+      name: rsyslog-gnutls
       state: present
   when:
       - rhel_08_030680
@@ -5524,9 +5692,9 @@
   tags:
       - RHEL-08-030680
       - CAT2
-      - CCI-00036
+      - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230478r627750_rule
+      - SV-230478r744011_rule
       - V-230478
       - gnutls
 
@@ -5603,14 +5771,11 @@
       - V-230482
       - auditd
 
-- name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
+- name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
   lineinfile:
       path: /etc/audit/auditd.conf
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-  with_items:
-      - { regexp: '^space_left =', line: 'space_left = 25%' }
-      - { regexp: '^space_left_action =', line: 'space_left_action = EMAIL' }
+      regexp: '^space_left ='
+      line: 'space_left = 25%'
   when:
       - rhel_08_030730
   tags:
@@ -5618,8 +5783,24 @@
       - CAT2
       - CCI-001855
       - SRG-OS-000343-GPOS-00134
-      - SV-230483r627750_rule
+      - SV-230483r744014_rule
       - V-230483
+      - auditd
+
+- name: "MEDIUM | RHEL-08-030731 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume 75 percent utilization."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: '^space_left_action ='
+      line: 'space_left_action = EMAIL'
+  when:
+      - rhel_08_030731
+  tags:
+      - RHEL-08-030731
+      - CAT2
+      - CCI-001855
+      - SRG-OS-000343-GPOS-00134
+      - SV-244543r743878_rule
+      - V-244543
       - auditd
 
 - name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
@@ -5672,23 +5853,6 @@
       - V-230489
       - dnf
       - sendmail
-
-- name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
-  package:
-      name: gssproxy
-      state: absent
-  when:
-      - rhel_08_040370
-      - "'gssproxy' in ansible_facts.packages"
-  tags:
-      - RHEL-08-040370
-      - CAT2
-      - CCI-000381
-      - SRG-OS-000480-GPOS-00227
-      - SV-230559r646887_rule
-      - V-230559
-      - dnf
-      - gssproxy
 
 - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
   lineinfile:
@@ -5865,7 +6029,7 @@
   block:
       - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Install firewalld"
         package:
-            name: firewalld
+            name: firewalld.noarch
             state: present
         when: rhel8stig_firewall_service == "firewalld"
 
@@ -5887,10 +6051,36 @@
       - CAT2
       - CCI-002314
       - SRG-OS-000297-GPOS-00115
-      - SV-230505r627750_rule
+      - SV-230505r744020_rule
       - V-230505
       - firewall
       - "{{ rhel8stig_firewall_service }}"
+
+- name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8"
+  block:
+      - name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8 | Install firewalld if needed"
+        package:
+            name: firewalld
+            state: present
+        when: "'firewalld' not in ansible_facts.packages"
+
+      - name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8 | Enable the service"
+        systemd:
+            name: firewalld
+            state: started
+            enabled: true
+  when:
+      - rhel_08_040101
+      - rhel8stig_firewall_service == "firewalld"
+  tags:
+      - RHEL-08-040101
+      - CAT2
+      - CCI-002314
+      - SRG-OS-000297-GPOS-00115
+      - SV-244544r743881_rule
+      - V-244544
+      - firewalld
+      - firewall
 
 - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
   block:
@@ -6020,19 +6210,15 @@
   tags:
       - CAT2
       - RHEL-08-040120
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230508r627750_rule
-      - V-230508
       - RHEL-08-040121
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230509r627750_rule
-      - V-230509
       - RHEL-08-040122
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
+      - SV-230508r627750_rule
+      - SV-230509r627750_rule
       - SV-230510r627750_rule
+      - V-230508
+      - V-230509
       - V-230510
       - mounts
 
@@ -6071,19 +6257,15 @@
   tags:
       - CAT2
       - RHEL-08-040123
+      - RHEL-08-040124
+      - RHEL-08-04125
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
       - SV-230511r627750_rule
-      - V-230511
-      - RHEL-08-040124
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
       - SV-230512r627750_rule
-      - V-230512
-      - RHEL-08-04125
-      - CCI-00176
-      - SRG-OS-000368-GPOS-00154
       - SV-230513r627750_rule
+      - V-230511
+      - V-230512
       - V-230513
       - mounts
 
@@ -6121,19 +6303,15 @@
   tags:
       - CAT2
       - RHEL-08-040126
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230514r627750_rule
-      - V-230514
       - RHEL-08-040127
-      - V-230514
-      - SRG-OS-000368-GPOS-00154
-      - SV-230515r627750_rule
-      - V-230515
       - RHEL-08-040128
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
+      - SV-230514r627750_rule
+      - SV-230515r627750_rule
       - SV-230516r627750_rule
+      - V-230514
+      - V-230515
       - V-230516
       - mounts
 
@@ -6171,19 +6349,15 @@
   tags:
       - CAT2
       - RHEL-08-040129
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230517r627750_rule
-      - V-230517
       - RHEL-08-040130
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230518r627750_rule
-      - V-230518
       - RHEL-08-040131
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
+      - SV-230517r627750_rule
+      - SV-230518r627750_rule
       - SV-230519r627750_rule
+      - V-230517
+      - V-230518
       - V-230519
       - mounts
 
@@ -6221,108 +6395,128 @@
   tags:
       - CAT2
       - RHEL-08-040132
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230520r627750_rule
-      - V-230520
       - RHEL-08-040133
-      - CCI-001764
-      - SRG-OS-000368-GPOS-00154
-      - SV-230521r627750_rule
-      - V-230521
       - RHEL-08-040134
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
+      - SV-230520r627750_rule
+      - SV-230521r627750_rule
       - SV-230522r627750_rule
+      - V-230520
+      - V-230521
       - V-230522
       - mounts
 
-- name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
+- name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be installed."
+  package:
+      name: fapolicyd
+      state: present
+  when:
+      - rhel_08_040135
+      - "'fapolicyd' not in ansible_facts.packages"
+  tags:
+      - RHEL-08-040135
+      - CAT2
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-230523r744023_rule
+      - V-230523
+      - fapolicyd
+
+- name: "MEDIUM | RHEL-08-040136 | PATCH | The RHEL 8 fapolicy module must be enabled."
+  systemd:
+      name: fapolicyd
+      state: started
+      enabled: true
+  when:
+      - rhel_08_040136
+  tags:
+      - RHEL-08-040136
+      - CAT2
+      - CCI-001764
+      - SRG-OS-000368-GPOS-00154
+      - SV-244545r743884_rule
+      - V-244545
+      - fapolicy
+
+- name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
   block:
-      - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Install fapolicy"
-        package:
-            name: fapolicyd
-            state: present
-
-      - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy mounts"
-        shell: mount | egrep '^tmpfs| ext4| ext3| xfs' | awk '{ printf "%s\n", $3 }' >> /etc/fapolicyd/fapolicyd.mounts
-        changed_when: false
-        failed_when: false
-
-      - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Start/enable fapolicy"
-        service:
-            name: fapolicyd
-            state: started
-            enabled: yes
-
-      - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
+      - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
         lineinfile:
             path: /etc/fapolicyd/fapolicyd.rules
             line: "{{ item }}"
         with_items:
             - "{{ rhel8stig_fapolicy_white_list }}"
 
-      - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
+      - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
         lineinfile:
             path: /etc/fapolicyd/fapolicyd.conf
             regexp: '^permissive ='
             line: 'permissive = 0'
   when:
-      - rhel_08_040135
+      - rhel_08_040137
   tags:
-      - RHEL-08-040135
+      - RHEL-08-040137
       - CAT2
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
-      - SV-230523r627750_rule
-      - V-230523
-      - fapolicyd
+      - SV-244546r743887_rule
+      - V-244546
+      - fapolicy
 
-- name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection."
+- name: |
+    "MEDIUM | RHEL-08-040139 | PATCH | RHEL 8 must have the USBGuard installed."
+    "MEDIUM | RHEL-08-040140 | PATCH | RHEL 8 must block unauthorized peripherals before establishing a connection."
+    "MEDIUM | RHEL-08-040141 | PATCH | RHEL 8 must enable the USBGuard."
   block:
-      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Install usbguard"
+      - name: "MEDIUM | RHEL-08-040139 | PATCH | RHEL 8 must have the USBGuard installed. | Install usbguard"
         package:
             name: usbguard
             state: present
+        when:
+            - rhel_08_040139
+            - "'usbguard' not in ansible_facts.packages"
 
-      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | generate policy"
+      - name: "MEDIUM | RHEL-08-040140 | PATCH | RHEL 8 must block unauthorized peripherals before establishing a connection. | generate policy"
         shell: usbguard generate-policy > /etc/usbguard/rules.conf
+        when:
+            - rhel_08_040140
+            - rhel_08_040139 or
+              "'usbguard' in ansible_facts.packages"
 
-      - name: "MEDIUM | RHEL-08-040140 | PATCH |  RHEL 8 must block unauthorized peripherals before establishing a connection. | Start/Enable service"
+      - name: "MEDIUM | RHEL-08-040141 | PATCH | RHEL 8 must enable the USBGuard. | Start/Enable service"
         service:
             name: usbguard
             state: started
             enabled: yes
+        when:
+            - rhel_08_040141
+            - rhel_08_040139 or
+              "'usbguard' in ansible_facts.packages"
   when:
-      - rhel_08_040140
+      - rhel_08_040139 or
+        rhel_08_040140 or
+        rhel_08_040141
   tags:
+      - RHEL-08-040139
       - RHEL-08-040140
+      - RHEL-08-040141
       - CAT2
       - CCI-001958
       - SRG-OS-000378-GPOS-00163
-      - SV-230524r627750_rule
+      - SV-244547r743890_rule
+      - SV-230524r744026_rule
+      - SV-244548r743893_rule
+      - V-244547
       - V-230524
+      - V-244548
       - usbguard
 
 - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
-  block:
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Install nftables"
-        package:
-            name: nftables
-            state: present
-
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Start/Enable nftables"
-        systemd:
-            name: nftables
-            state: started
-            enabled: yes
-            masked: no
-
-      - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces. | Configure FirewallBackend"
-        lineinfile:
-            path: /etc/firewalld/firewalld.conf
-            regexp: '^FirewallBackend='
-            line: 'FirewallBackend=nftables'
+  lineinfile:
+      path: /etc/firewalld/firewalld.conf
+      regexp: '^FirewallBackend='
+      line: 'FirewallBackend=nftables'
   when:
       - rhel_08_040150
   tags:
@@ -6330,31 +6524,43 @@
       - CAT2
       - CCI-002385
       - SRG-OS-000420-GPOS-00186
-      - SV-230525r627750_rule
+      - SV-230525r744029_rule
       - V-230525
       - firewall
       - nftables
 
-- name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
+- name: |
+    "MEDIUM | RHEL-08-040159 | PATCH | All RHEL 8 networked systems must have SSH installed."
+    "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
   block:
-      - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Install openssh-server"
+      - name: "MEDIUM | RHEL-08-040159 | PATCH | All RHEL 8 networked systems must have SSH installed. | Install openssh-server"
         package:
             name: openssh-server
             state: present
+        when:
+            - "'openssh-server' not in ansible_facts.packages"
+            - rhel_08_040159
 
       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
         service:
             name: sshd
             state: started
             enabled: yes
+        when:
+            - rhel_08_040159 or
+              "'openssh-server' in ansible_facts.packages"
   when:
-      - rhel_08_040160
+      - rhel_08_040159 or
+        rhel_08_040160
   tags:
-      - rhel_08_040160
+      - RHEL-08-040159
+      - RHEL-08-040160
       - CAT2
       - CCI-002418
       - SRG-OS-000423-GPOS-00187
-      - SV-230526r627750_rule
+      - SV-244549r743896_rule
+      - SV-230526r744032_rule
+      - V-244549
       - V-230526
       - ssh
 
@@ -6393,34 +6599,54 @@
       - V-230532
       - debug-shell
 
-- name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+- name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   block:
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
+      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects value 0 active"
         sysctl:
-            name: "{{ item }}"
+            name: net.ipv4.conf.default.accept_redirects
             state: present
             value: '0'
         notify: change_requires_reboot
-        with_items:
-            - net.ipv4.conf.default.accept_redirects
-            - net.ipv6.conf.default.accept_redirects
 
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | The RHEL 8 must prevent Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
+      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects default value to 0 config"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.default.accept_redirects=', line: 'net.ipv4.conf.default.accept_redirects=0' }
-            - { regexp: '^net.ipv6.conf.default.accept_redirects=', line: 'net.ipv6.conf.default.accept_redirects=0' }
+            regexp: '^net.ipv4.conf.default.accept_redirects='
+            line: 'net.ipv4.conf.default.accept_redirects=0'
+  when:
+      - rhel_08_040209
+  tags:
+      - RHEL-08-040209
+      - CAT2
+      - CI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244550r743899_rule
+      - V-244550
+      - ipv4
+
+- name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+  block:
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
+        sysctl:
+            name: net.ipv6.conf.default.accept_redirects
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.default.accept_redirects='
+            line: 'net.ipv6.conf.default.accept_redirects=0'
   when:
       - rhel_08_040210
+      - rhel8stig_ipv6_required
   tags:
       - RHEL-08-040210
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r627750_rule
+      - SV-230535r744035_rule
       - V-230535
       - icmp
 
@@ -6445,7 +6671,7 @@
       - CAT2
       - CCI-00036
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r627750_rule
+      - SV-230536r744037_rule
       - V-230536
       - icmp
 
@@ -6470,93 +6696,141 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r627750_rule
+      - SV-230537r744039_rule
       - V-230537
       - icmp
 
-- name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets."
+- name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
   block:
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route in sysctl"
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route in sysctl"
         sysctl:
-            name: "{{ item }}"
+            name: net.ipv4.conf.all.accept_source_route
             state: present
             value: '0'
         notify: change_requires_reboot
-        with_items:
-            - net.ipv4.conf.all.accept_source_route
-            - net.ipv6.conf.all.accept_source_route
 
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | The RHEL 8 must not forward source-routed packets. | Set conf.all accept_source_route default value to 0"
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route default value to 0"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.all.accept_source_route', line: 'net.ipv4.conf.all.accept_source_route=0' }
-            - { regexp: '^net.ipv6.conf.all.accept_source_route', line: 'net.ipv6.conf.all.accept_source_route=0' }
+            regexp: '^net.ipv4.conf.all.accept_source_routes='
+            line: 'net.ipv4.conf.all.accept_source_route=0'
+  when:
+      - rhel_08_040239
+  tags:
+      - RHEL-08-040239
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244551r743902_rule
+      - V-244551
+      - ip4
+
+- name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
+  block:
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Set conf.all accept_source_route in sysctl"
+        sysctl:
+            name: net.ipv6.conf.all.accept_source_route
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Set conf.all accept_source_route default value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.all.accept_source_route'
+            line: 'net.ipv6.conf.all.accept_source_route=0'
   when:
       - rhel_08_040240
+      - rhel8stig_ipv6_required
   tags:
       - RHEL-08-040240
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r627750_rule
+      - SV-230538r744042_rule
       - V-230538
       - icmp
 
-- name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default."
+- name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
   block:
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route in sysctl"
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route in sysctl"
         sysctl:
-            name: "{{ item }}"
+            name: net.ipv4.conf.default.accept_source_route
             state: present
             value: '0'
         notify: change_requires_reboot
-        with_items:
-            - net.ipv4.conf.default.accept_source_route
-            - net.ipv6.conf.default.accept_source_route
 
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | The RHEL 8 must not forward source-routed packets by default. | Set conf.default accept_source_route value to 0"
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route value to 0"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.default.accept_source_route', line: 'net.ipv4.conf.default.accept_source_route=0' }
-            - { regexp: '^net.ipv6.conf.default.accept_source_route', line: 'net.ipv6.conf.default.accept_source_route=0' }
+            regexp: '^net.ipv4.conf.default.accept_source_route='
+            line: 'net.ipv4.conf.default.accept_source_route=0'
+  when:
+      - rhel_08_040249
+  tags:
+      - RHEL-08-040249
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244552r743905_rule
+      - V-244552
+      - ipv4
+
+- name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
+  block:
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Set conf.default accept_source_route in sysctl"
+        sysctl:
+            name: net.ipv6.conf.default.accept_source_route
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Set conf.default accept_source_route value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.default.accept_source_route'
+            line: 'net.ipv6.conf.default.accept_source_route=0'
   when:
       - rhel_08_040250
+      - rhel8stig_ipv6_required
   tags:
       - RHEL-08-040250
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r627750_rule
+      - SV-230539r744045_rule
       - V-230539
       - icmp
 
 - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
   block:
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward in sysctl"
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv4 ip_forward in sysctl"
         sysctl:
-            name: "{{ item }}"
+            name: net.ipv4.ip_forward
             state: present
             value: '0'
         notify: change_requires_reboot
-        with_items:
-            - net.ipv4.ip_forward
-            - net.ipv6.conf.all.forwarding
 
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set ip_forward value to 0"
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv6 ip_forward in sysctl"
+        sysctl:
+            name: net.ipv6.conf.all.forwarding
+            state: present
+            value: '0'
+        notify: change_requires_reboot
+        when: rhel8stig_ipv6_required
+
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv4 ip_forward value to 0"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.ip_forward', line: 'net.ipv4.ip_forward=0' }
-            - { regexp: '^net.ipv6.conf.all.forwarding', line: 'net.ipv6.conf.all.forwarding=0' }
+            regexp: '^net.ipv4.ip_forward'
+            line: 'net.ipv4.ip_forward=0'
 
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv6 ip_forward value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv6.conf.all.forwarding'
+            line: 'net.ipv6.conf.all.forwarding=0'
+        when: rhel8stig_ipv6_required
   when:
       - rhel_08_040260
       - not rhel8stig_system_is_router
@@ -6585,6 +6859,7 @@
             line: 'net.ipv6.conf.all.accept_ra=0'
   when:
       - rhel_08_040261
+      - rhel8stig_ipv6_required
       - not rhel8stig_system_is_router
   tags:
       - RHEL-08-040261
@@ -6611,6 +6886,7 @@
             line: 'net.ipv6.conf.default.accept_ra=0'
   when:
       - rhel_08_040262
+      - rhel8stig_ipv6_required
       - not rhel8stig_system_is_router
   tags:
       - RHEL-08-040262
@@ -6642,38 +6918,57 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r627750_rule
+      - SV-230543r744047_rule
       - V-230543
       - icmp
 
-- name: "MEDIUM | RHEL-08-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages."
+- name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
   block:
-      - name: "MEDIUM | RHEL-08-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects in sysctl"
         sysctl:
-            name: "{{ item }}"
+            name: net.ipv4.conf.all.accept_redirects
+            state: present
+            value: '0'
+
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects value to 0"
+        lineinfile:
+            path: /etc/sysctl.conf
+            regexp: '^net.ipv4.conf.all.accept_redirects='
+            line: 'net.ipv4.conf.all.accept_redirects=0'
+  when:
+      - rhel_08_040279
+  tags:
+      - RHEL-08-040279
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244553r743908_rule
+      - V-244553
+      - ipv4
+
+- name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
+  block:
+      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
+        sysctl:
+            name: net.ipv6.conf.all.accept_redirects
             state: present
             value: '0'
         notify: change_requires_reboot
-        with_items:
-            - net.ipv4.conf.all.accept_redirects
-            - net.ipv6.conf.all.accept_redirects
 
-      - name: "MEDIUM | RHEL-08-040280 | PATCH | The RHEL 8 must ignore Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
+      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
         lineinfile:
             path: /etc/sysctl.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-        with_items:
-            - { regexp: '^net.ipv4.conf.all.accept_redirects', line: 'net.ipv4.conf.all.accept_redirects=0' }
-            - { regexp: '^net.ipv6.conf.all.accept_redirects', line: 'net.ipv6.conf.all.accept_redirects=0' }
+            regexp: '^net.ipv6.conf.all.accept_redirects'
+            line: 'net.ipv6.conf.all.accept_redirects=0'
   when:
       - rhel_08_040280
+      - rhel8stig_ipv6_required
   tags:
       - RHEL-08-040280
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r627750_rule
+      - SV-230544r744050_rule
       - V-230544
       - icmp
 
@@ -6767,6 +7062,22 @@
       - SV-230549r627750_rule
       - V-230549
       - sysctl
+
+- name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
+  lineinfile:
+      path: /etc/sysctl.conf
+      regexp: '^net.core.bpf_jit_harden='
+      line: 'net.core.bpf_jit_harden=2'
+  notify: sysctl system
+  when:
+      - rhel_08_040286
+  tags:
+      - RHEL-08-040286
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-244554r743911_rule
+      - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
   command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
@@ -6885,6 +7196,23 @@
       - V-230557
       - tftp
 
+- name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
+  package:
+      name: gssproxy
+      state: absent
+  when:
+      - rhel_08_040370
+      - "'gssproxy' in ansible_facts.packages"
+  tags:
+      - RHEL-08-040370
+      - CAT2
+      - CCI-000381
+      - SRG-OS-000480-GPOS-00227
+      - SV-230559r646887_rule
+      - V-230559
+      - dnf
+      - gssproxy
+
 - name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
   package:
       name: iprutils
@@ -6974,7 +7302,7 @@
 
 - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo."
   block:
-      - name: "MEDIUM | RHEL-08-010383 | PATCH | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Get privilege escalation"
+      - name: "MEDIUM | RHEL-08-010383 | AUDIT | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Get privilege escalation"
         shell: egrep -is '(!rootpw|!targetpw|!runaspw)' /etc/sudoers /etc/sudoers.d/* | grep -v '#' | cut -d ':' -f1 | sort --uniq
         changed_when: false
         failed_when: false
@@ -7037,7 +7365,7 @@
 
 - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command."
   block:
-      - name: "MEDIUM | RHEL-08-010384 | PATCH | RHEL 8 must require re-authentication when using the sudo command. | Get files with timeout set"
+      - name: "MEDIUM | RHEL-08-010384 | AUDIT | RHEL 8 must require re-authentication when using the sudo command. | Get files with timeout set"
         shell: grep -is 'timestamp_timeout' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
         changed_when: false
         failed_when: false
