@@ -114,7 +114,8 @@
   vars:
       rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
   when:
-      - rhel_08_010740 or
+      - rhel_08_010731 or
+        rhel_08_010740 or
         rhel_08_010750 or
         rhel_08_020320
   tags:
@@ -448,9 +449,13 @@
         shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
         register: modify_secontext
         when: faillock_secontext.stdout != '1'
-      
+
       - name: "PRELIM | RHEL-08-020017 | Set {{ rhel8stig_pam_faillock.dir }} selinux context"
         shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
         when: modify_secontext.changed
   when:
       - rhel_08_020017
+
+- name: "PRELIM | Section 1.1 | Create list of mount points"
+  set_fact:
+      mount_names: "{{ ansible_mounts | map(attribute='mount') | list }}"
