@@ -476,8 +476,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install ATM', line: 'install ATM /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist ATM', line: 'blacklist ATM', insertafter: '^install ATM /bin/true' }
+      - { regexp: '^install atm', line: 'install atm /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist atm', line: 'blacklist atm', insertafter: '^install atm /bin/true' }
   when:
       - rhel_08_040021
   tags:
@@ -502,8 +502,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install CAN', line: 'install CAN /bin/true', insertafter: 'EOF' }
-      - { regexp: 'blacklist CAN', line: 'blacklist CAN', insertafter: '^install CAN /bin/true' }
+      - { regexp: '^install can', line: 'install can /bin/true', insertafter: 'EOF' }
+      - { regexp: 'blacklist can', line: 'blacklist can', insertafter: '^install can /bin/true' }
   when:
       - rhel_08_040022
   tags:
@@ -528,8 +528,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install SCTP', line: 'install SCTP /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist SCTP', line: 'blacklist SCTP', insertafter: '^install SCTP' }
+      - { regexp: '^install sctp', line: 'install sctp /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist sctp', line: 'blacklist sctp', insertafter: '^install sctp' }
   when:
       - rhel_08_040023
   tags:
@@ -554,8 +554,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install TIPC', line: 'install TIPC /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist TIPC', line: 'blacklist TIPC', insertafter: '^install TIPC' }
+      - { regexp: '^install tipc', line: 'install tipc /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist tipc', line: 'blacklist tipc', insertafter: '^install tipc' }
   when:
       - rhel_08_040024
   tags:
