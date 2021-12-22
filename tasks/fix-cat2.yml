@@ -500,7 +500,7 @@
       - CAT2
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230243r627750_rule
+      - SV-230243r792857_rule
       - V-230243
       - permissions
 
@@ -883,7 +883,7 @@
       - CAT2
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230256r627750_rule
+      - SV-230256r792859_rule
       - V-230256
       - gnutls
 
@@ -7370,6 +7370,6 @@
       - CAT2
       - CCI-002038
       - SRG-OS-000373-GPOS-00156
-      - SV-237643r646899_rule
+      - SV-237643r792980_rule
       - V-237643
       - sudo
