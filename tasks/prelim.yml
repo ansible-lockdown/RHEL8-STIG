@@ -349,8 +349,8 @@
 
 - name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
   find:
-      paths: /etc/sysctl.d
-      patterns: '.*sysctl.conf'
+      paths: /etc/sysctl.d /run/sysctl.d /usr/local/lib/sysctl.d /usr/lib/sysctl.d /lib/sysctl.d
+      patterns: '.*.conf'
       use_regex: yes
       file_type: any
   register: rhel8stig_sysctlconf_filename
