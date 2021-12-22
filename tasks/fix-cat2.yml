@@ -327,8 +327,8 @@
       - CAT2
       - CCI-000213
       - SRG-OS-000080-GPOS-00048
-      - SV-244521r743812_rule
-      - SV-244522r743815_rule
+      - SV-244521r792982_rule
+      - SV-244522r792984_rule
       - V-244521
       - V-244522
 
@@ -478,32 +478,6 @@
       - V-230282
       - selinux
       - disruption_high
-
-- name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources."
-  block:
-      - name: "MEDIUM | RHEL-08-010180 | AUDIT | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Find public folders not owned by root"
-        shell: "find / ! -user root -type d -perm -0002 -exec ls -lLd {} \\; | sed 's/.* //'"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010180_public_not_root_owned
-
-      - name: "MEDIUM | RHEL-08-010180 | PATCH | All RHEL 8 public directories must be owned by root or a system account to prevent unauthorized and unintended information transferred via shared system resources. | Chown non-root public folders"
-        file:
-            path: "{{ item }}"
-            owner: root
-            group: root
-        with_items:
-            - "{{ rhel_08_010180_public_not_root_owned.stdout_lines }}"
-  when:
-      - rhel_08_010180
-  tags:
-      - RHEL-08-010180
-      - CAT2
-      - CCI-001090
-      - SRG-OS-000138-GPOS-00069
-      - SV-230242r627750_rule
-      - V-230242
-      - permissions
 
 - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
   block:
@@ -2265,7 +2239,7 @@
       - RHEL-08-010690
       - CAT2
       - CCI-000366
-      - SV-230317r627750_rule
+      - SV-230317r792896_rule
       - V-230317
       - complexity-high
 
