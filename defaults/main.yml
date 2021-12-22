@@ -1,8 +1,13 @@
 ---
+## metadata for Audit benchmark
+benchmark_version: '1.4'
+
 ## Benchmark name used by audting control role
 # The audit variable found at the base
 benchmark: RHEL8-STIG
 
+# Whether to skip the reboot
+rhel8cis_skip_reboot: true
 
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
@@ -226,6 +231,8 @@ rhel_08_020022: true
 rhel_08_020023: true
 rhel_08_020025: true
 rhel_08_020026: true
+rhel_08_020027: true
+rhel_08_020028: true
 rhel_08_020030: true
 rhel_08_020031: true
 rhel_08_020032: true
