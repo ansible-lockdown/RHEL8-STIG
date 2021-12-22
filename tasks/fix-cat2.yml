@@ -1217,7 +1217,7 @@
       - CAT2
       - CCI-001084
       - SRG-OS-000134-GPOS-00068
-      - SV-230277r627750_rule
+      -  SV-230277r792884_rule
       - V-230277
       - grub
 
@@ -1257,7 +1257,7 @@
       - CAT2
       - CCI-001084
       - SRG-OS-000134-GPOS-00068
-      - SV-230278r743948_rule
+      - SV-230278r792886_rule
       - V-230278
       - grub
 
@@ -1297,7 +1297,7 @@
       - CAT2
       - CCI-001084
       - SRG-OS-000134-GPOS-00068
-      - SV-230279r627750_rule
+      - SV-230279r792888_rule
       - V-230279
       - grub
 
@@ -2949,6 +2949,59 @@
       - SV-230345r743984_rule
       - V-230345
       - pamd
+- name: |
+    "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
+     MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+  block:
+      - name: |
+          "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
+           MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+        sefcontext:
+            target: "{{ rhel8stig_pam_faillock.dir }}"
+            ftype: d
+            setype: faillog_t
+            state: present
+        register: add_faillock_secontext
+        when: faillock_dir.changed
+
+      - name: |
+          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
+           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
+
+      - name: |
+          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
+           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
+        register: faillock_secontext
+        changed_when: false
+        failed_when: false
+
+      - name: |
+          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
+           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+        shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
+        register: modify_secontext
+        when: faillock_secontext.stdout != '1'
+
+      - name: |
+          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
+           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
+        when: modify_secontext.changed
+  when:
+      - rhel_08_020027 or
+        rhel_08_020028
+  tags:
+      - RHEL-08-020027
+      - RHEL-08-020028
+      - CAT2
+      - CCI-000044
+      - SRG-OS-000021-GPOS-00005
+      - SV-250315r793009_rule
+      - SV-250316r793010_rule
+      - V-250315
+      - V-250316
 
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
@@ -3093,12 +3146,13 @@
         notify: dconf update
   when:
       - rhel_08_020050
+      - "'dconf' in ansible_facts.packages"
   tags:
       - RHEL-08-020050
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230351r627750_rule
+      - SV-230351r792899_rule
       - V-230351
       - smartcard
 
@@ -3914,6 +3968,7 @@
   with_items:
       - /etc/bashrc
       - /etc/csh.cshrc
+      - /etc/profile
   when:
       - rhel_08_020353
   tags:
@@ -3921,7 +3976,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230385r627750_rule
+      - SV-230385r792902_rule
       - V-230385
       - umask
 
@@ -6300,9 +6355,9 @@
       - RHEL-08-040134
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
-      - SV-230520r627750_rule
-      - SV-230521r627750_rule
-      - SV-230522r627750_rule
+      - SV-230520r792927_rule
+      - SV-230521r792930_rule
+      - SV-230522r792933_rule
       - V-230520
       - V-230521
       - V-230522
