@@ -589,7 +589,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230498r627750_rule
+      - SV-230498r792922_rule
       - V-230498
       - modprobe
       - cramfs
@@ -615,7 +615,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230499r627750_rule
+      - SV-230499r792924_rule
       - V-230499
       - modprobe
       - firewire
