@@ -552,7 +552,7 @@
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveInterval.*'
-      line: ClientAliveCountMax 0
+      line: "ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}"
   notify: restart sshd
   when:
       - rhel_08_010201
