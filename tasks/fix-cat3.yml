@@ -294,7 +294,7 @@
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230468r627750_rule
+      - SV-230468r792904_rule
       - V-230468
       - grub
 
@@ -333,7 +333,7 @@
       - CAT3
       - CCI-001849
       - SRG-OS-000341-GPOS-00132
-      - SV-230469r744004_rule
+      - SV-230469r792906_rule
       - V-230469
       - grub
 
@@ -426,7 +426,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230491r627750_rule
+      - SV-230491r792908_rule
       - V-230491
       - grub
 
@@ -451,7 +451,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230494r627750_rule
+      - SV-230494r792911_rule
       - V-230494
       - modprobe
       - atm
@@ -477,7 +477,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230495r627750_rule
+      - SV-230495r792914_rule
       - V-230495
       - modprobe
       - can
@@ -503,7 +503,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r744017_rule
+      - SV-230496r792917_rule
       - V-230496
       - modprobe
       - sctp
@@ -529,7 +529,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r627750_rule
+      - SV-230497r792920_rule
       - V-230497
       - modprobe
       - tipc
