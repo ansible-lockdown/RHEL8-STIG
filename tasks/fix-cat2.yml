@@ -1014,26 +1014,9 @@
       - aide
 
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
-  block:
-      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.kexec_load_disabled ='
-            line: "kernel.kexec_load_disabled = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Set kernel exec load if no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.kexec_load_disabled ='
-            line: "kernel.kexec_load_disabled = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010372
   tags:
@@ -1046,26 +1029,9 @@
       - sysctl
 
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
-  block:
-      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^fs.protected_symlinks ='
-            line: "fs.protected_symlinks = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set protected symlinks if no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^fs.protected_symlinks ='
-            line: "fs.protected_symlinks = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010373
   tags:
@@ -1078,26 +1044,9 @@
       - sysctl
 
 - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
-  block:
-      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^fs.protected_hardlinks ='
-            line: "fs.protected_hardlinks = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Set protected hardlinks if no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^fs.protected_hardlinks ='
-            line: "fs.protected_hardlinks = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010374
   tags:
@@ -1353,14 +1302,9 @@
       - grub
 
 - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
-  sysctl:
-      name: kernel.randomize_va_space
-      value: '2'
-      state: present
-      reload: "{{ rhel8stig_sysctl_reload }}"
-      sysctl_set: yes
-      ignoreerrors: yes
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010430
   tags:
@@ -1368,7 +1312,7 @@
       - CAT2
       - CCI-002824
       - SRG-OS-000433-GPOS-00193
-      - SV-230280r627750_rule
+      - SV-230280r792891_rule
       - V-230280
       - sysctl
 
@@ -2036,26 +1980,9 @@
       - kdump
 
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
-  block:
-      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.core_pattern ='
-            line: "kernel.core_pattern = |/bin/false"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern. | Set kernel core pattern if no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.core_pattern ='
-            line: "kernel.core_pattern = |/bin/false"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010671
   tags:
@@ -2063,7 +1990,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230311r627750_rule
+      - SV-230311r792894_rule
       - V-230311
       - sysctl
 
@@ -6574,19 +6501,9 @@
       - debug-shell
 
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  block:
-      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects value 0 active"
-        sysctl:
-            name: net.ipv4.conf.default.accept_redirects
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accept_redirects default value to 0 config"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.default.accept_redirects='
-            line: 'net.ipv4.conf.default.accept_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040209
   tags:
@@ -6594,24 +6511,14 @@
       - CAT2
       - CI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244550r743899_rule
+      - SV-244550r792987_rule
       - V-244550
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  block:
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects in sysctl"
-        sysctl:
-            name: net.ipv6.conf.default.accept_redirects
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Set accpet_redirects default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.default.accept_redirects='
-            line: 'net.ipv6.conf.default.accept_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040210
       - rhel8stig_ipv6_required
@@ -6620,24 +6527,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r744035_rule
+      - SV-230535r792936_rule
       - V-230535
       - icmp
 
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
-  block:
-      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects in sysctl"
-        sysctl:
-            name: net.ipv4.conf.all.send_redirects
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Set send_redirects default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.all.send_redirects'
-            line: 'net.ipv4.conf.all.send_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040220
   tags:
@@ -6645,24 +6542,14 @@
       - CAT2
       - CCI-00036
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r744037_rule
+      - SV-230536r792939_rule
       - V-230536
       - icmp
 
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
-  block:
-      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast in sysctl"
-        sysctl:
-            name: net.ipv4.icmp_echo_ignore_broadcasts
-            state: present
-            value: '1'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Set echo_ignore_broadcast default value to 1"
-        lineinfile:
-            name: /etc/sysctl.conf
-            regexp: '^net.ipv4.icmp_echo_ignore_broadcasts'
-            line: 'net.ipv4.icmp_echo_ignore_broadcasts=1'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040230
   tags:
@@ -6670,24 +6557,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r744039_rule
+      - SV-230537r792942_rule
       - V-230537
       - icmp
 
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
-  block:
-      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route in sysctl"
-        sysctl:
-            name: net.ipv4.conf.all.accept_source_route
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Set accept_source_route default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.all.accept_source_routes='
-            line: 'net.ipv4.conf.all.accept_source_route=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040239
   tags:
@@ -6695,24 +6572,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r743902_rule
+      - SV-244551r792990_rule
       - V-244551
       - ip4
 
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
-  block:
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Set conf.all accept_source_route in sysctl"
-        sysctl:
-            name: net.ipv6.conf.all.accept_source_route
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Set conf.all accept_source_route default value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.all.accept_source_route'
-            line: 'net.ipv6.conf.all.accept_source_route=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040240
       - rhel8stig_ipv6_required
@@ -6721,24 +6588,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r744042_rule
+      - SV-230538r792945_rule
       - V-230538
       - icmp
 
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
-  block:
-      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route in sysctl"
-        sysctl:
-            name: net.ipv4.conf.default.accept_source_route
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Set accept_source_route value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.default.accept_source_route='
-            line: 'net.ipv4.conf.default.accept_source_route=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040249
   tags:
@@ -6746,24 +6603,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r743905_rule
+      - SV-244552r792993_rule
       - V-244552
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
-  block:
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Set conf.default accept_source_route in sysctl"
-        sysctl:
-            name: net.ipv6.conf.default.accept_source_route
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Set conf.default accept_source_route value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.default.accept_source_route'
-            line: 'net.ipv6.conf.default.accept_source_route=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040250
       - rhel8stig_ipv6_required
@@ -6772,65 +6619,46 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r744045_rule
+      - SV-230539r792948_rule
       - V-230539
       - icmp
 
-- name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router."
-  block:
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv4 ip_forward in sysctl"
-        sysctl:
-            name: net.ipv4.ip_forward
-            state: present
-            value: '0'
-        notify: change_requires_reboot
+- name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sys
+  when:
+      - rhel_08_040259
+      - not rhel8stig_system_is_router
+  tags:
+      - RHEL-08-040259
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-250317r793008_rule
+      - V-250317
+      - icmp
 
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv6 ip_forward in sysctl"
-        sysctl:
-            name: net.ipv6.conf.all.forwarding
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-        when: rhel8stig_ipv6_required
-
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv4 ip_forward value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.ip_forward'
-            line: 'net.ipv4.ip_forward=0'
-
-      - name: "MEDIUM | RHEL-08-040260 | PATCH | The RHEL 8 must not be performing packet forwarding unless the system is a router. | Set IPv6 ip_forward value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.all.forwarding'
-            line: 'net.ipv6.conf.all.forwarding=0'
-        when: rhel8stig_ipv6_required
+- name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sys
   when:
       - rhel_08_040260
       - not rhel8stig_system_is_router
   tags:
-      - RHEL-08-0402606
+      - RHEL-08-040260
       - CAT2
-      - CCI-00036
+      - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r627750_rule
+      - SV-230540r792951_rule
       - V-230540
       - icmp
 
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
-  block:
-      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra in sysctl"
-        sysctl:
-            name: net.ipv6.conf.all.accept_ra
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Set accept_ra value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.all.accept_ra'
-            line: 'net.ipv6.conf.all.accept_ra=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040261
       - rhel8stig_ipv6_required
@@ -6840,24 +6668,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r627750_rule
+      - SV-230541r792954_rule
       - V-230541
       - icmp
 
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
-  block:
-      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra in sysctl"
-        sysctl:
-            name: net.ipv6.conf.default.accept_ra
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Set accept_ra to value 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.default.accept_ra'
-            line: 'net.ipv6.conf.default.accept_ra=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040262
       - rhel8stig_ipv6_required
@@ -6867,24 +6685,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r627750_rule
+      - SV-230542r792957_rule
       - V-230542
       - icmp
 
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
-  block:
-      - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects in sysctl"
-        sysctl:
-            name: net.ipv4.conf.default.send_redirects
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Set default.send_redirects value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.default.send_redirects'
-            line: 'net.ipv4.conf.default.send_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040270
   tags:
@@ -6892,23 +6700,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r744047_rule
+      - SV-230543r792960_rule
       - V-230543
       - icmp
 
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
-  block:
-      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects in sysctl"
-        sysctl:
-            name: net.ipv4.conf.all.accept_redirects
-            state: present
-            value: '0'
-
-      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Set accept_redirects value to 0"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv4.conf.all.accept_redirects='
-            line: 'net.ipv4.conf.all.accept_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040279
   tags:
@@ -6916,24 +6715,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r743908_rule
+      - SV-244553r792996_rule
       - V-244553
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
-  block:
-      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects in sysctl"
-        sysctl:
-            name: net.ipv6.conf.all.accept_redirects
-            state: present
-            value: '0'
-        notify: change_requires_reboot
-
-      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Set all.accept_redirects default value"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^net.ipv6.conf.all.accept_redirects'
-            line: 'net.ipv6.conf.all.accept_redirects=0'
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040280
       - rhel8stig_ipv6_required
@@ -6942,19 +6731,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r744050_rule
+      - SV-230544r792963_rule
       - V-230544
       - icmp
 
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
-  lineinfile:
-      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-      regexp: '^kernel.unprivileged_bpf_disabled'
-      line: 'kernel.unprivileged_bpf_disabled = 1'
-      owner: root
-      group: root
-      mode: 0640
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040281
   tags:
@@ -6962,16 +6746,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r627750_rule
+      - SV-230545r792966_rule
       - V-230545
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
-  lineinfile:
-      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-      regexp: '^kernel.yama.ptrace_scope'
-      line: 'kernel.yama.ptrace_scope = 1'
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040282
   tags:
@@ -6979,19 +6761,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r627750_rule
+      - SV-230546r792969_rule
       - V-230546
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
-  lineinfile:
-      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-      regexp: '^kernel.kptr_restrict'
-      line: 'kernel.kptr_restrict = 1'
-      owner: root
-      group: root
-      mode: 0640
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040283
   tags:
@@ -6999,16 +6776,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r627750_rule
+      - SV-230547r792972_rule
       - V-230547
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
-  lineinfile:
-      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-      regexp: '^user.max_user_namespaces'
-      line: 'user.max_user_namespaces = 0'
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040284
   tags:
@@ -7016,16 +6791,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r627750_rule
+      - SV-230548r792975_rule
       - V-230548
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
-  lineinfile:
-      path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-      regexp: '^net.ipv4.conf.all.rp_filter'
-      line: 'net.ipv4.conf.all.rp_filter = 1'
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040285
   tags:
@@ -7033,16 +6806,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r627750_rule
+      - SV-230549r792978_rule
       - V-230549
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
-  lineinfile:
-      path: /etc/sysctl.conf
-      regexp: '^net.core.bpf_jit_harden='
-      line: 'net.core.bpf_jit_harden=2'
-  notify: sysctl system
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_040286
   tags:
@@ -7050,7 +6821,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244554r743911_rule
+      - V-244554r792999_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"

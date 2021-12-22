@@ -32,26 +32,9 @@
       - sshd
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-  block:
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010375
   tags:
@@ -64,26 +47,9 @@
       - sysctl
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-  block:
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010376
   tags:
