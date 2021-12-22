@@ -228,7 +228,7 @@
   lineinfile:
       path: /etc/security/limits.conf
       regexp: '^\*               hard    maxlogins'
-      line: '*                hard    maxlogins       10'
+      line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
       insertbefore: '^# End of file'
       create: yes
       owner: root
