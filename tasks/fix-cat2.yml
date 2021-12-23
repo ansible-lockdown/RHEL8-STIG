@@ -5644,7 +5644,7 @@
       state: present
   when:
       - rhel_08_030680
-      - "'gnutls' not in ansible_facts.packages"
+      - "'rsyslog-gnutls' not in ansible_facts.packages"
   tags:
       - RHEL-08-030680
       - CAT2
