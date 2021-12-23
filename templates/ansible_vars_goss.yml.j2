@@ -472,6 +472,9 @@ rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
 rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
 
+# RHEL_08_040137
+python_bin: {{ ansible_python.executable }}
+
 # RHEL_08_040260-62
 rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
 
