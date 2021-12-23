@@ -84,6 +84,15 @@
       - CAT3
       - low
 
+- name: trigger update sysctl 
+  command: /bin/true
+  notify: update sysctl
+  check_mode: false
+  tags:
+      - CAT1
+      - CAT2
+      - CAT3
+
 - name: flush handlers
   meta: flush_handlers
   tags:

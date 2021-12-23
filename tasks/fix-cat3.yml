@@ -32,26 +32,9 @@
       - sshd
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-  block:
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010375
   tags:
@@ -59,31 +42,14 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r627750_rule
+      - SV-230269r792879_rule
       - V-230269
       - sysctl
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-  block:
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010376
   tags:
@@ -91,7 +57,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r627750_rule
+      - SV-230270r792882_rule
       - V-230270
       - sysctl
 
@@ -228,7 +194,7 @@
   lineinfile:
       path: /etc/security/limits.conf
       regexp: '^\*               hard    maxlogins'
-      line: '*                hard    maxlogins       10'
+      line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
       insertbefore: '^# End of file'
       create: yes
       owner: root
@@ -328,7 +294,7 @@
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230468r627750_rule
+      - SV-230468r792904_rule
       - V-230468
       - grub
 
@@ -367,7 +333,7 @@
       - CAT3
       - CCI-001849
       - SRG-OS-000341-GPOS-00132
-      - SV-230469r744004_rule
+      - SV-230469r792906_rule
       - V-230469
       - grub
 
@@ -460,7 +426,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230491r627750_rule
+      - SV-230491r792908_rule
       - V-230491
       - grub
 
@@ -476,8 +442,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install ATM', line: 'install ATM /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist ATM', line: 'blacklist ATM', insertafter: '^install ATM /bin/true' }
+      - { regexp: '^install atm', line: 'install atm /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist atm', line: 'blacklist atm', insertafter: '^install atm /bin/true' }
   when:
       - rhel_08_040021
   tags:
@@ -485,7 +451,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230494r627750_rule
+      - SV-230494r792911_rule
       - V-230494
       - modprobe
       - atm
@@ -502,8 +468,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install CAN', line: 'install CAN /bin/true', insertafter: 'EOF' }
-      - { regexp: 'blacklist CAN', line: 'blacklist CAN', insertafter: '^install CAN /bin/true' }
+      - { regexp: '^install can', line: 'install can /bin/true', insertafter: 'EOF' }
+      - { regexp: 'blacklist can', line: 'blacklist can', insertafter: '^install can /bin/true' }
   when:
       - rhel_08_040022
   tags:
@@ -511,7 +477,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230495r627750_rule
+      - SV-230495r792914_rule
       - V-230495
       - modprobe
       - can
@@ -528,8 +494,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install SCTP', line: 'install SCTP /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist SCTP', line: 'blacklist SCTP', insertafter: '^install SCTP' }
+      - { regexp: '^install sctp', line: 'install sctp /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist sctp', line: 'blacklist sctp', insertafter: '^install sctp' }
   when:
       - rhel_08_040023
   tags:
@@ -537,7 +503,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r744017_rule
+      - SV-230496r792917_rule
       - V-230496
       - modprobe
       - sctp
@@ -554,8 +520,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install TIPC', line: 'install TIPC /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist TIPC', line: 'blacklist TIPC', insertafter: '^install TIPC' }
+      - { regexp: '^install tipc', line: 'install tipc /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist tipc', line: 'blacklist tipc', insertafter: '^install tipc' }
   when:
       - rhel_08_040024
   tags:
@@ -563,7 +529,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r627750_rule
+      - SV-230497r792920_rule
       - V-230497
       - modprobe
       - tipc
@@ -589,7 +555,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230498r627750_rule
+      - SV-230498r792922_rule
       - V-230498
       - modprobe
       - cramfs
@@ -615,7 +581,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230499r627750_rule
+      - SV-230499r792924_rule
       - V-230499
       - modprobe
       - firewire

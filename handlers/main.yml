@@ -2,6 +2,15 @@
 - name: systemctl daemon-reload
   systemd: daemon_reload=yes
 
+- name: update sysctl
+  template:
+      src: 99-sysctl.conf.j2
+      dest: /etc/sysctl.d/99-sysctl.conf
+      owner: root
+      group: root
+      mode: 0644
+  notify: sysctl system
+
 - name: sysctl system
   command: sysctl --system
 
