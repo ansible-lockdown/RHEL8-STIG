@@ -1015,7 +1015,7 @@
 
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010372
@@ -1030,7 +1030,7 @@
 
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010373
@@ -1045,7 +1045,7 @@
 
 - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010374
@@ -1303,7 +1303,7 @@
 
 - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010430
@@ -1981,7 +1981,7 @@
 
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010671
@@ -6557,7 +6557,7 @@
 
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040209
@@ -6572,7 +6572,7 @@
 
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040210
@@ -6588,7 +6588,7 @@
 
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040220
@@ -6603,7 +6603,7 @@
 
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040230
@@ -6618,7 +6618,7 @@
 
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040239
@@ -6633,7 +6633,7 @@
 
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040240
@@ -6649,7 +6649,7 @@
 
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040249
@@ -6664,7 +6664,7 @@
 
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040250
@@ -6680,7 +6680,7 @@
 
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sys
   when:
       - rhel_08_040259
@@ -6696,7 +6696,7 @@
 
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sys
   when:
       - rhel_08_040260
@@ -6712,7 +6712,7 @@
 
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040261
@@ -6729,7 +6729,7 @@
 
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040262
@@ -6746,7 +6746,7 @@
 
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040270
@@ -6761,7 +6761,7 @@
 
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040279
@@ -6776,7 +6776,7 @@
 
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040280
@@ -6792,7 +6792,7 @@
 
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040281
@@ -6807,7 +6807,7 @@
 
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040282
@@ -6822,7 +6822,7 @@
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040283
@@ -6837,7 +6837,7 @@
 
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040284
@@ -6852,7 +6852,7 @@
 
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040285
@@ -6867,7 +6867,7 @@
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
   debug:
-    msg: "Control being set handler update sysctl /etc/99-sysctl.conf"
+    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040286
