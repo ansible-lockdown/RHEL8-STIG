@@ -6377,7 +6377,7 @@
       - SRG-OS-000368-GPOS-00154
       - SV-230523r744023_rule
       - V-230523
-      - fapolicyd
+      - fapolicy
 
 - name: "MEDIUM | RHEL-08-040136 | PATCH | The RHEL 8 fapolicy module must be enabled."
   systemd:
@@ -6404,14 +6404,16 @@
         with_items:
             - "allow exe={{ ansible_python.executable }} : ftype=text/x-python"
             - "{{ rhel8stig_fapolicy_white_list }}"
+        notify:
+            - restart fapolicyd
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
         lineinfile:
             path: /etc/fapolicyd/fapolicyd.conf
             regexp: '^permissive ='
             line: 'permissive = 0'
-  notify:
-      - restart fapolicyd
+        notify:
+            - restart fapolicyd
   when:
       - rhel_08_040137
   tags:
