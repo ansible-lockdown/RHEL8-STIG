@@ -40,6 +40,11 @@
       name: rsyslog
       state: restarted
 
+- name: restart fapolicyd
+  service:
+      name: fapolicyd
+      state: restarted
+
 - name: confirm grub2 user cfg
   stat:
       path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
