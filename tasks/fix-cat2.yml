@@ -6402,6 +6402,7 @@
             path: /etc/fapolicyd/fapolicyd.rules
             line: "{{ item }}"
         with_items:
+            - "allow exe={{ ansible_python.executable }} : ftype=text/x-python"
             - "{{ rhel8stig_fapolicy_white_list }}"
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
