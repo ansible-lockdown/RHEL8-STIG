@@ -6410,6 +6410,8 @@
             path: /etc/fapolicyd/fapolicyd.conf
             regexp: '^permissive ='
             line: 'permissive = 0'
+  notify:
+      - restart fapolicyd
   when:
       - rhel_08_040137
   tags:
