@@ -314,11 +314,6 @@
         stat:
             path: "{{ rhel8stig_sssd_conf }}"
         register: rhel8stig_sssd_conf_present
-        when:
-            - rhel_08_010400 or
-              rhel_08_020090 or
-              rhel_08_020250 or
-              rhel_08_020290
 
       - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
         debug:
@@ -326,6 +321,11 @@
         changed_when: true
         when:
             - not rhel8stig_sssd_conf_present.stat.exists
+  when:
+      - rhel_08_010400 or
+        rhel_08_020090 or
+        rhel_08_020250 or
+        rhel_08_020290
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
