@@ -6686,7 +6686,7 @@
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
   debug:
     msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  notify: update sys
+  notify: update sysctl
   when:
       - rhel_08_040259
       - not rhel8stig_system_is_router
@@ -6702,7 +6702,7 @@
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
   debug:
     msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  notify: update sys
+  notify: update sysctl
   when:
       - rhel_08_040260
       - not rhel8stig_system_is_router
