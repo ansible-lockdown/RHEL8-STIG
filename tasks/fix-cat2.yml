@@ -1145,6 +1145,7 @@
       state: present
   when:
       - rhel_08_010410
+      - not system_is_container
   tags:
       - RHEL-08-010410
       - CAT2
