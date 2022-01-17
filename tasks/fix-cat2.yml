@@ -2484,7 +2484,7 @@
       - SV-230328r627750_rule
       - V-23032
       - complexity-high
-      - mount
+      - mounts
       - home
 
 - name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
