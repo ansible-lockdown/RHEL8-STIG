@@ -2056,6 +2056,7 @@
       line: "ProcessSizeMax=0"
   when:
       - rhel_08_010675
+      - "'systemd' in ansible_facts.packages"
   tags:
       - RHEL-08-010675
       - CAT2
