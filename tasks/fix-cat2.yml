@@ -5776,6 +5776,7 @@
   notify: restart {{ rhel8stig_time_service }}
   when:
       - rhel_08_030740
+      - "'chrony' in ansible_facts.packages"
   tags:
       - RHEL-08-030740
       - CAT2
@@ -5783,7 +5784,7 @@
       - SRG-OS-000355-GPOS-00143
       - SV-230484r627750_rule
       - V-230484
-      - chronyd
+      - chrony
 
 - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
   shell: dnf remove abrt*
