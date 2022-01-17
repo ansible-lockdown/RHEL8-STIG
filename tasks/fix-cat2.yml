@@ -252,7 +252,7 @@
       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
         debug:
             msg:
-                - "ALERT!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
+                - "WARNING!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
             - not rhel8stig_disruption_high
@@ -1171,7 +1171,7 @@
       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
         debug:
             msg:
-                - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
+                - "WARNING!! You do not have execute disable active. Please change the setting in your BIOS settings"
         when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
   when:
       - rhel_08_010420
@@ -1494,7 +1494,7 @@
   block:
       - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp. | Alert on missing mount"
         debug:
-            msg: "Warning! /var/tmp does not exist, /var/tmp needs to use a sperate file system. This is a manual task"
+            msg: "WARNING!! /var/tmp does not exist, /var/tmp needs to use a sperate file system. This is a manual task"
         register: var_tmp_mount_absent
         changed_when: var_tmp_mount_absent.skipped is defined
         when: "'/var/tmp' not in mount_names"
@@ -2427,7 +2427,7 @@
       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Alert nouser files"
         debug:
             msg:
-                - "ALERT!!! There are files with no user assigned. Please review files listed below and assign owner"
+                - "WARNING!! There are files with no user assigned. Please review files listed below and assign owner"
                 - "{{ rhel_08_010780_nouser_files.stdout_lines }}"
         when: rhel_08_010780_nouser_files.stdout | length > 0
   when:
@@ -2452,7 +2452,7 @@
       - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Alert nogroup files"
         debug:
             msg:
-                - "ALERT!!!! There are files with no group assigned. Please review files listed below and assign group"
+                - "WARNING!! There are files with no group assigned. Please review files listed below and assign group"
                 - "{{ rhel_08_010790_nogroup_files.stdout_lines }}"
         when: rhel_08_010790_nogroup_files.stdout | length > 0
   when:
@@ -2510,7 +2510,7 @@
 - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
   debug:
       msg:
-          - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
+          - "WARNING!!  Please check temporary accounts for expiration dates to be 72 hours or less."
           - "To do this please run sudo chage -l account_name for the accounts you need to check"
           - "The results will display the Account Expires information"
           - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
@@ -3637,7 +3637,7 @@
       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
         debug:
             msg:
-                - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+                - "WARNING!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
                 - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
   when:
       - rhel_08_020240
@@ -5610,7 +5610,7 @@
       - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
         debug:
             msg:
-                - "ALERT!!!Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
+                - "WARNING!! Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
                 - "Path: {{ rhel_08_030660_audit_log_path.stdout }}"
                 - "Disk Space: {{ rhel_08_030660_audit_log_partition.stdout }}"
   when:
