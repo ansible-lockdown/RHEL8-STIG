@@ -2994,6 +2994,7 @@
   when:
       - rhel_08_020027 or
         rhel_08_020028
+      - not system_is_container
   tags:
       - RHEL-08-020027
       - RHEL-08-020028
@@ -3004,6 +3005,7 @@
       - SV-250316r793010_rule
       - V-250315
       - V-250316
+      - selinux
 
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
