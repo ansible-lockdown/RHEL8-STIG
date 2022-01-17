@@ -1768,7 +1768,6 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1783,7 +1782,6 @@
             - rhel_08_010610
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
