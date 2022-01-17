@@ -2004,6 +2004,7 @@
   notify: systemctl daemon-reload
   when:
       - rhel_08_010672
+      - "'systemd' in ansible_facts.packages"
   tags:
       - RHEL-08-010672
       - CAT2
