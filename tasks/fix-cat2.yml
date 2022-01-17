@@ -5658,6 +5658,7 @@
       - SV-230478r744011_rule
       - V-230478
       - gnutls
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
   lineinfile:
@@ -5674,6 +5675,7 @@
       - SV-230479r627750_rule
       - V-230479
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
   lineinfile:
@@ -5714,6 +5716,7 @@
       - SV-230481r627750_rule
       - V-230481
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
   lineinfile:
@@ -5731,6 +5734,7 @@
       - SV-230482r627750_rule
       - V-230482
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
   lineinfile:
