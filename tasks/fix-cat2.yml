@@ -1489,7 +1489,7 @@
       - SV-230295r627750_rule
       - V-230295
       - complexity-high
-      - mount
+      - mounts
       - tmp
 
 - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp."
