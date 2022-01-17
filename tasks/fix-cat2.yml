@@ -6132,6 +6132,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_040111
+      - not system_is_container
   tags:
       - RHEL-08-040111
       - CAT2
@@ -6467,6 +6468,7 @@
       - rhel_08_040139 or
         rhel_08_040140 or
         rhel_08_040141
+      - not system_is_container
   tags:
       - RHEL-08-040139
       - RHEL-08-040140
