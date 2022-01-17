@@ -5,16 +5,18 @@
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
         debug:
             msg:
-                - "ALERT! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
+                - "WARNING!! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
                 - "McAfee is the suggested by STIG"
         when:
-            - "'mcafeetp' or 'mfetpd' not in ansible_facts.packages"
+            - "'mcafeetp' not in ansible_facts.packages or
+               'mfetpd' not in ansible_facts.packages"
 
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
         debug:
             msg: "Congratulations! You have McAfee installed"
         when:
-            - "'mcafeetp' or 'mfetpd' in ansible_facts.packages"
+            - "'mcafeetp' in ansible_facts.packages or
+               'mfetpd' in ansible_facts.packages"
   when:
       - rhel_08_040286
       - rhel8stig_av_sftw == 'mcafee'
@@ -180,7 +182,7 @@
       - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. | Message out certs"
         debug:
             msg:
-                - "WARNING!!!!The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
+                - "WARNING!! The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
                 - "If they are not please apply the latest PKI CA certificate bundle from cyber.mil and copy the DoD_PKE_CA_chain.pem into /etc/sssd/pki/sssd_auth_ca_db.pem"
                 - "{{ rhel_08_010090_certs_list.stdout_lines }}"
   when:
@@ -1469,7 +1471,7 @@
 
 - name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
   debug:
-      msg: "WARNING!!!! /tmp is not mounted on a separate partition"
+      msg: "WARNING!!  /tmp is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
@@ -2239,7 +2241,7 @@
       - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Message out user list"
         debug:
             msg:
-                - "WARNING!!!!The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
+                - "WARNING!! The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
                 - "{{ rhel_08_010720_user_list.stdout_lines }}"
         when: rhel_08_010720_user_list.stdout | length > 0
   when:
@@ -2466,7 +2468,7 @@
 
 - name: "MEDIUM | RHEL-08-010800 | PATCH | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
   debug:
-      msg: "WARNING!!!! /home is not mounted on a separate partition"
+      msg: "WARNING!!  /home is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
@@ -3757,7 +3759,7 @@
       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
         debug:
             msg:
-                - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+                - "WARNING!! Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
                 - "{{ rhel_08_020270_system_users.stdout_lines }}"
   when:
       - rhel_08_020270
