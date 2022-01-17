@@ -184,7 +184,7 @@
             msg:
                 - "WARNING!! The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
                 - "If they are not please apply the latest PKI CA certificate bundle from cyber.mil and copy the DoD_PKE_CA_chain.pem into /etc/sssd/pki/sssd_auth_ca_db.pem"
-                - "{{ rhel_08_010090_certs_list.stdout_lines }}"
+                - "{{ rhel_08_010090_certs_list.stdout_lines | default('None-found') }}"
   when:
       - rhel_08_010090
   tags:
