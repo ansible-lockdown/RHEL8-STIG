@@ -127,7 +127,7 @@
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
-      msg: "WARNING: /var is not mounted on a separate partition"
+      msg: "WARNING!! /var is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
