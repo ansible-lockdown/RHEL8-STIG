@@ -1473,7 +1473,7 @@
 
 - name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
   debug:
-      msg: "WARNING!!  /tmp is not mounted on a separate partition"
+      msg: "WARNING!! /tmp is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
@@ -1507,6 +1507,7 @@
         when: "'/var/tmp' in mount_names"
   when:
       - rhel_08_010544
+      - not system_is_container
   tags:
       - RHEL-08-010544
       - CAT2
