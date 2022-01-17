@@ -555,6 +555,7 @@
       - rhel_08_010210 or
         rhel_08_010220 or
         rhel_08_010230
+      - not system_is_container
   tags:
       - CAT2
       - RHEL-08-010210
