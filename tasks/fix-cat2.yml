@@ -2039,6 +2039,7 @@
       line: "Storage=none"
   when:
       - rhel_08_010674
+      - "'systemd' in ansible_facts.packages"
   tags:
       - RHEL-08-010674
       - CAT2
