@@ -1,4 +1,5 @@
 ---
+
 - name: Gather distribution info
   setup:
       gather_subset: distribution,!all,!min
@@ -9,7 +10,7 @@
 
 - name: Check OS version and family
   assert:
-      that: ansible_os_family == 'RedHat' and ansible_distribution_major_version is version_compare('8', '==')
+      that: (ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
       msg: "This role can only be run against RHEL/CENTOS 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
   tags:
       - always
