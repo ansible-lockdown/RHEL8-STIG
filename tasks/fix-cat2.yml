@@ -464,7 +464,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_010170 or rhel_08_010450
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_disruption_high
   tags:
       - CAT2
@@ -1476,7 +1476,7 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010543
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
   tags:
@@ -1539,7 +1539,7 @@
       enabled: yes
   when:
       - rhel_08_010560
-      - not rhel8stig_system_is_container
+      - not system_is_container
   tags:
       - RHEL-08-010560
       - CAT2
@@ -1723,7 +1723,7 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1738,12 +1738,12 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010600
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not (rhel8stig_system_is_chroot and system_is_container)
   tags:
       - RHEL-08-010600
       - CAT2
@@ -1767,7 +1767,7 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1782,12 +1782,12 @@
             - rhel_08_010610
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010610
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not (rhel8stig_system_is_chroot and system_is_container)
   tags:
       - RHEL-08-010610
       - CAT2
@@ -1811,7 +1811,7 @@
             - rhel_08_010620
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1826,12 +1826,12 @@
             - rhel_08_010620
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+            - not (rhel8stig_system_is_chroot and system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010620
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not (rhel8stig_system_is_chroot and system_is_container)
   tags:
       - RHEL-08-010620
       - CAT2
@@ -2127,7 +2127,7 @@
   when:
       - rhel_08_010680
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - not system_is_ec2
   tags:
       - RHEL-08-010680
@@ -2473,7 +2473,7 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010800
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
   tags:
@@ -5868,7 +5868,7 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not rhel8stig_system_is_container
+            - not system_is_container
             - rhel8stig_firewall_service == "firewalld"
             - rhel8stig_start_firewall_service
         tags:
@@ -5903,7 +5903,7 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not rhel8stig_system_is_container
+            - not system_is_container
             - rhel8stig_firewall_service == "iptables"
             - rhel8stig_start_firewall_service
         tags:
@@ -5923,7 +5923,7 @@
   when:
       - rhel_08_040030
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_disruptive
   tags:
       - RHEL-08-040030
