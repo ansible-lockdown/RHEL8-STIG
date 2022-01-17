@@ -40,8 +40,8 @@ rhel8stig_workaround_for_ssg_benchmark: true
 # tweak role to run in a chroot, such as in kickstart %post script
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 
-# tweak role to run in a non-privileged container
-rhel8stig_system_is_container: false
+# tweak role to run in a non-privileged container (default value)- dynamically discovered in tasks/main.yml
+system_is_container: false
 
 # rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks

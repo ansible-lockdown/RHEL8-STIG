@@ -1,5 +1,3 @@
----
-
 - name: Gather distribution info
   setup:
       gather_subset: distribution,!all,!min
@@ -19,6 +17,15 @@
   assert:
       that: ansible_version.full is version_compare(rhel8stig_min_ansible_version, '>=')
       msg: You must use Ansible {{ rhel8stig_min_ansible_version }} or greater
+  tags:
+      - always
+
+- name: Discover and set container variable if required
+  set_fact:
+     system_is_container: true
+  when:
+      - ansible_connection == 'docker' or
+        ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
       - always
 
