@@ -114,6 +114,7 @@
   when:
       - rhel_08_010471 or
         rhel_08_010472
+      - not system_is_container
   tags:
       - RHEL-08-010471
       - RHEL-08-010472
@@ -132,7 +133,7 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010540
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
@@ -154,7 +155,7 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010541
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
@@ -176,7 +177,7 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010542
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
