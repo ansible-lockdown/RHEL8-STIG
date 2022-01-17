@@ -143,7 +143,7 @@
       - SV-230292r627750_rule
       - V-230292
       - complexity-high
-      - mount
+      - mounts
       - var
 
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
@@ -165,7 +165,7 @@
       - SV-230293r627750_rule
       - V-230293
       - complexity_high
-      - mount
+      - mounts
       - auditd
 
 - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
@@ -187,7 +187,7 @@
       - SV-230294r627750_rule
       - V-230294
       - complexity_high
-      - mount
+      - mounts
       - auditd
 
 - name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
