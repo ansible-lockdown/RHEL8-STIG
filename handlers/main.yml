@@ -1,6 +1,9 @@
 ---
 - name: systemctl daemon-reload
-  systemd: daemon_reload=yes
+  systemd: 
+      daemon_reload: True
+  when:
+      - not system_is_container
 
 - name: update sysctl
   template:
@@ -13,6 +16,7 @@
 
 - name: sysctl system
   command: sysctl --system
+  when: "'procps-ng' in ansible_facts.packages"
 
 - name: restart sshd
   service:
