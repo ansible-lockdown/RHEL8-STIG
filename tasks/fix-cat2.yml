@@ -6942,6 +6942,7 @@
   when:
       - rhel_08_040330
       - not rhel8stig_net_promisc_mode_required
+      - not system_is_container
   tags:
       - RHEL-08-040330
       - CAT2
