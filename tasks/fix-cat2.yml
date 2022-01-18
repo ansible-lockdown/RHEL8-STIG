@@ -4022,6 +4022,7 @@
       - SV-230387r743996_rule
       - V-230387
       - cron
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
   lineinfile:
