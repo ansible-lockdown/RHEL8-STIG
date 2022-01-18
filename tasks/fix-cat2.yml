@@ -6551,7 +6551,7 @@
       - RG-OS-000033-GPOS-00014
       - SV-230527r627750_rule
       - V-230527
-      - sshd
+      - ssh
 
 - name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
   systemd:
