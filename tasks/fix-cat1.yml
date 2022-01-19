@@ -127,6 +127,7 @@
             - not ansible_check_mode or
               rhel_08_010020_audit.rc > 1
   when:
+      - not system_is_container
       - rhel_08_010020
   tags:
       - RHEL-08-010020
@@ -153,6 +154,7 @@
             mode: 0640
         notify: confirm grub2 user cfg
   when:
+      - not system_is_container
       - not system_is_ec2
       - rhel_08_010140 or
         rhel_08_010150
@@ -288,6 +290,7 @@
   when:
       - rhel_08_020330
       - rhel8stig_disruption_high
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-020330
       - CAT1
@@ -373,6 +376,7 @@
         notify: systemctl daemon-reload
   when:
       - rhel_08_040170
+      - not system_is_container
   tags:
       - RHEL-08-040170
       - CAT1
@@ -429,6 +433,7 @@
   notify: systemctl daemon-reload
   when:
       - rhel_08_040172
+      - not system_is_container
   tags:
       - RHEL-08-040172
       - CAT1
