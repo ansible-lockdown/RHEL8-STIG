@@ -40,6 +40,8 @@
       - not system_is_ec2
       - rhel_08_010140 or
         rhel_08_010150
+  tags:
+      - grub
 
 - name: Check if using resolv.conf template settings are changed
   assert:
