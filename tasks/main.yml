@@ -27,7 +27,7 @@
      system_is_container: true
   when:
       - ansible_connection == 'docker' or
-        ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
+        ansible_virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
       - always
 
