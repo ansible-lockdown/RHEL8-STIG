@@ -44,6 +44,7 @@
       - cat2
       - medium
       - RHEL-08-010380
+      - sudo
 
 - name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150| Install grub2-tools."
   dnf:
