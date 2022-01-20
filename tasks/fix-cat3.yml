@@ -33,7 +33,7 @@
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010375
@@ -48,7 +48,7 @@
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010376
@@ -337,6 +337,7 @@
       - SV-230469r792906_rule
       - V-230469
       - grub
+      - auditd
 
 - name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
   lineinfile:
@@ -349,6 +350,7 @@
       mode: 0600
   when:
       - rhel_08_030603
+      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3
