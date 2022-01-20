@@ -2197,7 +2197,9 @@
             owner: "{{ rhel8stig_ww_dir_owner }}"
         with_items:
             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010700_world_writable_directories.stdout | length > 0
+        when: 
+            - rhel_08_010700_world_writable_directories.stdout is defined
+            - rhel_08_010700_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010700
   tags:
