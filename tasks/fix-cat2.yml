@@ -1013,6 +1013,7 @@
   when:
       - rhel_08_010360
       - rhel8stig_disruption_high
+      - "'crontabs' in ansible_facts.packages"
   tags:
       - RHEL-08-010360
       - CAT2
