@@ -22,13 +22,22 @@
   tags:
       - always
 
-- name: Discover and set container variable if required
-  set_fact:
-     system_is_container: true
+- name: Setup rules if container
+  block:
+      - name: Discover and set container variable if required
+        set_fact:
+            system_is_container: true
+
+      - name: output if discovered is a container
+        debug:
+            msg: system has been discovered as a container
+        when:
+            - system_is_container
   when:
       - ansible_connection == 'docker' or
         ansible_virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
+      - container_discovery
       - always
 
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
