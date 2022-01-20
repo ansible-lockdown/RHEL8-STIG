@@ -22,6 +22,7 @@
   notify: restart sshd
   when:
       - rhel_08_010292
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010292
       - CAT3
