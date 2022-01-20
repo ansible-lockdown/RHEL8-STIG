@@ -13,7 +13,7 @@
       group: root
       mode: 0644
   notify: sysctl system
-  when: "'systemd' in ansible_facts.packages"
+  when: "'procps-ng' in ansible_facts.packages"
 
 - name: sysctl system
   command: sysctl --system
