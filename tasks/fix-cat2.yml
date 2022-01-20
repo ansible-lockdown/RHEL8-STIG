@@ -6592,6 +6592,7 @@
       masked: yes
       daemon_reload: yes
   when:
+      - ansible_service_mgr == 'systemd'
       - rhel_08_040180
   tags:
       - RHEL-08-040180
