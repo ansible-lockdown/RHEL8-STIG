@@ -2225,7 +2225,9 @@
             group: "{{ rhel8stig_ww_dir_grpowner }}"
         with_items:
             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010710_world_writable_directories.stdout | length > 0
+        when: 
+            - rhel_08_010710_world_writable_directories.stdout is defined
+            - rhel_08_010710_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010710
   tags:
@@ -2256,7 +2258,9 @@
             msg:
                 - "WARNING!! The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
                 - "{{ rhel_08_010720_user_list.stdout_lines }}"
-        when: rhel_08_010720_user_list.stdout | length > 0
+        when: 
+            - rhel_08_010720_user_list.stdout is defined
+            - rhel_08_010720_user_list.stdout | length > 0
   when:
       - rhel_08_010720
   tags:
