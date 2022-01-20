@@ -25,6 +25,7 @@
       state: restarted
   when:
       - not rhel8stig_system_is_chroot
+      - "'openssh-server' in ansible_facts.packages"
 
 - name: restart sssd
   service:
