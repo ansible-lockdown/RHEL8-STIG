@@ -78,6 +78,8 @@
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
+        when:
+            - rhel8stig_ssh_required
 
       - name: |
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
@@ -209,6 +211,7 @@
             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
   when:
       - rhel_08_010100
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010100
       - CAT2
@@ -334,6 +337,7 @@
       - SV-244522r792984_rule
       - V-244521
       - V-244522
+      - grub
 
 - name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
   lineinfile:
@@ -776,6 +780,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_010287
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010287
       - CAT2
@@ -794,7 +799,7 @@
           "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
         command: fips-mode-setup --check
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010290_pre_fips_check.stdout is not defined
         register: rhel_08_010290_pre_fips_check
 
       - name: |
@@ -833,7 +838,7 @@
       - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
         command: fips-mode-setup --check
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
         register: rhel_08_010293_pre_fips_check
 
       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
@@ -1016,6 +1021,7 @@
       - SV-230263r627750_rule
       - V-230263
       - aide
+      - cron
 
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
   debug:
@@ -1447,6 +1453,7 @@
   notify: restart sshd
   when:
       - rhel_08_010521
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010521
       - CAT2
@@ -1463,6 +1470,7 @@
       line: "GSSAPIAuthentication no"
   when:
       - rhel_08_010522
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010522
       - CAT2
@@ -2496,6 +2504,7 @@
   notify: restart sshd
   when:
       - rhel_08_010830
+      - rhel8stig_ssh_required
       - rhel8stig_disruption_high
   tags:
       - RHEL-08-010830
@@ -6526,6 +6535,7 @@
   when:
       - rhel_08_040159 or
         rhel_08_040160
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040159
       - RHEL-08-040160
@@ -6546,6 +6556,7 @@
   notify: restart sshd
   when:
       - rhel_08_040161
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040161
       - CAT2
@@ -6983,6 +6994,7 @@
       line: 'X11UseLocalhost yes'
   when:
       - rhel_08_040341
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040341
       - CAT2
