@@ -1978,6 +1978,7 @@
       state: stopped
   when:
       - rhel_08_010670
+      - "'kexec-tools' in ansible_facts.packages"
       - not rhel8stig_kdump_needed
   tags:
       - RHEL-08-010670
