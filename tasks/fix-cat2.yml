@@ -5956,7 +5956,8 @@
   when:
       - rhel_08_040030
       - not rhel8stig_system_is_chroot
-      - not system_is_container
+      - rhel8stig_firewall_service != "not_required"
+
       - rhel8stig_disruptive
   tags:
       - RHEL-08-040030
