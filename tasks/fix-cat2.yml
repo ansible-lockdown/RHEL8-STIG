@@ -326,7 +326,7 @@
       - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
   when:
       - rhel_08_010141 or
-        rhel_08_010141
+        rhel_08_010149
   tags:
       - RHEL-08-010141
       - RHEL-08-010149
