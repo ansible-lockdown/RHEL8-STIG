@@ -28,6 +28,10 @@
         set_fact:
             system_is_container: true
 
+      - name: Load variable for container
+        include_vars:
+            file: "{{ container_vars_file }}"
+      
       - name: output if discovered is a container
         debug:
             msg: system has been discovered as a container
@@ -47,6 +51,7 @@
 
   when:
       - not system_is_ec2
+      - not system_is_container
       - rhel_08_010140 or
         rhel_08_010150
   tags:
