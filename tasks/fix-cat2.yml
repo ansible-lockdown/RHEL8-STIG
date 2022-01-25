@@ -2689,7 +2689,7 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required pam_faillock.so'
             line: 'account    required pam_faillock.so'
             insertafter: '^account'
         notify: restart sssd
