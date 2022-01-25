@@ -134,7 +134,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010540
-      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
@@ -156,7 +155,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010541
-      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
@@ -168,7 +166,6 @@
       - V-230293
       - complexity_high
       - mounts
-      - auditd
 
 - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
   debug:
@@ -178,7 +175,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010542
-      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
