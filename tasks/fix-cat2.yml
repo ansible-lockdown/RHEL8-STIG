@@ -6038,6 +6038,7 @@
             enabled: yes
   when:
       - rhel_08_040100
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040100
       - CAT2
@@ -6104,6 +6105,7 @@
         register: rhel_08_040090_default_zone_set
   when:
       - rhel_08_040090
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040090
       - CAT2
@@ -6518,6 +6520,7 @@
       line: 'FirewallBackend=nftables'
   when:
       - rhel_08_040150
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040150
       - CAT2
