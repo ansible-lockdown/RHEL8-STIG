@@ -43,6 +43,10 @@ rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 # tweak role to run in a non-privileged container (default value)- dynamically discovered in tasks/main.yml
 system_is_container: false
 
+# Place to find the container yml file for your environment - /vars/...
+container_vars_file: is_container.yml
+
+
 # rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
