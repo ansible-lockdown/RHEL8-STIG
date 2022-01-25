@@ -2697,9 +2697,9 @@
             - system-auth
             - password-auth
   when:
-      - rhel_08_020013
+      - rhel_08_020014
   tags:
-      - RHEL-08-020013
+      - RHEL-08-020014
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
