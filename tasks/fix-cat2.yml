@@ -1488,7 +1488,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010543
-      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
   tags:
@@ -1517,7 +1516,6 @@
         when: "'/var/tmp' in mount_names"
   when:
       - rhel_08_010544
-      - not system_is_container
   tags:
       - RHEL-08-010544
       - CAT2
@@ -1796,7 +1794,7 @@
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010610
-      - not (rhel8stig_system_is_chroot and system_is_container)
+      - not rhel8stig_system_is_chroot
   tags:
       - RHEL-08-010610
       - CAT2
@@ -1838,7 +1836,7 @@
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010620
-      - not (rhel8stig_system_is_chroot and system_is_container)
+      - not rhel8stig_system_is_chroot
   tags:
       - RHEL-08-010620
       - CAT2
@@ -2490,7 +2488,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010800
-      - not system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
   tags:
