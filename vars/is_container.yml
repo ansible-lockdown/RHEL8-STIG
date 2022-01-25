@@ -94,87 +94,118 @@ rhel_08_030620: false
 rhel_08_030630: false
 rhel_08_030640: false
 rhel_08_030660: false
-rhel_08_030690: false
+# rhel_08_030690: false  # Also rsyslog
 rhel_08_030700: false
-rhel_08_030710: false
-rhel_08_030720: false
+# rhel_08_030710: false  # Also rsyslog
+# rhel_08_030720: false  # Also rsyslog
 rhel_08_030730: false
 rhel_08_030731: false
-
-rhel_08_010542
-rhel_08_030063
-rhel_08_030602
+# rhel_08_010542: false  # Also Rsyslog
+rhel_08_030063: false
+# rhel_08_030602: false # Also grub
 
 
 # rsyslog
-rhel_08_010070
-rhel_08_010561
-rhel_08_030010
-rhel_08_030670
-rhel_08_030680
-rhel_08_030690
-rhel_08_030710
-rhel_08_030720
+rhel_08_010070: false
+rhel_08_010561: false
+rhel_08_030010: false
+rhel_08_030670: false
+rhel_08_030680: false
+rhel_08_030690: false
+rhel_08_030710: false
+rhel_08_030720: false
 
 ## mounts
 #/tmp
-rhel_08_010543
-rhel_08_040123
-rhel_08_040124
-rhel_08_040125
+rhel_08_010543: false
+rhel_08_040123: false
+rhel_08_040124: false
+rhel_08_040125: false
 # /var/log
-rhel_08_040126
-rhel_08_040127
-rhel_08_040128
-rhel_08_010541
+rhel_08_040126: false
+rhel_08_040127: false
+rhel_08_040128: false
+rhel_08_010541: false
 # /var/tmp
-rhel_08_010544
-rhel_08_040132
-rhel_08_040133
-rhel_08_040134
+rhel_08_010544: false
+rhel_08_040132: false
+rhel_08_040133: false
+rhel_08_040134: false
 # /var/log/audit
-rhel_08_040129
-rhel_08_040130
-rhel_08_040131
-rhel_08_010542
+rhel_08_040129: false
+rhel_08_040130: false
+rhel_08_040131: false
+rhel_08_010542: false
 # /home
-rhel_08_010570
-rhel_08_010590
-rhel_08_010800
+rhel_08_010570: false
+rhel_08_010590: false
+rhel_08_010800: false
 # /boot
-rhel_08_010571
+rhel_08_010571: false
 # /boot/efi
-rhel_08_010572
+rhel_08_010572: false
 #
-rhel_08_010580
+rhel_08_010580: false
 # /media
-rhel_08_010610
+rhel_08_010610: false
 # /mnt
-rhel_08_010620
+rhel_08_010620: false
 # NFS
-rhel_08_010630
-rhel_08_010640
-rhel_08_010650
+rhel_08_010630: false
+rhel_08_010640: false
+rhel_08_010650: false
 # /dev/shm
-rhel_08_040120
-rhel_08_040121
-rhel_08_040122
+rhel_08_040120: false
+rhel_08_040121: false
+rhel_08_040122: false
 # /var
-rhel_08_010540
+rhel_08_010540: false
 
 # firewall
 rhel8stig_firewall_service: not_required
 
 # fapolicy
+rhel_08_040135: false
+rhel_08_040136: false
+rhel_08_040137: false
 
 # grub
+rhel_08_010141: false
+rhel_08_010149: false
+rhel_08_010421: false
+rhel_08_010422: false
+rhel_08_010423: false
+rhel_08_030601: false
+rhel_08_030602: false
+rhel_08_040004: false
 
 # modprobe
+rhel_08_040021: false
+rhel_08_040022: false
+rhel_08_040023: false
+rhel_08_040024: false
+rhel_08_040025: false
+rhel_08_040026: false
 
 # chrony
+rhel_08_030740: false
+rhel_08_030741: false
+rhel_08_030742: false
 
 # fips
+rhel_08_010290: false
+rhel_08_010291: false
+rhel_08_010293: false
 
 # aide
+rhel_08_010360: false
+rhel_08_030650: false
+rhel_08_040300: false
+rhel_08_040310: false
 
 # sudo
+rhel_08_010380: false
+rhel_08_010381: false
+rhel_08_010382: false
+rhel_08_010383: false
+rhel_08_010384: false
