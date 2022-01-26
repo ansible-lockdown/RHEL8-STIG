@@ -848,6 +848,7 @@ rhel8stig_custom_firewall_zone: "new_fw_zone"
 # RHEL-08-040090
 # rhel8stig_white_list_services is the services that you want to allow through initially for teh new firewall zone
 # http and ssh need to be enabled for the role to run.
+# This can also be a port number if no service exists
 rhel8stig_white_list_services:
     - http
     - https
