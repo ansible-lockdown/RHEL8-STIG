@@ -554,7 +554,7 @@ rhel8stig_local_int_home_perms: 0750
 # rhel8stig_local_int_home_file_perms is the permissions set to files in the local interactive
 # user home directories. These are only set when rhel8stig_disruption_high is set to true
 # All files users home directories that are less restrictive than 0750 will be set to this value
-rhel8stig_local_int_home_file_perms: 750
+rhel8stig_local_int_home_file_perms: 0750
 
 # RHEL-08-010770
 # rhel8stig_local_int_perm is the permissions set to the local initialization files
