@@ -40,8 +40,12 @@ rhel8stig_workaround_for_ssg_benchmark: true
 # tweak role to run in a chroot, such as in kickstart %post script
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 
-# tweak role to run in a non-privileged container
-rhel8stig_system_is_container: false
+# tweak role to run in a non-privileged container (default value)- dynamically discovered in tasks/main.yml
+system_is_container: false
+
+# Place to find the container yml file for your environment - /vars/...
+container_vars_file: is_container.yml
+
 
 # rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
@@ -844,6 +848,7 @@ rhel8stig_custom_firewall_zone: "new_fw_zone"
 # RHEL-08-040090
 # rhel8stig_white_list_services is the services that you want to allow through initially for teh new firewall zone
 # http and ssh need to be enabled for the role to run.
+# This can also be a port number if no service exists
 rhel8stig_white_list_services:
     - http
     - https

@@ -1,6 +1,9 @@
 ---
 - name: systemctl daemon-reload
-  systemd: daemon_reload=yes
+  systemd: 
+      daemon_reload: true
+  when:
+      - not system_is_container
 
 - name: update sysctl
   template:
@@ -10,9 +13,11 @@
       group: root
       mode: 0644
   notify: sysctl system
+  when: "'procps-ng' in ansible_facts.packages"
 
 - name: sysctl system
   command: sysctl --system
+  when: "'procps-ng' in ansible_facts.packages"
 
 - name: restart sshd
   service:
@@ -20,6 +25,7 @@
       state: restarted
   when:
       - not rhel8stig_system_is_chroot
+      - "'openssh-server' in ansible_facts.packages"
 
 - name: restart sssd
   service:
@@ -57,7 +63,7 @@
   when:
       - rhel8stig_grub2_user_cfg.stat.exists
       - not rhel8stig_skip_for_travis
-      - not rhel8stig_system_is_container
+      - not system_is_container
 
 - name: copy grub2 config to BIOS/UEFI to satisfy benchmark
   listen: make grub2 config
@@ -75,7 +81,7 @@
       - rhel8stig_grub2_user_cfg.stat.exists
       - rhel8stig_workaround_for_disa_benchmark
       - not rhel8stig_skip_for_travis
-      - not rhel8stig_system_is_container
+      - not system_is_container
 
 - name: "restart {{ rhel8stig_time_service }}"
   service:
@@ -84,7 +90,7 @@
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - not system_is_container
 
 - name: restart auditd
   command: /usr/sbin/service auditd restart
@@ -93,7 +99,7 @@
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - not system_is_container
 
 - name: rebuild initramfs
   command: dracut -f

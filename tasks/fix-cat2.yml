@@ -5,16 +5,18 @@
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
         debug:
             msg:
-                - "ALERT! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
+                - "WARNING!! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
                 - "McAfee is the suggested by STIG"
         when:
-            - "'mcafeetp' or 'mfetpd' not in ansible_facts.packages"
+            - "'mcafeetp' not in ansible_facts.packages or
+               'mfetpd' not in ansible_facts.packages"
 
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
         debug:
             msg: "Congratulations! You have McAfee installed"
         when:
-            - "'mcafeetp' or 'mfetpd' in ansible_facts.packages"
+            - "'mcafeetp' in ansible_facts.packages or
+               'mfetpd' in ansible_facts.packages"
   when:
       - rhel_08_040286
       - rhel8stig_av_sftw == 'mcafee'
@@ -76,6 +78,8 @@
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
+        when:
+            - rhel8stig_ssh_required
 
       - name: |
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
@@ -167,6 +171,7 @@
       - SRG-OS-000032-GPOS-00013
       - SV-230228r627750_rule
       - V-230228
+      - rsyslog
 
 # This task wants you to download the latest DoD root certs and place the chain pem in /etc/sssd/pki/sssd_auth_ca_db.pem. This might need to be a message out, but I will circle back to this and confirm.
 - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor."
@@ -180,9 +185,9 @@
       - name: "MEDIUM | RHEL-08-010090 | PATCH | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. | Message out certs"
         debug:
             msg:
-                - "WARNING!!!!The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
+                - "WARNING!! The certs below are the ones applied to this system. Please review and confirm they are the latest issued from the DoD"
                 - "If they are not please apply the latest PKI CA certificate bundle from cyber.mil and copy the DoD_PKE_CA_chain.pem into /etc/sssd/pki/sssd_auth_ca_db.pem"
-                - "{{ rhel_08_010090_certs_list.stdout_lines }}"
+                - "{{ rhel_08_010090_certs_list.stdout_lines | default('None-found') }}"
   when:
       - rhel_08_010090
   tags:
@@ -206,6 +211,7 @@
             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
   when:
       - rhel_08_010100
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010100
       - CAT2
@@ -250,7 +256,7 @@
       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
         debug:
             msg:
-                - "ALERT!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
+                - "WARNING!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
             - not rhel8stig_disruption_high
@@ -320,7 +326,7 @@
       - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
   when:
       - rhel_08_010141 or
-        rhel_08_010141
+        rhel_08_010149
   tags:
       - RHEL-08-010141
       - RHEL-08-010149
@@ -331,6 +337,7 @@
       - SV-244522r792984_rule
       - V-244521
       - V-244522
+      - grub
 
 - name: "MEDIUM | RHEL-08-010151 | PATCH | RHEL 8 operating systems must require authentication upon booting into emergency or rescue modes."
   lineinfile:
@@ -462,7 +469,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_010170 or rhel_08_010450
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - rhel8stig_disruption_high
   tags:
       - CAT2
@@ -553,6 +560,7 @@
       - rhel_08_010210 or
         rhel_08_010220 or
         rhel_08_010230
+      - not system_is_container
   tags:
       - CAT2
       - RHEL-08-010210
@@ -772,6 +780,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_010287
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010287
       - CAT2
@@ -790,7 +799,7 @@
           "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
         command: fips-mode-setup --check
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010290_pre_fips_check.stdout is not defined
         register: rhel_08_010290_pre_fips_check
 
       - name: |
@@ -829,7 +838,7 @@
       - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
         command: fips-mode-setup --check
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
         register: rhel_08_010293_pre_fips_check
 
       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
@@ -1004,6 +1013,7 @@
   when:
       - rhel_08_010360
       - rhel8stig_disruption_high
+      - "'crontabs' in ansible_facts.packages"
   tags:
       - RHEL-08-010360
       - CAT2
@@ -1012,10 +1022,11 @@
       - SV-230263r627750_rule
       - V-230263
       - aide
+      - cron
 
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010372
@@ -1030,7 +1041,7 @@
 
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010373
@@ -1045,7 +1056,7 @@
 
 - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010374
@@ -1075,7 +1086,7 @@
       - SRG-OS-000373-GPOS-00156
       - SV-230271r627750_rule
       - V-230271
-      - sudoers
+      - sudo
 
 - name: "MEDIUM | RHEL-08-010381 | PATCH | RHEL 8 must require users to reauthenticate for privilege escalation."
   replace:
@@ -1094,7 +1105,7 @@
       - SRG-OS-000373-GPOS-00156
       - SV-230272r627750_rule
       - V-230272
-      - sudoers
+      - sudo
 
 - name: "MEDIUM | RHEL-08-010390 | PATCH | RHEL 8 must have the packages required for multifactor authentication installed."
   package:
@@ -1142,6 +1153,7 @@
       state: present
   when:
       - rhel_08_010410
+      - not system_is_container
   tags:
       - RHEL-08-010410
       - CAT2
@@ -1169,7 +1181,7 @@
       - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
         debug:
             msg:
-                - "ALERT!! You do not have execute disable active. Please change the setting in your BIOS settings"
+                - "WARNING!! You do not have execute disable active. Please change the setting in your BIOS settings"
         when: '"(Execute Disable) protection: active" not in rhel_08_010420_nx_bit_state.stdout'
   when:
       - rhel_08_010420
@@ -1217,7 +1229,7 @@
       - CAT2
       - CCI-001084
       - SRG-OS-000134-GPOS-00068
-      -  SV-230277r792884_rule
+      - SV-230277r792884_rule
       - V-230277
       - grub
 
@@ -1303,7 +1315,7 @@
 
 - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010430
@@ -1442,6 +1454,7 @@
   notify: restart sshd
   when:
       - rhel_08_010521
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010521
       - CAT2
@@ -1458,6 +1471,7 @@
       line: "GSSAPIAuthentication no"
   when:
       - rhel_08_010522
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010522
       - CAT2
@@ -1469,12 +1483,11 @@
 
 - name: "MEDIUM | RHEL-08-010543 | PATCH | A separate RHEL 8 filesystem must be used for the /tmp directory."
   debug:
-      msg: "WARNING!!!! /tmp is not mounted on a separate partition"
+      msg: "WARNING!! /tmp is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
       - rhel_08_010543
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
   tags:
@@ -1485,14 +1498,14 @@
       - SV-230295r627750_rule
       - V-230295
       - complexity-high
-      - mount
+      - mounts
       - tmp
 
 - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp."
   block:
       - name: "MEDIUM | RHEL-08-010544 | PATCH | RHEL 8 must use a separate file system for /var/tmp. | Alert on missing mount"
         debug:
-            msg: "Warning! /var/tmp does not exist, /var/tmp needs to use a sperate file system. This is a manual task"
+            msg: "WARNING!! /var/tmp does not exist, /var/tmp needs to use a sperate file system. This is a manual task"
         register: var_tmp_mount_absent
         changed_when: var_tmp_mount_absent.skipped is defined
         when: "'/var/tmp' not in mount_names"
@@ -1537,7 +1550,7 @@
       enabled: yes
   when:
       - rhel_08_010560
-      - not rhel8stig_system_is_container
+      - not system_is_container
   tags:
       - RHEL-08-010560
       - CAT2
@@ -1721,7 +1734,6 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1736,12 +1748,11 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nodev' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010600
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not (rhel8stig_system_is_chroot and system_is_container)
   tags:
       - RHEL-08-010600
       - CAT2
@@ -1765,7 +1776,6 @@
             - rhel_08_010600
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1780,12 +1790,11 @@
             - rhel_08_010610
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'noexec' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010610
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not rhel8stig_system_is_chroot
   tags:
       - RHEL-08-010610
       - CAT2
@@ -1809,7 +1818,6 @@
             - rhel_08_010620
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
 
@@ -1824,12 +1832,11 @@
             - rhel_08_010620
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nosuid' not in home_mount.options"
-            - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
         vars:
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010620
-      - not (rhel8stig_system_is_chroot and rhel8stig_system_is_container)
+      - not rhel8stig_system_is_chroot
   tags:
       - RHEL-08-010620
       - CAT2
@@ -1969,6 +1976,7 @@
       state: stopped
   when:
       - rhel_08_010670
+      - "'kexec-tools' in ansible_facts.packages"
       - not rhel8stig_kdump_needed
   tags:
       - RHEL-08-010670
@@ -1981,7 +1989,7 @@
 
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010671
@@ -2002,6 +2010,7 @@
   notify: systemctl daemon-reload
   when:
       - rhel_08_010672
+      - ansible_service_mgr == 'systemd'
   tags:
       - RHEL-08-010672
       - CAT2
@@ -2036,6 +2045,7 @@
       line: "Storage=none"
   when:
       - rhel_08_010674
+      - "'systemd' in ansible_facts.packages"
   tags:
       - RHEL-08-010674
       - CAT2
@@ -2052,6 +2062,7 @@
       line: "ProcessSizeMax=0"
   when:
       - rhel_08_010675
+      - "'systemd' in ansible_facts.packages"
   tags:
       - RHEL-08-010675
       - CAT2
@@ -2125,7 +2136,7 @@
   when:
       - rhel_08_010680
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - not system_is_container
       - not system_is_ec2
   tags:
       - RHEL-08-010680
@@ -2184,7 +2195,9 @@
             owner: "{{ rhel8stig_ww_dir_owner }}"
         with_items:
             - "{{ rhel_08_010700_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010700_world_writable_directories.stdout | length > 0
+        when: 
+            - rhel_08_010700_world_writable_directories.stdout is defined
+            - rhel_08_010700_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010700
   tags:
@@ -2210,7 +2223,9 @@
             group: "{{ rhel8stig_ww_dir_grpowner }}"
         with_items:
             - "{{ rhel_08_010710_world_writable_directories.stdout_lines }}"
-        when: rhel_08_010710_world_writable_directories.stdout | length > 0
+        when: 
+            - rhel_08_010710_world_writable_directories.stdout is defined
+            - rhel_08_010710_world_writable_directories.stdout | length > 0
   when:
       - rhel_08_010710
   tags:
@@ -2239,9 +2254,11 @@
       - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Message out user list"
         debug:
             msg:
-                - "WARNING!!!!The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
+                - "WARNING!! The users listed below are interactive users with no home directories. Please create home directories to confirm with STIG standards"
                 - "{{ rhel_08_010720_user_list.stdout_lines }}"
-        when: rhel_08_010720_user_list.stdout | length > 0
+        when: 
+            - rhel_08_010720_user_list.stdout is defined
+            - rhel_08_010720_user_list.stdout | length > 0
   when:
       - rhel_08_010720
   tags:
@@ -2425,7 +2442,7 @@
       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Alert nouser files"
         debug:
             msg:
-                - "ALERT!!! There are files with no user assigned. Please review files listed below and assign owner"
+                - "WARNING!! There are files with no user assigned. Please review files listed below and assign owner"
                 - "{{ rhel_08_010780_nouser_files.stdout_lines }}"
         when: rhel_08_010780_nouser_files.stdout | length > 0
   when:
@@ -2450,7 +2467,7 @@
       - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Alert nogroup files"
         debug:
             msg:
-                - "ALERT!!!! There are files with no group assigned. Please review files listed below and assign group"
+                - "WARNING!! There are files with no group assigned. Please review files listed below and assign group"
                 - "{{ rhel_08_010790_nogroup_files.stdout_lines }}"
         when: rhel_08_010790_nogroup_files.stdout | length > 0
   when:
@@ -2466,12 +2483,11 @@
 
 - name: "MEDIUM | RHEL-08-010800 | PATCH | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
   debug:
-      msg: "WARNING!!!! /home is not mounted on a separate partition"
+      msg: "WARNING!!  /home is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
       - rhel_08_010800
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
   tags:
@@ -2482,7 +2498,7 @@
       - SV-230328r627750_rule
       - V-23032
       - complexity-high
-      - mount
+      - mounts
       - home
 
 - name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
@@ -2493,6 +2509,7 @@
   notify: restart sshd
   when:
       - rhel_08_010830
+      - rhel8stig_ssh_required
       - rhel8stig_disruption_high
   tags:
       - RHEL-08-010830
@@ -2508,7 +2525,7 @@
 - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
   debug:
       msg:
-          - "ALERT!!!! Please check temporary accounts for expiration dates to be 72 hours or less."
+          - "WARNING!!  Please check temporary accounts for expiration dates to be 72 hours or less."
           - "To do this please run sudo chage -l account_name for the accounts you need to check"
           - "The results will display the Account Expires information"
           - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
@@ -2650,7 +2667,7 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
+            regexp: '^auth\s+required pam_faillock.so preauth'
             line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
@@ -2661,7 +2678,7 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
+            regexp: '^auth\s+required pam_faillock.so authfail'
             line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
@@ -2672,7 +2689,7 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required pam_faillock.so'
             line: 'account    required pam_faillock.so'
             insertafter: '^account'
         notify: restart sssd
@@ -2680,9 +2697,9 @@
             - system-auth
             - password-auth
   when:
-      - rhel_08_020013
+      - rhel_08_020014
   tags:
-      - RHEL-08-020013
+      - RHEL-08-020014
       - CAT2
       - CCI-000044
       - SRG-OS-000021-GPOS-00005
@@ -2992,6 +3009,7 @@
   when:
       - rhel_08_020027 or
         rhel_08_020028
+      - not system_is_container
   tags:
       - RHEL-08-020027
       - RHEL-08-020028
@@ -3002,6 +3020,7 @@
       - SV-250316r793010_rule
       - V-250315
       - V-250316
+      - selinux
 
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
@@ -3635,7 +3654,7 @@
       - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
         debug:
             msg:
-                - "ALERT!!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+                - "WARNING!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
                 - "{{ rhel_08_020240_duplicate_uid_users.stdout_lines }}"
   when:
       - rhel_08_020240
@@ -3757,7 +3776,7 @@
       - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 emergency accounts must be automatically removed or disabled after the crisis is resolved or within 72 hours."
         debug:
             msg:
-                - "WARNING!!!Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+                - "WARNING!! Below are the system accounts. If any where emergency accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
                 - "{{ rhel_08_020270_system_users.stdout_lines }}"
   when:
       - rhel_08_020270
@@ -4017,6 +4036,7 @@
       - SV-230387r743996_rule
       - V-230387
       - cron
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
   lineinfile:
@@ -4158,6 +4178,7 @@
       - V-230396
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access."
   block:
@@ -4183,6 +4204,7 @@
       - V-230397
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030090 | PATCH | RHEL 8 audit logs must be group-owned by root to prevent unauthorized read access."
   lineinfile:
@@ -4200,6 +4222,7 @@
       - V-230398
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access."
   block:
@@ -4228,6 +4251,7 @@
       - V-230399
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access."
   block:
@@ -4259,6 +4283,7 @@
       - V-230400
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
   block:
@@ -4285,6 +4310,7 @@
       - V-230401
       - permissions
       - log
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
   lineinfile:
@@ -5490,6 +5516,7 @@
       - SV-230471r627750_rule
       - V-230471
       - permissions
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
   block:
@@ -5515,6 +5542,7 @@
       - SV-230472r627750_rule
       - V-230472
       - permissions
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030630 | PATCH | RHEL 8 audit tools must be owned by root."
   file:
@@ -5539,6 +5567,7 @@
       - SV-230473r744008_rule
       - V-230473
       - permissions
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030640 | PATCH | RHEL 8 audit tools must be group-owned by root."
   file:
@@ -5563,6 +5592,7 @@
       - SV-230474r627750_rule
       - V-230474
       - permissions
+      - auditd
 
 - name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
   lineinfile:
@@ -5608,7 +5638,7 @@
       - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
         debug:
             msg:
-                - "ALERT!!!Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
+                - "WARNING!! Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
                 - "Path: {{ rhel_08_030660_audit_log_path.stdout }}"
                 - "Disk Space: {{ rhel_08_030660_audit_log_partition.stdout }}"
   when:
@@ -5653,6 +5683,7 @@
       - SV-230478r744011_rule
       - V-230478
       - gnutls
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
   lineinfile:
@@ -5669,6 +5700,7 @@
       - SV-230479r627750_rule
       - V-230479
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
   lineinfile:
@@ -5709,6 +5741,7 @@
       - SV-230481r627750_rule
       - V-230481
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
   lineinfile:
@@ -5726,6 +5759,7 @@
       - SV-230482r627750_rule
       - V-230482
       - auditd
+      - rsyslog
 
 - name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
   lineinfile:
@@ -5767,6 +5801,7 @@
   notify: restart {{ rhel8stig_time_service }}
   when:
       - rhel_08_030740
+      - "'chrony' in ansible_facts.packages"
   tags:
       - RHEL-08-030740
       - CAT2
@@ -5774,7 +5809,7 @@
       - SRG-OS-000355-GPOS-00143
       - SV-230484r627750_rule
       - V-230484
-      - chronyd
+      - chrony
 
 - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
   shell: dnf remove abrt*
@@ -5866,7 +5901,7 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not rhel8stig_system_is_container
+            - not system_is_container
             - rhel8stig_firewall_service == "firewalld"
             - rhel8stig_start_firewall_service
         tags:
@@ -5901,7 +5936,7 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not rhel8stig_system_is_container
+            - not system_is_container
             - rhel8stig_firewall_service == "iptables"
             - rhel8stig_start_firewall_service
         tags:
@@ -5921,7 +5956,8 @@
   when:
       - rhel_08_040030
       - not rhel8stig_system_is_chroot
-      - not rhel8stig_system_is_container
+      - rhel8stig_firewall_service != "not_required"
+
       - rhel8stig_disruptive
   tags:
       - RHEL-08-040030
@@ -6002,6 +6038,7 @@
             enabled: yes
   when:
       - rhel_08_040100
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040100
       - CAT2
@@ -6051,7 +6088,8 @@
             zone: "{{ rhel8stig_custom_firewall_zone }}"
             permanent: true
             state: enabled
-            service: "{{ item }}"
+            service: "{{ (item == (item | regex_search('^[a-z]+$')))        | bool | ternary(item, omit) }}"
+            port:    "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | bool | ternary(item, omit) }}"
         with_items:
             - "{{ rhel8stig_white_list_services }}"
 
@@ -6068,6 +6106,7 @@
         register: rhel_08_040090_default_zone_set
   when:
       - rhel_08_040090
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040090
       - CAT2
@@ -6123,6 +6162,7 @@
   notify: change_requires_reboot
   when:
       - rhel_08_040111
+      - not system_is_container
   tags:
       - RHEL-08-040111
       - CAT2
@@ -6458,6 +6498,7 @@
       - rhel_08_040139 or
         rhel_08_040140 or
         rhel_08_040141
+      - not system_is_container
   tags:
       - RHEL-08-040139
       - RHEL-08-040140
@@ -6480,6 +6521,7 @@
       line: 'FirewallBackend=nftables'
   when:
       - rhel_08_040150
+      - rhel8stig_firewall_service != "not_required"
   tags:
       - RHEL-08-040150
       - CAT2
@@ -6513,6 +6555,7 @@
   when:
       - rhel_08_040159 or
         rhel_08_040160
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040159
       - RHEL-08-040160
@@ -6533,6 +6576,7 @@
   notify: restart sshd
   when:
       - rhel_08_040161
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040161
       - CAT2
@@ -6540,7 +6584,7 @@
       - RG-OS-000033-GPOS-00014
       - SV-230527r627750_rule
       - V-230527
-      - sshd
+      - ssh
 
 - name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
   systemd:
@@ -6550,6 +6594,7 @@
       masked: yes
       daemon_reload: yes
   when:
+      - ansible_service_mgr == 'systemd'
       - rhel_08_040180
   tags:
       - RHEL-08-040180
@@ -6562,7 +6607,7 @@
 
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040209
@@ -6577,7 +6622,7 @@
 
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040210
@@ -6593,7 +6638,7 @@
 
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040220
@@ -6608,7 +6653,7 @@
 
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040230
@@ -6623,7 +6668,7 @@
 
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040239
@@ -6638,7 +6683,7 @@
 
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040240
@@ -6654,7 +6699,7 @@
 
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040249
@@ -6669,7 +6714,7 @@
 
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040250
@@ -6685,7 +6730,7 @@
 
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040259
@@ -6701,7 +6746,7 @@
 
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040260
@@ -6717,7 +6762,7 @@
 
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040261
@@ -6734,7 +6779,7 @@
 
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040262
@@ -6751,7 +6796,7 @@
 
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040270
@@ -6766,7 +6811,7 @@
 
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040279
@@ -6781,7 +6826,7 @@
 
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040280
@@ -6797,7 +6842,7 @@
 
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040281
@@ -6812,7 +6857,7 @@
 
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040282
@@ -6827,7 +6872,7 @@
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040283
@@ -6842,7 +6887,7 @@
 
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040284
@@ -6857,7 +6902,7 @@
 
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040285
@@ -6872,7 +6917,7 @@
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_040286
@@ -6931,6 +6976,7 @@
   when:
       - rhel_08_040330
       - not rhel8stig_net_promisc_mode_required
+      - not system_is_container
   tags:
       - RHEL-08-040330
       - CAT2
@@ -6969,6 +7015,7 @@
       line: 'X11UseLocalhost yes'
   when:
       - rhel_08_040341
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-040341
       - CAT2

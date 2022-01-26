@@ -22,6 +22,7 @@
   notify: restart sshd
   when:
       - rhel_08_010292
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010292
       - CAT3
@@ -29,11 +30,11 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230253r627750_rule
       - V-230253
-      - sshd
+      - ssh
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010375
@@ -48,7 +49,7 @@
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
   debug:
-    msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
   notify: update sysctl
   when:
       - rhel_08_010376
@@ -114,6 +115,7 @@
   when:
       - rhel_08_010471 or
         rhel_08_010472
+      - not system_is_container
   tags:
       - RHEL-08-010471
       - RHEL-08-010472
@@ -127,12 +129,11 @@
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
-      msg: "WARNING: /var is not mounted on a separate partition"
+      msg: "WARNING!! /var is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
       - rhel_08_010540
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
@@ -143,7 +144,7 @@
       - SV-230292r627750_rule
       - V-230292
       - complexity-high
-      - mount
+      - mounts
       - var
 
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
@@ -154,7 +155,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010541
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
@@ -165,8 +165,7 @@
       - SV-230293r627750_rule
       - V-230293
       - complexity_high
-      - mount
-      - auditd
+      - mounts
 
 - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
   debug:
@@ -176,7 +175,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010542
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
@@ -187,7 +185,7 @@
       - SV-230294r627750_rule
       - V-230294
       - complexity_high
-      - mount
+      - mounts
       - auditd
 
 - name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
@@ -336,6 +334,7 @@
       - SV-230469r792906_rule
       - V-230469
       - grub
+      - auditd
 
 - name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
   lineinfile:
@@ -348,6 +347,7 @@
       mode: 0600
   when:
       - rhel_08_030603
+      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3

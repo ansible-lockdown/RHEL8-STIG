@@ -1,4 +1,3 @@
----
 - name: Gather distribution info
   setup:
       gather_subset: distribution,!all,!min
@@ -9,16 +8,40 @@
 
 - name: Check OS version and family
   assert:
-      that: ansible_os_family == 'RedHat' and ansible_distribution_major_version is version_compare('8', '==')
-      msg: "This role can only be run against RHEL/CENTOS 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+      that: (ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
+      fail_msg: "This role can only be run against RHEL/CENTOS 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+      success_msg: "This role is running against a supported OS {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
   tags:
       - always
 
 - name: Check ansible version
   assert:
       that: ansible_version.full is version_compare(rhel8stig_min_ansible_version, '>=')
-      msg: You must use Ansible {{ rhel8stig_min_ansible_version }} or greater
+      fail_msg: "You must use Ansible {{ rhel8stig_min_ansible_version }} or greater"
+      success_msg: "This role is running a supported version of ansible {{ ansible_version.full }} >= {{ rhel8stig_min_ansible_version }}"
   tags:
+      - always
+
+- name: Setup rules if container
+  block:
+      - name: Discover and set container variable if required
+        set_fact:
+            system_is_container: true
+
+      - name: Load variable for container
+        include_vars:
+            file: "{{ container_vars_file }}"
+      
+      - name: output if discovered is a container
+        debug:
+            msg: system has been discovered as a container
+        when:
+            - system_is_container
+  when:
+      - ansible_connection == 'docker' or
+        ansible_virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
+  tags:
+      - container_discovery
       - always
 
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
@@ -28,8 +51,11 @@
 
   when:
       - not system_is_ec2
+      - not system_is_container
       - rhel_08_010140 or
         rhel_08_010150
+  tags:
+      - grub
 
 - name: Check if using resolv.conf template settings are changed
   assert:
