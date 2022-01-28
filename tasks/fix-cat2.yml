@@ -54,17 +54,18 @@
       - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Message out warning"
         debug:
             msg:
-                - 'WARNING!! Below is partition layout. Please run the "sudo more /etc/crypttab" command to confirm'
-                - "every persistent disk partition has an entry. If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
+                - 'WARNING!! Below is the partition layout. Please run the "sudo more /etc/crypttab" command to confirm every persistent disk partition has an entry.'
+                - "If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
                 - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
 
-  when: rhel_08_010030
+  when:
+      - rhel_08_010030
   tags:
       - RHEL-08-010030
       - CAT2
       - CCI-001199
       - SRG-OS-000185-GPOS-00079
-      - SV-230224r627750_rule
+      - SV-230224r809268_rule
       - V-230224
 
 - name: |
@@ -195,7 +196,7 @@
       - CAT2
       - CCI-000185
       - SRG-OS-000066-GPOS-00034
-      - SV-230229r627750_rule
+      - SV-230229r809270_rule
       - V-230229
 
 - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key."
@@ -1143,7 +1144,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230274r743945_rule
+      - SV-230274r809281_rule
       - V-230274
       - multifactor
 
@@ -3383,12 +3384,12 @@
 - name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*maxclassrepeat'
+      line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
       create: yes
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*maxclassrepeat'
-      line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
   when:
       - rhel_08_020140
   tags:
@@ -3396,7 +3397,7 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230360r627750_rule
+      - SV-230360r809289_rule
       - V-230360
       - pwquality
 
@@ -5995,17 +5996,17 @@
 
 - name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
   lineinfile:
-      path: "{{ item.path }}"
+      path: /etc/modprobe.d/blacklist.conf 
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      insertafter: "{{ item.insertafter }}"
       create: yes
       owner: root
       group: root
       mode: 0640
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: "{{ item.insertafter }}"
   with_items:
-      - { path: /etc/modprobe.d/usb-storage.conf, regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
-      - { path: /etc/modprobe.d/blacklist.conf, regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
+      - { regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
   when:
       - rhel_08_040080
   tags:
@@ -6013,7 +6014,7 @@
       - CAT2
       - CCI-000778
       - SRG-OS-000114-GPOS-00059
-      - SV-230503r627750_rule
+      - SV-230503r809319_rule
       - V-230503
       - usb_devices
 
@@ -6112,7 +6113,7 @@
       - CAT2
       - CCI-002314
       - SRG-OS-000297-GPOS-00115
-      - SV-230504r627750_rule
+      - SV-230504r809321_rule
       - V-230504
       - firewall
 
