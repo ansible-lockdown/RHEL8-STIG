@@ -274,14 +274,11 @@
       - V-230232
       - disruption_high
 
-- name: "MEDIUM | RHEL-08-010130 | PATCH | The RHEL 8 password-auth file must be configured to use a sufficient number of hashing rounds."
-  pamd:
-      name: password-auth
-      type: password
-      control: sufficient
-      module_path: pam_unix.so
-      module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
-      state: args_present
+- name: "MEDIUM | RHEL-08-010130 | PATCH | The RHEL 8 shadow password suite must be configured to use a sufficient number of hashing rounds."
+  lineinfile:
+      path: /etc/login.defs
+      regexp:  ^.*SHA_CRYPT_MIN_ROUNDS\s
+      line: SHA_CRYPT_MIN_ROUNDS {{ rhel8stig_hashing_rounds }}
   when:
       - rhel_08_010130
   tags:

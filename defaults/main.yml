@@ -818,7 +818,7 @@ rhel8stig_dns_servers:  # The order needs to be set as expected. If you have 3 y
 rhel8stig_int_gid: 1000
 
 # RHEL-08-010130
-# The rounds parameter goes into the password sufficient pam_unix.so element of the password-auth and system-auth files. The value shoudl be set no lower than 5000
+# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 5000
 rhel8stig_hashing_rounds: 5000
 
 # RHEL-08-010100
