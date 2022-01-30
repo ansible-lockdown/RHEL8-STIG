@@ -290,24 +290,24 @@
       - V-230233
       - pamd
 
-- name: "MEDIUM | RHEL-08-010131 | PATCH | The RHEL 8 system-auth file must be configured to use a sufficient number of hashing rounds."
-  pamd:
-      name: system-auth
-      type: password
-      control: sufficient
-      module_path: pam_unix.so
-      module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
-      state: args_present
-  when:
-      - rhel_08_010131
-  tags:
-      - RHEL-08-010131
-      - CAT2
-      - CCI-000196
-      - SRG-OS-000073-GPOS-00041
-      - SV-244520r743809_rule
-      - V-244520
-      - pamd
+# - name: "MEDIUM | RHEL-08-010131 | PATCH | The RHEL 8 system-auth file must be configured to use a sufficient number of hashing rounds."
+#   pamd:
+#       name: system-auth
+#       type: password
+#       control: sufficient
+#       module_path: pam_unix.so
+#       module_arguments: "rounds={{ rhel8stig_hashing_rounds }}"
+#       state: args_present
+#   when:
+#       - rhel_08_010131
+#   tags:
+#       - RHEL-08-010131
+#       - CAT2
+#       - CCI-000196
+#       - SRG-OS-000073-GPOS-00041
+#       - SV-244520r743809_rule
+#       - V-244520
+#       - pamd
 
 - name: |
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
@@ -392,11 +392,11 @@
       - CAT2
       - CCI-000803
       - SRG-OS-000120-GPOS-00061
-      - SV-244524r743821_rule
+      - SV-244524r809331_rule
       - V-244524
       - pamd
 
-- name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
+- name: "MEDIUM | RHEL-08-010160 | PATCH | The RHEL 8 pam_unix.so module must be configured in the password-auth file to use a FIPS 140-2 approved cryptographic hashing algorithm for system authentication."
   pamd:
       name: password-auth
       type: password
@@ -411,7 +411,7 @@
       - CAT2
       - CCI-000803
       - SRG-OS-000120-GPOS-00061
-      - SV-230237r743931_rule
+      - SV-230237r809276_rule
       - V-230237
       - pamd
 
@@ -784,7 +784,7 @@
       - CAT2
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-244526r743827_rule
+      - SV-244526r809334_rule
       - V-244526
       - ssh
 
@@ -868,7 +868,7 @@
       - CAT2
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230255r627750_rule
+      - SV-230255r809382_rule
       - V-230255
       - openssl
 
@@ -3103,7 +3103,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r627750_rul
+      - SV-230349r810020_rule
       - V-230349
       - tmux
 
@@ -5850,6 +5850,7 @@
   notify: change_requires_reboot
   with_items:
       - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
+      - { regexp: '^install uvcvideo', line: 'install uvcvideo /bin/true', insertafter: '##Disable WebCam' }
       - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
   when:
       - rhel_08_040020
@@ -5858,7 +5859,7 @@
       - CAT2
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230493r627750_rule
+      - SV-230493r809316_rule
       - V-230493
       - camera
 
