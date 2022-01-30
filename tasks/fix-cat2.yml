@@ -996,7 +996,7 @@
         check_mode: false
         register: rhel_08_010331_directories
 
-      - name: "MEDIUM | RHEL-08-010331 | AUDIT | RHEL 8 library directories must have mode 755 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010331 | AUDIT | RHEL 8 library directories must have mode 755 or less permissive. | Alert on permissions"
         debug:
             msg:
                 - "Alert! There are library directories that have permessions set to more permissive than 755"
@@ -1017,11 +1017,112 @@
             - rhel8stig_disruption_high
             - rhel_08_010331_directories.stdout | length > 0
   when:
+      - rhel_08_010331
+  tags:
       - RHEL-08-010331
       - CAT2
       - CCI-001499
       - SV-251707r809345_rule
       - V-251707
+      - permissions
+
+- name: "MEDIUM | RHEL-08-010341 | PATCH | RHEL 8 library directories must be owned by root."
+  block:
+      - name: "MEDIUM | RHEL-08-010341 | AUDIT | RHEL 8 library directories must be owned by root. | Get directories"
+        shell: find /lib /lib64 /usr/lib /usr/lib64 ! -user root -type d
+        changed_when: false
+        failed_when: false
+        check_mode: false
+        register: rhel_08_010341_directories
+
+      - name: "MEDIUM | RHEL-08-010341 | AUDIT | RHEL 8 library directories must be owned by root. | Alert on permissions"
+        debug:
+            msg:
+                - "Alert! There are library directories that are not owned by root"
+                - "To conform to STIG standards, please review these directories and change owner to root"
+                - "{{ rhel_08_010341_directories.stdout_lines }}"
+        when:
+            - rhel_08_010341_directories.stdout | length > 0
+            - not rhel8stig_disruption_high
+
+      - name: "MEDIUM | RHEL-08-010341 | PATCH | RHEL 8 library directories must be owned by root. | Set permissions"
+        file:
+            path: "{{ item }}"
+            state: directory
+            owner: root
+        with_items:
+            - "{{ rhel_08_010341_directories.stdout_lines }}"
+        when:
+            - rhel_08_010341_directories.stdout | length > 0
+            - rhel8stig_disruption_high
+  when:
+      - rhel_08_010341
+  tags:
+      - RHEL-08-010341
+      - CAT2
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-251708r810012_rule
+      - V-251708
+      - permissions
+
+- name: "MEDIUM | RHEL-08-010351 | PATCH | RHEL 8 library directories must be group-owned by root or a system account."
+  block:
+      - name: "MEDIUM | RHEL-08-010351 | AUDIT | RHEL 8 library directories must be group-owned by root or a system account. | Get directories"
+        shell: find /lib /lib64 /usr/lib /usr/lib64 ! -group root -type d
+        changed_when: false
+        failed_when: false
+        check_mode: false
+        register: rhel_08_010351_directories
+
+      - debug: var=rhel_08_010351_directories
+
+      - name: "MEDIUM | RHEL-08-010351 | AUDIT | RHEL 8 library directories must be group-owned by root or a system account. | Alert on permissions"
+        debug:
+            msg:
+                - "Alert! There are library directories that are not group owned by root."
+                - "To conform to STIG standards, please review these directories and change group owner to root"
+                - "{{ rhel_08_010351_directories.stdout_lines }}"
+        when:
+            - rhel_08_010351_directories.stdout | length > 0
+            - not rhel8stig_disruption_high
+
+      - name: "MEDIUM | RHEL-08-010351 | PATCH | RHEL 8 library directories must be group-owned by root or a system account. | Set permissions"
+        file:
+            path: "{{ item }}"
+            state: directory
+            group: root
+        with_items:
+            - "{{ rhel_08_010351_directories.stdout_lines }}"
+        when:
+            - rhel_08_010351_directories.stdout | length > 0
+            - rhel8stig_disruption_high
+  when:
+      - rhel_08_010351
+  tags:
+      - RHEL-08-010351
+      - CAT2
+      - CCI-001499
+      - SRG-OS-000259-GPOS-00100
+      - SV-251709r810014_rule
+      - V-251709
+      - permissions
+
+- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions."
+  package:
+      name: aide
+      state: present
+  when:
+      - rhel_08_010359
+      - "'aide' not in ansible_facts.packages"
+  tags:
+      - RHEL-08-010359
+      - CAT2
+      - CCI-002696
+      - SRG-OS-000445-GPOS-00199
+      - SV-251710r809354_rule
+      - V-251710
+      - aide
 
 - name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
   cron:
@@ -1102,6 +1203,22 @@
       - SV-230268r792876_rule
       - V-230268
       - sysctl
+
+- name: "MEDIUM | RHEL-08-010379 | PATCH | RHEL 8 must specify the default 'include' directory for the /etc/sudoers file."
+  lineinfile:
+      path: /etc/sudoers
+      regex: '^#includedir'
+      line: '#includedir /etc/sudoers.d'
+  when:
+      - rhel_08_010379
+  tags:
+      - RHEL-08-010379
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251711r810015_rule
+      - V-251711
+      - sudoers
 
 - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
   replace:
