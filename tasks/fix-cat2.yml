@@ -987,6 +987,42 @@
       - V-230262
       - permissions
 
+- name: "MEDIUM | RHEL-08-010331 | PATCH | RHEL 8 library directories must have mode 755 or less permissive."
+  block:
+      - name: "MEDIUM | RHEL-08-010331 | AUDIT | RHEL 8 library directories must have mode 755 or less permissive. | Get directories"
+        shell: find /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type d
+        changed_when: false
+        failed_when: false
+        check_mode: false
+        register: rhel_08_010331_directories
+
+      - name: "MEDIUM | RHEL-08-010331 | AUDIT | RHEL 8 library directories must have mode 755 or less permissive. | Set permissions"
+        debug:
+            msg:
+                - "Alert! There are library directories that have permessions set to more permissive than 755"
+                - "To conform to STIG standards, please review these directories and set to 755 or less permissive"
+                - "{{ rhel_08_010331_directories.stdout_lines }}"
+        when:
+            - not rhel8stig_disruption_high
+            - rhel_08_010331_directories.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010331 | PATCH | RHEL 8 library directories must have mode 755 or less permissive. | Set permissions"
+        file:
+            path: "{{ item }}"
+            state: directory
+            mode: "{{ rhel8stig_lib_dir_perms }}"
+        with_items:
+            - "{{ rhel_08_010331_directories.stdout_lines }}"
+        when:
+            - rhel8stig_disruption_high
+            - rhel_08_010331_directories.stdout | length > 0
+  when:
+      - RHEL-08-010331
+      - CAT2
+      - CCI-001499
+      - SV-251707r809345_rule
+      - V-251707
+
 - name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
   cron:
       name: 'Run AIDE integrity check {{ rhel8stig_aide_cron.special_time }}'
@@ -6454,7 +6490,7 @@
       - CAT2
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
-      - SV-244546r743887_rule
+      - SV-244546r809339_rule
       - V-244546
       - fapolicy
 

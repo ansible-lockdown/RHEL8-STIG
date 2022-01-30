@@ -824,6 +824,11 @@ rhel8stig_hashing_rounds: 5000
 # RHEL-08-010100
 rhel8stig_path_to_sshkey: "/root/.ssh/"
 
+# RHEL-08-010331
+# rhel8stig_lib_dir_perms is the permissions that will be set to library directories when they are found to be 755 or more permissive and rhel8stig_disruption_high is true
+# To conform to STIG standards these directories need to be 755 or less permissive
+rhel8stig_lib_dir_perms: 0755
+
 # RHEL-08-010510
 # rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
 rhel8stig_sshd_compression: "no"
