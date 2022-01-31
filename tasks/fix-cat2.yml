@@ -1209,6 +1209,7 @@
       path: /etc/sudoers
       regex: '^#includedir'
       line: '#includedir /etc/sudoers.d'
+      validate: '/usr/sbin/visudo -cf %s'
   when:
       - rhel_08_010379
   tags:
@@ -1694,22 +1695,22 @@
       - V-230296
       - ssh
 
-- name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
-  service:
-      name: auditd
-      state: started
-      enabled: yes
-  when:
-      - rhel_08_010560
-      - not system_is_container
-  tags:
-      - RHEL-08-010560
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230297r627750_rule
-      - V-230297
-      - auditd
+# - name: "MEDIUM | RHEL-08-010560 | PATCH | The auditd service must be running in RHEL 8."
+#   service:
+#       name: auditd
+#       state: started
+#       enabled: yes
+#   when:
+#       - rhel_08_010560
+#       - not system_is_container
+#   tags:
+#       - RHEL-08-010560
+#       - CAT2
+#       - CCI-000366
+#       - SRG-OS-000480-GPOS-00227
+#       - SV-230297r627750_rule
+#       - V-230297
+#       - auditd
 
 - name: "MEDIUM | RHEL-08-010561 | PATCH | The rsyslog service must be running in RHEL 8."
   service:
@@ -1791,7 +1792,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244530r743839_rule
+      - SV-244530r809336_rule
       - V-244530
       - mounts
       - efi
@@ -3448,27 +3449,139 @@
       - V-230355
       - authentication
 
-- name: "MEDIUM | RHEL-08-020100 | PATCH RHEL 8 must ensure a password complexity module is enabled."
+- name: "MEDIUM | RHEL-08-020100 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the password-auth file."
   lineinfile:
-      path: "{{ item.path }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
+      path: /etc/pam.d/password-auth
+      regexp: '^password   required pam_pwquality.so'
+      line: 'password   required pam_pwquality.so'
       insertafter: '^password'
       owner: root
       group: root
       mode: 0640
-  with_items:
-      - { path: /etc/pam.d/system-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
-      - { path: /etc/pam.d/password-auth, regexp: '^password   required pam_pwquality.so', line: 'password   required pam_pwquality.so retry=3' }
   when:
       - rhel_08_020100
   tags:
       - RHEL-08-020100
       - CAT2
-      - CCI-000192
+      - CCI-000366
       - SRG-OS-000069-GPOS-00037
-      - SV-230356r627750_rule
+      - SV-230356r809379_rule
       - V-230356
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020101 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the system-auth file."
+  lineinfile:
+      path: /etc/pam.d/system-auth
+      regexp: '^password   required pam_pwquality.so'
+      line: 'password   required pam_pwquality.so'
+      insertafter: '^password'
+      owner: root
+      group: root
+      mode: 0640
+  when:
+      - rhel_08_020101
+  tags:
+      - RHEL-08-020101
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251713r810407_rule
+      - V-251713
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less."
+  block:
+      - name: "MEDIUM | RHEL-08-020102 | AUDIT | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Get pam_pwquality state"
+        shell: cat /etc/pam.d/system-auth | grep "password.*required.*pam_pwquality.so"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020102_pwquality_status
+
+      - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Set if no pw required pam_pwquality"
+        lineinfile:
+           path: /etc/pam.d/system-auth
+           line: 'ppassword   required pam_pwquality.so retry={{ rhel8stig_pam_pwquality_retry }}'
+           insertafter: '^password'
+           owner: root
+           group: root
+           mode: 0640
+        when: rhel_08_020102_pwquality_status.stdout | length == 0
+
+      - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
+        pamd:
+            name: system-auth
+            type: password
+            control: required
+            module_path: pam_pwquality.so
+            module_arguments: 'retry={{ rhel8stig_pam_pwquality_retry }}'
+            state: args_present
+        when: rhel_08_020102_pwquality_status.stdout | length > 0
+  when:
+      - rhel_08_020102
+      - ansible_distribution_version <= "8.4"
+  tags:
+      - RHEL-08-020102
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251714r810410_rule
+      - V-251714
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less."
+  block:
+      - name: "MEDIUM | RHEL-08-020103 | AUDIT | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Get pam_pwquality state"
+        shell: cat /etc/pam.d/password-auth | grep "password.*required.*pam_pwquality.so"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020103_pwquality_status
+
+      - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Set if no pw required pam_pwquality"
+        lineinfile:
+           path: /etc/pam.d/password-auth
+           line: 'password   required pam_pwquality.so retry={{ rhel8stig_pam_pwquality_retry }}'
+           insertafter: '^password'
+           owner: root
+           group: root
+           mode: 0640
+        when: rhel_08_020103_pwquality_status.stdout | length == 0
+
+      - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
+        pamd:
+            name: password-auth
+            type: password
+            control: required
+            module_path: pam_pwquality.so
+            module_arguments: 'retry={{ rhel8stig_pam_pwquality_retry }}'
+            state: args_present
+        when: rhel_08_020103_pwquality_status.stdout | length > 0
+  when:
+      - rhel_08_020103
+      - ansible_distribution_version <= "8.4"
+  tags:
+      - RHEL-08-020103
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251715r810412_rule
+      - V-251715
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020104 | PATCH | RHEL 8 systems, version 8.4 and above, must ensure the password complexity module is configured for three retries or less."
+  lineinfile:
+      path: /etc/security/pwquality.conf
+      regexp: '^retry =|^#.*retry ='
+      line: retry = {{ rhel8stig_pam_pwquality_retry }}
+  when:
+      - rhel_08_020104
+      - ansible_distribution_version >= "8.4"
+  tags:
+      - RHEL-08-020104
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251716r809372_rule
+      - V-251716
       - pamd
 
 - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
@@ -7357,7 +7470,7 @@
       - CAT2
       - CCI-002227
       - SRG-OS-000480-GPOS-00227
-      - SV-237642r646896_rule
+      - SV-237642r809326_rule
       - V-237642
       - sudo
 
@@ -7394,6 +7507,21 @@
       - CAT2
       - CCI-002038
       - SRG-OS-000373-GPOS-00156
-      - SV-237643r792980_rule
+      - SV-237643r809328_rule
       - V-237643
       - sudo
+
+- name: "MEDIUM | RHEL-08-010385 | PATCH | The RHEL 8 operating system must not be configured to bypass password requirements for privilege escalation."
+  lineinfile:
+      path: /etc/pam.d/sudo
+      regex: 'pam_succeed_if'
+      state: absent
+  when:
+      - rhel_08_010385
+  tags:
+      - RHEL-08-010385
+      - CAT2
+      - CCI-002038
+      - SRG-OS-000373-GPOS-00156
+      - SV-251712r810017_rule
+      - V-251712

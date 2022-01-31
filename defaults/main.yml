@@ -256,6 +256,10 @@ rhel_08_020081: true
 rhel_08_020082: true
 rhel_08_020090: true
 rhel_08_020100: true
+rhel_08_020101: true
+rhel_08_020102: true
+rhel_08_020103: true
+rhel_08_020104: true
 rhel_08_020110: true
 rhel_08_020120: true
 rhel_08_020130: true
@@ -693,6 +697,12 @@ rhel8stig_shell_session_timeout:
 # to fulfill documented and validated mission requirements.
 # Timeout value is in seconds. (60 seconds * 10 = 600)
 rhel8stig_ssh_session_timeout: 600
+
+# RHEL-08-020102
+# RHEL-08-020103
+# rhel8stig_pam_pwquality_retry is the number of retries set to the password required pam_pwquality.so in system and password auth files
+# To conform to STIG standards this value needs to be 3 or less
+rhel8stig_pam_pwquality_retry: 3
 
 # RHEL-08-020320
 # If vsftpd is required, remove 'ftp' from rhel8stig_unnecessary_accounts.
