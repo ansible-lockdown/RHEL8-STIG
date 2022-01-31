@@ -856,11 +856,25 @@
       - fips
 
 - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
-  lineinfile:
-      path: /etc/crypto-policies/back-ends/opensslcnf.config
-      regexp: '^MinProtocol ='
-      line: "MinProtocol = TLSv1.2"
-  notify: change_requires_reboot
+  block:
+      - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
+        lineinfile:
+            path: /etc/crypto-policies/back-ends/opensslcnf.config
+            regexp: '^MinProtocol ='
+            line: "MinProtocol = TLSv1.2"
+        notify: change_requires_reboot
+        when: ansible_facts.packages['crypto-policies'][0].version | int < 20210617
+
+      - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
+        lineinfile:
+            path: /etc/crypto-policies/back-ends/opensslcnf.config
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+        notify: change_requires_reboot
+        with_items:
+            - { regexp: '^TLS.MinProtocol = ', line: "TLS.MinProtocol = TLSv1.2" }
+            - { regexp: '^DTLS.MinProtocol =', line: "DTLS.MinProtocol = DTLSv1.2" }
+        when: ansible_facts.packages['crypto-policies'][0].version | int >= 20210617
   when:
       - rhel_08_010294
   tags:
