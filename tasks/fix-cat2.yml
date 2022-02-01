@@ -4317,15 +4317,8 @@
       - umask
 
 - name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-  with_items:
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv' }
-      - { regexp: '^-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv' }
-      - { regexp: '^-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv', line: '-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv' }
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030000
@@ -4821,10 +4814,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      regexp: '^-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
-      line: '-a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-priv_change'
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030190
@@ -4838,14 +4829,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-      - -a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-      - -a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
-      - -a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030200
@@ -4943,9 +4928,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-chage
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030250
@@ -4959,9 +4943,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030260
@@ -4996,9 +4979,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030280
@@ -5012,9 +4994,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-passwd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030290
@@ -5027,36 +5008,24 @@
       - V-230422
       - auditd
 
-- name: |
-    "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
-    "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-      - -a always,exit -F arch=b32 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
-      - -a always,exit -F arch=b64 -S mount -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+- name: "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
-      - rhel_08_030300 or
-        rhel_08_030302
+      - rhel_08_030300
   tags:
-      - CAT2
       - RHEL-08-030300
-      - RHEL-08-030302
+      - CAT2
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
       - SV-230423r627750_rule
-      - SV-230425r627750_rule
       - V-230423
-      - V-230425
       - auditd
 
 - name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/umount -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-mount
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030301
@@ -5069,10 +5038,24 @@
       - V-230424
       - auditd
 
+- name: "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  notify: restart auditd
+  when:
+      - rhel_08_030302
+  tags:
+      - RHEL-08-030302
+      - CAT2
+      - CCI-000169
+      - SRG-OS-000062-GPOS-00031
+      - SV-230425r627750_rule
+      - V-230425
+      - auditd
+
 - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030310
@@ -5086,9 +5069,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030311
@@ -5102,9 +5084,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030312
@@ -5118,9 +5099,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030313
@@ -5134,9 +5114,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030314
@@ -5150,9 +5129,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030315 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030315
@@ -5166,9 +5144,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030316
@@ -5182,9 +5159,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-unix-update
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030317
@@ -5198,9 +5174,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-ssh
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030320
@@ -5214,9 +5189,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030330
@@ -5230,9 +5204,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030340 | PATCH | Successful/unsuccessful uses of the pam_timestamp_check command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-pam_timestamp_check
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030340
@@ -5246,9 +5219,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030350 | PATCH | Successful/unsuccessful uses of the newgrp command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k priv_cmd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030350
@@ -5262,12 +5234,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030360 | PATCH | Successful/unsuccessful uses of the init_module command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S init_module,finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-      - -a always,exit -F arch=b64 -S init_module,finit_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030360
@@ -5281,12 +5249,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S rename,unlink,rmdir,renameat,unlinkat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k delete
-      - -a always,exit -F arch=b64 -S rename,unlink,rmdir,renameat,unlinkat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k delete
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030361
@@ -5376,9 +5340,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-gpasswd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030370
@@ -5411,12 +5374,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
-      - -a always,exit -F arch=b64 -S delete_module -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k module_chng
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030390
@@ -5430,9 +5389,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-crontab
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030400
@@ -5446,9 +5404,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k priv_cmd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030410
@@ -5462,15 +5419,9 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-      - -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-      - -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-      - -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_access
-  notify: restart auditd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  notify: restart auditd 
   when:
       - rhel_08_030420
   tags:
@@ -5588,12 +5539,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-      - -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030480
@@ -5607,12 +5554,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "{{ item }}"
-  with_items:
-      - -a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
-      - -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030490
@@ -5721,9 +5664,8 @@
 #       - auditd
 
 - name: "MEDIUM | RHEL-08-030550 | PATCH | Successful/unsuccessful uses of the sudo command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k priv_cmd
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030550
@@ -5737,9 +5679,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030560 | PATCH | Successful/unsuccessful uses of the usermod command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k privileged-usermod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030560
@@ -5753,9 +5694,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ rhel8stig_interactive_uid_start }} -F auid!=unset -k perm_mod
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030570
@@ -5769,9 +5709,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030580
@@ -5785,9 +5724,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: "-w {{ rhel8stig_pam_faillock.dir }} -p wa -k logins"
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030590
@@ -5801,9 +5739,8 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
-  lineinfile:
-      path: /etc/audit/rules.d/audit.rules
-      line: -w /var/log/lastlog -p wa -k logins
+  debug:
+      msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: restart auditd
   when:
       - rhel_08_030600
