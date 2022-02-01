@@ -3259,11 +3259,17 @@
       - V-230348
       - tmux
 
-- name: " MEDIUM | RHEL-08-020041 | PATCH | RHEL 8 must ensure session control is automatically started at shell initialization."
-  lineinfile:
-      path: /etc/bashrc
-      regexp: '^\[ -n "$PS1" -a -z "$TMUX" \]'
-      line: '[ -n "$PS1" -a -z "$TMUX" ] && exec tmux'
+- name: "MEDIUM | RHEL-08-020041 | PATCH | RHEL 8 must ensure session control is automatically started at shell initialization. | Set tmux.sh if file exists"
+  blockinfile:
+      path: /etc/profile.d/tmux.sh
+      marker: "# <!-- {mark} ANSIBLE LOCKDOWN RHEL-08-020041 MANAGED BLOCK -->"
+      block: |
+          if [ "$PS1" ]; then
+          parent=$(ps -o ppid= -p $$)
+          name=$(ps -o comm= -p $parent)
+          case "$name" in (sshd|login) exec tmux ;; esac
+          fi
+      create: true
   when:
       - rhel_08_020041
   tags:
