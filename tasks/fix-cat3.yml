@@ -1,4 +1,5 @@
 ---
+
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
   dnf:
       name: policycoreutils
@@ -21,6 +22,7 @@
   notify: restart sshd
   when:
       - rhel_08_010292
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-010292
       - CAT3
@@ -28,29 +30,12 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230253r627750_rule
       - V-230253
-      - sshd
+      - ssh
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-  block:
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Set kernel message buffer no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.dmesg_restrict ='
-            line: "kernel.dmesg_restrict = 1"
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010375
   tags:
@@ -58,31 +43,14 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r627750_rule
+      - SV-230269r792879_rule
       - V-230269
       - sysctl
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-  block:
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling if using numbered link files"
-        lineinfile:
-            path: "{{ rhel8stig_sysctlconf_filename.files[0].path }}"
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched > 0
-            - rhel8stig_sysctlconf_filename.files[0].islnk
-
-      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Set kernel profiling no numbered link files"
-        lineinfile:
-            path: /etc/sysctl.conf
-            regexp: '^kernel.perf_event_paranoid ='
-            line: 'kernel.perf_event_paranoid = 2'
-        notify: sysctl system
-        when:
-            - rhel8stig_sysctlconf_filename.matched == 0 or
-              not rhel8stig_sysctlconf_filename.files[0].islnk
+  debug:
+      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  notify: update sysctl
   when:
       - rhel_08_010376
   tags:
@@ -90,7 +58,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r627750_rule
+      - SV-230270r792882_rule
       - V-230270
       - sysctl
 
@@ -124,30 +92,48 @@
       - SV-230281r627750_rule
       - V-230281
 
-- name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
-  systemd:
-      name: rngd.service
-      state: started
-      enabled: yes
+- name: |
+    "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service.
+     LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+  block:
+      - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+        package:
+            name: rng-tools
+            state: present
+        when:
+            - rhel_08_010472
+            - "'rng-tools' not in ansible_facts.packages"
+
+      - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
+        systemd:
+            name: rngd.service
+            state: started
+            enabled: yes
+        when:
+            - rhel_08_010471
+            - "'rng-tools' in ansible_facts.packages"
   when:
-      - rhel_08_010471
-      - "'rng-tools' in ansible_facts.packages"
+      - rhel_08_010471 or
+        rhel_08_010472
+      - not system_is_container
   tags:
       - RHEL-08-010471
+      - RHEL-08-010472
       - CAT3
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
       - SV-230285r627750_rule
+      - SV-244527r743830_rule
       - V-230285
+      - V-244527
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
   debug:
-      msg: "WARNING: /var is not mounted on a separate partition"
+      msg: "WARNING!! /var is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
       - rhel_08_010540
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
@@ -158,7 +144,7 @@
       - SV-230292r627750_rule
       - V-230292
       - complexity-high
-      - mount
+      - mounts
       - var
 
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
@@ -169,7 +155,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010541
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
@@ -180,8 +165,7 @@
       - SV-230293r627750_rule
       - V-230293
       - complexity_high
-      - mount
-      - auditd
+      - mounts
 
 - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
   debug:
@@ -191,7 +175,6 @@
       - rhel8stig_audit_complex
   when:
       - rhel_08_010542
-      - not rhel8stig_system_is_container
       - rhel8stig_complex
       - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
@@ -202,14 +185,14 @@
       - SV-230294r627750_rule
       - V-230294
       - complexity_high
-      - mount
+      - mounts
       - auditd
 
 - name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
   lineinfile:
       path: /etc/security/limits.conf
       regexp: '^\*               hard    maxlogins'
-      line: '*                hard    maxlogins       10'
+      line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
       insertbefore: '^# End of file'
       create: yes
       owner: root
@@ -309,7 +292,7 @@
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230468r627750_rule
+      - SV-230468r792904_rule
       - V-230468
       - grub
 
@@ -347,9 +330,11 @@
       - RHEL-08-030602
       - CAT3
       - CCI-001849
-      - SV-230469r627750_rule
+      - SRG-OS-000341-GPOS-00132
+      - SV-230469r792906_rule
       - V-230469
       - grub
+      - auditd
 
 - name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
   lineinfile:
@@ -362,12 +347,13 @@
       mode: 0600
   when:
       - rhel_08_030603
+      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230470r627750_rule
+      - SV-230470r744006_rule
       - V-230470
       - usb
 
@@ -440,7 +426,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230491r627750_rule
+      - SV-230491r792908_rule
       - V-230491
       - grub
 
@@ -456,8 +442,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install ATM', line: 'install ATM /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist ATM', line: 'blacklist ATM', insertafter: '^install ATM /bin/true' }
+      - { regexp: '^install atm', line: 'install atm /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist atm', line: 'blacklist atm', insertafter: '^install atm /bin/true' }
   when:
       - rhel_08_040021
   tags:
@@ -465,7 +451,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230494r627750_rule
+      - SV-230494r792911_rule
       - V-230494
       - modprobe
       - atm
@@ -482,8 +468,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install CAN', line: 'install CAN /bin/true', insertafter: 'EOF' }
-      - { regexp: 'blacklist CAN', line: 'blacklist CAN', insertafter: '^install CAN /bin/true' }
+      - { regexp: '^install can', line: 'install can /bin/true', insertafter: 'EOF' }
+      - { regexp: 'blacklist can', line: 'blacklist can', insertafter: '^install can /bin/true' }
   when:
       - rhel_08_040022
   tags:
@@ -491,7 +477,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230495r627750_rule
+      - SV-230495r792914_rule
       - V-230495
       - modprobe
       - can
@@ -508,8 +494,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install SCTP', line: 'install SCTP /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist SCTP', line: 'blacklist SCTP', insertafter: '^install SCTP' }
+      - { regexp: '^install sctp', line: 'install sctp /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist sctp', line: 'blacklist sctp', insertafter: '^install sctp' }
   when:
       - rhel_08_040023
   tags:
@@ -517,7 +503,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r627750_rule
+      - SV-230496r792917_rule
       - V-230496
       - modprobe
       - sctp
@@ -534,8 +520,8 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install TIPC', line: 'install TIPC /bin/true', insertafter: 'EOF' }
-      - { regexp: '^blacklist TIPC', line: 'blacklist TIPC', insertafter: '^install TIPC' }
+      - { regexp: '^install tipc', line: 'install tipc /bin/true', insertafter: 'EOF' }
+      - { regexp: '^blacklist tipc', line: 'blacklist tipc', insertafter: '^install tipc' }
   when:
       - rhel_08_040024
   tags:
@@ -543,7 +529,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r627750_rule
+      - SV-230497r792920_rule
       - V-230497
       - modprobe
       - tipc
@@ -569,7 +555,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230498r627750_rule
+      - SV-230498r792922_rule
       - V-230498
       - modprobe
       - cramfs
@@ -595,7 +581,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230499r627750_rule
+      - SV-230499r792924_rule
       - V-230499
       - modprobe
       - firewire
@@ -615,13 +601,11 @@
   tags:
       - CAT3
       - RHEL-08-040300
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230551r627750_rule
-      - V-230551
       - RHEL-08-040310
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
+      - SV-230551r627750_rule
       - SV-230552r627750_rule
+      - V-230551
       - V-230552
       - aide

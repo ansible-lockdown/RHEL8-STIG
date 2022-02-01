@@ -44,11 +44,13 @@
       - cat2
       - medium
       - RHEL-08-010380
+      - sudo
 
 - name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150| Install grub2-tools."
   dnf:
       name: grub2-tools
   when:
+      - not system_is_container
       - "'grub2-tools' not in ansible_facts.packages"
       - rhel_08_010020 or
         rhel_08_010140 or
@@ -69,7 +71,6 @@
       - rhel_08_010020 or
         rhel_08_010140 or
         rhel_08_010150
-
   tags:
       - cat1
       - high
@@ -102,6 +103,7 @@
   dnf:
       name: cronie
   when:
+      - not system_is_container
       - "'cronie' not in ansible_facts.packages"
       - rhel_08_010360
   tags:
@@ -114,7 +116,8 @@
   vars:
       rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
   when:
-      - rhel_08_010740 or
+      - rhel_08_010731 or
+        rhel_08_010740 or
         rhel_08_010750 or
         rhel_08_020320
   tags:
@@ -150,6 +153,7 @@
   dnf:
       name: rsyslog
   when:
+      - not system_is_container
       - rhel_08_010070 or
         rhel_08_030010
       - "'rsyslog' not in ansible_facts.packages"
@@ -177,6 +181,7 @@
   dnf:
       name: audispd-plugins
   when:
+      - not system_is_container
       - rhel_08_030620 or
         rhel_08_030630 or
         rhel_08_030640 or
@@ -230,6 +235,7 @@
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
+      - not system_is_container
       - rhel_08_010360 or
         rhel_08_010380 or
         rhel_08_040310
@@ -247,6 +253,7 @@
       name: libselinux-utils
       state: present
   when:
+      - not system_is_container
       - "'libselinux-utils' not in ansible_facts.packages"
       - rhel_08_010170 or
         rhel_08_010450
@@ -275,7 +282,8 @@
         command: ssh-keygen -N '' -f /etc/ssh/ssh_host_rsa_key -t rsa -b 4096
         when: not rhel8stig_ssh_host_rsa_key_stat.stat.exists
         notify: clean up ssh host key
-  when: rhel8stig_ssh_required
+  when:
+      - rhel8stig_ssh_required
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
@@ -314,11 +322,6 @@
         stat:
             path: "{{ rhel8stig_sssd_conf }}"
         register: rhel8stig_sssd_conf_present
-        when:
-            - rhel_08_010400 or
-              rhel_08_020090 or
-              rhel_08_020250 or
-              rhel_08_020290
 
       - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
         debug:
@@ -326,6 +329,11 @@
         changed_when: true
         when:
             - not rhel8stig_sssd_conf_present.stat.exists
+  when:
+      - rhel_08_010400 or
+        rhel_08_020090 or
+        rhel_08_020250 or
+        rhel_08_020290
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
@@ -345,26 +353,6 @@
         set_fact:
             rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | string }}"
             rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | string }}"
-
-- name: "PRELIM | Find sysctl config file name | RHEL-08-010372 | RHEL-08-010373 | RHEL-08-010374 | RHEL-08-010375 | RHEL-08-010376"
-  find:
-      paths: /etc/sysctl.d
-      patterns: '.*sysctl.conf'
-      use_regex: yes
-      file_type: any
-  register: rhel8stig_sysctlconf_filename
-  when:
-      - rhel_08_010372 or
-        rhel_08_010373 or
-        rhel_08_010374 or
-        rhel_08_010375 or
-        rhel_08_010376 or
-        rhel_08_040280 or
-        rhel_08_040281 or
-        rhel_08_040282 or
-        rhel_08_040283 or
-        rhel_08_040284 or
-        rhel_08_040285
 
 - name: Gather the package facts
   package_facts:
@@ -409,7 +397,7 @@
                 - "bootloader path set to {{ rhel8stig_bootloader_path }}"
                 - "legacy boot equals {{ rhel8stig_legacy_boot }}"
 
-- name: "PRELIM | RHEL-08-020017 | If using selinux set up system prereqs"
+- name: "PRELIM | RHEL-08-020017 | RHEL-08-020027 | REHL-08-020028 | If using selinux set up system prereqs"
   block:
       - name: "PRELIM | RHEL-08-020017 | Install policycoreutils-python-utils"
         package:
@@ -417,7 +405,7 @@
             state: present
         when: "'policycoreutils-python-utils' not in ansible_facts.packages"
 
-      - name: "PRELIM | RHEL-08-020017 | create faillock dir if rhel_08_020017"
+      - name: "PRELIM | RHEL-08-020027 | create faillock dir if rhel_08_020027"
         file:
             path: "{{ rhel8stig_pam_faillock.dir }}"
             state: directory
@@ -425,32 +413,12 @@
             owner: root
             group: root
         register: faillock_dir
-
-      - name: "PRELIM | RHEL-08-020017 | Add permenant secontext"
-        sefcontext:
-            target: "{{ rhel8stig_pam_faillock.dir }}"
-            ftype: d
-            setype: faillog_t
-            state: present
-        register: add_faillock_secontext
-        when: faillock_dir.changed
-
-      - name: "PRELIM | RHEL-08-020017 | Set faillock directory selinux context immediately"
-        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
-
-      - name: "PRELIM | RHEL-08-020017 | Capture secontext"
-        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
-        register: faillock_secontext
-        changed_when: false
-        failed_when: false
-
-      - name: "PRELIM | RHEL-08-020017 | Modify context of not correct"
-        shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
-        register: modify_secontext
-        when: faillock_secontext.stdout != '1'
-      
-      - name: "PRELIM | RHEL-08-020017 | Set {{ rhel8stig_pam_faillock.dir }} selinux context"
-        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
-        when: modify_secontext.changed
   when:
+      - not system_is_container
       - rhel_08_020017
+      - rhel_08_020027
+      - rhel_08_020028
+
+- name: "PRELIM | Section 1.1 | Create list of mount points"
+  set_fact:
+      mount_names: "{{ ansible_mounts | map(attribute='mount') | list }}"
