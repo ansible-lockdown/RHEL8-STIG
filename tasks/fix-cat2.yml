@@ -1176,6 +1176,7 @@
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_010372
@@ -1191,6 +1192,7 @@
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_010373
@@ -1206,6 +1208,7 @@
 - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_010374
@@ -1482,6 +1485,7 @@
 - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_010430
@@ -2156,6 +2160,7 @@
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_010671
@@ -3156,9 +3161,9 @@
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
         shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
-        register: faillock_secontext
         changed_when: false
         failed_when: false
+        register: faillock_secontext
 
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
@@ -3838,39 +3843,31 @@
 
 - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations."
   block:
-      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Ensure pam_pwhistory rule exists"
+      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Get pam_pwhistory status"
+        shell: cat /etc/pam.d/password-auth | grep "password.*required.*pam_pwhistory.so"
+        changed_when: false
+        failed_when: false
+        register: rhel_08_020220_pwhistory_status
+
+      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pw_history"
+        lineinfile:
+            path: /etc/pam.d/password-auth
+            line: "password required pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
+            insertafter: '^password'
+            owner: root
+            group: root
+            mode: 0640
+        when: rhel_08_020220_pwhistory_status.stdout | length == 0
+
+      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
         pamd:
             name: password-auth
-            state: before
-            type: password
-            control: sufficient
-            module_path: pam_unix.so
-            new_type: password
-            new_control: required
-            new_module_path: pam_pwhistory.so
-
-      # TODO: Remove temporary audit check to determine if the following pamd module task needs to be run since the module is not idempotent
-      - name: "MEDIUM | RHEL-08-020220 | AUDIT | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Check for existing password history reuse settings"
-        command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}\\s+retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}$' /etc/pam.d/password-auth"
-        check_mode: no
-        changed_when: no
-        failed_when: rhel_08_020220_pw_hist_settings.rc > 1
-        register: rhel_08_020220_pw_hist_settings
-
-      # TODO: Once the pamd module is fixed (either args_present or updated) then remove the previous grep task and update the following.
-      - name: "MEDIUM | RHEL-08-020220 | PATCH | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Ensure pam_pwhistory module arguments are set"
-        pamd:
-            name: "{{ item.item }}"
-            state: updated
             type: password
             control: required
             module_path: pam_pwhistory.so
-            module_arguments:
-                - use_authtok
-                - remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}
-                - retry={{ rhel8stig_pam_pwhistory.retries | default(3) }}
-        with_items: "{{ rhel_08_020220_pw_hist_settings.results }}"
-        when: item.rc == 1
+            module_arguments: 'remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}'
+            state: args_present
+        when: rhel_08_020220_pwhistory_status.stdout | length > 0
   when:
       - rhel_08_020220
   tags:
@@ -3890,7 +3887,6 @@
         failed_when: false
         register: rhel_08_020221_pwhistory_status
 
-      - debug: var=rhel_08_020221_pwhistory_status
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pwhistory"
         lineinfile:
             path: /etc/pam.d/system-auth
@@ -4319,7 +4315,8 @@
 - name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030000
   tags:
@@ -4816,7 +4813,8 @@
 - name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030190
   tags:
@@ -4831,7 +4829,8 @@
 - name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030200
   tags:
@@ -4930,7 +4929,8 @@
 - name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030250
   tags:
@@ -4945,7 +4945,8 @@
 - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030260
   tags:
@@ -4981,7 +4982,8 @@
 - name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030280
   tags:
@@ -4996,7 +4998,8 @@
 - name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030290
   tags:
@@ -5011,7 +5014,8 @@
 - name: "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030300
   tags:
@@ -5026,7 +5030,8 @@
 - name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030301
   tags:
@@ -5041,7 +5046,8 @@
 - name: "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030302
   tags:
@@ -5056,7 +5062,8 @@
 - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030310
   tags:
@@ -5071,7 +5078,8 @@
 - name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030311
   tags:
@@ -5086,7 +5094,8 @@
 - name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030312
   tags:
@@ -5101,7 +5110,8 @@
 - name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030313
   tags:
@@ -5116,7 +5126,8 @@
 - name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030314
   tags:
@@ -5131,7 +5142,8 @@
 - name: "MEDIUM | RHEL-08-030315 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030315
   tags:
@@ -5146,7 +5158,8 @@
 - name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030316
   tags:
@@ -5161,7 +5174,8 @@
 - name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030317
   tags:
@@ -5176,7 +5190,8 @@
 - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030320
   tags:
@@ -5191,7 +5206,8 @@
 - name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030330
   tags:
@@ -5206,7 +5222,8 @@
 - name: "MEDIUM | RHEL-08-030340 | PATCH | Successful/unsuccessful uses of the pam_timestamp_check command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030340
   tags:
@@ -5221,7 +5238,8 @@
 - name: "MEDIUM | RHEL-08-030350 | PATCH | Successful/unsuccessful uses of the newgrp command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030350
   tags:
@@ -5236,7 +5254,8 @@
 - name: "MEDIUM | RHEL-08-030360 | PATCH | Successful/unsuccessful uses of the init_module command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030360
   tags:
@@ -5251,7 +5270,8 @@
 - name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030361
   tags:
@@ -5342,7 +5362,8 @@
 - name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030370
   tags:
@@ -5376,7 +5397,8 @@
 - name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030390
   tags:
@@ -5391,7 +5413,8 @@
 - name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030400
   tags:
@@ -5406,7 +5429,8 @@
 - name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030410
   tags:
@@ -5421,7 +5445,8 @@
 - name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd 
+  changed_when: true
+  notify: update auditd 
   when:
       - rhel_08_030420
   tags:
@@ -5541,7 +5566,8 @@
 - name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030480
   tags:
@@ -5556,7 +5582,8 @@
 - name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030490
   tags:
@@ -5666,7 +5693,8 @@
 - name: "MEDIUM | RHEL-08-030550 | PATCH | Successful/unsuccessful uses of the sudo command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030550
   tags:
@@ -5681,7 +5709,8 @@
 - name: "MEDIUM | RHEL-08-030560 | PATCH | Successful/unsuccessful uses of the usermod command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030560
   tags:
@@ -5696,7 +5725,8 @@
 - name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030570
   tags:
@@ -5711,7 +5741,8 @@
 - name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030580
   tags:
@@ -5726,7 +5757,8 @@
 - name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030590
   tags:
@@ -5741,7 +5773,8 @@
 - name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
   debug:
       msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  notify: restart auditd
+  changed_when: true
+  notify: update auditd
   when:
       - rhel_08_030600
   tags:
@@ -6863,6 +6896,7 @@
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040209
@@ -6878,6 +6912,7 @@
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040210
@@ -6894,6 +6929,7 @@
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040220
@@ -6909,6 +6945,7 @@
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040230
@@ -6924,6 +6961,7 @@
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040239
@@ -6939,6 +6977,7 @@
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040240
@@ -6955,6 +6994,7 @@
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040249
@@ -6970,6 +7010,7 @@
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040250
@@ -6986,6 +7027,7 @@
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040259
@@ -7002,6 +7044,7 @@
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040260
@@ -7018,6 +7061,7 @@
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040261
@@ -7035,6 +7079,7 @@
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040262
@@ -7052,6 +7097,7 @@
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040270
@@ -7067,6 +7113,7 @@
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040279
@@ -7082,6 +7129,7 @@
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040280
@@ -7098,6 +7146,7 @@
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040281
@@ -7113,6 +7162,7 @@
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040282
@@ -7128,6 +7178,7 @@
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040283
@@ -7143,6 +7194,7 @@
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040284
@@ -7158,6 +7210,7 @@
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040285
@@ -7173,6 +7226,7 @@
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
   debug:
       msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+  changed_when: true
   notify: update sysctl
   when:
       - rhel_08_040286

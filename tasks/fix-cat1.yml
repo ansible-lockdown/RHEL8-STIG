@@ -137,16 +137,16 @@
       - SV-230223r792855_rule
       - V-230223
 
-- name: "MEDIUM | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
+- name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
   block:
-      - name: "MEDIUM | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Get users with no pw set"
-        command: "awk -F: '!$2 {print $1}' /etc/shadow"
+      - name: "HIGH | RHEL-08-010121 | AUDIT | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Get users with no pw set"
+        shell: "awk -F: '!$2 {print $1}' /etc/shadow"
         changed_when: false
         failed_when: false
         check_mode: false
         register: rhel_08_010121_no_pw_users
 
-      - name: "MEDIUM | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Warn on accounts with no passwords"
+      - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Warn on accounts with no passwords"
         debug:
             msg:
                 - "Alert! You have users that are not using passwords. Please either set a password, lock, or remove the accounts below:"
@@ -155,7 +155,7 @@
             - rhel_08_010121_no_pw_users.stdout | length > 0
             - not rhel8stig_disruption_high
 
-      - name: "MEDIUM | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Lock accounts with no passwords, disruptive"
+      - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Lock accounts with no passwords, disruptive"
         user:
             name: "{{ item }}"
             password_lock: yes
@@ -165,7 +165,7 @@
             - rhel_08_010121_no_pw_users.stdout | length > 0
             - rhel8stig_disruption_high
   when:
-      - RHEL-08-010121
+      - rhel_08_010121
   tags:
       - RHEL-08-010121
       - CAT1

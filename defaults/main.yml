@@ -87,6 +87,7 @@ audit_cmd_timeout: 60000
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
+rhel_08_010121: true
 rhel_08_010140: true
 rhel_08_010150: true
 rhel_08_010370: true
@@ -168,6 +169,7 @@ rhel_08_010381: true
 rhel_08_010382: true
 rhel_08_010383: true
 rhel_08_010384: true
+rhel_08_010385: true
 rhel_08_010390: true
 rhel_08_010400: true
 rhel_08_010410: true
@@ -187,7 +189,7 @@ rhel_08_010522: true
 rhel_08_010543: true
 rhel_08_010544: true
 rhel_08_010550: true
-rhel_08_010560: true
+# rhel_08_010560: true
 rhel_08_010561: true
 rhel_08_010570: true
 rhel_08_010571: true
@@ -356,7 +358,7 @@ rhel_08_030420: true
 # rhel_08_030440: true
 # rhel_08_030450: true
 # rhel_08_030460: true
-rhel_08_030470: true
+# rhel_08_030470: true
 rhel_08_030480: true
 rhel_08_030490: true
 # rhel_08_030500: true
