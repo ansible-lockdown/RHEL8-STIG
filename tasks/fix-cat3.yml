@@ -82,6 +82,8 @@
             line: 'clean_requirements_on_remove=True'
         with_items:
             - "{{ rhel_08_010440_package_confs.files }}"
+        loop_control:
+            label: "{{ item.path }}"
   when:
       - rhel_08_010440
   tags:

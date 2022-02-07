@@ -303,6 +303,8 @@
       - { regexp: '^set superusers', line: 'set superusers="{{ rhel8stig_boot_superuser }}"', insertafter: '### BEGIN /etc/grub.d/01_users ###' }
       - { regexp: '^export superusers', line: 'export superusers', insertafter: '^set superusers' }
       - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
+  loop_control:
+      label: "{{ item.line }}"
   when:
       - rhel_08_010141 or
         rhel_08_010149
@@ -1498,6 +1500,8 @@
             mode: "{{ rhel8stig_ssh_pub_key_perm }}"
         with_items:
             - "{{ rhel_08_010480_public_files.files }}"
+        loop_control:
+            label: "{{ item.path }}"
         notify: restart sshd
   when:
       - rhel_08_010480
@@ -1530,6 +1534,8 @@
             mode: "{{ rhel8stig_ssh_priv_key_perm }}"
         with_items:
             - "{{ rhel_08_010490_private_host_key_files.files }}"
+        loop_control:
+            label: "{{ item.path }}"
         notify: restart sshd
   when:
       - rhel_08_010490
@@ -1817,6 +1823,8 @@
             opts: "{{ item.opts }},nodev"
         with_items:
             - "{{ rhel8stig_010580_mounts | default([]) }}"
+        loop_control:
+            label: "{{ item.mpoint }}"
         when:
             - item.device != "/"
             - "'odev' not in item.opts"
@@ -2067,6 +2075,8 @@
         register: rhel_08_010660_world_writable_files
         with_items:
             - "{{ ansible_mounts }}"
+        loop_control:
+            label: "{{ item.mount }}"
 
       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
         set_fact:
