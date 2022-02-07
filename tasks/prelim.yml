@@ -422,7 +422,3 @@
 - name: "PRELIM | Section 1.1 | Create list of mount points"
   set_fact:
       mount_names: "{{ ansible_mounts | map(attribute='mount') | list }}"
-
-# - name: "PRELIM | Get OS Version"
-#   set_fact:
-#       os_release: "{{ distribution_version }}"

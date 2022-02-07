@@ -1,3 +1,5 @@
+---
+
 - name: Gather distribution info
   setup:
       gather_subset: distribution,!all,!min
@@ -31,7 +33,7 @@
       - name: Load variable for container
         include_vars:
             file: "{{ container_vars_file }}"
-      
+
       - name: output if discovered is a container
         debug:
             msg: system has been discovered as a container
@@ -110,10 +112,12 @@
       - CAT3
       - low
 
-- name: trigger update sysctl 
+- name: trigger update sysctl
   command: /bin/true
-  notify: update sysctl
+  changed_when: rhel8stig_trigger_update_sysctl.rc == 0
   check_mode: false
+  register: rhel8stig_trigger_update_sysctl
+  notify: update sysctl
   tags:
       - CAT1
       - CAT2

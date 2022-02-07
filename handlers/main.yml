@@ -1,6 +1,6 @@
 ---
 - name: systemctl daemon-reload
-  systemd: 
+  systemd:
       daemon_reload: true
   when:
       - not system_is_container
