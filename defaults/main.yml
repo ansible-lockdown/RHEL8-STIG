@@ -122,7 +122,6 @@ rhel_08_010100: true
 rhel_08_010110: true
 rhel_08_010120: true
 rhel_08_010130: true
-# rhel_08_010131: true
 rhel_08_010141: true
 rhel_08_010149: true
 rhel_08_010151: true
@@ -189,7 +188,6 @@ rhel_08_010522: true
 rhel_08_010543: true
 rhel_08_010544: true
 rhel_08_010550: true
-# rhel_08_010560: true
 rhel_08_010561: true
 rhel_08_010570: true
 rhel_08_010571: true
@@ -295,7 +293,6 @@ rhel_08_030010: true
 rhel_08_030020: true
 rhel_08_030030: true
 rhel_08_030040: true
-# rhel_08_030050: true
 rhel_08_030060: true
 rhel_08_030061: true
 rhel_08_030062: true
@@ -318,13 +315,8 @@ rhel_08_030180: true
 rhel_08_030181: true
 rhel_08_030190: true
 rhel_08_030200: true
-# rhel_08_030210: true
-# rhel_08_030220: true
-# rhel_08_030230: true
-# rhel_08_030240: true
 rhel_08_030250: true
 rhel_08_030260: true
-# rhel_08_030270: true
 rhel_08_030280: true
 rhel_08_030290: true
 rhel_08_030300: true
@@ -344,28 +336,13 @@ rhel_08_030340: true
 rhel_08_030350: true
 rhel_08_030360: true
 rhel_08_030361: true
-# rhel_08_030362: true
-# rhel_08_030363: true
-# rhel_08_030364: true
-# rhel_08_030365: true
 rhel_08_030370: true
-# rhel_08_030380: true
 rhel_08_030390: true
 rhel_08_030400: true
 rhel_08_030410: true
 rhel_08_030420: true
-# rhel_08_030430: true
-# rhel_08_030440: true
-# rhel_08_030450: true
-# rhel_08_030460: true
-# rhel_08_030470: true
 rhel_08_030480: true
 rhel_08_030490: true
-# rhel_08_030500: true
-# rhel_08_030510: true
-# rhel_08_030520: true
-# rhel_08_030530: true
-# rhel_08_030540: true
 rhel_08_030550: true
 rhel_08_030560: true
 rhel_08_030570: true
