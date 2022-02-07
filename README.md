@@ -4,7 +4,7 @@
 ![Build Status](https://img.shields.io/github/workflow/status/ansible-lockdown/RHEL8-STIG/DevelToMain?label=Main%20Build%20Status&style=plastic)
 ![Release](https://img.shields.io/github/v/release/ansible-lockdown/RHEL8-STIG?style=plastic)
 
-Configure a RHEL 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
+Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
 This role is based on RHEL 8 DISA STIG: [Version 1, Rel 5 released on  Jan 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R5_STIG.zip).
 
@@ -28,8 +28,7 @@ Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit
 
 ## Requirements
 
-RHEL 8 or CentOS 8 - Other versions are not supported. Although tested on rocky and almalinux
-Containers
+RHEL/Rocky/AlmaLinux 8 - Other versions are not supported.
 Access to download or add the goss binary and content to the system if using auditing. options are available on how to get the content to the system.
 
 ### General
