@@ -116,12 +116,12 @@ rhel_08_030710: false
 rhel_08_030720: false
 
 ## mounts
-#/tmp
+# /tmp
 rhel_08_010543: false
 rhel_08_040123: false
 rhel_08_040124: false
 rhel_08_040125: false
-# /var/log
+# /var/log
 rhel_08_040126: false
 rhel_08_040127: false
 rhel_08_040128: false

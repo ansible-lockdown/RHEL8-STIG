@@ -87,6 +87,7 @@ audit_cmd_timeout: 60000
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
+rhel_08_010121: true
 rhel_08_010140: true
 rhel_08_010150: true
 rhel_08_010370: true
@@ -121,7 +122,6 @@ rhel_08_010100: true
 rhel_08_010110: true
 rhel_08_010120: true
 rhel_08_010130: true
-rhel_08_010131: true
 rhel_08_010141: true
 rhel_08_010149: true
 rhel_08_010151: true
@@ -152,17 +152,23 @@ rhel_08_010300: true
 rhel_08_010310: true
 rhel_08_010320: true
 rhel_08_010330: true
+rhel_08_010331: true
 rhel_08_010340: true
+rhel_08_010341: true
 rhel_08_010350: true
+rhel_08_010351: true
+rhel_08_010359: true
 rhel_08_010360: true
 rhel_08_010372: true
 rhel_08_010373: true
 rhel_08_010374: true
+rhel_08_010379: true
 rhel_08_010380: true
 rhel_08_010381: true
 rhel_08_010382: true
 rhel_08_010383: true
 rhel_08_010384: true
+rhel_08_010385: true
 rhel_08_010390: true
 rhel_08_010400: true
 rhel_08_010410: true
@@ -182,7 +188,6 @@ rhel_08_010522: true
 rhel_08_010543: true
 rhel_08_010544: true
 rhel_08_010550: true
-rhel_08_010560: true
 rhel_08_010561: true
 rhel_08_010570: true
 rhel_08_010571: true
@@ -251,6 +256,10 @@ rhel_08_020081: true
 rhel_08_020082: true
 rhel_08_020090: true
 rhel_08_020100: true
+rhel_08_020101: true
+rhel_08_020102: true
+rhel_08_020103: true
+rhel_08_020104: true
 rhel_08_020110: true
 rhel_08_020120: true
 rhel_08_020130: true
@@ -263,6 +272,7 @@ rhel_08_020190: true
 rhel_08_020200: true
 rhel_08_020210: true
 rhel_08_020220: true
+rhel_08_020221: true
 rhel_08_020230: true
 rhel_08_020231: true
 rhel_08_020240: true
@@ -283,7 +293,6 @@ rhel_08_030010: true
 rhel_08_030020: true
 rhel_08_030030: true
 rhel_08_030040: true
-rhel_08_030050: true
 rhel_08_030060: true
 rhel_08_030061: true
 rhel_08_030062: true
@@ -306,13 +315,8 @@ rhel_08_030180: true
 rhel_08_030181: true
 rhel_08_030190: true
 rhel_08_030200: true
-rhel_08_030210: true
-rhel_08_030220: true
-rhel_08_030230: true
-rhel_08_030240: true
 rhel_08_030250: true
 rhel_08_030260: true
-rhel_08_030270: true
 rhel_08_030280: true
 rhel_08_030290: true
 rhel_08_030300: true
@@ -332,28 +336,13 @@ rhel_08_030340: true
 rhel_08_030350: true
 rhel_08_030360: true
 rhel_08_030361: true
-rhel_08_030362: true
-rhel_08_030363: true
-rhel_08_030364: true
-rhel_08_030365: true
 rhel_08_030370: true
-rhel_08_030380: true
 rhel_08_030390: true
 rhel_08_030400: true
 rhel_08_030410: true
 rhel_08_030420: true
-rhel_08_030430: true
-rhel_08_030440: true
-rhel_08_030450: true
-rhel_08_030460: true
-rhel_08_030470: true
 rhel_08_030480: true
 rhel_08_030490: true
-rhel_08_030500: true
-rhel_08_030510: true
-rhel_08_030520: true
-rhel_08_030530: true
-rhel_08_030540: true
 rhel_08_030550: true
 rhel_08_030560: true
 rhel_08_030570: true
@@ -436,6 +425,7 @@ rhel_08_040285: true
 rhel_08_040286: true
 rhel_08_040290: true
 rhel_08_040320: true
+rhel_08_040321: true
 rhel_08_040330: true
 rhel_08_040340: true
 rhel_08_040341: true
@@ -689,6 +679,12 @@ rhel8stig_shell_session_timeout:
 # Timeout value is in seconds. (60 seconds * 10 = 600)
 rhel8stig_ssh_session_timeout: 600
 
+# RHEL-08-020102
+# RHEL-08-020103
+# rhel8stig_pam_pwquality_retry is the number of retries set to the password required pam_pwquality.so in system and password auth files
+# To conform to STIG standards this value needs to be 3 or less
+rhel8stig_pam_pwquality_retry: 3
+
 # RHEL-08-020320
 # If vsftpd is required, remove 'ftp' from rhel8stig_unnecessary_accounts.
 #
@@ -704,6 +700,7 @@ rhel8stig_unnecessary_accounts:
 rhel8stig_remove_unnecessary_user_files: no
 
 # RHEL-08-020220
+# RHEL-08-020221
 # pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
 rhel8stig_pam_pwhistory:
     remember: 5
@@ -818,11 +815,16 @@ rhel8stig_dns_servers:  # The order needs to be set as expected. If you have 3 y
 rhel8stig_int_gid: 1000
 
 # RHEL-08-010130
-# The rounds parameter goes into the password sufficient pam_unix.so element of the password-auth and system-auth files. The value shoudl be set no lower than 5000
+# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 5000
 rhel8stig_hashing_rounds: 5000
 
 # RHEL-08-010100
 rhel8stig_path_to_sshkey: "/root/.ssh/"
+
+# RHEL-08-010331
+# rhel8stig_lib_dir_perms is the permissions that will be set to library directories when they are found to be 755 or more permissive and rhel8stig_disruption_high is true
+# To conform to STIG standards these directories need to be 755 or less permissive
+rhel8stig_lib_dir_perms: 0755
 
 # RHEL-08-010510
 # rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"

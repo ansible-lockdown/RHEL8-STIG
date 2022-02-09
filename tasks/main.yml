@@ -1,3 +1,5 @@
+---
+
 - name: Gather distribution info
   setup:
       gather_subset: distribution,!all,!min
@@ -8,8 +10,8 @@
 
 - name: Check OS version and family
   assert:
-      that: (ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
-      fail_msg: "This role can only be run against RHEL/CENTOS 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
+      that: (ansible_distribution != 'CentOS' and ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
+      fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
       success_msg: "This role is running against a supported OS {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
   tags:
       - always
@@ -31,7 +33,7 @@
       - name: Load variable for container
         include_vars:
             file: "{{ container_vars_file }}"
-      
+
       - name: output if discovered is a container
         debug:
             msg: system has been discovered as a container
@@ -110,10 +112,12 @@
       - CAT3
       - low
 
-- name: trigger update sysctl 
+- name: trigger update sysctl
   command: /bin/true
-  notify: update sysctl
+  changed_when: rhel8stig_trigger_update_sysctl.rc == 0
   check_mode: false
+  register: rhel8stig_trigger_update_sysctl
+  notify: update sysctl
   tags:
       - CAT1
       - CAT2
