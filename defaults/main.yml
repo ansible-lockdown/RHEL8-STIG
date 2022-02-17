@@ -9,6 +9,8 @@ benchmark: RHEL8-STIG
 # Whether to skip the reboot
 rhel8cis_skip_reboot: true
 
+# These will toggle enable/disable the running of entire categories
+# Set to true will run the category and set to false will skip the entire category
 rhel8stig_cat1_patch: true
 rhel8stig_cat2_patch: true
 rhel8stig_cat3_patch: true
