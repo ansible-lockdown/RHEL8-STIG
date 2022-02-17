@@ -6,7 +6,8 @@ name: testing_pipeline
 # Triggers the workflow on push or pull request
 # events but only for the devel branch
 on:
-  pull_request:
+  pull_request_target:
+    types: [opened, reponed, synchronize]
     branches:
       - devel
       - main
