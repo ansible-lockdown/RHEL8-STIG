@@ -840,7 +840,7 @@ rhel8stig_ntp_server_name: server.name
 # RHEL-08-040137
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
 rhel8stig_fapolicy_white_list:
-    - 'deny_audit perm=any pattern=ld_so : all'
+    - "deny_audit perm=any pattern=ld_so : all"
     - deny all all
 
 # RHEL-08-040090
