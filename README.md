@@ -8,6 +8,8 @@ Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be 
 
 This role is based on RHEL 8 DISA STIG: [Version 1, Rel 5 released on  Jan 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R5_STIG.zip).
 
+# George Nalen changed for GitHub action tests
+
 ## Updating
 
 Coming from a previous release.
