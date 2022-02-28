@@ -52,7 +52,7 @@ kernel.core_pattern = |/bin/false
 net.ipv4.conf.default.accept_redirects = 0
 {% endif %}
 
-{% if rhel_08_040210 %}
+{% if rhel_08_040210 and rhel8stig_ipv6_required %}
 # RHEL-08-040210
 net.ipv6.conf.default.accept_redirects = 0
 {% endif %}
@@ -82,27 +82,27 @@ net.ipv6.conf.all.accept_source_route = 0
 net.ipv4.conf.default.accept_source_route = 0
 {% endif %}
 
-{% if rhel_08_040250 %}
+{% if rhel_08_040250 and rhel8stig_ipv6_required %}
 # RHEL-08-040250
 net.ipv6.conf.default.accept_source_route = 0
 {% endif %}
 
-{% if rhel_08_040259 %}
+{% if rhel_08_040259 and not rhel8stig_system_is_router %}
 # RHEL-08-040259
 net.ipv4.ip_forward = 0
 {% endif %}
 
-{% if rhel_08_040260 %}
+{% if rhel_08_040260 and not rhel8stig_system_is_router %}
 # RHEL-08-040260
 net.ipv6.conf.all.forwarding = 0
 {% endif %}
 
-{% if rhel_08_040261 %}
+{% if rhel_08_040261 and rhel8stig_ipv6_required and not rhel8stig_system_is_router %}
 # RHEL-08-040261
 net.ipv6.conf.all.accept_ra = 0
 {% endif %}
 
-{% if rhel_08_040262 %}
+{% if rhel_08_040262 and rhel8stig_ipv6_required and not rhel8stig_system_is_router %}
 # RHEL-08-040262
 net.ipv6.conf.default.accept_ra = 0
 {% endif %}
@@ -117,7 +117,7 @@ net.ipv4.conf.default.send_redirects = 0
 net.ipv4.conf.all.accept_redirects = 0
 {% endif %}
 
-{% if rhel_08_040280 %}
+{% if rhel_08_040280 and rhel8stig_ipv6_required %}
 # RHEL-08-040280
 net.ipv6.conf.all.accept_redirects = 0
 {% endif %}
