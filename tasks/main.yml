@@ -28,7 +28,7 @@
   block:
       - name: Discover and set container variable if required
         set_fact:
-            system_is_container: true
+            rhel8stig_system_is_container: true
 
       - name: Load variable for container
         include_vars:
@@ -38,7 +38,7 @@
         debug:
             msg: system has been discovered as a container
         when:
-            - system_is_container
+            - rhel8stig_system_is_container
   when:
       - ansible_connection == 'docker' or
         ansible_virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
@@ -53,7 +53,7 @@
 
   when:
       - not system_is_ec2
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - rhel_08_010140 or
         rhel_08_010150
   tags:

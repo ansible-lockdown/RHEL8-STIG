@@ -41,7 +41,7 @@ rhel8stig_workaround_for_ssg_benchmark: true
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 
 # tweak role to run in a non-privileged container (default value)- dynamically discovered in tasks/main.yml
-system_is_container: false
+rhel8stig_system_is_container: false
 
 # Place to find the container yml file for your environment - /vars/...
 container_vars_file: is_container.yml

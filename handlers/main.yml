@@ -3,7 +3,7 @@
   systemd:
       daemon_reload: true
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
 
 - name: update sysctl
   template:
@@ -63,7 +63,7 @@
   when:
       - rhel8stig_grub2_user_cfg.stat.exists
       - not rhel8stig_skip_for_travis
-      - not system_is_container
+      - not rhel8stig_system_is_container
 
 - name: copy grub2 config to BIOS/UEFI to satisfy benchmark
   listen: make grub2 config
@@ -81,7 +81,7 @@
       - rhel8stig_grub2_user_cfg.stat.exists
       - rhel8stig_workaround_for_disa_benchmark
       - not rhel8stig_skip_for_travis
-      - not system_is_container
+      - not rhel8stig_system_is_container
 
 - name: "restart {{ rhel8stig_time_service }}"
   service:
@@ -90,7 +90,7 @@
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot
-      - not system_is_container
+      - not rhel8stig_system_is_container
 
 - name: update auditd
   template:
@@ -108,7 +108,7 @@
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot
-      - not system_is_container
+      - not rhel8stig_system_is_container
 
 - name: rebuild initramfs
   command: dracut -f

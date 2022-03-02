@@ -50,7 +50,7 @@
   dnf:
       name: grub2-tools
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - "'grub2-tools' not in ansible_facts.packages"
       - rhel_08_010020 or
         rhel_08_010140 or
@@ -103,7 +103,7 @@
   dnf:
       name: cronie
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - "'cronie' not in ansible_facts.packages"
       - rhel_08_010360
   tags:
@@ -153,7 +153,7 @@
   dnf:
       name: rsyslog
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - rhel_08_010070 or
         rhel_08_030010
       - "'rsyslog' not in ansible_facts.packages"
@@ -181,7 +181,7 @@
   dnf:
       name: audispd-plugins
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - rhel_08_030620 or
         rhel_08_030630 or
         rhel_08_030640 or
@@ -235,7 +235,7 @@
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - rhel_08_010360 or
         rhel_08_010380 or
         rhel_08_040310
@@ -253,7 +253,7 @@
       name: libselinux-utils
       state: present
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - "'libselinux-utils' not in ansible_facts.packages"
       - rhel_08_010170 or
         rhel_08_010450
@@ -414,7 +414,7 @@
             group: root
         register: faillock_dir
   when:
-      - not system_is_container
+      - not rhel8stig_system_is_container
       - rhel_08_020017
       - rhel_08_020027
       - rhel_08_020028
