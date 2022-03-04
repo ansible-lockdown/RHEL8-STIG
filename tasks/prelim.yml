@@ -412,6 +412,8 @@
             mode: 0755
             owner: root
             group: root
+            recurse: yes
+            setype: faillog_t
         register: faillock_dir
   when:
       - not system_is_container
