@@ -32,8 +32,9 @@ Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit
 
 ## Requirements
 
-RHEL/Rocky/AlmaLinux 8 - Other versions are not supported.
-Access to download or add the goss binary and content to the system if using auditing. options are available on how to get the content to the system.
+- RHEL/Rocky/AlmaLinux 8 - Other versions are not supported.
+- Other OSs can be checked by changing the skip_os_check to true for testing purposes.
+- Access to download or add the goss binary and content to the system if using auditing. options are available on how to get the content to the system.
 
 ### General
 
