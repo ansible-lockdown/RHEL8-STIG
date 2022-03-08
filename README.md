@@ -4,9 +4,13 @@
 ![Build Status](https://img.shields.io/github/workflow/status/ansible-lockdown/RHEL8-STIG/DevelToMain?label=Main%20Build%20Status&style=plastic)
 ![Release](https://img.shields.io/github/v/release/ansible-lockdown/RHEL8-STIG?style=plastic)
 
-Configure a RHEL 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
+Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 4 released on  Oct 27, 2021](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R4_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 5 released on  Jan 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R5_STIG.zip).
+
+## Join us
+
+On our [Discord Server](https://discord.gg/JFxpSgPFEJ) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
 
 ## Updating
 
@@ -28,8 +32,7 @@ Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit
 
 ## Requirements
 
-RHEL 8 or CentOS 8 - Other versions are not supported. Although tested on rocky and almalinux
-Containers
+RHEL/Rocky/AlmaLinux 8 - Other versions are not supported.
 Access to download or add the goss binary and content to the system if using auditing. options are available on how to get the content to the system.
 
 ### General
@@ -131,3 +134,25 @@ We encourage you (the community) to contribute to this role. Please read the rul
 - All community Pull Requests are pulled into the devel branch
 - Pull Requests into devel will confirm your commits have a GPG signature, Signed-off, and a functional test before being approved
 - Once your changes are merged and a more detailed review is complete, an authorized member will merge your changes into the main branch for a new release.
+
+## Pipeline Testing
+
+uses:
+
+- ansible-core 2.12
+- ansible collections - pulls in the latest version based on requirements file
+- runs the audit using the devel branch
+- This is an automated test that occurs on pull requests into devel
+
+## Support
+
+This is a community project at its core and will be managed as such.
+
+If you would are interested in dedicated support to assist or provide bespoke setups
+
+- [Ansible Counselor](https://www.mindpointgroup.com/products/ansible-counselor-on-demand-ansible-services-and-consulting/)
+- [Try us out](https://engage.mindpointgroup.com/try-ansible-counselor)
+
+## Credits
+
+This repo originated from work done by [Sam Doran](https://github.com/samdoran/ansible-role-stig)
