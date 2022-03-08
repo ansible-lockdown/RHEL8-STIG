@@ -6281,6 +6281,11 @@
 
 - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
   block:
+      - name: Check if Rules Directory Exists
+        stat:
+          path: /etc/fapolicyd/rules.d/
+        register: rules_dir
+
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
         lineinfile:
             path: /etc/fapolicyd/fapolicyd.rules
