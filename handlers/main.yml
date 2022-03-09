@@ -46,6 +46,10 @@
       name: rsyslog
       state: restarted
 
+- name: generate fapolicyd rules
+  command: fagenrules --load
+  when: rules_dir is defined and not rules_dir.stat.exists
+
 - name: restart fapolicyd
   service:
       name: fapolicyd
