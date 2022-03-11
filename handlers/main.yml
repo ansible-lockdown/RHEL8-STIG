@@ -46,6 +46,10 @@
       name: rsyslog
       state: restarted
 
+- name: generate fapolicyd rules
+  command: fagenrules --load
+  when: rhel_08_040137_rules_dir.stat.exists
+
 - name: restart fapolicyd
   service:
       name: fapolicyd
