@@ -48,7 +48,7 @@
 
 - name: generate fapolicyd rules
   command: fagenrules --load
-  when: rules_dir.stat.exists
+  when: rhel_08_040137_rules_dir.stat.exists
 
 - name: restart fapolicyd
   service:

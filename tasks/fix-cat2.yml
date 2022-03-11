@@ -6284,13 +6284,13 @@
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Check for rules.d/ directory"
         stat:
           path: /etc/fapolicyd/rules.d/
-        register: rules_dir
+        register: rhel_08_040137_rules_dir
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
         lineinfile:
-            create: yes
-            path: "{{ '/etc/fapolicyd/rules.d/99-stig.rules' if rules_dir.stat.exists else '/etc/fapolicyd/fapolicyd.rules' }}"
+            path: "{{ '/etc/fapolicyd/rules.d/99-stig.rules' if rhel_08_040137_rules_dir.stat.exists else '/etc/fapolicyd/fapolicyd.rules' }}"
             line: "{{ item }}"
+            create: yes
         with_items:
             - "allow exe={{ ansible_python.executable }} : ftype=text/x-python"
             - "{{ rhel8stig_fapolicy_white_list }}"
