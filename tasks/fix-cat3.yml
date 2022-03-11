@@ -17,7 +17,7 @@
 - name: "LOW | RHEL-08-010292 | PATCH | RHEL 8 must ensure the SSH server uses strong entropy."
   lineinfile:
       path: /etc/sysconfig/sshd
-      regexp: '^SSH_USE_STRONG_RNG=|^.*SSH_USE_STRONG_RNG='
+      regexp: '^(#)?SSH_USE_STRONG_RNG='
       line: SSH_USE_STRONG_RNG=32
   notify: restart sshd
   when:
