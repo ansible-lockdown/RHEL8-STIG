@@ -675,7 +675,7 @@
       name: tmux
       state: present
   when:
-      - rhel_08_020032
+      - rhel_08_020039
       - "'tmux' not in ansible_facts.packages"
   tags:
       - RHEL-08-020039
