@@ -4,7 +4,9 @@
 rhel8stig_ssh_required: false
 
 # tmux
+rhel_08_020039: false
 rhel_08_020040: false
+rhel_08_020041: false
 rhel_08_020070: false
 
 # auditd
@@ -12,7 +14,7 @@ rhel_08_010560: false
 rhel_08_030000: false
 rhel_08_030020: false
 rhel_08_030040: false
-rhel_08_030050: false
+# rhel_08_030050: false
 rhel_08_030060: false
 rhel_08_030061: false
 rhel_08_030062: false
@@ -41,7 +43,7 @@ rhel_08_030230: false
 rhel_08_030240: false
 rhel_08_030250: false
 rhel_08_030260: false
-rhel_08_030270: false
+# rhel_08_030270: false
 rhel_08_030280: false
 rhel_08_030290: false
 rhel_08_030300: false
@@ -61,28 +63,13 @@ rhel_08_030340: false
 rhel_08_030350: false
 rhel_08_030360: false
 rhel_08_030361: false
-rhel_08_030362: false
-rhel_08_030363: false
-rhel_08_030364: false
-rhel_08_030365: false
 rhel_08_030370: false
-rhel_08_030380: false
 rhel_08_030390: false
 rhel_08_030400: false
 rhel_08_030410: false
 rhel_08_030420: false
-rhel_08_030430: false
-rhel_08_030440: false
-rhel_08_030450: false
-rhel_08_030460: false
-rhel_08_030470: false
 rhel_08_030480: false
 rhel_08_030490: false
-rhel_08_030500: false
-rhel_08_030510: false
-rhel_08_030520: false
-rhel_08_030530: false
-rhel_08_030540: false
 rhel_08_030550: false
 rhel_08_030560: false
 rhel_08_030570: false
@@ -198,12 +185,14 @@ rhel_08_010291: false
 rhel_08_010293: false
 
 # aide
+rhel_08_010359: false
 rhel_08_010360: false
 rhel_08_030650: false
 rhel_08_040300: false
 rhel_08_040310: false
 
 # sudo
+rhel_08_010379: false
 rhel_08_010380: false
 rhel_08_010381: false
 rhel_08_010382: false
