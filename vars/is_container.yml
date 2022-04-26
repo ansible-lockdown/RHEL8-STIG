@@ -1,0 +1,200 @@
+---
+# Container vars file
+
+rhel8stig_ssh_required: false
+
+# tmux
+rhel_08_020039: false
+rhel_08_020040: false
+rhel_08_020041: false
+rhel_08_020070: false
+
+# auditd
+rhel_08_010560: false
+rhel_08_030000: false
+rhel_08_030020: false
+rhel_08_030040: false
+# rhel_08_030050: false
+rhel_08_030060: false
+rhel_08_030061: false
+rhel_08_030062: false
+rhel_08_030070: false
+rhel_08_030080: false
+rhel_08_030090: false
+rhel_08_030100: false
+rhel_08_030110: false
+rhel_08_030120: false
+rhel_08_030121: false
+rhel_08_030122: false
+rhel_08_030130: false
+rhel_08_030140: false
+rhel_08_030150: false
+rhel_08_030160: false
+rhel_08_030170: false
+rhel_08_030171: false
+rhel_08_030172: false
+rhel_08_030180: false
+rhel_08_030181: false
+rhel_08_030190: false
+rhel_08_030200: false
+rhel_08_030210: false
+rhel_08_030220: false
+rhel_08_030230: false
+rhel_08_030240: false
+rhel_08_030250: false
+rhel_08_030260: false
+# rhel_08_030270: false
+rhel_08_030280: false
+rhel_08_030290: false
+rhel_08_030300: false
+rhel_08_030301: false
+rhel_08_030302: false
+rhel_08_030310: false
+rhel_08_030311: false
+rhel_08_030312: false
+rhel_08_030313: false
+rhel_08_030314: false
+rhel_08_030315: false
+rhel_08_030316: false
+rhel_08_030317: false
+rhel_08_030320: false
+rhel_08_030330: false
+rhel_08_030340: false
+rhel_08_030350: false
+rhel_08_030360: false
+rhel_08_030361: false
+rhel_08_030370: false
+rhel_08_030390: false
+rhel_08_030400: false
+rhel_08_030410: false
+rhel_08_030420: false
+rhel_08_030480: false
+rhel_08_030490: false
+rhel_08_030550: false
+rhel_08_030560: false
+rhel_08_030570: false
+rhel_08_030580: false
+rhel_08_030590: false
+rhel_08_030600: false
+rhel_08_030610: false
+rhel_08_030620: false
+rhel_08_030630: false
+rhel_08_030640: false
+rhel_08_030660: false
+# rhel_08_030690: false  # Also rsyslog
+rhel_08_030700: false
+# rhel_08_030710: false  # Also rsyslog
+# rhel_08_030720: false  # Also rsyslog
+rhel_08_030730: false
+rhel_08_030731: false
+# rhel_08_010542: false  # Also Rsyslog
+rhel_08_030063: false
+# rhel_08_030602: false # Also grub
+
+
+# rsyslog
+rhel_08_010070: false
+rhel_08_010561: false
+rhel_08_030010: false
+rhel_08_030670: false
+rhel_08_030680: false
+rhel_08_030690: false
+rhel_08_030710: false
+rhel_08_030720: false
+
+## mounts
+# /tmp
+rhel_08_010543: false
+rhel_08_040123: false
+rhel_08_040124: false
+rhel_08_040125: false
+# /var/log
+rhel_08_040126: false
+rhel_08_040127: false
+rhel_08_040128: false
+rhel_08_010541: false
+# /var/tmp
+rhel_08_010544: false
+rhel_08_040132: false
+rhel_08_040133: false
+rhel_08_040134: false
+# /var/log/audit
+rhel_08_040129: false
+rhel_08_040130: false
+rhel_08_040131: false
+rhel_08_010542: false
+# /home
+rhel_08_010570: false
+rhel_08_010590: false
+rhel_08_010800: false
+# /boot
+rhel_08_010571: false
+# /boot/efi
+rhel_08_010572: false
+#
+rhel_08_010580: false
+# /media
+rhel_08_010610: false
+# /mnt
+rhel_08_010620: false
+# NFS
+rhel_08_010630: false
+rhel_08_010640: false
+rhel_08_010650: false
+# /dev/shm
+rhel_08_040120: false
+rhel_08_040121: false
+rhel_08_040122: false
+# /var
+rhel_08_010540: false
+
+# firewall
+rhel8stig_firewall_service: not_required
+
+# fapolicy
+rhel_08_040135: false
+rhel_08_040136: false
+rhel_08_040137: false
+
+# grub
+rhel_08_010141: false
+rhel_08_010149: false
+rhel_08_010421: false
+rhel_08_010422: false
+rhel_08_010423: false
+rhel_08_030601: false
+rhel_08_030602: false
+rhel_08_040004: false
+
+# modprobe
+rhel_08_040021: false
+rhel_08_040022: false
+rhel_08_040023: false
+rhel_08_040024: false
+rhel_08_040025: false
+rhel_08_040026: false
+
+# chrony
+rhel_08_030740: false
+rhel_08_030741: false
+rhel_08_030742: false
+
+# fips
+rhel_08_010290: false
+rhel_08_010291: false
+rhel_08_010293: false
+
+# aide
+rhel_08_010359: false
+rhel_08_010360: false
+rhel_08_030650: false
+rhel_08_040300: false
+rhel_08_040310: false
+
+# sudo
+rhel_08_010379: false
+rhel_08_010380: false
+rhel_08_010381: false
+rhel_08_010382: false
+rhel_08_010383: false
+rhel_08_010384: false

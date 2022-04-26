@@ -127,6 +127,7 @@
             - not ansible_check_mode or
               rhel_08_010020_audit.rc > 1
   when:
+      - not system_is_container
       - rhel_08_010020
   tags:
       - RHEL-08-010020
@@ -135,6 +136,43 @@
       - SRG-OS-000033-GPOS-00014
       - SV-230223r792855_rule
       - V-230223
+
+- name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
+  block:
+      - name: "HIGH | RHEL-08-010121 | AUDIT | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Get users with no pw set"
+        shell: "awk -F: '!$2 {print $1}' /etc/shadow"
+        changed_when: false
+        failed_when: false
+        check_mode: false
+        register: rhel_08_010121_no_pw_users
+
+      - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Warn on accounts with no passwords"
+        debug:
+            msg:
+                - "Alert! You have users that are not using passwords. Please either set a password, lock, or remove the accounts below:"
+                - "{{ rhel_08_010121_no_pw_users.stdout_lines }}"
+        when:
+            - rhel_08_010121_no_pw_users.stdout | length > 0
+            - not rhel8stig_disruption_high
+
+      - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Lock accounts with no passwords, disruptive"
+        user:
+            name: "{{ item }}"
+            password_lock: yes
+        with_items:
+            - "{{ rhel_08_010121_no_pw_users.stdout_lines }}"
+        when:
+            - rhel_08_010121_no_pw_users.stdout | length > 0
+            - rhel8stig_disruption_high
+  when:
+      - rhel_08_010121
+  tags:
+      - RHEL-08-010121
+      - CAT1
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-251706r809342_rule
+      - V-251706
 
 - name: |
         "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance."
@@ -153,6 +191,7 @@
             mode: 0640
         notify: confirm grub2 user cfg
   when:
+      - not system_is_container
       - not system_is_ec2
       - rhel_08_010140 or
         rhel_08_010150
@@ -288,6 +327,7 @@
   when:
       - rhel_08_020330
       - rhel8stig_disruption_high
+      - rhel8stig_ssh_required
   tags:
       - RHEL-08-020330
       - CAT1
@@ -373,6 +413,7 @@
         notify: systemctl daemon-reload
   when:
       - rhel_08_040170
+      - not system_is_container
   tags:
       - RHEL-08-040170
       - CAT1
@@ -402,6 +443,8 @@
         with_items:
             - { regexp: '^\[org/gnome/settings-daemon/plugins/media-keys\]', line: '[org/gnome/settings-daemon/plugins/media-keys]', insertafter: 'EOF' }
             - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }
+        loop_control:
+            label: "{{ item.line }}"
         when: rhel_08_040171_logout_settings_status.stdout | length == 0
 
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
@@ -412,7 +455,7 @@
         when: rhel_08_040171_logout_settings_status.stdout | length > 0
   when:
       - rhel_08_040171
-      - "'gnome-desktop' in ansible_facts.packages"
+      - "'gnome-desktop' in ansible_facts.packages or 'gnome-desktop3' in ansible_facts.packages"
   tags:
       - RHEL-08-040171
       - CAT1
@@ -429,6 +472,7 @@
   notify: systemctl daemon-reload
   when:
       - rhel_08_040172
+      - not system_is_container
   tags:
       - RHEL-08-040172
       - CAT1
