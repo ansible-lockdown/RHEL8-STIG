@@ -885,6 +885,11 @@ rhel8stig_tmux_lock_after_time: 900
 rhel8stig_sudo_timestamp_timeout: 1
 
 #### Goss Configuration Settings ####
+# Set correct env for the run_audit.sh script from https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
+audit_run_script_environment:
+    AUDIT_BIN: "{{ audit_bin }}"
+    AUDIT_FILE: 'goss.yml'
+    AUDIT_CONTENT_LOCATION: "{{ audit_out_dir }}"
 
 ### Goss binary settings ###
 goss_version:
