@@ -145,6 +145,12 @@ uses:
 - runs the audit using the devel branch
 - This is an automated test that occurs on pull requests into devel
 
+## Known Issues
+
+If adopting stig rule RHEL-08-040134
+
+This will affect cloud init as per https://bugs.launchpad.net/cloud-init/+bug/1839899
+
 ## Support
 
 This is a community project at its core and will be managed as such.
