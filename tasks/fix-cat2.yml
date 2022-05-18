@@ -1166,7 +1166,7 @@
       - CAT2
       - CCI-001749
       - SRG-OS-000366-GPOS-00153
-      - SV-230266r792870_rule
+      - SV-230266r818816_rule
       - V-230266
       - sysctl
 
@@ -1182,7 +1182,7 @@
       - CAT2
       - CCI-002165
       - SRG-OS-000312-GPOS-00122
-      - SV-230267r792873_rule
+      - SV-230267r818819_rule
       - V-230267
       - sysctl
 
@@ -1198,7 +1198,7 @@
       - CAT2
       - CCI-002165
       - SRG-OS-000312-GPOS-00122
-      - SV-230268r792876_rule
+      - SV-230268r818822_rule
       - V-230268
       - sysctl
 
@@ -1475,7 +1475,7 @@
       - CAT2
       - CCI-002824
       - SRG-OS-000433-GPOS-00193
-      - SV-230280r792891_rule
+      - SV-230280r818831_rule
       - V-230280
       - sysctl
 
@@ -2141,7 +2141,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230311r792894_rule
+      - SV-230311r818834_rule
       - V-230311
       - sysctl
 
@@ -3442,7 +3442,7 @@
       - CAT2
       - CCI-000187
       - SRG-OS-000068-GPOS-00036
-      - SV-230355r627750_rule
+      - SV-230355r818836_rule
       - V-230355
       - authentication
 
@@ -4762,7 +4762,7 @@
       - CAT2
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-244542r743875_rule
+      - SV-244542r818838_rule
       - V-244542
       - auditd
 
@@ -5581,7 +5581,7 @@
       - CAT2
       - CCI-001851
       - SRG-OS-000342-GPOS-00133
-      - SV-230481r627750_rule
+      - SV-230481r818840_rule
       - V-230481
       - auditd
       - rsyslog
@@ -6468,7 +6468,7 @@
       - CAT2
       - CI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244550r792987_rule
+      - SV-244550r818845_rule
       - V-244550
       - ipv4
 
@@ -6485,7 +6485,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r792936_rule
+      - SV-230535r818848_rule
       - V-230535
       - icmp
 
@@ -6501,7 +6501,7 @@
       - CAT2
       - CCI-00036
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r792939_rule
+      - SV-230536r818851_rule
       - V-230536
       - icmp
 
@@ -6517,7 +6517,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r792942_rule
+      - SV-230537r818854_rule
       - V-230537
       - icmp
 
@@ -6533,7 +6533,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r792990_rule
+      - SV-244551r818857_rule
       - V-244551
       - ip4
 
@@ -6550,7 +6550,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r792945_rule
+      - SV-230538r818860_rule
       - V-230538
       - icmp
 
@@ -6566,7 +6566,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r792993_rule
+      - SV-244552r818863_rule
       - V-244552
       - ipv4
 
@@ -6583,7 +6583,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r792948_rule
+      - SV-230539r818866_rule
       - V-230539
       - icmp
 
@@ -6600,7 +6600,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-250317r793008_rule
+      - SV-250317r818869_rule
       - V-250317
       - icmp
 
@@ -6617,7 +6617,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r792951_rule
+      - SV-230540r818872_rule
       - V-230540
       - icmp
 
@@ -6635,7 +6635,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r792954_rule
+      - SV-230541r818875_rule
       - V-230541
       - icmp
 
@@ -6653,7 +6653,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r792957_rule
+      - SV-230542r818878_rule
       - V-230542
       - icmp
 
@@ -6669,7 +6669,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r792960_rule
+      - SV-230543r818881_rule
       - V-230543
       - icmp
 
@@ -6685,7 +6685,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r792996_rule
+      - SV-244553r818884_rule
       - V-244553
       - ipv4
 
@@ -6702,7 +6702,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r792963_rule
+      - SV-230544r818887_rule
       - V-230544
       - icmp
 
@@ -6718,7 +6718,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r792966_rule
+      - SV-230545r818890_rule
       - V-230545
       - sysctl
 
@@ -6734,7 +6734,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r792969_rule
+      - SV-230546r818893_rule
       - V-230546
       - sysctl
 
@@ -6750,7 +6750,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r792972_rule
+      - SV-230547r818896_rule
       - V-230547
       - sysctl
 
@@ -6766,7 +6766,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r792975_rule
+      - SV-230548r818899_rule
       - V-230548
       - sysctl
 
@@ -6782,7 +6782,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r792978_rule
+      - SV-230549r818902_rule
       - V-230549
       - sysctl
 
@@ -6798,7 +6798,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - V-244554r792999_rule
+      - SV-244554r818905_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
