@@ -43,7 +43,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r818825_rule
+      - SV-230269r833296_rule
       - V-230269
       - sysctl
 
@@ -58,7 +58,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r818828_rule
+      - SV-230270r833298_rule
       - V-230270
       - sysctl
 
