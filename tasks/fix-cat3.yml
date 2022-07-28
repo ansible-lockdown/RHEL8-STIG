@@ -349,7 +349,6 @@
       mode: 0600
   when:
       - rhel_08_030603
-      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3
