@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
-  dnf:
+  package:
       name: policycoreutils
   when:
       - rhel_08_010171
