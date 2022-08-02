@@ -2,7 +2,7 @@
 - name: "PRELIM | dconf"
   block:
       - name: "PRELIM | Install dconf"
-        dnf:
+        package:
             name: dconf
         when:
             - "'dconf' not in ansible_facts.packages"
@@ -47,7 +47,7 @@
       - sudo
 
 - name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150| Install grub2-tools."
-  dnf:
+  package:
       name: grub2-tools
   when:
       - not system_is_container
@@ -100,7 +100,7 @@
       - always
 
 - name: ensure cronie is available
-  dnf:
+  package:
       name: cronie
   when:
       - not system_is_container
@@ -150,7 +150,7 @@
       - complexity-high
 
 - name: "PRELIM | RHEL-08-010070 | RHEL-08-030010 | Ensure rsyslog is installed when required."
-  dnf:
+  package:
       name: rsyslog
   when:
       - not system_is_container
@@ -178,7 +178,7 @@
       - RHEL-08-010020
 
 - name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
-  dnf:
+  package:
       name: audispd-plugins
   when:
       - not system_is_container
@@ -220,7 +220,7 @@
 - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install and initialize AIDE"
   block:
       - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install AIDE"
-        dnf:
+        package:
             name: aide
             state: present
         notify: "{{ rhel8stig_aide_handler }}"
@@ -249,7 +249,7 @@
       - RHEL-08-040310
 
 - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
-  dnf:
+  package:
       name: libselinux-utils
       state: present
   when:
@@ -261,7 +261,7 @@
 - name: "PRELIM | Bare bones SSH Server"
   block:
       - name: "PRELIM | Install SSH"
-        dnf:
+        package:
             name: openssh-server
             state: present
         when:

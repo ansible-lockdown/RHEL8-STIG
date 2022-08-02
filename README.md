@@ -6,11 +6,11 @@
 
 Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 6 released on April 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R6_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 7 released on July 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R7_STIG.zip).
 
 ## Join us
 
-On our [Discord Server](https://discord.gg/JFxpSgPFEJ) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
+On our [Discord Server](https://discord.io/ansible-lockdown) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
 
 ## Updating
 
@@ -149,7 +149,7 @@ uses:
 
 If adopting stig rule RHEL-08-040134
 
-This will affect cloud init as per https://bugs.launchpad.net/cloud-init/+bug/1839899
+This will affect cloud init as per [bug 1839899](https://bugs.launchpad.net/cloud-init/+bug/1839899)
 
 ## Support
 

@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
-  dnf:
+  package:
       name: policycoreutils
   when:
       - rhel_08_010171
@@ -43,7 +43,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r818825_rule
+      - SV-230269r833296_rule
       - V-230269
       - sysctl
 
@@ -58,7 +58,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r818828_rule
+      - SV-230270r833298_rule
       - V-230270
       - sysctl
 
@@ -349,7 +349,6 @@
       mode: 0600
   when:
       - rhel_08_030603
-      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3
