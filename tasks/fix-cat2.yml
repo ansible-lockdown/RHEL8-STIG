@@ -5996,7 +5996,7 @@
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
   block:
-    - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth "
+    - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth"
       lineinfile:
         path: /etc/modprobe.d/bluetooth.conf
         regexp: '^install bluetooth '
