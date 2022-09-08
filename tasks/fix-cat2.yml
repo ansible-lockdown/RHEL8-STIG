@@ -6032,7 +6032,6 @@
       - V-230507
       - bluetooth
 
-
 - name: |
       "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
       "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
