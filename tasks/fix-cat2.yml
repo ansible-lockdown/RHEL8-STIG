@@ -5995,15 +5995,31 @@
       - wifi
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
-  lineinfile:
-      path: /etc/modprobe.d/bluetooth.conf
-      regexp: '^install bluetooth '
-      line: "install bluetooth /bin/true"
-      create: yes
-      owner: root
-      group: root
-      mode: 0640
-  notify: change_requires_reboot
+  block:
+    - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth "
+      lineinfile:
+        path: /etc/modprobe.d/bluetooth.conf
+        regexp: '^install bluetooth '
+        line: "install bluetooth /bin/true"
+        create: yes
+        owner: root
+        group: root
+        mode: 0640
+      notify: change_requires_reboot      
+
+    - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth kernel module"
+      lineinfile:
+          path: /etc/modprobe.d/blacklist.conf
+          create: yes
+          regexp: "{{ item.regexp }}"
+          line: "{{ item.line }}"
+          owner: root
+          group: root
+          mode: 0640
+          insertafter: "{{ item.insertafter }}"
+      notify: change_requires_reboot
+      with_items:
+          - { regexp: '^blacklist bluetooth', line: 'blacklist bluetooth', insertafter: '#blacklist bluetooth' }
   when:
       - rhel_08_040111
       - not system_is_container
@@ -6015,6 +6031,7 @@
       - SV-230507r833336_rule
       - V-230507
       - bluetooth
+
 
 - name: |
       "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
