@@ -6019,7 +6019,7 @@
           insertafter: "{{ item.insertafter }}"
       notify: change_requires_reboot
       with_items:
-          - { regexp: '^blacklist bluetooth', line: 'blacklist bluetooth', insertafter: '#blacklist bluetooth module' }
+          - { regexp: '^blacklist bluetooth', line: 'blacklist bluetooth', insertafter: '#blacklist bluetooth kernel module' }
   when:
       - rhel_08_040111
       - not system_is_container
