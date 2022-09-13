@@ -55,7 +55,7 @@
         debug:
             msg:
                 - 'WARNING!! Below is the partition layout. Please run the "sudo more /etc/crypttab" command to confirm every persistent disk partition has an entry.'
-                - "If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
+                - "If partitions other than pseudo file systems (such as /var or /sys) this is a finding"
                 - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
 
   when:
@@ -257,7 +257,7 @@
       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
         debug:
             msg:
-                - "WARNING!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
+                - "WARNING!! The following accounts do not have FIPS 140-2 hashing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
             - not rhel8stig_disruption_high

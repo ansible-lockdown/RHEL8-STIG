@@ -152,7 +152,7 @@
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
   debug:
       msg:
-          - "WARNING!! /var/log is not mounted on a seperate partition"
+          - "WARNING!! /var/log is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
