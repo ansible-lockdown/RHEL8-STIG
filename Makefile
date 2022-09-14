@@ -1,5 +1,8 @@
 # TESTS
 
+yamllint:
+	git ls-files "*.yml"|xargs yamllint
+
 requirements:
 	@echo 'Python dependencies:'
 	@cat requirements.txt
