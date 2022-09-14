@@ -1,5 +1,7 @@
 # TESTS
 
+all: yamllint
+
 yamllint:
 	git ls-files "*.yml"|xargs yamllint
 
