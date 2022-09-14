@@ -75,19 +75,19 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: terraform apply -var-file "OS.tfvars" -var-file "github_vars.tfvars" --auto-approve -input=false
 
-## Debug Section
+      ## Debug Section
       - name: DEBUG - Show Ansible hostfile
         if: env.ENABLE_DEBUG == 'true'
         working-directory: .github/workflows
         run: cat hosts.yml
 
-# Aws deployments taking a while to come up insert sleep or playbook fails
+      # Aws deployments taking a while to come up insert sleep or playbook fails
 
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash
 
-# Run the ansible playbook
+      # Run the ansible playbook
       - name: Run_Ansible_Playbook
         uses: arillso/action.playbook@master
         with:
@@ -95,12 +95,12 @@ jobs:
           inventory: .github/workflows/hosts.yml
           galaxy_file: collections/requirements.yml
           private_key: ${{ secrets.SSH_PRV_KEY }}
-#          verbose: 3
+          # verbose: 3
         env:
           ANSIBLE_HOST_KEY_CHECKING: "false"
           ANSIBLE_DEPRECATION_WARNINGS: "false"
 
-# Remove test system - User secrets to keep if necessary
+      # Remove test system - User secrets to keep if necessary
 
       - name: Terraform_Destroy
         working-directory: .github/workflows

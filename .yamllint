@@ -21,7 +21,6 @@ rules:
   brackets:
     max-spaces-inside: 1
     level: error
-  comments-indentation: disable
   indentation:
     indent-sequences: consistent
     level: error
