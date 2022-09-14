@@ -34,9 +34,9 @@
 
 - name: "PRELIM | Find all sudoers files."
   command: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
-  check_mode: no
-  changed_when: no
-  failed_when: no
+  check_mode: false
+  changed_when: false
+  failed_when: false
   register: rhel8stig_sudoers_files
   when:
       - rhel_08_010380
@@ -133,7 +133,7 @@
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   args:
-      warn: no
+      warn: false
   register: rhel_08_010690_getent
   changed_when: rhel_08_020680_getent.stdout_lines is defined
   failed_when: false
@@ -166,9 +166,9 @@
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
   args:
-      warn: no
-  changed_when: no
-  check_mode: no
+      warn: false
+  changed_when: false
+  check_mode: false
   register: rhel_08_boot_part
   when:
       - rhel_08_010020
@@ -200,14 +200,14 @@
 #   block:
 #       - name: "PRELIM | RHEL-08-030330 | Find audit.log location"
 #         command: grep -oP '^log_file\s*=\s*\K.*?(?=\s*$)' /etc/audit/auditd.conf
-#         changed_when: no
-#         check_mode: no
+#         changed_when: false
+#         check_mode: false
 #         register: rhel_08_audit_log_file
 
 #       - name: "PRELIM | RHEL-08-030330 | Find partition holding audit.log"
 #         shell: df --output=target {{ rhel_08_audit_log_file.stdout }} | tail -n 1
-#         changed_when: no
-#         check_mode: no
+#         changed_when: false
+#         check_mode: false
 #         register: rhel_08_audit_part
 #   when:
 #       - rhel_08_030330
@@ -231,7 +231,7 @@
         stat:
             path: "{{ rhel8stig_aide_db_file }}"
         register: rhel8stig_aide_db_status
-        check_mode: no
+        check_mode: false
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
@@ -271,7 +271,7 @@
         service:
             name: sshd
             state: "{{ rhel8stig_service_started }}"
-            enabled: yes
+            enabled: true
 
       - name: PRELIM | check if ssh host key exists
         stat:
@@ -288,10 +288,10 @@
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
   args:
-      warn: no
+      warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
-  changed_when: no
+  changed_when: false
   failed_when: false
   when:
       - rhel_08_stig_interactive_homedir_results is defined
@@ -412,7 +412,7 @@
             mode: 0755
             owner: root
             group: root
-            recurse: yes
+            recurse: true
             setype: faillog_t
         register: faillock_dir
   when:
