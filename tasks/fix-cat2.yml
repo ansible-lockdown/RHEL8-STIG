@@ -5721,7 +5721,7 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
               shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
-              register: rhel8stig_PPSM_CLSA_check_firewalld
+              register: rhel8stig_ppsm_clsa_check_firewalld
               changed_when: false
               failed_when: false
               check_mode: false
@@ -5735,11 +5735,11 @@
               debug:
                   msg:
                       - "The following output is what firewalld is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_firewalld.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_firewalld.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall
@@ -5757,7 +5757,7 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
               shell: iptables-save | grep -i accept | grep -i input
-              register: rhel8stig_PPSM_CLSA_check_iptables
+              register: rhel8stig_ppsm_clsa_check_iptables
               changed_when: false
               failed_when: false
               check_mode: false
@@ -5770,11 +5770,11 @@
               debug:
                   msg:
                       - "The following output is what iptabes is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_iptables.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_iptables.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_iptables.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall
