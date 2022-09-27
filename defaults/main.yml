@@ -33,7 +33,7 @@ rhel8stig_disruption_high: true
 
 # Show "changed" for disruptive items not remediated per disruption-high
 # setting to make them stand out.
-rhel8stig_audit_disruptive: yes
+rhel8stig_audit_disruptive: true
 
 rhel8stig_skip_for_travis: false
 
@@ -566,7 +566,7 @@ rhel8stig_min_supported_os_ver:
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
-rhel8stig_system_is_router: no
+rhel8stig_system_is_router: false
 
 rhel8stig_time_service: chronyd
 
@@ -580,7 +580,7 @@ rhel8stig_ssh_required: true
 
 # RHEL-08-040500
 # If not required, remove tftp
-rhel8stig_tftp_required: no
+rhel8stig_tftp_required: false
 
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
@@ -700,7 +700,7 @@ rhel8stig_pam_pwquality_retry: 3
 rhel8stig_unnecessary_accounts:
     - ftp
     - games
-rhel8stig_remove_unnecessary_user_files: no
+rhel8stig_remove_unnecessary_user_files: false
 
 # RHEL-08-020220
 # RHEL-08-020221
@@ -719,7 +719,7 @@ rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
     unlock_time: 0
-    fail_for_root: yes
+    fail_for_root: true
     dir: /var/log/faillock
 
 # RHEL-08-030670
@@ -746,7 +746,7 @@ rhel8stig_audisp_overflow_action: syslog
 
 # RHEL-08-040330
 # Network interface promiscuous mode setting will be disabled unless set to true
-rhel8stig_net_promisc_mode_required: no
+rhel8stig_net_promisc_mode_required: false
 
 # /etc/login.defs settings
 # RHEL-08-010110
@@ -773,7 +773,7 @@ rhel8stig_auditd_mail_acct: root
 # Setting to enable or disable fixes that depend on password-based authentication
 # i.e. if users authenticate with a means other than passwords (pubkey)
 # and will not know or use passwords then this should be 'no'
-rhel8stig_using_password_auth: yes
+rhel8stig_using_password_auth: true
 
 rhel8stig_availability_override: false
 # auditd_failure_flag
