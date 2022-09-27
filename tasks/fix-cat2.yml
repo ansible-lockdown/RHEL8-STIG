@@ -3454,7 +3454,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0640
+      mode: 0644
   when:
       - rhel_08_020100
   tags:
@@ -3474,7 +3474,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0640
+      mode: 0644
   when:
       - rhel_08_020101
   tags:
@@ -3501,7 +3501,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020102_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
@@ -3540,7 +3540,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020103_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
@@ -3828,7 +3828,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020220_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3866,7 +3866,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020221_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
