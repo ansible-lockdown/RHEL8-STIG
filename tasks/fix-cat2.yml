@@ -1,5 +1,5 @@
 ---
-
+# TODO: ansible-lint: schema
 - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
   block:
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
@@ -2445,7 +2445,7 @@
         failed_when: false
         register: rhel_08_010731_files
         with_items:
-            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start|int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
+            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start | int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
 
       - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
         file:
@@ -2483,7 +2483,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010740
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010740
@@ -2505,7 +2505,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010741
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
       - item.uid != 65534
   tags:
       - RHEL-08-010741
@@ -2525,7 +2525,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010750
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010750
@@ -3109,6 +3109,7 @@
       - SV-230345r743984_rule
       - V-230345
       - pamd
+
 - name: |
     "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
      MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
@@ -3132,7 +3133,7 @@
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
+        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }} | grep -c faillog_t"
         changed_when: false
         failed_when: false
         register: faillock_secontext
@@ -5720,7 +5721,7 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
               shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
-              register: rhel8stig_PPSM_CLSA_check_firewalld
+              register: rhel8stig_ppsm_clsa_check_firewalld
               changed_when: false
               failed_when: false
               check_mode: false
@@ -5734,11 +5735,11 @@
               debug:
                   msg:
                       - "The following output is what firewalld is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_firewalld.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_firewalld.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall
@@ -5756,7 +5757,7 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
               shell: iptables-save | grep -i accept | grep -i input
-              register: rhel8stig_PPSM_CLSA_check_iptables
+              register: rhel8stig_ppsm_clsa_check_iptables
               changed_when: false
               failed_when: false
               check_mode: false
@@ -5769,11 +5770,11 @@
               debug:
                   msg:
                       - "The following output is what iptabes is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_iptables.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_iptables.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_iptables.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall

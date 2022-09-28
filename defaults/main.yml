@@ -615,7 +615,7 @@ rhel8stig_cron_special_disable: "{{
 
 # Set maximum number of simultaneous system logins (RHEL-08-040000)
 rhel8stig_maxlogins: 10
-
+# TODO: ansible-lint: var-spacing
 rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary(
         rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '),
         rhel8stig_logon_banner_nice) }}"
