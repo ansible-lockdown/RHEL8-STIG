@@ -39,7 +39,8 @@
   failed_when: false
   register: rhel8stig_sudoers_files
   when:
-      - rhel_08_010380
+      - rhel_08_010380 or
+        rhel_08_010381
   tags:
       - cat2
       - medium

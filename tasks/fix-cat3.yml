@@ -365,6 +365,7 @@
       line: "port 0"
   when:
       - rhel_08_030741
+      - "'chrony' in ansible_facts.packages"
   tags:
       - RHEL-08-030741
       - CAT3
