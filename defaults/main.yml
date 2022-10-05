@@ -6,9 +6,6 @@ benchmark_version: '1.7'
 # The audit variable found at the base
 benchmark: RHEL8-STIG
 
-# Whether to skip the reboot
-rhel8cis_skip_reboot: true
-
 # Whether to skip the OS check for supported OS's
 skip_os_check: false
 
@@ -49,7 +46,6 @@ system_is_container: false
 # Place to find the container yml file for your environment - /vars/...
 container_vars_file: is_container.yml
 
-
 # rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
@@ -59,7 +55,6 @@ rhel8stig_skip_reboot: true
 
 # Defined will change if control requires
 change_requires_reboot: false
-
 
 ### Goss is required on the remote host
 setup_audit: false
@@ -82,7 +77,6 @@ audit_cmd_timeout: 60000
 
 ### End Goss enablements ####
 #### Detailed settings found at the end of this document ####
-
 
 # These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
