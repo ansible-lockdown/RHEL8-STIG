@@ -418,9 +418,9 @@
         register: faillock_dir
   when:
       - not system_is_container
-      - rhel_08_020017
-      - rhel_08_020027
-      - rhel_08_020028
+      - rhel_08_020017 or
+        rhel_08_020027 or
+        rhel_08_020028
 
 - name: "PRELIM | Section 1.1 | Create list of mount points"
   set_fact:
