@@ -293,18 +293,13 @@
 - name: |
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
     "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
-  lineinfile:
-      dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: "{{ item.insertafter }}"
+  template:
+    src: template/01_users.j2
+    dest: /etc/grub.d/01_users
+    mode: '0755'
+    owner: root
+    group: root
   notify: confirm grub2 user cfg
-  with_items:
-      - { regexp: '^set superusers', line: 'set superusers="{{ rhel8stig_boot_superuser }}"', insertafter: '### BEGIN /etc/grub.d/01_users ###' }
-      - { regexp: '^export superusers', line: 'export superusers', insertafter: '^set superusers' }
-      - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
-  loop_control:
-      label: "{{ item.line }}"
   when:
       - rhel_08_010141 or
         rhel_08_010149
