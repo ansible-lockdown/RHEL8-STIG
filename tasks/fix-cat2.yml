@@ -138,6 +138,7 @@
       content: |
           [org/gnome/login-screen]
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
+          banner-message-enable=true
       mode: '0644'
       owner: root
       group: root
