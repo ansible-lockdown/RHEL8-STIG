@@ -64,23 +64,6 @@
       - RHEL-08-010140
       - RHEL-08-010150
 
-- name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150 | Check whether machine is UEFI-based"
-  stat:
-      path: /sys/firmware/efi
-  register: rhel_08_sys_firmware_efi
-  when:
-      - rhel_08_010020 or
-        rhel_08_010140 or
-        rhel_08_010150
-  tags:
-      - cat1
-      - high
-      - cat2
-      - medium
-      - RHEL-08-010020
-      - RHEL-08-010140
-      - RHEL-08-010150
-
 - name: "PRELIM | Gather chroot status"
   setup:
       gather_subset: chroot,!all,!min
@@ -113,17 +96,22 @@
       - RHEL-08-010360
 
 - name: "PRELIM | RHEL-08-010740 | RHEL-08-010750 | RHEL-08-020320 | Parse /etc/passwd"
-  include_tasks: parse_etc_passwd.yml
+  import_tasks: parse_etc_passwd.yml
   vars:
       rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
   when:
-      - rhel_08_010731 or
+      - rhel_08_010141 or
+        rhel_08_010149 or
+        rhel_08_010731 or
         rhel_08_010740 or
         rhel_08_010750 or
         rhel_08_020320
   tags:
       - cat2
       - medium
+      - RHEL-08-010141
+      - RHEL-08-010149
+      - RHEL-08-010731
       - RHEL-08-010740
       - RHEL-08-010750
       - RHEL-08-020320
@@ -132,11 +120,11 @@
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
-  shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  shell: "getent passwd {% raw %}{{% endraw %}{{ rhel8stig_int_gid }}..24339{% raw %}}{% endraw %} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   args:
       warn: false
   register: rhel_08_010690_getent
-  changed_when: rhel_08_020680_getent.stdout_lines is defined
+  changed_when: rhel_08_010690_getent.stdout_lines is defined
   failed_when: false
   tags:
       - RHEL-08-010690
@@ -287,7 +275,7 @@
       - rhel8stig_ssh_required
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
-  shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   args:
       warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
@@ -366,25 +354,25 @@
       path: /sys/firmware/efi
   register: rhel8_efi_boot
   tags:
+      - always
       - goss_template
 
 - name: PRELIM | set bootloader type
   block:
-      - name: "PRELIM | set fact if UEFI boot | RHEL or OEL"
+      - name: "PRELIM | set fact if UEFI boot"
+        set_fact:
+            rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
+            rhel8stig_legacy_boot: false
+        when:
+            - rhel8_efi_boot.stat.exists
+
+      - name: "PRELIM | set fact if UEFI boot | Oracle Linux"
         set_fact:
             rhel8stig_bootloader_path: /boot/efi/EFI/redhat
             rhel8stig_legacy_boot: false
         when:
             - rhel8_efi_boot.stat.exists
-            - ansible_distribution != 'CentOS'  # Note: rhel & OEL both use redhat path
-
-      - name: "PRELIM | set fact if UEFI boot | CentOS "
-        set_fact:
-            rhel8stig_bootloader_path: /boot/efi/EFI/centos
-            rhel8stig_legacy_boot: false
-        when:
-            - rhel8_efi_boot.stat.exists
-            - ansible_distribution == 'CentOS'
+            - ansible_distribution == 'Oracle Linux'
 
       - name: "PRELIM | set if not UEFI boot"
         set_fact:
@@ -397,6 +385,8 @@
             msg:
                 - "bootloader path set to {{ rhel8stig_bootloader_path }}"
                 - "legacy boot equals {{ rhel8stig_legacy_boot }}"
+  tags:
+      - always
 
 - name: "PRELIM | RHEL-08-020017 | RHEL-08-020027 | REHL-08-020028 | If using selinux set up system prereqs"
   block:

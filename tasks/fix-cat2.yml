@@ -85,7 +85,7 @@
       - name: |
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
-        copy:
+        copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
             owner: root
@@ -133,11 +133,12 @@
       - banner
 
 - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
-  copy:
+  copy:  # noqa: template-instead-of-copy
       dest: /etc/dconf/db/local.d/01-banner-message
       content: |
           [org/gnome/login-screen]
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
+          banner-message-enable=true
       mode: '0644'
       owner: root
       group: root
@@ -293,18 +294,13 @@
 - name: |
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
     "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
-  lineinfile:
-      dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: "{{ item.insertafter }}"
+  template:
+      src: 01_users.j2
+      dest: /etc/grub.d/01_users
+      owner: root
+      group: root
+      mode: 0644
   notify: confirm grub2 user cfg
-  with_items:
-      - { regexp: '^set superusers', line: 'set superusers="{{ rhel8stig_boot_superuser }}"', insertafter: '### BEGIN /etc/grub.d/01_users ###' }
-      - { regexp: '^export superusers', line: 'export superusers', insertafter: '^set superusers' }
-      - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
-  loop_control:
-      label: "{{ item.line }}"
   when:
       - rhel_08_010141 or
         rhel_08_010149
@@ -772,33 +768,13 @@
       - ssh
 
 - name: |
-    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
-    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections."
-  block:
-      - name: |
-          "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
-          "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
-        command: fips-mode-setup --check
-        changed_when: false
-        failed_when: rhel_08_010290_pre_fips_check.stdout is not defined
-        register: rhel_08_010290_pre_fips_check
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Enable FIPS"
-        command: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
-        notify: change_requires_reboot
-        when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
-        lineinfile:
-            path: /etc/crypto-policies/back-ends/opensshserver.config
-            regexp: '^CRYPTO_POLICY='
-            line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
-        notify: change_requires_reboot
+    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
+    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/opensshserver.config
+      regexp: '^CRYPTO_POLICY='
+      line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
+  notify: change_requires_reboot
   when:
       - rhel_08_010290 or
         rhel_08_010291
@@ -872,7 +848,7 @@
 - name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
   lineinfile:
       path: /etc/crypto-policies/back-ends/gnutls.config
-      regexp: '^(.*\+VERS-ALL:)'
+      regexp: '^(.*)\+VERS-ALL:'
       line: '\1{{ rhel8stig_gnutls_encryption }}'
       backrefs: true
       create: true
@@ -2484,6 +2460,7 @@
   when:
       - rhel_08_010740
       - (item.uid >= rhel8stig_interactive_uid_start | int)
+      - (item.uid >= rhel8stig_interactive_uid_stop | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010740
@@ -2557,8 +2534,7 @@
   file:
       path: "{{ item }}"
       mode: "{{ rhel8stig_local_int_perm }}"
-  with_items:
-      - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+  with_items: "{{ rhel_08_stig_interactive_homedir_inifiles }}"
   when:
       - rhel_08_010770
       - rhel8stig_disruption_high
@@ -3123,7 +3099,6 @@
             setype: faillog_t
             state: present
         register: add_faillock_secontext
-        when: faillock_dir.changed
 
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
@@ -3220,7 +3195,7 @@
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
             path: /etc/tmux.conf
-            regexp: '^set \-g'
+            regexp: '^set -g lock-command'
             line: "set -g lock-command vlock"
             create: true
             owner: root
@@ -5937,6 +5912,28 @@
             port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | bool | ternary(item, omit) }}"
         with_items:
             - "{{ rhel8stig_white_list_services }}"
+
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.10+"
+        firewalld:
+            zone: "{{ rhel8stig_custom_firewall_zone }}"
+            permanent: true
+            state: enabled
+            target: DROP
+        when: ansible_version.full is version_compare('2.10.0 | int', '>=')
+
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+        block:
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | current setting"
+              shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
+              changed_when: false
+              failed_when: false
+              register: rhel8stig-target_drop_set
+
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+              shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
+              when:
+                  - rhel8stig-target_drop_set.rc != 0
+        when: ansible_version.full is version_compare('2.10 | int', '<')
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         command: firewall-cmd --reload

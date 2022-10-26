@@ -89,7 +89,7 @@ net.ipv6.conf.default.accept_source_route = 0
 
 {% if rhel_08_040259 and not rhel8stig_system_is_router %}
 # RHEL-08-040259
-net.ipv4.ip_forward = 0
+net.ipv4.conf.all.forwarding = 0
 {% endif %}
 
 {% if rhel_08_040260 and not rhel8stig_system_is_router %}

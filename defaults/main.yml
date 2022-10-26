@@ -579,7 +579,7 @@ rhel8stig_tftp_required: false
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
 rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword
-rhel8stig_boot_superuser: root
+rhel8stig_boot_superuser: bootloader_admin
 
 # AIDE settings
 # Set to false for fire and forget mode
@@ -782,10 +782,6 @@ rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 
 # REHL-08-010020
 rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 
-#
-rhel8stig_machine_uses_uefi: "{{ rhel_08_sys_firmware_efi.stat.exists }}"
-rhel8stig_grub_cfg_path: "{{ rhel8stig_machine_uses_uefi | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
-rhel8stig_grub_cfg_path_invalid: "{{ (not rhel8stig_machine_uses_uefi) | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
 
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
