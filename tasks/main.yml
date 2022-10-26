@@ -48,6 +48,25 @@
   tags:
       - user_passwd
 
+- name: "Ensure superuser for grub does not match existing user"
+  block:
+      - name: "Ensure superuser for grub does not match existing user | capture users"
+        shell: cat /etc/passwd | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        check_mode: false
+        register: rhel8stig_user_list
+
+      - name: "Ensure superuser for grub does not match existing user"
+        assert:
+            that: rhel8stig_boot_superuser not in rhel8stig_user_list.stdout_lines
+            fail_msg: "A unique name must be used for bootloader access user='{{ rhel8stig_boot_superuser }}' already exists refer to variable rhel8stig_boot_superuser"
+  when:
+      - rhel_08_010141 or
+        rhel_08_010149
+  tags:
+      - RHEL-08-010141
+      - RHEL-08-010149
 
 - name: Setup rules if container
   block:
