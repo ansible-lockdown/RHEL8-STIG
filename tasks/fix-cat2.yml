@@ -2480,6 +2480,7 @@
   when:
       - rhel_08_010740
       - (item.uid >= rhel8stig_interactive_uid_start | int)
+      - (item.uid >= rhel8stig_interactive_uid_stop | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010740
