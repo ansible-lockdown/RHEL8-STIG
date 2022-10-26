@@ -211,7 +211,7 @@
       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create key pair"
         openssh_keypair:
             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
-  when:f
+  when:
       - rhel_08_010100
       - rhel8stig_ssh_required
   tags:
@@ -868,7 +868,7 @@
 - name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
   lineinfile:
       path: /etc/crypto-policies/back-ends/gnutls.config
-      regexp: '^(.*\+VERS-ALL:)'
+      regexp: '^(.*)\+VERS-ALL:'
       line: '\1{{ rhel8stig_gnutls_encryption }}'
       backrefs: true
       create: true
