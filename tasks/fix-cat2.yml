@@ -85,7 +85,7 @@
       - name: |
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
-        copy:
+        copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
             owner: root
@@ -133,7 +133,7 @@
       - banner
 
 - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
-  copy:
+  copy:  # noqa: template-instead-of-copy
       dest: /etc/dconf/db/local.d/01-banner-message
       content: |
           [org/gnome/login-screen]
@@ -295,11 +295,11 @@
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
     "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
   template:
-    src: 01_users.j2
-    dest: /etc/grub.d/01_users
-    owner: root
-    group: root
-    mode: 0644
+      src: 01_users.j2
+      dest: /etc/grub.d/01_users
+      owner: root
+      group: root
+      mode: 0644
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -771,9 +771,9 @@
     "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
     "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
   lineinfile:
-    path: /etc/crypto-policies/back-ends/opensshserver.config
-    regexp: '^CRYPTO_POLICY='
-    line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
+      path: /etc/crypto-policies/back-ends/opensshserver.config
+      regexp: '^CRYPTO_POLICY='
+      line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
   notify: change_requires_reboot
   when:
       - rhel_08_010290 or
