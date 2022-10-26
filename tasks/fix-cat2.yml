@@ -5933,7 +5933,7 @@
               shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
               when:
                   - rhel8stig-target_drop_set.rc != 0
-        when: ansible_version.full is version_compare('2.9.0 | int', '<=')
+        when: ansible_version.full is version_compare('2.10 | int', '<')
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         command: firewall-cmd --reload
