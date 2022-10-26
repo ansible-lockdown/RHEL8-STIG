@@ -5913,12 +5913,27 @@
         with_items:
             - "{{ rhel8stig_white_list_services }}"
 
-      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Taregt Drop"
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.10+"
         firewalld:
             zone: "{{ rhel8stig_custom_firewall_zone }}"
             permanent: true
             state: enabled
             target: DROP
+        when: ansible_version.full is version_compare('2.10.0 | int', '>=')
+
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+        block:
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | current setting"
+              shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
+              changed_when: false
+              failed_when: false
+              register: rhel8stig-target_drop_set
+
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+              shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
+              when:
+                  - rhel8stig-target_drop_set.rc != 0
+        when: ansible_version.full is version_compare('2.9.0 | int', '<=')
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         command: firewall-cmd --reload
