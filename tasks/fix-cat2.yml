@@ -5938,6 +5938,13 @@
         with_items:
             - "{{ rhel8stig_white_list_services }}"
 
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Taregt Drop"
+        firewalld:
+            zone: "{{ rhel8stig_custom_firewall_zone }}"
+            permanent: true
+            state: enabled
+            target: DROP
+
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         command: firewall-cmd --reload
         changed_when: rhel_08_040090_zone_reload.rc == 0
