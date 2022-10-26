@@ -22,6 +22,7 @@ galaxy_info:
         - complianceascode
         - disa
         - rhel8
+        - mindpoint
 collections:
     - community.general
     - community.crypto
