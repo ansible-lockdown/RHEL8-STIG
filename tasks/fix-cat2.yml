@@ -768,33 +768,13 @@
       - ssh
 
 - name: |
-    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
-    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections."
-  block:
-      - name: |
-          "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
-          "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
-        command: fips-mode-setup --check
-        changed_when: false
-        failed_when: rhel_08_010290_pre_fips_check.stdout is not defined
-        register: rhel_08_010290_pre_fips_check
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Enable FIPS"
-        command: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
-        notify: change_requires_reboot
-        when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
-        lineinfile:
-            path: /etc/crypto-policies/back-ends/opensshserver.config
-            regexp: '^CRYPTO_POLICY='
-            line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
-        notify: change_requires_reboot
+    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
+    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
+  lineinfile:
+    path: /etc/crypto-policies/back-ends/opensshserver.config
+    regexp: '^CRYPTO_POLICY='
+    line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
+  notify: change_requires_reboot
   when:
       - rhel_08_010290 or
         rhel_08_010291
@@ -3120,7 +3100,6 @@
             setype: faillog_t
             state: present
         register: add_faillock_secontext
-        when: faillock_dir.changed
 
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
