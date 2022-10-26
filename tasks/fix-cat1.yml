@@ -18,7 +18,9 @@
   block:
       - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | install FIPS"
         package:
-            name: dracut-fips
+            name: 
+            - dracut-fips
+            - crypto-policies-scripts
             state: present
         notify:
             - rebuild initramfs
@@ -182,7 +184,7 @@
             "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
             "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
         lineinfile:
-            path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
+            path: "{{ rhel8stig_bootloader_path }}/user.cfg"
             create: true
             regexp: ^GRUB2_PASSWORD=
             line: "GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}"
