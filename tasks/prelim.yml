@@ -120,11 +120,11 @@
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
-  shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  shell: "getent passwd {% raw %}{{% endraw %}{{ rhel8stig_int_gid }}..24339{% raw %}}{% endraw %} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   args:
       warn: false
   register: rhel_08_010690_getent
-  changed_when: rhel_08_020680_getent.stdout_lines is defined
+  changed_when: rhel_08_010690_getent.stdout_lines is defined
   failed_when: false
   tags:
       - RHEL-08-010690
@@ -275,7 +275,7 @@
       - rhel8stig_ssh_required
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
-  shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   args:
       warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"

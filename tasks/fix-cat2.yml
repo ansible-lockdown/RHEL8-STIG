@@ -2534,8 +2534,7 @@
   file:
       path: "{{ item }}"
       mode: "{{ rhel8stig_local_int_perm }}"
-  with_items:
-      - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+  with_items: "{{ rhel_08_stig_interactive_homedir_inifiles }}"
   when:
       - rhel_08_010770
       - rhel8stig_disruption_high
