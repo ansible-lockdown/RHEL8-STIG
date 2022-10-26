@@ -579,7 +579,7 @@ rhel8stig_tftp_required: false
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
 rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword
-rhel8stig_boot_superuser: root
+rhel8stig_boot_superuser: bootloader_admin
 
 # AIDE settings
 # Set to false for fire and forget mode
