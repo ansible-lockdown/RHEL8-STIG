@@ -57,13 +57,13 @@
 
 - name: confirm grub2 user cfg
   stat:
-      path: "{{ rhel8stig_grub_cfg_path | dirname }}/user.cfg"
+      path: "/etc/grub.d/01_users"
   changed_when: rhel8stig_grub2_user_cfg.stat.exists
   register: rhel8stig_grub2_user_cfg
   notify: make grub2 config
 
 - name: make grub2 config
-  command: /usr/sbin/grub2-mkconfig --output={{ rhel8stig_grub_cfg_path }}
+  command: /usr/sbin/grub2-mkconfig --output={{ rhel8stig_bootloader_path }}/grub.cfg
   when:
       - rhel8stig_grub2_user_cfg.stat.exists
       - not rhel8stig_skip_for_travis
@@ -72,15 +72,12 @@
 - name: copy grub2 config to BIOS/UEFI to satisfy benchmark
   listen: make grub2 config
   copy:
-      src: "{{ rhel8stig_grub_cfg_path | dirname }}/{{ item }}"
-      dest: "{{ rhel8stig_grub_cfg_path_invalid | dirname }}/{{ item }}"
-      remote_src: yes
+      src: "{{ rhel8stig_bootloader_path }}/grub.cfg"
+      dest: "{{ rhel8stig_bootloader_path }}/grub.cfg"
+      remote_src: true
       owner: root
       group: root
       mode: 0755
-  with_items:
-      - grub.cfg
-      - user.cfg
   when:
       - rhel8stig_grub2_user_cfg.stat.exists
       - rhel8stig_workaround_for_disa_benchmark
@@ -108,7 +105,7 @@
 - name: restart auditd
   command: /usr/sbin/service auditd restart
   args:
-      warn: no
+      warn: false
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot
@@ -122,7 +119,7 @@
 
 - name: update running audit failure mode
   command: auditctl -f {{ rhel8stig_auditd_failure_flag }}
-  failed_when: no
+  failed_when: false
 
 - name: clean up ssh host key
   file:

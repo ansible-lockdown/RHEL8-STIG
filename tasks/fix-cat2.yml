@@ -1,5 +1,5 @@
 ---
-
+# TODO: ansible-lint: schema
 - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
   block:
       - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
@@ -55,7 +55,7 @@
         debug:
             msg:
                 - 'WARNING!! Below is the partition layout. Please run the "sudo more /etc/crypttab" command to confirm every persistent disk partition has an entry.'
-                - "If partitions other than psuedo file systems (such as /var or /sys) this is a finding"
+                - "If partitions other than pseudo file systems (such as /var or /sys) this is a finding"
                 - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
 
   when:
@@ -85,7 +85,7 @@
       - name: |
               "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
               "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
-        copy:
+        copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
             owner: root
@@ -133,11 +133,12 @@
       - banner
 
 - name: "MEDIUM | RHEL-08-010050 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
-  copy:
+  copy:  # noqa: template-instead-of-copy
       dest: /etc/dconf/db/local.d/01-banner-message
       content: |
           [org/gnome/login-screen]
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
+          banner-message-enable=true
       mode: '0644'
       owner: root
       group: root
@@ -160,7 +161,7 @@
   lineinfile:
       path: /etc/rsyslog.conf
       line: "auth.*;authpriv.*;daemon.* /var/log/secure"
-      create: yes
+      create: true
       mode: '0644'
   notify: restart rsyslog
   when:
@@ -248,7 +249,7 @@
       - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Lock user not using FIPS 140-2 hashing"
         command: "passwd -l {{ item }}"
         args:
-            warn: no
+            warn: false
         with_items:
             - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
@@ -257,7 +258,7 @@
       - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Message out user accounts"
         debug:
             msg:
-                - "WARNING!! The following accounts do not have FIPS 140-2 hasing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
+                - "WARNING!! The following accounts do not have FIPS 140-2 hashing. Please review the accounts and correct to conform to control 010120 of the RHEL8 STIG"
                 - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
             - not rhel8stig_disruption_high
@@ -293,18 +294,13 @@
 - name: |
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
     "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
-  lineinfile:
-      dest: "{{ rhel8stig_grub_cfg_path | dirname }}/grub.cfg"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      insertafter: "{{ item.insertafter }}"
+  template:
+      src: 01_users.j2
+      dest: /etc/grub.d/01_users
+      owner: root
+      group: root
+      mode: 0644
   notify: confirm grub2 user cfg
-  with_items:
-      - { regexp: '^set superusers', line: 'set superusers="{{ rhel8stig_boot_superuser }}"', insertafter: '### BEGIN /etc/grub.d/01_users ###' }
-      - { regexp: '^export superusers', line: 'export superusers', insertafter: '^set superusers' }
-      - { regexp: '^password_pbkdf2', line: 'password_pbkdf2 {{ rhel8stig_boot_superuser }} ${GRUB2_PASSWORD}', insertafter: '^export superusers' }
-  loop_control:
-      label: "{{ item.line }}"
   when:
       - rhel_08_010141 or
         rhel_08_010149
@@ -325,7 +321,7 @@
       path: /usr/lib/systemd/system/rescue.service
       regexp: '^ExecStart='
       line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell rescue"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -345,7 +341,7 @@
       path: /usr/lib/systemd/system/emergency.service
       regexp: '^ExecStart='
       line: "ExecStart=-/usr/lib/systemd/systemd-sulogin-shell emergency"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -404,7 +400,7 @@
         find:
             path: /
             patterns: '*.keytab'
-            recurse: yes
+            recurse: true
         register: rhel8stig_010161_keytab_files
 
       - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
@@ -772,33 +768,13 @@
       - ssh
 
 - name: |
-    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms."
-    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections."
-  block:
-      - name: |
-          "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Get current FIPS mode state"
-          "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Get current FIPS mode state"
-        command: fips-mode-setup --check
-        changed_when: false
-        failed_when: rhel_08_010290_pre_fips_check.stdout is not defined
-        register: rhel_08_010290_pre_fips_check
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Enable FIPS"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Enable FIPS"
-        command: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
-        notify: change_requires_reboot
-        when: '"disabled" in rhel_08_010290_pre_fips_check.stdout'
-
-      - name: |
-          "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
-          "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
-        lineinfile:
-            path: /etc/crypto-policies/back-ends/opensshserver.config
-            regexp: '^CRYPTO_POLICY='
-            line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
-        notify: change_requires_reboot
+    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
+    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/opensshserver.config
+      regexp: '^CRYPTO_POLICY='
+      line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
+  notify: change_requires_reboot
   when:
       - rhel_08_010290 or
         rhel_08_010291
@@ -872,10 +848,10 @@
 - name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
   lineinfile:
       path: /etc/crypto-policies/back-ends/gnutls.config
-      regexp: '^(.*\+VERS-ALL:)'
+      regexp: '^(.*)\+VERS-ALL:'
       line: '\1{{ rhel8stig_gnutls_encryption }}'
       backrefs: true
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -902,7 +878,7 @@
               "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root or a system account. | Get commands no group-owned by root"
         shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010300_commands
@@ -916,7 +892,7 @@
             owner: root
             group: root
             mode: "{{ rhel8stig_sys_commands_perm }}"
-            force: yes
+            force: true
         with_items:
             - "{{ rhel_08_010300_commands.stdout_lines }}"
   when:
@@ -949,7 +925,7 @@
               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
         shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010330_library_files
@@ -1166,7 +1142,7 @@
       - CAT2
       - CCI-001749
       - SRG-OS-000366-GPOS-00153
-      - SV-230266r818816_rule
+      - SV-230266r833290_rule
       - V-230266
       - sysctl
 
@@ -1182,7 +1158,7 @@
       - CAT2
       - CCI-002165
       - SRG-OS-000312-GPOS-00122
-      - SV-230267r818819_rule
+      - SV-230267r833292_rule
       - V-230267
       - sysctl
 
@@ -1198,7 +1174,7 @@
       - CAT2
       - CCI-002165
       - SRG-OS-000312-GPOS-00122
-      - SV-230268r818822_rule
+      - SV-230268r833294_rule
       - V-230268
       - sysctl
 
@@ -1215,7 +1191,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-251711r810015_rule
+      - SV-251711r833385_rule
       - V-251711
       - sudoers
 
@@ -1234,7 +1210,7 @@
       - CAT2
       - CCI-002038
       - SRG-OS-000373-GPOS-00156
-      - SV-230271r627750_rule
+      - SV-230271r833301_rule
       - V-230271
       - sudo
 
@@ -1348,7 +1324,7 @@
       - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010421_grub_cmdline_linux
@@ -1388,7 +1364,7 @@
       - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010422_grub_cmdline_linux
@@ -1428,7 +1404,7 @@
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010423_grub_cmdline_linux
@@ -1475,7 +1451,7 @@
       - CAT2
       - CCI-002824
       - SRG-OS-000433-GPOS-00193
-      - SV-230280r818831_rule
+      - SV-230280r833303_rule
       - V-230280
       - sysctl
 
@@ -1484,7 +1460,7 @@
       - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
         find:
             paths: /etc/ssh
-            recurse: yes
+            recurse: true
             file_type: file
             patterns: 'ssh_host*_key.pub'
             hidden: true
@@ -1518,7 +1494,7 @@
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
         find:
             paths: /etc/ssh
-            recurse: yes
+            recurse: true
             file_type: file
             patterns: 'ssh_host*key'
             hidden: true
@@ -1788,9 +1764,9 @@
       - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Get mounts"
         shell: mount | grep '^/dev\S* on /\S' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'
         args:
-            warn: no
-        changed_when: no
-        check_mode: no
+            warn: false
+        changed_when: false
+        check_mode: false
         register: rhel8stig_010580_mounts_nodev
 
       - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Split results"
@@ -2067,7 +2043,7 @@
       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
         shell: find {{ item.mount }} -xdev -type f -perm -002
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010660_world_writable_files
@@ -2114,7 +2090,7 @@
 - name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
   service:
       name: kdump
-      enabled: no
+      enabled: false
       state: stopped
   when:
       - rhel_08_010670
@@ -2141,15 +2117,15 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230311r818834_rule
+      - SV-230311r833305_rule
       - V-230311
       - sysctl
 
 - name: "MEDIUM | RHEL-08-010672 | PATCH | RHEL 8 must disable acquiring, saving, and processing core dumps."
   systemd:
       name: systemd-coredump.socket
-      masked: yes
-      daemon_reload: yes
+      masked: true
+      daemon_reload: true
   notify: systemctl daemon-reload
   when:
       - rhel_08_010672
@@ -2159,7 +2135,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230312r627750_rule
+      - SV-230312r833308_rule
       - V-230312
       - systemd
 
@@ -2220,23 +2196,23 @@
   block:
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Audit the /etc/nsswitch.conf"
         shell: grep "dns" /etc/nsswitch.conf | grep -v "#"
-        changed_when: no
+        changed_when: false
         failed_when: false
-        check_mode: no
+        check_mode: false
         register: rhel_08_010680_nsswitch_check
 
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine if networkmanager is setting /etc/resolv.conf"
         command: grep -c "# Generated by NetworkManager" /etc/resolv.conf
-        changed_when: no
+        changed_when: false
         failed_when: false
-        check_mode: no
+        check_mode: false
         register: rhel_08_010680_networkmanager_check
 
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Determine number of nameserver lines in /etc/resolv.conf"
         shell: grep -i "nameserver" /etc/resolv.conf | grep -v "#" | wc -l
-        changed_when: no
+        changed_when: false
         failed_when: false
-        check_mode: no
+        check_mode: false
         register: rhel_08_010680_nameserver_count
 
       - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Change resolv.conf if dns is not present in nsswitch.conf"
@@ -2296,7 +2272,7 @@
         shell: find "{{ item }}" -maxdepth 1 -type f | xargs grep "PATH=" | cut -d':' -f1 | xargs realpath
         with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
         register: rhel_08_010690_ini_path_grep_list
-        changed_when: no
+        changed_when: false
         failed_when: false
 
       - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
@@ -2445,7 +2421,7 @@
         failed_when: false
         register: rhel_08_010731_files
         with_items:
-            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start|int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
+            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start | int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
 
       - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
         file:
@@ -2483,7 +2459,8 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010740
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
+      - (item.uid >= rhel8stig_interactive_uid_stop | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010740
@@ -2505,7 +2482,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010741
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
       - item.uid != 65534
   tags:
       - RHEL-08-010741
@@ -2525,7 +2502,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010750
-      - (item.uid >= rhel8stig_interactive_uid_start|int)
+      - (item.uid >= rhel8stig_interactive_uid_start | int)
   tags:
       - skip_ansible_lint
       - RHEL-08-010750
@@ -2557,8 +2534,7 @@
   file:
       path: "{{ item }}"
       mode: "{{ rhel8stig_local_int_perm }}"
-  with_items:
-      - "{{ rhel_08_stig_interactive_homedir_inifiles }}"
+  with_items: "{{ rhel_08_stig_interactive_homedir_inifiles }}"
   when:
       - rhel_08_010770
       - rhel8stig_disruption_high
@@ -2577,7 +2553,7 @@
       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
         shell: find / -nouser
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010780_nouser_files
@@ -3109,6 +3085,7 @@
       - SV-230345r743984_rule
       - V-230345
       - pamd
+
 - name: |
     "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
      MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
@@ -3122,7 +3099,6 @@
             setype: faillog_t
             state: present
         register: add_faillock_secontext
-        when: faillock_dir.changed
 
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
@@ -3132,7 +3108,7 @@
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }}| grep -c faillog_t"
+        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }} | grep -c faillog_t"
         changed_when: false
         failed_when: false
         register: faillock_secontext
@@ -3184,7 +3160,7 @@
       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
         lineinfile:
             path: /etc/dconf/db/local.d/00-screensaver
-            create: yes
+            create: true
             regexp: '^lock-enabled'
             owner: root
             group: root
@@ -3219,9 +3195,9 @@
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
             path: /etc/tmux.conf
-            regexp: '^set \-g'
+            regexp: '^set -g lock-command'
             line: "set -g lock-command vlock"
-            create: yes
+            create: true
             owner: root
             group: root
             mode: 0644
@@ -3254,7 +3230,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r810020_rule
+      - SV-230349r833388_rule
       - V-230349
       - tmux
 
@@ -3263,7 +3239,7 @@
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
         shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action
@@ -3277,7 +3253,7 @@
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
         lineinfile:
             path: /etc/dconf/db/distro.d/20-authselect
-            create: yes
+            create: true
             owner: root
             group: root
             mode: 0644
@@ -3305,7 +3281,7 @@
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
         lineinfile:
             path: /etc/dconf/db/distro.d/locks/20-authselect
-            create: yes
+            create: true
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
             owner: root
             group: root
@@ -3329,7 +3305,7 @@
       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
         shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_020060_idle_delay_param
@@ -3337,7 +3313,7 @@
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
         lineinfile:
             path: /etc/dconf/db/local.d/00-screensaver
-            create: yes
+            create: true
             owner: root
             group: root
             mode: 0640
@@ -3402,7 +3378,7 @@
 - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
   lineinfile:
       path: /etc/dconf/db/local.d/locks/session
-      create: yes
+      create: true
       line: /org/gnome/desktop/screensaver/lock-delay
       owner: root
       group: root
@@ -3454,7 +3430,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0640
+      mode: 0644
   when:
       - rhel_08_020100
   tags:
@@ -3474,7 +3450,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0640
+      mode: 0644
   when:
       - rhel_08_020101
   tags:
@@ -3501,7 +3477,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020102_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
@@ -3540,7 +3516,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020103_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
@@ -3577,14 +3553,14 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-251716r809372_rule
+      - SV-251716r833387_rule
       - V-251716
       - pamd
 
 - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3597,14 +3573,14 @@
       - CAT2
       - CCI-000192
       - SRG-OS-000069-GPOS-00037
-      - SV-230357r627750_rule
+      - SV-230357r833313_rule
       - V-230357
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3617,14 +3593,14 @@
       - CAT2
       - CCI-00019
       - SRG-OS-000070-GPOS-00038
-      - SV-230358r627750_rule
+      - SV-230358r833315_rule
       - V-230358
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3637,7 +3613,7 @@
       - CAT2
       - CCI-000194
       - SRG-OS-000071-GPOS-00039
-      - SV-230359r627750_rule
+      - SV-230359r833317_rule
       - V-230359
       - pwquality
 
@@ -3646,7 +3622,7 @@
       path: /etc/security/pwquality.conf
       regexp: '^#?\s*maxclassrepeat'
       line: "maxclassrepeat = {{ rhel8stig_password_complexity.maxclassrepeat | default('4') }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3657,14 +3633,14 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230360r809289_rule
+      - SV-230360r833319_rule
       - V-230360
       - pwquality
 
 - name: "MEDIUM | RHEL-08-20150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3677,14 +3653,14 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230361r627750_rule
+      - SV-230361r833321_rule
       - V-230361
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3697,14 +3673,14 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230362r627750_rule
+      - SV-230362r833323_rule
       - V-230362
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3717,7 +3693,7 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230363r627750_rule
+      - SV-230363r833325_rule
       - V-230363
       - pwquality
 
@@ -3746,7 +3722,7 @@
 - name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
   lineinfile:
       path: /etc/login.defs
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3766,7 +3742,7 @@
 - name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
   lineinfile:
       path: /etc/login.defs
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3787,7 +3763,7 @@
   block:
       - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
         command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
-        check_mode: no
+        check_mode: false
         changed_when: rhel_08_020210_users.stdout | length > 0
         register: rhel_08_020210_users
 
@@ -3828,7 +3804,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020220_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3866,7 +3842,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0640
+            mode: 0644
         when: rhel_08_020221_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3892,7 +3868,7 @@
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -3905,7 +3881,7 @@
       - CAT2
       - CCI-000205
       - SRG-OS-000078-GPOS-00046
-      - SV-230369r627750_rule
+      - SV-230369r833327_rule
       - V-230369
       - pwquality
 
@@ -4077,7 +4053,7 @@
 - name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       regexp: '^#?\s*ocredit'
       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
       owner: root
@@ -4090,7 +4066,7 @@
       - CAT2
       - CCI-001619
       - SRG-OS-000266-GPOS-00101
-      - SV-230375r627750_rule
+      - SV-230375r833329_rule
       - V-230375
       - pwquality
 
@@ -4121,7 +4097,7 @@
 - name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: yes
+      create: true
       regexp: '^#?\s*dictcheck'
       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
       owner: root
@@ -4134,7 +4110,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00225
-      - SV-230377r627750_rule
+      - SV-230377r833331_rule
       - V-230377
       - pwquality
 
@@ -4161,7 +4137,7 @@
   block:
       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
         command: "grep '^{{ item }}:' /etc/passwd"
-        check_mode: no
+        check_mode: false
         failed_when: rhel_08_020320_unnecessary_accounts_found.rc > 1
         changed_when: rhel_08_020320_unnecessary_accounts_found.rc == 0
         register: rhel_08_020320_unnecessary_accounts_found
@@ -4240,9 +4216,9 @@
             paths: /home
             patterns: '^\.'
             contains: 'umask'
-            recurse: yes
-            hidden: yes
-            use_regex: yes
+            recurse: true
+            hidden: true
+            use_regex: true
         register: rhel8stig_020352_files
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
@@ -4521,7 +4497,7 @@
       - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
         shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_030110_audit_log_dir
@@ -4736,7 +4712,7 @@
       - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed. | Enable and start service"
         service:
             name: auditd
-            enabled: yes
+            enabled: true
             state: started
   when:
       - rhel_08_030180
@@ -5460,7 +5436,7 @@
       - CAT2
       - CCI-001496
       - SRG-OS-000278-GPOS-00108
-      - SV-230475r627750_rule
+      - SV-230475r833333_rule
       - V-230475
       - aide
 
@@ -5565,7 +5541,7 @@
 - name: "MEDIUM | RHEL-08-03710 | PATCH | RHEL 8 must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
   lineinfile:
       path: /etc/rsyslog.conf
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -5691,7 +5667,7 @@
 - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
   lineinfile:
       path: /etc/modprobe.d/blacklist.conf
-      create: yes
+      create: true
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       owner: root
@@ -5720,10 +5696,10 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
               shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
-              register: rhel8stig_PPSM_CLSA_check_firewalld
+              register: rhel8stig_ppsm_clsa_check_firewalld
               changed_when: false
               failed_when: false
-              check_mode: no
+              check_mode: false
               when:
                   - rhel_08_040030
               tags:
@@ -5734,11 +5710,11 @@
               debug:
                   msg:
                       - "The following output is what firewalld is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_firewalld.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_firewalld.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_firewalld.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall
@@ -5756,10 +5732,10 @@
         block:
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
               shell: iptables-save | grep -i accept | grep -i input
-              register: rhel8stig_PPSM_CLSA_check_iptables
+              register: rhel8stig_ppsm_clsa_check_iptables
               changed_when: false
               failed_when: false
-              check_mode: no
+              check_mode: false
               when: rhel_08_040030
               tags:
                   - RHEL-08-040030
@@ -5769,11 +5745,11 @@
               debug:
                   msg:
                       - "The following output is what iptabes is accepting on service ports to {{ ansible_hostname }}."
-                      - "{{ rhel8stig_PPSM_CLSA_check_iptables.stdout_lines }}"
+                      - "{{ rhel8stig_ppsm_clsa_check_iptables.stdout_lines }}"
               changed_when: true
               when:
                   - rhel_08_040030
-                  - rhel8stig_PPSM_CLSA_check_iptables.stdout_lines is defined
+                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is defined
               tags:
                   - RHEL-08-040030
                   - firewall
@@ -5824,7 +5800,7 @@
         service:
             name: autofs
             state: stopped
-            enabled: no
+            enabled: false
         when: rhel_08_040070_autofs_status.stdout == "loaded"
   when:
       - rhel_08_040070
@@ -5843,7 +5819,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -5879,7 +5855,7 @@
         service:
             name: "{{ rhel8stig_firewall_service }}"
             state: started
-            enabled: yes
+            enabled: true
   when:
       - rhel_08_040100
       - rhel8stig_firewall_service != "not_required"
@@ -5937,6 +5913,28 @@
         with_items:
             - "{{ rhel8stig_white_list_services }}"
 
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.10+"
+        firewalld:
+            zone: "{{ rhel8stig_custom_firewall_zone }}"
+            permanent: true
+            state: enabled
+            target: DROP
+        when: ansible_version.full is version_compare('2.10.0 | int', '>=')
+
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+        block:
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | current setting"
+              shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
+              changed_when: false
+              failed_when: false
+              register: rhel8stig-target_drop_set
+
+            - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
+              shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
+              when:
+                  - rhel8stig-target_drop_set.rc != 0
+        when: ansible_version.full is version_compare('2.10 | int', '<')
+
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         command: firewall-cmd --reload
         changed_when: rhel_08_040090_zone_reload.rc == 0
@@ -5965,18 +5963,18 @@
       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"
         command: rpm -q NetworkManager
         args:
-            warn: no
-        check_mode: no
-        changed_when: no
+            warn: false
+        check_mode: false
+        changed_when: false
         register: rhel_08_nmcli_available
-        failed_when: no
+        failed_when: false
 
       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
         command: nmcli radio wifi
         args:
-            warn: no
+            warn: false
         register: rhel_08_wifi_enabled
-        check_mode: no
+        check_mode: false
         changed_when: rhel_08_wifi_enabled.stdout != "disabled"
         when: rhel_08_nmcli_available.rc == 0
 
@@ -5995,15 +5993,31 @@
       - wifi
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
-  lineinfile:
-      path: /etc/modprobe.d/bluetooth.conf
-      regexp: '^install bluetooth '
-      line: "install bluetooth /bin/true"
-      create: yes
-      owner: root
-      group: root
-      mode: 0640
-  notify: change_requires_reboot
+  block:
+      - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth"
+        lineinfile:
+            path: /etc/modprobe.d/bluetooth.conf
+            regexp: '^install bluetooth '
+            line: "install bluetooth /bin/true"
+            create: true
+            owner: root
+            group: root
+            mode: 0640
+        notify: change_requires_reboot
+
+      - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth kernel module"
+        lineinfile:
+            path: /etc/modprobe.d/blacklist.conf
+            create: true
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
+            owner: root
+            group: root
+            mode: 0640
+            insertafter: "{{ item.insertafter }}"
+        notify: change_requires_reboot
+        with_items:
+            - { regexp: '^blacklist bluetooth', line: 'blacklist bluetooth', insertafter: '#blacklist bluetooth kernel module' }
   when:
       - rhel_08_040111
       - not system_is_container
@@ -6012,7 +6026,7 @@
       - CAT2
       - CCI-001443
       - SRG-OS-000300-GPOS-00118
-      - SV-230507r627750_rule
+      - SV-230507r833336_rule
       - V-230507
       - bluetooth
 
@@ -6027,7 +6041,7 @@
             "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
         shell: mount | grep /dev/shm
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_040120_dev_shm_status
@@ -6283,14 +6297,14 @@
   block:
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Check for rules.d/ directory"
         stat:
-          path: /etc/fapolicyd/rules.d/
+            path: /etc/fapolicyd/rules.d/
         register: rhel_08_040137_rules_dir
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
         lineinfile:
             path: "{{ '/etc/fapolicyd/rules.d/99-stig.rules' if rhel_08_040137_rules_dir.stat.exists else '/etc/fapolicyd/fapolicyd.rules' }}"
             line: "{{ item }}"
-            create: yes
+            create: true
         with_items:
             - "allow exe={{ ansible_python.executable }} : ftype=text/x-python"
             - "{{ rhel8stig_fapolicy_white_list }}"
@@ -6340,7 +6354,7 @@
         service:
             name: usbguard
             state: started
-            enabled: yes
+            enabled: true
         when:
             - rhel_08_040141
             - rhel_08_040139 or
@@ -6399,7 +6413,7 @@
         service:
             name: sshd
             state: started
-            enabled: yes
+            enabled: true
         when:
             - rhel_08_040159 or
               "'openssh-server' in ansible_facts.packages"
@@ -6441,9 +6455,9 @@
   systemd:
       name: debug-shell.service
       state: stopped
-      enabled: no
-      masked: yes
-      daemon_reload: yes
+      enabled: false
+      masked: true
+      daemon_reload: true
   when:
       - ansible_service_mgr == 'systemd'
       - rhel_08_040180
@@ -6501,7 +6515,7 @@
       - CAT2
       - CCI-00036
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r818851_rule
+      - SV-230536r833342_rule
       - V-230536
       - icmp
 
@@ -6517,7 +6531,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r818854_rule
+      - SV-230537r833344_rule
       - V-230537
       - icmp
 
@@ -6533,7 +6547,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r818857_rule
+      - SV-244551r833375_rule
       - V-244551
       - ip4
 
@@ -6550,7 +6564,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r818860_rule
+      - SV-230538r833346_rule
       - V-230538
       - icmp
 
@@ -6566,7 +6580,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r818863_rule
+      - SV-244552r833377_rule
       - V-244552
       - ipv4
 
@@ -6583,7 +6597,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r818866_rule
+      - SV-230539r838722_rule
       - V-230539
       - icmp
 
@@ -6600,7 +6614,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-250317r818869_rule
+      - SV-250317r833383_rule
       - V-250317
       - icmp
 
@@ -6617,7 +6631,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r818872_rule
+      - SV-230540r833349_rule
       - V-230540
       - icmp
 
@@ -6635,7 +6649,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r818875_rule
+      - SV-230541r833351_rule
       - V-230541
       - icmp
 
@@ -6653,7 +6667,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r818878_rule
+      - SV-230542r833353_rule
       - V-230542
       - icmp
 
@@ -6669,7 +6683,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r818881_rule
+      - SV-230543r833355_rule
       - V-230543
       - icmp
 
@@ -6685,7 +6699,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r818884_rule
+      - SV-244553r833379_rule
       - V-244553
       - ipv4
 
@@ -6702,7 +6716,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r818887_rule
+      - SV-230544r833357_rule
       - V-230544
       - icmp
 
@@ -6718,7 +6732,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r818890_rule
+      - SV-230545r833359_rule
       - V-230545
       - sysctl
 
@@ -6734,7 +6748,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r818893_rule
+      - SV-230546r833361_rule
       - V-230546
       - sysctl
 
@@ -6750,7 +6764,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r818896_rule
+      - SV-230547r833363_rule
       - V-230547
       - sysctl
 
@@ -6766,7 +6780,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r818899_rule
+      - SV-230548r833365_rule
       - V-230548
       - sysctl
 
@@ -6782,7 +6796,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r818902_rule
+      - SV-230549r833367_rule
       - V-230549
       - sysctl
 
@@ -6798,7 +6812,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244554r818905_rule
+      - SV-244554r833381_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
@@ -6857,10 +6871,10 @@
   block:
       - name: "MEDIUM | RHEL-08-040330 | AUDIT | RHEL 8 network interfaces must not be in promiscuous mode. | Check promiscuous mode"
         shell: "ip link | grep -i promisc | cut -d ':' -f 2"
-        check_mode: no
-        failed_when: no
+        check_mode: false
+        failed_when: false
         changed_when: rhel_08_040670_promisc_check.stdout != ''
-        ignore_errors: yes
+        ignore_errors: true
         register: rhel_08_040670_promisc_check
 
       - name: "MEDIUM | RHEL-08-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode. | Set promiscuous mode"
@@ -6884,7 +6898,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding no'
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -7104,7 +7118,7 @@
       - CAT2
       - CCI-002227
       - SRG-OS-000480-GPOS-00227
-      - SV-237642r809326_rule
+      - SV-237642r833369_rule
       - V-237642
       - sudo
 
@@ -7141,7 +7155,7 @@
       - CAT2
       - CCI-002038
       - SRG-OS-000373-GPOS-00156
-      - SV-237643r809328_rule
+      - SV-237643r838720_rule
       - V-237643
       - sudo
 

@@ -14,7 +14,7 @@ rules:
     spaces: 4
     # Requiring consistent indentation within a file, either indented or not
     indent-sequences: consistent
-  truthy: disable
+    level: error
   braces:
     max-spaces-inside: 1
     level: error
@@ -22,3 +22,11 @@ rules:
     max-spaces-inside: 1
     level: error
   line-length: disable
+  key-duplicates: enable
+  new-line-at-end-of-file: enable
+  new-lines:
+    type: unix
+  trailing-spaces: enable
+  truthy:
+    allowed-values: ['true', 'false']
+    check-keys: false

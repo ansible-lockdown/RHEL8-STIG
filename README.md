@@ -6,11 +6,11 @@
 
 Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 6 released on April 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R6_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 7 released on July 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R7_STIG.zip).
 
 ## Join us
 
-On our [Discord Server](https://discord.gg/JFxpSgPFEJ) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
+On our [Discord Server](https://discord.io/ansible-lockdown) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
 
 ## Updating
 
@@ -45,7 +45,7 @@ Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit
   - [Tower User Guide](https://docs.ansible.com/ansible-tower/latest/html/userguide/index.html)
   - [Ansible Community Info](https://docs.ansible.com/ansible/latest/community/index.html)
 - Functioning Ansible and/or Tower Installed, configured, and running. This includes all of the base Ansible/Tower configurations, needed packages installed, and infrastructure setup.
-- Please read through the tasks in this role to gain an understanding of what each control is doing. Some of the tasks are disruptive and can have unintended consiquences in a live production system. Also familiarize yourself with the variables in the defaults/main.yml file or the [Main Variables Wiki Page](https://github.com/ansible-lockdown/RHEL8-STIG/wiki/Main-Variables).
+- Please read through the tasks in this role to gain an understanding of what each control is doing. Some of the tasks are disruptive and can have unintended consequences in a live production system. Also familiarize yourself with the variables in the defaults/main.yml file or the [Main Variables Wiki Page](https://github.com/ansible-lockdown/RHEL8-STIG/wiki/Main-Variables).
 
 ## Documentation
 
@@ -149,7 +149,7 @@ uses:
 
 If adopting stig rule RHEL-08-040134
 
-This will affect cloud init as per https://bugs.launchpad.net/cloud-init/+bug/1839899
+This will affect cloud init as per [bug 1839899](https://bugs.launchpad.net/cloud-init/+bug/1839899)
 
 ## Support
 

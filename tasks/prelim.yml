@@ -2,7 +2,7 @@
 - name: "PRELIM | dconf"
   block:
       - name: "PRELIM | Install dconf"
-        dnf:
+        package:
             name: dconf
         when:
             - "'dconf' not in ansible_facts.packages"
@@ -34,12 +34,13 @@
 
 - name: "PRELIM | Find all sudoers files."
   command: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
-  check_mode: no
-  changed_when: no
-  failed_when: no
+  check_mode: false
+  changed_when: false
+  failed_when: false
   register: rhel8stig_sudoers_files
   when:
-      - rhel_08_010380
+      - rhel_08_010380 or
+        rhel_08_010381
   tags:
       - cat2
       - medium
@@ -47,7 +48,7 @@
       - sudo
 
 - name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150| Install grub2-tools."
-  dnf:
+  package:
       name: grub2-tools
   when:
       - not system_is_container
@@ -59,23 +60,6 @@
   tags:
       - cat1
       - high
-      - RHEL-08-010020
-      - RHEL-08-010140
-      - RHEL-08-010150
-
-- name: "PRELIM | RHEL-08-010020 | RHEL-08-010140 | RHEL-08-010150 | Check whether machine is UEFI-based"
-  stat:
-      path: /sys/firmware/efi
-  register: rhel_08_sys_firmware_efi
-  when:
-      - rhel_08_010020 or
-        rhel_08_010140 or
-        rhel_08_010150
-  tags:
-      - cat1
-      - high
-      - cat2
-      - medium
       - RHEL-08-010020
       - RHEL-08-010140
       - RHEL-08-010150
@@ -100,7 +84,7 @@
       - always
 
 - name: ensure cronie is available
-  dnf:
+  package:
       name: cronie
   when:
       - not system_is_container
@@ -112,17 +96,22 @@
       - RHEL-08-010360
 
 - name: "PRELIM | RHEL-08-010740 | RHEL-08-010750 | RHEL-08-020320 | Parse /etc/passwd"
-  include_tasks: parse_etc_passwd.yml
+  import_tasks: parse_etc_passwd.yml
   vars:
       rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
   when:
-      - rhel_08_010731 or
+      - rhel_08_010141 or
+        rhel_08_010149 or
+        rhel_08_010731 or
         rhel_08_010740 or
         rhel_08_010750 or
         rhel_08_020320
   tags:
       - cat2
       - medium
+      - RHEL-08-010141
+      - RHEL-08-010149
+      - RHEL-08-010731
       - RHEL-08-010740
       - RHEL-08-010750
       - RHEL-08-020320
@@ -131,11 +120,11 @@
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
-  shell: "getent passwd {'{{ rhel8stig_int_gid }}'..24339} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  shell: "getent passwd {% raw %}{{% endraw %}{{ rhel8stig_int_gid }}..24339{% raw %}}{% endraw %} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
   args:
-      warn: no
+      warn: false
   register: rhel_08_010690_getent
-  changed_when: rhel_08_020680_getent.stdout_lines is defined
+  changed_when: rhel_08_010690_getent.stdout_lines is defined
   failed_when: false
   tags:
       - RHEL-08-010690
@@ -150,7 +139,7 @@
       - complexity-high
 
 - name: "PRELIM | RHEL-08-010070 | RHEL-08-030010 | Ensure rsyslog is installed when required."
-  dnf:
+  package:
       name: rsyslog
   when:
       - not system_is_container
@@ -166,9 +155,9 @@
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
   args:
-      warn: no
-  changed_when: no
-  check_mode: no
+      warn: false
+  changed_when: false
+  check_mode: false
   register: rhel_08_boot_part
   when:
       - rhel_08_010020
@@ -178,7 +167,7 @@
       - RHEL-08-010020
 
 - name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
-  dnf:
+  package:
       name: audispd-plugins
   when:
       - not system_is_container
@@ -200,14 +189,14 @@
 #   block:
 #       - name: "PRELIM | RHEL-08-030330 | Find audit.log location"
 #         command: grep -oP '^log_file\s*=\s*\K.*?(?=\s*$)' /etc/audit/auditd.conf
-#         changed_when: no
-#         check_mode: no
+#         changed_when: false
+#         check_mode: false
 #         register: rhel_08_audit_log_file
 
 #       - name: "PRELIM | RHEL-08-030330 | Find partition holding audit.log"
 #         shell: df --output=target {{ rhel_08_audit_log_file.stdout }} | tail -n 1
-#         changed_when: no
-#         check_mode: no
+#         changed_when: false
+#         check_mode: false
 #         register: rhel_08_audit_part
 #   when:
 #       - rhel_08_030330
@@ -220,7 +209,7 @@
 - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install and initialize AIDE"
   block:
       - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Install AIDE"
-        dnf:
+        package:
             name: aide
             state: present
         notify: "{{ rhel8stig_aide_handler }}"
@@ -231,7 +220,7 @@
         stat:
             path: "{{ rhel8stig_aide_db_file }}"
         register: rhel8stig_aide_db_status
-        check_mode: no
+        check_mode: false
         changed_when: not rhel8stig_aide_db_status.stat.exists
         notify: "{{ rhel8stig_aide_handler }}"
   when:
@@ -249,7 +238,7 @@
       - RHEL-08-040310
 
 - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
-  dnf:
+  package:
       name: libselinux-utils
       state: present
   when:
@@ -261,7 +250,7 @@
 - name: "PRELIM | Bare bones SSH Server"
   block:
       - name: "PRELIM | Install SSH"
-        dnf:
+        package:
             name: openssh-server
             state: present
         when:
@@ -271,7 +260,7 @@
         service:
             name: sshd
             state: "{{ rhel8stig_service_started }}"
-            enabled: yes
+            enabled: true
 
       - name: PRELIM | check if ssh host key exists
         stat:
@@ -286,12 +275,12 @@
       - rhel8stig_ssh_required
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
-  shell: find "{{ item }}" -maxdepth 1 -type f | awk -F"/" '$NF ~ /^\..*$/ {print $NF}' | grep -v history
+  shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   args:
-      warn: no
+      warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
-  changed_when: no
+  changed_when: false
   failed_when: false
   when:
       - rhel_08_stig_interactive_homedir_results is defined
@@ -365,25 +354,25 @@
       path: /sys/firmware/efi
   register: rhel8_efi_boot
   tags:
+      - always
       - goss_template
 
 - name: PRELIM | set bootloader type
   block:
-      - name: "PRELIM | set fact if UEFI boot | RHEL or OEL"
+      - name: "PRELIM | set fact if UEFI boot"
+        set_fact:
+            rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
+            rhel8stig_legacy_boot: false
+        when:
+            - rhel8_efi_boot.stat.exists
+
+      - name: "PRELIM | set fact if UEFI boot | Oracle Linux"
         set_fact:
             rhel8stig_bootloader_path: /boot/efi/EFI/redhat
             rhel8stig_legacy_boot: false
         when:
             - rhel8_efi_boot.stat.exists
-            - ansible_distribution != 'CentOS'  # Note: rhel & OEL both use redhat path
-
-      - name: "PRELIM | set fact if UEFI boot | CentOS "
-        set_fact:
-            rhel8stig_bootloader_path: /boot/efi/EFI/centos
-            rhel8stig_legacy_boot: false
-        when:
-            - rhel8_efi_boot.stat.exists
-            - ansible_distribution == 'CentOS'
+            - ansible_distribution == 'Oracle Linux'
 
       - name: "PRELIM | set if not UEFI boot"
         set_fact:
@@ -396,6 +385,8 @@
             msg:
                 - "bootloader path set to {{ rhel8stig_bootloader_path }}"
                 - "legacy boot equals {{ rhel8stig_legacy_boot }}"
+  tags:
+      - always
 
 - name: "PRELIM | RHEL-08-020017 | RHEL-08-020027 | REHL-08-020028 | If using selinux set up system prereqs"
   block:
@@ -412,14 +403,14 @@
             mode: 0755
             owner: root
             group: root
-            recurse: yes
+            recurse: true
             setype: faillog_t
         register: faillock_dir
   when:
       - not system_is_container
-      - rhel_08_020017
-      - rhel_08_020027
-      - rhel_08_020028
+      - rhel_08_020017 or
+        rhel_08_020027 or
+        rhel_08_020028
 
 - name: "PRELIM | Section 1.1 | Create list of mount points"
   set_fact:

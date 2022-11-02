@@ -1,0 +1,13 @@
+## Configured for DISA STIG control 010141 and 010149
+## Using Ansible playbook
+#!/bin/sh -e
+cat << EOF
+if [ -f \${prefix}/user.cfg ]; then
+  source \${prefix}/user.cfg
+  if [ -n "\${GRUB2_PASSWORD}" ]; then
+    set superusers="{{ rhel8stig_boot_superuser }}"
+    export superusers
+    password_pbkdf2 {{ rhel8stig_boot_superuser }} \${GRUB2_PASSWORD}
+  fi
+fi
+EOF

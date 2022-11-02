@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
-  dnf:
+  package:
       name: policycoreutils
   when:
       - rhel_08_010171
@@ -43,7 +43,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r818825_rule
+      - SV-230269r833296_rule
       - V-230269
       - sysctl
 
@@ -58,7 +58,7 @@
       - CAT3
       - CCI-001090
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r818828_rule
+      - SV-230270r833298_rule
       - V-230270
       - sysctl
 
@@ -67,7 +67,7 @@
       - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Find .conf files"
         find:
             paths: /etc
-            recurse: yes
+            recurse: true
             file_type: any
             depth: 2
             patterns:
@@ -110,7 +110,7 @@
         systemd:
             name: rngd.service
             state: started
-            enabled: yes
+            enabled: true
         when:
             - rhel_08_010471
             - "'rng-tools' in ansible_facts.packages"
@@ -152,7 +152,7 @@
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
   debug:
       msg:
-          - "WARNING!! /var/log is not mounted on a seperate partition"
+          - "WARNING!! /var/log is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
   when:
@@ -196,7 +196,7 @@
       regexp: '^\*               hard    maxlogins'
       line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
       insertbefore: '^# End of file'
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -270,7 +270,7 @@
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit to 1 as active"
         shell: grubby --update-kernel=ALL --args="audit=1"
         args:
-            warn: no
+            warn: false
         when: (ansible_proc_cmdline.audit is defined and ansible_proc_cmdline.audit != '1') or
               (ansible_proc_cmdline.audit is not defined)
 
@@ -309,7 +309,7 @@
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | set audit_backlog_limit active"
         shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
         args:
-            warn: no
+            warn: false
         when: (ansible_proc_cmdline.audit_backlog_limit is defined and ansible_proc_cmdline.audit_backlog_limit != '8192') or
               (ansible_proc_cmdline.audit_backlog_limit is not defined)
 
@@ -343,13 +343,12 @@
       path: /etc/usbguard/usbguard-daemon.conf
       regexp: '^AuditBackend='
       line: "AuditBackend=LinuxAudit"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0600
   when:
       - rhel_08_030603
-      - "'usbguard' in ansible_facts.packages"
   tags:
       - RHEL-08-030603
       - CAT3
@@ -366,6 +365,7 @@
       line: "port 0"
   when:
       - rhel_08_030741
+      - "'chrony' in ansible_facts.packages"
   tags:
       - RHEL-08-030741
       - CAT3
@@ -396,14 +396,14 @@
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
         shell: grubby --update-kernel=ALL --args="pti=on"
         args:
-            warn: no
+            warn: false
         when: (ansible_proc_cmdline.pti is defined and ansible_proc_cmdline.pti != 'on') or
               (ansible_proc_cmdline.pti is not defined )
 
       - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
         shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         args:
-            warn: no
+            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_040004_grub_cmdline_linux
@@ -438,7 +438,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -464,7 +464,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -490,7 +490,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -516,7 +516,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -542,7 +542,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640
@@ -568,7 +568,7 @@
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
       insertafter: "{{ item.insertafter }}"
-      create: yes
+      create: true
       owner: root
       group: root
       mode: 0640

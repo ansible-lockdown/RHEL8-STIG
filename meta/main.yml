@@ -5,11 +5,12 @@ galaxy_info:
     company: "MindPoint Group"
     license: MIT
     role_name: rhel8_stig
-    min_ansible_version: 2.9.0
+    namespace: mindpointgroup
+    min_ansible_version: '2.9.0'
     platforms:
         - name: EL
           versions:
-              - 8
+              - '8'
     galaxy_tags:
         - system
         - security
@@ -21,8 +22,9 @@ galaxy_info:
         - complianceascode
         - disa
         - rhel8
+        - mindpoint
 collections:
-  - community.general
-  - community.crypto
-  - ansible.posix
+    - community.general
+    - community.crypto
+    - ansible.posix
 dependencies: []

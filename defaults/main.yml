@@ -1,13 +1,10 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: '1.4'
+benchmark_version: '1.7'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
 benchmark: RHEL8-STIG
-
-# Whether to skip the reboot
-rhel8cis_skip_reboot: true
 
 # Whether to skip the OS check for supported OS's
 skip_os_check: false
@@ -33,7 +30,7 @@ rhel8stig_disruption_high: true
 
 # Show "changed" for disruptive items not remediated per disruption-high
 # setting to make them stand out.
-rhel8stig_audit_disruptive: yes
+rhel8stig_audit_disruptive: true
 
 rhel8stig_skip_for_travis: false
 
@@ -49,7 +46,6 @@ system_is_container: false
 # Place to find the container yml file for your environment - /vars/...
 container_vars_file: is_container.yml
 
-
 # rhel8cis/stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
@@ -59,7 +55,6 @@ rhel8stig_skip_reboot: true
 
 # Defined will change if control requires
 change_requires_reboot: false
-
 
 ### Goss is required on the remote host
 setup_audit: false
@@ -82,7 +77,6 @@ audit_cmd_timeout: 60000
 
 ### End Goss enablements ####
 #### Detailed settings found at the end of this document ####
-
 
 # These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
@@ -566,7 +560,7 @@ rhel8stig_min_supported_os_ver:
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
-rhel8stig_system_is_router: no
+rhel8stig_system_is_router: false
 
 rhel8stig_time_service: chronyd
 
@@ -580,12 +574,12 @@ rhel8stig_ssh_required: true
 
 # RHEL-08-040500
 # If not required, remove tftp
-rhel8stig_tftp_required: no
+rhel8stig_tftp_required: false
 
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
 rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword
-rhel8stig_boot_superuser: root
+rhel8stig_boot_superuser: bootloader_admin
 
 # AIDE settings
 # Set to false for fire and forget mode
@@ -615,7 +609,7 @@ rhel8stig_cron_special_disable: "{{
 
 # Set maximum number of simultaneous system logins (RHEL-08-040000)
 rhel8stig_maxlogins: 10
-
+# TODO: ansible-lint: var-spacing
 rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary(
         rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '),
         rhel8stig_logon_banner_nice) }}"
@@ -700,7 +694,7 @@ rhel8stig_pam_pwquality_retry: 3
 rhel8stig_unnecessary_accounts:
     - ftp
     - games
-rhel8stig_remove_unnecessary_user_files: no
+rhel8stig_remove_unnecessary_user_files: false
 
 # RHEL-08-020220
 # RHEL-08-020221
@@ -719,7 +713,7 @@ rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
     unlock_time: 0
-    fail_for_root: yes
+    fail_for_root: true
     dir: /var/log/faillock
 
 # RHEL-08-030670
@@ -746,7 +740,7 @@ rhel8stig_audisp_overflow_action: syslog
 
 # RHEL-08-040330
 # Network interface promiscuous mode setting will be disabled unless set to true
-rhel8stig_net_promisc_mode_required: no
+rhel8stig_net_promisc_mode_required: false
 
 # /etc/login.defs settings
 # RHEL-08-010110
@@ -773,7 +767,7 @@ rhel8stig_auditd_mail_acct: root
 # Setting to enable or disable fixes that depend on password-based authentication
 # i.e. if users authenticate with a means other than passwords (pubkey)
 # and will not know or use passwords then this should be 'no'
-rhel8stig_using_password_auth: yes
+rhel8stig_using_password_auth: true
 
 rhel8stig_availability_override: false
 # auditd_failure_flag
@@ -788,10 +782,6 @@ rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 
 # REHL-08-010020
 rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 
-#
-rhel8stig_machine_uses_uefi: "{{ rhel_08_sys_firmware_efi.stat.exists }}"
-rhel8stig_grub_cfg_path: "{{ rhel8stig_machine_uses_uefi | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
-rhel8stig_grub_cfg_path_invalid: "{{ (not rhel8stig_machine_uses_uefi) | ternary('/boot/efi/EFI/' ~ (ansible_distribution | lower) ~ '/grub.cfg', '/boot/grub2/grub.cfg') }}"
 
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
@@ -926,8 +916,8 @@ audit_out_dir: '/var/tmp'
 audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
 
 # If changed these can affect other products
-pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
-post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
 
 ## The following should not need changing
 goss_file: "{{ audit_conf_dir }}goss.yml"
