@@ -6,7 +6,7 @@
 
 Configure a RHEL/Rocky 8 system to be DISA STIG compliant. All findings will be audited by default. Non-disruptive CAT I, CAT II, and CAT III findings will be corrected by default. Disruptive finding remediation can be enabled by setting `rhel8stig_disruption_high` to `yes`.
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 7 released on July 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R7_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 8 released on Oct 27, 2022](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R8_STIG.zip).
 
 ## Join us
 
