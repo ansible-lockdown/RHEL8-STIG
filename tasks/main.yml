@@ -122,13 +122,14 @@
   tags:
       - always
 
-- import_tasks: prelim.yml
-  become: true
+- name: Include prelim tasks
+  import_tasks: prelim.yml
   tags:
       - prelim_tasks
       - run_audit
 
-- import_tasks: pre_remediation_audit.yml
+- name: Include pre-remediation tasks
+  import_tasks: pre_remediation_audit.yml
   when:
       - run_audit
       - setup_audit
@@ -194,7 +195,8 @@
       - CAT2
       - CAT3
 
-- import_tasks: post_remediation_audit.yml
+- name: Include post-remediation tasks
+  import_tasks: post_remediation_audit.yml
   when:
       - run_audit
 

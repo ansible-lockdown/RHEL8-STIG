@@ -57,7 +57,6 @@
                 - 'WARNING!! Below is the partition layout. Please run the "sudo more /etc/crypttab" command to confirm every persistent disk partition has an entry.'
                 - "If partitions other than pseudo file systems (such as /var or /sys) this is a finding"
                 - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
-
   when:
       - rhel_08_010030
   tags:
@@ -105,7 +104,7 @@
             - RHEL-08-010060
             - CCI-000048
             - SRG-OS-000023-GPOS-00006
-            - SV-230225r627750_rule
+            - SV-230225r858694_rule
             - SV-230227r627750_rule
             - V-230225
             - V-230227
@@ -197,8 +196,9 @@
       - CAT2
       - CCI-000185
       - SRG-OS-000066-GPOS-00034
-      - SV-230229r809270_rule
+      - SV-230229r858739_rule
       - V-230229
+      - certificates
 
 - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key."
   block:
@@ -436,9 +436,9 @@
       - V-230239
       - kerberos
 
-- name: |
-        "MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services."
-        "MEDIUM | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
+- name: "|
+        MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services.
+        MEDIUM | RHEL-08-010450 | PATCH | RHEL 8 must enable the SELinux targeted policy."
   selinux:
       state: enforcing
       policy: targeted
@@ -492,7 +492,7 @@
   lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveCountMax.*'
-      line: ClientAliveCountMax 0
+      line: ClientAliveCountMax 1
   notify: restart sshd
   when:
       - rhel_08_010200
@@ -502,7 +502,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r743934_rule
+      - SV-230244r858697_rule
       - V-230244
       - ssh
 
@@ -520,7 +520,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-244525r743824_rule
+      - SV-244525r858699_rule
       - V-244525
       - ssh
 
@@ -1125,16 +1125,32 @@
       - CAT2
       - CCI-001744
       - SRG-OS-000363-GPOS-00150
-      - SV-230263r627750_rule
+      - SV-230263r858725_rule
       - V-230263
       - aide
       - cron
 
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
+
+      - name: "MEDIUM | RHEL-08-010372 | AUDIT | RHEL 8 must prevent the loading of a new kernel for later execution. | Find conflicting instances"
+        shell: grep -rs "kernel.kexec_load_disabled = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010372_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^kernel.kexec_load_disabled = 0'
+            state: absent
+        loop: "{{ rhel_08_010372_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010372_conflicting_settings.stdout | length > 0
   when:
       - rhel_08_010372
   tags:
@@ -1147,10 +1163,26 @@
       - sysctl
 
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-010373 | AUDIT | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Find conflicting instances"
+        shell: grep -rs "fs.protected_symlinks = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010373_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^fs.protected_symlinks = 0'
+            state: absent
+        loop: "{{ rhel_08_010373_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010373_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_010373
   tags:
@@ -1163,10 +1195,26 @@
       - sysctl
 
 - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-010374 | AUDIT | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Find conflicting instances"
+        shell: grep -rs "fs.protected_hardlinks = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010374_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^fs.protected_hardlinks = 0'
+            state: absent
+        loop: "{{ rhel_08_010374_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010374_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_010374
   tags:
@@ -1269,7 +1317,7 @@
       - CAT2
       - CCI-001948
       - SRG-OS-000375-GPOS-00160
-      - SV-230274r809281_rule
+      - SV-230274r858741_rule
       - V-230274
       - multifactor
 
@@ -1440,10 +1488,26 @@
       - grub
 
 - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: " MEDIUM | RHEL-08-010430 | AUDIT | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution. | Find conflicting instances"
+        shell: grep -rs "kernel.randomize_va_space = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010430_conflicting_settings
+
+      - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: "kernel.randomize_va_space = [^2]"
+            state: absent
+        loop: "{{ rhel_08_010430_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010430_conflicting_settings.stdout | length > 0
+
+      - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_010430
   tags:
@@ -1451,7 +1515,7 @@
       - CAT2
       - CCI-002824
       - SRG-OS-000433-GPOS-00193
-      - SV-230280r833303_rule
+      - SV-230280r858767_rule
       - V-230280
       - sysctl
 
@@ -1537,7 +1601,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230288r627750_rule
+      - SV-230288r858701_rule
       - V-230288
       - ssh
 
@@ -1555,7 +1619,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230289r743954_rule
+      - SV-230289r858703_rule
       - V-230289
       - ssh
 
@@ -1573,7 +1637,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230290r627750_rule
+      - SV-230290r858705_rule
       - V-230290
       - ssh
 
@@ -1591,7 +1655,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230291r743957_rule
+      - SV-230291r858707_rule
       - V-230291
       - ssh
 
@@ -1608,7 +1672,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244528r743833_rule
+      - SV-244528r858709_rule
       - V-244528
       - ssh
 
@@ -1670,7 +1734,7 @@
       - CAT2
       - CCI-000770
       - SRG-OS-000109-GPOS-00056
-      - SV-230296r627750_rule
+      - SV-230296r858711_rule
       - V-230296
       - ssh
 
@@ -2636,7 +2700,7 @@
       - V-230330
       - CCI-000366
       - SRG-OS-000480-GPOS-00229
-      - SV-230330r646870_rule
+      - SV-230330r858713_rule
       - V-230330
       - ssh
       - disruption_high
@@ -3418,7 +3482,7 @@
       - CAT2
       - CCI-000187
       - SRG-OS-000068-GPOS-00036
-      - SV-230355r818836_rule
+      - SV-230355r858743_rule
       - V-230355
       - authentication
 
@@ -3553,19 +3617,19 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-251716r833387_rule
+      - SV-251716r858737_rule
       - V-251716
       - pamd
 
 - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: true
+      regexp: '^#?\s*ucredit'
+      line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"      
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*ucredit'
-      line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
+      create: true
   when:
       - rhel_08_020110
   tags:
@@ -3573,19 +3637,19 @@
       - CAT2
       - CCI-000192
       - SRG-OS-000069-GPOS-00037
-      - SV-230357r833313_rule
+      - SV-230357r858771_rule
       - V-230357
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*lcredit'
+      line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*lcredit'
-      line: "lcredit = {{ rhel8stig_password_complexity.lcredit | default('-1') }}"
   when:
       - rhel_08_020120
   tags:
@@ -3593,19 +3657,19 @@
       - CAT2
       - CCI-00019
       - SRG-OS-000070-GPOS-00038
-      - SV-230358r833315_rule
+      - SV-230358r858773_rule
       - V-230358
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*dcredit'
+      line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*dcredit'
-      line: "dcredit = {{ rhel8stig_password_complexity.dcredit | default('-1') }}"
   when:
       - rhel_08_020130
   tags:
@@ -3613,7 +3677,7 @@
       - CAT2
       - CCI-000194
       - SRG-OS-000071-GPOS-00039
-      - SV-230359r833317_rule
+      - SV-230359r858775_rule
       - V-230359
       - pwquality
 
@@ -3633,19 +3697,19 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230360r833319_rule
+      - SV-230360r858777_rule
       - V-230360
       - pwquality
 
 - name: "MEDIUM | RHEL-08-20150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*maxrepeat'
+      line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*maxrepeat'
-      line: "maxrepeat = {{ rhel8stig_password_complexity.maxrepeat | default('3') }}"
   when:
       - rhel_08_020150
   tags:
@@ -3653,19 +3717,19 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230361r833321_rule
+      - SV-230361r858779_rule
       - V-230361
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*minclass'
+      line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*minclass'
-      line: "minclass = {{ rhel8stig_password_complexity.minclass | default('4') }}"
   when:
       - rhel_08_020160
   tags:
@@ -3673,19 +3737,19 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230362r833323_rule
+      - SV-230362r858781_rule
       - V-230362
       - pwquality
 
 - name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*difok'
+      line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*difok'
-      line: "difok = {{ rhel8stig_password_complexity.difok | default('8') }}"
   when:
       - rhel_08_020170
   tags:
@@ -3693,7 +3757,7 @@
       - CAT2
       - CCI-000195
       - SRG-OS-000072-GPOS-00040
-      - SV-230363r833325_rule
+      - SV-230363r858783_rule
       - V-230363
       - pwquality
 
@@ -3722,12 +3786,12 @@
 - name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
   lineinfile:
       path: /etc/login.defs
+      regexp: ^#?PASS_MIN_DAYS
+      line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: ^#?PASS_MIN_DAYS
-      line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults.pass_min_days | default('1') }}"
   when:
       - rhel_08_020190
   tags:
@@ -3735,7 +3799,7 @@
       - CAT2
       - CCI-000198
       - SRG-OS-000075-GPOS-00043
-      - SV-230365r627750_rule
+      - SV-230365r858727_rule
       - V-230365
       - login
 
@@ -3861,19 +3925,19 @@
       - CAT2
       - CCI-000200
       - SRG-OS-000077-GPOS-00045
-      - SV-251717r810415_rule
+      - SV-251717r858745_rule
       - V-251717
       - pamd
 
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
   lineinfile:
       path: /etc/security/pwquality.conf
+      regexp: '^#?\s*minlen'
+      line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
       create: true
       owner: root
       group: root
       mode: 0644
-      regexp: '^#?\s*minlen'
-      line: "minlen = {{ rhel8stig_password_complexity.minlen | default('15') }}"
   when:
       - rhel_08_020230
   tags:
@@ -3881,7 +3945,7 @@
       - CAT2
       - CCI-000205
       - SRG-OS-000078-GPOS-00046
-      - SV-230369r833327_rule
+      - SV-230369r858785_rule
       - V-230369
       - pwquality
 
@@ -4053,9 +4117,9 @@
 - name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: true
       regexp: '^#?\s*ocredit'
       line: "ocredit = {{ rhel8stig_password_complexity.ocredit | default('-1') }}"
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -4066,7 +4130,7 @@
       - CAT2
       - CCI-001619
       - SRG-OS-000266-GPOS-00101
-      - SV-230375r833329_rule
+      - SV-230375r858787_rule
       - V-230375
       - pwquality
 
@@ -4097,9 +4161,9 @@
 - name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
   lineinfile:
       path: /etc/security/pwquality.conf
-      create: true
       regexp: '^#?\s*dictcheck'
       line: "dictcheck = {{ rhel8stig_password_complexity.dictcheck | default('1') }}"
+      create: true
       owner: root
       group: root
       mode: 0644
@@ -4110,7 +4174,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00225
-      - SV-230377r833331_rule
+      - SV-230377r858789_rule
       - V-230377
       - pwquality
 
@@ -4169,7 +4233,7 @@
 
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   lineinfile:
-      dest: /etc/ssh/sshd_config
+      path: /etc/ssh/sshd_config
       regexp: '(?i)^(#PrintLastLog yes?|^#?.rintLastLog no)'
       line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
@@ -4183,9 +4247,9 @@
   tags:
       - RHEL-08-020350
       - CAT2
-      - CCI-000366
+      - CCI-000052
       - SRG-OS-000480-GPOS-00227
-      - SV-230382r627750_rule
+      - SV-230382r858717_rule
       - V-230382
       - ssh
 
@@ -4236,7 +4300,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00228
-      - SV-230384r627750_rule
+      - SV-230384r858732_rule
       - V-230384
       - umask
 
@@ -6300,7 +6364,7 @@
             path: /etc/fapolicyd/rules.d/
         register: rhel_08_040137_rules_dir
 
-      - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist "
+      - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on newer than 8.4"
         lineinfile:
             path: "{{ '/etc/fapolicyd/rules.d/99-stig.rules' if rhel_08_040137_rules_dir.stat.exists else '/etc/fapolicyd/fapolicyd.rules' }}"
             line: "{{ item }}"
@@ -6311,12 +6375,27 @@
         notify:
             - generate fapolicyd rules
             - restart fapolicyd
+        when: ansible_distribution_version is version('8.4', '>=')
+
+      - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on older than 8.4"
+        lineinfile:
+            path: /etc/fapolicyd/fapolicyd.rules
+            line: "{{ item }}"
+            create: true
+        with_items:
+            - "allow exe={{ ansible_python.executable }} : ftype=text/x-python"
+            - "{{ rhel8stig_fapolicy_white_list }}"
+        notify:
+            - generate fapolicyd rules
+            - restart fapolicyd
+        when: ansible_distribution_version is version('8.4', '<=')
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
         lineinfile:
             path: /etc/fapolicyd/fapolicyd.conf
             regexp: '^permissive ='
             line: 'permissive = 0'
+            create: true
         notify:
             - restart fapolicyd
   when:
@@ -6326,7 +6405,7 @@
       - CAT2
       - CCI-001764
       - SRG-OS-000368-GPOS-00154
-      - SV-244546r809339_rule
+      - SV-244546r858730_rule
       - V-244546
       - fapolicy
 
@@ -6447,7 +6526,7 @@
       - CAT2
       - CCI-000068
       - RG-OS-000033-GPOS-00014
-      - SV-230527r627750_rule
+      - SV-230527r858719_rule
       - V-230527
       - ssh
 
@@ -6471,10 +6550,26 @@
       - debug-shell
 
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040209 | AUDIT | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.default.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040209_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040209 | AUDIT | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.default.accept_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040209_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040209_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040209
   tags:
@@ -6482,15 +6577,32 @@
       - CAT2
       - CI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244550r818845_rule
+      - SV-244550r858791_rule
       - V-244550
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040210 | AUDIT | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.default.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040210_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.default.accept_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040210_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040210_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
+
   when:
       - rhel_08_040210
       - rhel8stig_ipv6_required
@@ -6499,15 +6611,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r818848_rule
+      - SV-230535r858793_rule
       - V-230535
       - icmp
 
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040220 | AUDIT | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.all.send_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040220_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.all.send_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040220_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040220_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040220
   tags:
@@ -6515,15 +6643,31 @@
       - CAT2
       - CCI-00036
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r833342_rule
+      - SV-230536r858795_rule
       - V-230536
       - icmp
 
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040230 | AUDIT | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.icmp_echo_ignore_broadcasts = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040230_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.icmp_echo_ignore_broadcasts = [^1]
+            state: absent
+        loop: "{{ rhel_08_040230_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040230_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040230
   tags:
@@ -6531,15 +6675,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r833344_rule
+      - SV-230537r858797_rule
       - V-230537
       - icmp
 
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040239 | AUDIT | RHEL 8 must not forward IPv4 source-routed packets. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.all.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040239_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item  }}"
+            regexp: net.ipv4.conf.all.accept_source_route = [^0]
+            state: absent
+        loop: "{{ rhel_08_040239_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040239_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040239
   tags:
@@ -6547,15 +6707,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r833375_rule
+      - SV-244551r858799_rule
       - V-244551
       - ip4
 
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040240 | AUDIT | RHEL 8 must not forward IPv6 source-routed packets. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.all.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040240_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.all.accept_source_route = [^0]
+            state: absent
+        loop: "{{ rhel_08_040240_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040240_conflicting_settings.stdout |length > 0
+
+      - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040240
       - rhel8stig_ipv6_required
@@ -6564,15 +6740,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r833346_rule
+      - SV-230538r858801_rule
       - V-230538
       - icmp
 
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040249 | AUDIT | RHEL 8 must not forward IPv4 source-routed packets by default. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.default.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040249_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.default.accept_source_route = [^0]
+            state: absent
+        loop: "{{ rhel_08_040249_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040249_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040249
   tags:
@@ -6580,15 +6772,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r833377_rule
+      - SV-244552r858803_rule
       - V-244552
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040250 | AUDIT | RHEL 8 must not forward IPv6 source-routed packets by default. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.default.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040250_conflicting_findings
+
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.default.accept_source_route = [^0]
+            state: absent
+        loop: "{{ rhel_08_040250_conflicting_findings.stdout_lines }}"
+        when: rhel_08_040250_conflicting_findings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040250
       - rhel8stig_ipv6_required
@@ -6597,15 +6805,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r838722_rule
+      - SV-230539r861085_rule
       - V-230539
       - icmp
 
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040259 | AUDIT | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.all.forwarding = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040259_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.all.forwarding = [^0]
+            state: absent
+        loop: "{{ rhel_08_040259_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040259_conflicting_settings.stdout | length > 0
+              
+      - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040259
       - not rhel8stig_system_is_router
@@ -6614,15 +6838,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-250317r833383_rule
+      - SV-250317r858808_rule
       - V-250317
       - icmp
 
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040260 | AUDIT | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.all.forwarding = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040260_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.all.forwarding = [^0]
+            state: absent
+        loop: "{{ rhel_08_040260_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040260_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040260
       - not rhel8stig_system_is_router
@@ -6631,15 +6871,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r833349_rule
+      - SV-230540r858810_rule
       - V-230540
       - icmp
 
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040261 | AUDIT | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.all.accept_ra = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040261_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.all.accept_ra = [^0]
+            state: absent
+        loop: "{{ rhel_08_040261_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040261_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040261
       - rhel8stig_ipv6_required
@@ -6649,15 +6905,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r833351_rule
+      - SV-230541r858812_rule
       - V-230541
       - icmp
 
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040262 | AUDIT | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.default.accept_ra = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: False
+        register: rhel_08_040262_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.default.accept_ra = [^0]
+            state: absent
+        loop: "{{ rhel_08_040262_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040262_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040262
       - rhel8stig_ipv6_required
@@ -6667,15 +6939,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r833353_rule
+      - SV-230542r858814_rule
       - V-230542
       - icmp
 
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040270 | AUDIT | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.default.send_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040270_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.default.send_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040270_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040270_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040270
   tags:
@@ -6683,15 +6971,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r833355_rule
+      - SV-230543r858816_rule
       - V-230543
       - icmp
 
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040279 | AUDIT | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.all.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040279_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.all.accept_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040279_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040279_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040279
   tags:
@@ -6699,15 +7003,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r833379_rule
+      - SV-244553r858818_rule
       - V-244553
       - ipv4
 
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040280 | AUDIT | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Find conflicting instances"
+        shell: grep -rs "net.ipv6.conf.all.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040280_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv6.conf.all.accept_redirects = [^0]
+            state: absent
+        loop: "{{ rhel_08_040280_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040280_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040280
       - rhel8stig_ipv6_required
@@ -6716,15 +7036,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r833357_rule
+      - SV-230544r858820_rule
       - V-230544
       - icmp
 
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040281 | AUDIT | RHEL 8 must disable access to network bpf syscall from unprivileged processes. | Find conflicting instances"
+        shell: grep -rs "kernel.unprivileged_bpf_disabled = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040281_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: kernel.unprivileged_bpf_disabled = [^1]
+            state: absent
+        loop: "{{ rhel_08_040281_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040281_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040281
   tags:
@@ -6732,15 +7068,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r833359_rule
+      - SV-230545r858822_rule
       - V-230545
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040282 | AUDIT | RHEL 8 must restrict usage of ptrace to descendant processes. | Find conflicting instances"
+        shell: grep -rs "kernel.yama.ptrace_scope = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040282_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: kernel.yama.ptrace_scope = [^1]
+            state: absent
+        loop: "{{ rhel_08_040282_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040282_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040282
   tags:
@@ -6748,15 +7100,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r833361_rule
+      - SV-230546r858824_rule
       - V-230546
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040283 | AUDIT | RHEL 8 must restrict exposed kernel pointer addresses access. | Find conflicting instances"
+        shell: grep -rs "kernel.kptr_restrict = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040283_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: kernel.kptr_restrict = [^1]
+            state: absent
+        loop: "{{ rhel_08_040283_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040283_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040283
   tags:
@@ -6764,15 +7132,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r833363_rule
+      - SV-230547r858826_rule
       - V-230547
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040284 | AUDIT | RHEL 8 must disable the use of user namespaces. | Find conflicting instances"
+        shell: grep -rs "user.max_user_namespaces = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040284_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: user.max_user_namespaces = [^0]
+            state: absent
+        loop: "{{ rhel_08_040284_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040284_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040284
   tags:
@@ -6780,15 +7164,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r833365_rule
+      - SV-230548r858828_rule
       - V-230548
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040285 | AUDIT | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Find conflicting instances"
+        shell: grep -rs "net.ipv4.conf.all.rp_filter = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040285_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.ipv4.conf.all.rp_filter = [^1]
+            state: absent
+        loop: "{{ rhel_08_040285_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040285_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040285
   tags:
@@ -6796,15 +7196,31 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r833367_rule
+      - SV-230549r858830_rule
       - V-230549
       - sysctl
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  changed_when: true
-  notify: update sysctl
+  block:
+      - name: "MEDIUM | RHEL-08-040286 | AUDIT | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler. | Find conflicting instances"
+        shell: grep -rs "net.core.bpf_jit_harden = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_040286_conflicting_settings
+
+      - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler. | Replace conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: net.core.bpf_jit_harden = [^2]
+            state: absent
+        loop: "{{ rhel_08_040286_conflicting_settings.stdout_lines }}"
+        when: rhel_08_040286_conflicting_settings.stdout | length > 0
+
+      - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler. | Use template to create file"
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_040286
   tags:
@@ -6812,7 +7228,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244554r833381_rule
+      - SV-244554r858832_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
@@ -6911,7 +7327,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230555r627750_rule
+      - SV-230555r858721_rule
       - V-230555
       - ssh
 
@@ -6928,7 +7344,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230556r627750_rule
+      - SV-230556r858723_rule
       - ssh
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
@@ -7001,8 +7417,26 @@
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
       - SV-230561r627750_rule
-      - -230561
+      - V-230561
       - tuned
+
+- name: "MEDIUM | RHEL-08-040400 | AUDIT | RHEL 8 must prevent non-privileged users from executing privileged functions, including disabling, circumventing, or altering implemented security safeguards/countermeasures."
+  debug:
+      msg:
+          - "Warning! This task is a manual task"
+          - "Please do the following to conform to STIG standards"
+          - 'All administrators must be mapped to the "sysadm_u", "staff_u", or an appropriately tailored confined role as defined by the organization.'
+          - 'All authorized non-administrative users must be mapped to the "user_u" role.'
+  when:
+      - rhel_08_040400
+  tags:
+      - RHEL-08-040400
+      - CAT2
+      - CCI-002265
+      - SRG-OS-000324-GPOS-00125
+      - SV-254520r858835_rule
+      - V-254520
+      - selinux
 
 - name: "MEDIUM | RHEL-08-010163 | PATCH | The krb5-server package must not be installed on RHEL 8."
   package:
@@ -7118,7 +7552,7 @@
       - CAT2
       - CCI-002227
       - SRG-OS-000480-GPOS-00227
-      - SV-237642r833369_rule
+      - SV-237642r861086_rule
       - V-237642
       - sudo
 
@@ -7155,7 +7589,7 @@
       - CAT2
       - CCI-002038
       - SRG-OS-000373-GPOS-00156
-      - SV-237643r838720_rule
+      - SV-237643r861088_rule
       - V-237643
       - sudo
 

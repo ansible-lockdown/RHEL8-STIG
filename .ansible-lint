@@ -9,6 +9,7 @@ skip_list:
     - 'experimental'
     - 'name[casing]'
     - 'name[template]'
+    - 'fqcn[action]'
     - '204'
     - '305'
     - '303'

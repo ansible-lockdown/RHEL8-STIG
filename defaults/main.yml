@@ -430,6 +430,7 @@ rhel_08_040350: true
 rhel_08_040370: true
 rhel_08_040380: true
 rhel_08_040390: true
+rhel_08_040400: true
 
 # CAT 3 rules
 rhel_08_010171: true
