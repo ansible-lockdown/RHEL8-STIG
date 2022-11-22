@@ -3174,37 +3174,18 @@
           "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
            MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
         sefcontext:
-            target: "{{ rhel8stig_pam_faillock.dir }}"
-            ftype: d
+            target: "{{ rhel8stig_pam_faillock.dir }}(/.*)?"
+            ftype: a
             setype: faillog_t
+            seuser: system_u
             state: present
         register: add_faillock_secontext
 
       - name: |
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
-
-      - name: |
-          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
-           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "ls -Zd {{ rhel8stig_pam_faillock.dir }} | grep -c faillog_t"
-        changed_when: false
-        failed_when: false
-        register: faillock_secontext
-
-      - name: |
-          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
-           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "semanage fcontext -m -t faillog_t -s system_u {{ rhel8stig_pam_faillock.dir }}"
-        register: modify_secontext
-        when: faillock_secontext.stdout != '1'
-
-      - name: |
-          "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
-           MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-        shell: "restorecon -irv {{ rhel8stig_pam_faillock.dir }}"
-        when: modify_secontext.changed
+        shell: "restorecon -irvF {{ rhel8stig_pam_faillock.dir }}"
+        when: add_faillock_secontext.changed
   when:
       - rhel_08_020027 or
         rhel_08_020028
