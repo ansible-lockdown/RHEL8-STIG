@@ -299,7 +299,7 @@
       dest: /etc/grub.d/01_users
       owner: root
       group: root
-      mode: 0644
+      mode: 0755
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -939,6 +939,7 @@
             owner: root
             group: root
             mode: "{{ rhel8stig_lib_file_perm }}"
+            follow: false
         with_items:
             - "{{ rhel_08_010330_library_files.stdout_lines }}"
   when:
