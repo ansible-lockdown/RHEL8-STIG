@@ -936,10 +936,10 @@
               "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
         file:
             path: "{{ item }}"
-            owner: root
-            group: root
-            mode: "{{ rhel8stig_lib_file_perm }}"
-            follow: false
+            owner: "{{ rhel_08_010340 | ternary('root',omit) }}"
+            group: "{{ rhel_08_010350 | ternary('root',omit) }}"
+            mode: "{{ rhel_08_010330 | ternary(rhel8stig_lib_file_perm,omit) }}"
+            # follow: false
         with_items:
             - "{{ rhel_08_010330_library_files.stdout_lines }}"
   when:
