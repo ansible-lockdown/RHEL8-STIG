@@ -6159,7 +6159,7 @@
             path: /tmp
             state: mounted
             src: "{{ tmp_mount.device }}"
-            fstype: xfs
+            fstype: "{{ tmp_mount.fstype }}"
             opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
         vars:
             tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"
