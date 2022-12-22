@@ -502,8 +502,8 @@ rhel8stig_sys_commands_perm: 0755
 
 # RHEL-08-010330
 # rhel8stig_lib_file_perm is the permissions teh library files will be set to
-# To conform to STIG standards this needs to be set to 0755 or more restrictive
-rhel8stig_lib_file_perm: 0755
+# To conform to STIG standards this needs to be set to 755 or more restrictive
+rhel8stig_lib_file_perm: 755
 
 # RHEL-08-010480
 # rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
