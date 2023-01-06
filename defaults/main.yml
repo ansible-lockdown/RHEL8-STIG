@@ -430,6 +430,7 @@ rhel_08_040350: true
 rhel_08_040370: true
 rhel_08_040380: true
 rhel_08_040390: true
+rhel_08_040400: true
 
 # CAT 3 rules
 rhel_08_010171: true
@@ -501,8 +502,8 @@ rhel8stig_sys_commands_perm: 0755
 
 # RHEL-08-010330
 # rhel8stig_lib_file_perm is the permissions teh library files will be set to
-# To conform to STIG standards this needs to be set to 0755 or more restrictive
-rhel8stig_lib_file_perm: 0755
+# To conform to STIG standards this needs to be set to 755 or more restrictive
+rhel8stig_lib_file_perm: 755
 
 # RHEL-08-010480
 # rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
@@ -828,7 +829,7 @@ rhel8stig_sshd_compression: "no"
 
 # RHEL-08-030740
 # rhel8stig_ntp_server_name is the name of the NTP server
-rhel8stig_ntp_server_name: server.name
+rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 
 # RHEL-08-040137
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
@@ -901,7 +902,7 @@ copy_goss_from_path: /some/accessible/path
 ## managed by the control audit_content
 # git
 audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
-audit_git_version: main
+audit_git_version: benchmark_v1r8_rh8
 
 # copy:
 audit_local_copy: "some path to copy from"
@@ -911,7 +912,7 @@ audit_files_url: "some url maybe s3?"
 
 ## Goss configuration information
 # Where the goss configs and outputs are stored
-audit_out_dir: '/var/tmp'
+audit_out_dir: '/opt'
 # Where the goss audit configuration will be stored
 audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
 

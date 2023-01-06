@@ -33,9 +33,26 @@
       - ssh
 
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  notify: update sysctl
+  block:
+      - name: "LOW | RHEL-08-010375 | AUIDT | RHEL 8 must restrict access to the kernel message buffer. | Find conflicting instances"
+        shell: grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010375_conflicting_settings
+
+      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^kernel.dmesg_restrict = 0'
+            state: absent
+        loop: "{{ rhel_08_010375_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010375_conflicting_settings.stdout | length > 0
+
+      - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_010375
   tags:
@@ -48,9 +65,26 @@
       - sysctl
 
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-  debug:
-      msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-  notify: update sysctl
+  block:
+      - name: "LOW | RHEL-08-010376 | AUDIT | RHEL 8 must prevent kernel profiling by unprivileged users. | Find conflicting instances"
+        shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010376_conflicting_settings
+
+      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Remove conflicting instances"
+        lineinfile:
+            path: "{{ item }}"
+            regexp: '^kernel.perf_event_paranoid = [^2]'
+            state: absent
+        loop: "{{ rhel_08_010376_conflicting_settings.stdout_lines }}"
+        when: rhel_08_010376_conflicting_settings.stdout | length > 0
+
+      - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
+        debug:
+            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
+        changed_when: true
+        notify: update sysctl
   when:
       - rhel_08_010376
   tags:
@@ -237,9 +271,9 @@
   tags:
       - RHEL-08-020340
       - CAT3
-      - CCI-000366
+      - CCI-000052
       - SRG-OS-000480-GPOS-00227
-      - SV-230381r627750_rule
+      - SV-230381r858726_rule
       - V-230381
 
 - name: "LOW | RHEL-08-030063 | PATCH | RHEL 8 must resolve audit information before writing to disk."
