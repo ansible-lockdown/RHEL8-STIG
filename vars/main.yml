@@ -43,3 +43,7 @@ rhel8stig_re_qp_key_end: (?:" *)
 
 # insert the parameter at the beginning or append to the end, default append
 rhel8stig_re_qp_insert: "{{ insert | default(not (append | default(true))) }}"
+
+# RHEL-08-040342
+# Expected Values for FIPS KEX algorithims
+FIPS_KEX_ALGO: '-oKexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512'
