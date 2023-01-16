@@ -601,7 +601,7 @@ rhel8stig_aide_cron:
     special_time: daily
     # Disable the notification check rule to disable mailing notifications
     notify_by_mail: true
-    notify_cmd: ' | /bin/mail -s "$(hostname) - AIDE Integrity Check" root@localhost'
+    notify_cmd: ' | /var/spool/mail -s "$(hostname) - AIDE Integrity Check" root@localhost'
 
 rhel8stig_cron_special_disable: "{{
         rhel8stig_workaround_for_disa_benchmark or
