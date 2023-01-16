@@ -513,7 +513,7 @@ rhel8stig_ssh_pub_key_perm: 0644
 # RHEL-08-010490
 # rhel8stig_ssh_priv_key_perm are the permssions set to the SSH private host keys
 # To conform to STIG standards this needs to be set to 0600 or less permissive
-rhel8stig_ssh_priv_key_perm: 0600
+rhel8stig_ssh_priv_key_perm: 0640
 
 # RHEL-08-010690
 # Set standard user paths here
