@@ -1618,24 +1618,6 @@
       - V-230288
       - ssh
 
-- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '(?i)^#?Compression'
-      line: 'Compression {{ rhel8stig_sshd_compression }}'
-  notify: restart sshd
-  when:
-      - rhel_08_010510
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010510
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230289r858703_rule
-      - V-230289
-      - ssh
-
 - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
   lineinfile:
       path: /etc/ssh/sshd_config
