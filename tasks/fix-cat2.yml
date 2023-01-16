@@ -3251,12 +3251,15 @@
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
             path: /etc/tmux.conf
-            regexp: '^set -g lock-command'
-            line: "set -g lock-command vlock"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
             create: true
             owner: root
             group: root
             mode: 0644
+        loop:
+            - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
+            - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
   when:
       - rhel_08_020040
   tags:
