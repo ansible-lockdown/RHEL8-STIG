@@ -1080,18 +1080,31 @@
       - permissions
 
 - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions."
-  package:
-      name: aide
-      state: present
+  block:
+      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
+        package:
+            name: aide
+            state: present
+        when:
+            - "'aide' not in ansible_facts.packages"
+
+      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | check DB"
+        stat:
+          path: /var/lib/aide/aide.db.gz
+        register: aide_db_initiated
+
+      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | initiate DB"
+        shell: /usr/sbin/aide --init
+        when: not aide_db_initiated.stat.exists
+
   when:
       - rhel_08_010359
-      - "'aide' not in ansible_facts.packages"
   tags:
       - RHEL-08-010359
       - CAT2
       - CCI-002696
       - SRG-OS-000445-GPOS-00199
-      - SV-251710r809354_rule
+      - SV-251710r880730_rule
       - V-251710
       - aide
 
