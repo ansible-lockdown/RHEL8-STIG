@@ -7332,7 +7332,7 @@
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms."
   lineinfile:
       path: /etc/crypto-policies/back-ends/opensshserver.config
-      regexp: ^CRYPTO_POLICY={{ FIPS_KEX_ALGO }}
+      regexp: "^CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
       line: "CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
   when:
       - rhel_08_040342
