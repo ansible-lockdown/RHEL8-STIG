@@ -1079,39 +1079,12 @@
       - V-251709
       - permissions
 
-- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions."
-  block:
-      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
-        package:
-            name: aide
-            state: present
-        when:
-            - "'aide' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | check DB"
-        stat:
-            path: /var/lib/aide/aide.db.gz
-        register: aide_db_initiated
-
-      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | initiate DB"
-        shell: /usr/sbin/aide --init
-        args:
-            creates: /var/lib/aide/aide.db.new.gz
-        when: not aide_db_initiated.stat.exists
-
-      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | copy DB"
-        copy: 
-          src: /var/lib/aide/aide.db.new.gz
-          dest: /var/lib/aide/aide.db.gz
-          remote_src: true
-        when: not aide_db_initiated.stat.exists
-
-      - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | remove new db copy"
-        file:
-            path: /var/lib/aide/aide.db.new.gz
-            state: absent
-
+- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
+  package:
+      name: aide
+      state: present
   when:
+      - "'aide' not in ansible_facts.packages"
       - rhel_08_010359
   tags:
       - RHEL-08-010359
