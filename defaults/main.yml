@@ -892,7 +892,7 @@ audit_bin: "{{ audit_bin_path }}goss"
 audit_format: json
 
 # if get_goss_file == download change accordingly
-goss_url: "https://github.com/aelsabbahy/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
+goss_url: "https://github.com/goss-org/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
 
 ## if get_goss_file - copy the following needs to be updated for your environment
 ## it is expected that it will be copied from somewhere accessible to the control node
