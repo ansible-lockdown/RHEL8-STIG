@@ -2154,7 +2154,7 @@
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   block:
       - name: "MEDIUM | RHEL-08-010671 | AUDIT | RHEL 8 must disable the kernel.core_pattern."
-        shell: grep -rs 'kernel.core_pattern =.*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        shell: grep -rs 'kernel.core_pattern\s+=\s*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
         changed_when: false
         failed_when: false
         register: rhel_08_010671_conflicting_settings
