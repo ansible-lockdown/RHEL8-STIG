@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: '1.9'
+benchmark_version: 'v1r9'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -912,7 +912,7 @@ copy_goss_from_path: /some/accessible/path
 ## managed by the control audit_content
 # git
 audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
-audit_git_version: benchmark_v1r8_rh8
+audit_git_version: "benchmark_{{ benchmark_version }}_rh8"
 
 # copy:
 audit_local_copy: "some path to copy from"
