@@ -6357,7 +6357,9 @@
         notify:
             - generate fapolicyd rules
             - restart fapolicyd
-        when: ansible_distribution_version is version('8.4', '>=')
+        when:
+            - ansible_distribution_version is version('8.4', '>=')
+            - rhel_08_040137_rules_dir.stat.isdir
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on older than 8.4"
         lineinfile:
