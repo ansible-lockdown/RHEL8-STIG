@@ -1,6 +1,6 @@
 # Changes to RHEL8STIG
 
-## Release 2.7.0
+## Release 2.8.0
 
 - updates to workflow
   - ami
