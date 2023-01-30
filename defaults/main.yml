@@ -477,6 +477,15 @@ rhel8stig_smartcard: false
 # Configure your smartcard driver
 rhel8stig_smartcarddriver: cackey
 
+#Whether or not system uses remote automounted home directories via autofs
+rhel8stig_autofs_remote_home_dirs: false
+
+#The local mount point used by autofs to mount remote home directory to.  This location will be excluded during getent user enumeration
+rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
+  
+#The shell command to gather local interactive user directories
+local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  
 # IPv6 required
 rhel8stig_ipv6_required: true
 
