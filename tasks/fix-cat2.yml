@@ -7347,7 +7347,6 @@
       - SV-255924r880733_rule
       - ssh
 
-
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   lineinfile:
       path: /etc/xinetd.d/tftp
