@@ -1,5 +1,5 @@
-#Ami Rocky 87 - US_east 2
-ami_id        = "ami-0cdd387cfee91b0cf"
+#Ami Rocky 86 - US_east 1
+ami_id        = "ami-04211a47a54ddc806"
 ami_os        = "rocky8"
 ami_username  = "rocky"
 ami_user_home = "/home/rocky"
