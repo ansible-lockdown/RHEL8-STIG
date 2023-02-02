@@ -287,7 +287,7 @@
       - CAT2
       - CCI-000196
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r809273_rule
+      - SV-230233r880705_rule
       - V-230233
       - pamd
 
@@ -1079,19 +1079,19 @@
       - V-251709
       - permissions
 
-- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions."
+- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
   package:
       name: aide
       state: present
   when:
-      - rhel_08_010359
       - "'aide' not in ansible_facts.packages"
+      - rhel_08_010359
   tags:
       - RHEL-08-010359
       - CAT2
       - CCI-002696
       - SRG-OS-000445-GPOS-00199
-      - SV-251710r809354_rule
+      - SV-251710r880730_rule
       - V-251710
       - aide
 
@@ -1125,7 +1125,7 @@
       - CAT2
       - CCI-001744
       - SRG-OS-000363-GPOS-00150
-      - SV-230263r858725_rule
+      - SV-230263r880708_rule
       - V-230263
       - aide
       - cron
@@ -1553,9 +1553,9 @@
       - V-230286
       - ssh
 
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
-      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
         find:
             paths: /etc/ssh
             recurse: true
@@ -1566,7 +1566,7 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
             mode: "{{ rhel8stig_ssh_priv_key_perm }}"
@@ -1583,7 +1583,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230287r743951_rule
+      - SV-230287r880714_rule
       - V-230287
       - ssh
 
@@ -1603,24 +1603,6 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230288r858701_rule
       - V-230288
-      - ssh
-
-- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '(?i)^#?Compression'
-      line: 'Compression {{ rhel8stig_sshd_compression }}'
-  notify: restart sshd
-  when:
-      - rhel_08_010510
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010510
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230289r858703_rule
-      - V-230289
       - ssh
 
 - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
@@ -2172,7 +2154,7 @@
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   block:
       - name: "MEDIUM | RHEL-08-010671 | AUDIT | RHEL 8 must disable the kernel.core_pattern."
-        shell: grep -rs 'kernel.core_pattern =.*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        shell: grep -rs 'kernel.core_pattern\s+=\s*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
         changed_when: false
         failed_when: false
         register: rhel_08_010671_conflicting_settings
@@ -2547,7 +2529,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230322r743963_rule
+      - SV-230322r880717_rule
       - V-230322
       - permissions
 
@@ -3256,12 +3238,15 @@
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
             path: /etc/tmux.conf
-            regexp: '^set -g lock-command'
-            line: "set -g lock-command vlock"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
             create: true
             owner: root
             group: root
             mode: 0644
+        loop:
+            - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
+            - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
   when:
       - rhel_08_020040
   tags:
@@ -3269,7 +3254,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230348r743987_rule
+      - SV-230348r880720_rule
       - V-230348
       - tmux
 
@@ -3291,7 +3276,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r833388_rule
+      - SV-230349r880737_rule
       - V-230349
       - tmux
 
@@ -5497,7 +5482,7 @@
       - CAT2
       - CCI-001496
       - SRG-OS-000278-GPOS-00108
-      - SV-230475r833333_rule
+      - SV-230475r880722_rule
       - V-230475
       - aide
 
@@ -5988,12 +5973,12 @@
               shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
               changed_when: false
               failed_when: false
-              register: rhel8stig-target_drop_set
+              register: rhel8stig_target_drop_set
 
             - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
               shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
               when:
-                  - rhel8stig-target_drop_set.rc != 0
+                  - rhel8stig_target_drop_set.rc != 0
         when: ansible_version.full is version_compare('2.10 | int', '<')
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
@@ -6372,7 +6357,9 @@
         notify:
             - generate fapolicyd rules
             - restart fapolicyd
-        when: ansible_distribution_version is version('8.4', '>=')
+        when:
+            - ansible_distribution_version is version('8.4', '>=')
+            - rhel_08_040137_rules_dir.stat.isdir
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on older than 8.4"
         lineinfile:
@@ -7342,6 +7329,22 @@
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
       - SV-230556r858723_rule
+      - ssh
+
+- name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms."
+  lineinfile:
+      path: /etc/crypto-policies/back-ends/opensshserver.config
+      regexp: "^CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
+      line: "CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
+  when:
+      - rhel_08_040342
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-040342
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-255924r880733_rule
       - ssh
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."

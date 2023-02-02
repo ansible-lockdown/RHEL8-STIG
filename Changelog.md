@@ -1,12 +1,30 @@
 # Changes to RHEL8STIG
 
+## Release 2.8.0
+
+- updates to workflow
+  - ami
+  - update to actions to latest versions
+  - update_galaxy workflow added
+- README alignment
+- ansible.cfg added showing how tested
+- audit template updated
+- moved warnihg statements arounf for reboot
+
+- RULEID reference updated
+- 010510 rule no longer required
+- 010671 improvement
+- 020040 loop added
+- 040090 - var typo fixed
+- 040342 new control for FIP_KEX Algorithms
+  - new FIPS_KEX_ALGO variable
+
 ## Release 2.7.0
 - lint updates
 - Benchmark 1.8 Updates
   - New RULEID for the following, plus additional notes if needed
     - CAT1
       - RHEL-08-010000 
-      - 
     - CAT2
       - RHEL-08-010040
       - RHEL-08-010090

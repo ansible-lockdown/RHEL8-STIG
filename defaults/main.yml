@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: '1.7'
+benchmark_version: 'v1r9'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -178,7 +178,6 @@ rhel_08_010450: true
 rhel_08_010480: true
 rhel_08_010490: true
 rhel_08_010500: true
-rhel_08_010510: true
 rhel_08_010520: true
 rhel_08_010521: true
 rhel_08_010522: true
@@ -426,6 +425,7 @@ rhel_08_040321: true
 rhel_08_040330: true
 rhel_08_040340: true
 rhel_08_040341: true
+rhel_08_040342: true
 rhel_08_040350: true
 rhel_08_040370: true
 rhel_08_040380: true
@@ -554,10 +554,10 @@ rhel8stig_local_int_perm: 0740
 # These are the minimum supported releases.
 # (Red Hat has support for older versions if you pay extra for it.)
 rhel8stig_min_supported_os_ver:
-    RedHat: "8.4"
-    CentOS: "8.4"
-    Rocky: "8.4"
-    AlmaLinux: "8.4"
+    RedHat: "8.7"
+    CentOS: "8.7"
+    Rocky: "8.7"
+    AlmaLinux: "8.7"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -601,7 +601,7 @@ rhel8stig_aide_cron:
     special_time: daily
     # Disable the notification check rule to disable mailing notifications
     notify_by_mail: true
-    notify_cmd: ' | /bin/mail -s "$(hostname) - AIDE Integrity Check" root@localhost'
+    notify_cmd: ' | /var/spool/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
 
 rhel8stig_cron_special_disable: "{{
         rhel8stig_workaround_for_disa_benchmark or
@@ -875,6 +875,7 @@ rhel8stig_tmux_lock_after_time: 900
 # Value must be greater than 0 to conform to STIG standards
 rhel8stig_sudo_timestamp_timeout: 1
 
+
 #### Goss Configuration Settings ####
 # Set correct env for the run_audit.sh script from https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
 audit_run_script_environment:
@@ -884,14 +885,14 @@ audit_run_script_environment:
 
 ### Goss binary settings ###
 goss_version:
-    release: v0.3.16
-    checksum: 'sha256:827e354b48f93bce933f5efcd1f00dc82569c42a179cf2d384b040d8a80bfbfb'
+    release: v0.3.21
+    checksum: 'sha256:9a9200779603acf0353d2c0e85ae46e083596c10838eaf4ee050c924678e4fe3'
 audit_bin_path: /usr/local/bin/
 audit_bin: "{{ audit_bin_path }}goss"
 audit_format: json
 
 # if get_goss_file == download change accordingly
-goss_url: "https://github.com/aelsabbahy/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
+goss_url: "https://github.com/goss-org/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
 
 ## if get_goss_file - copy the following needs to be updated for your environment
 ## it is expected that it will be copied from somewhere accessible to the control node
@@ -902,7 +903,7 @@ copy_goss_from_path: /some/accessible/path
 ## managed by the control audit_content
 # git
 audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
-audit_git_version: benchmark_v1r8_rh8
+audit_git_version: "benchmark_{{ benchmark_version }}_rh8"
 
 # copy:
 audit_local_copy: "some path to copy from"
