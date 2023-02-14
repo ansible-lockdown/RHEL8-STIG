@@ -4219,9 +4219,6 @@
       regexp: '(?i)^(#PrintLastLog yes?|^#?.rintLastLog no)'
       line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
-      owner: root
-      group: root
-      mode: 0644
   notify: restart sshd
   when:
       - rhel_08_020350
@@ -7298,10 +7295,6 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding no'
-      create: true
-      owner: root
-      group: root
-      mode: 0640
   notify: restart sshd
   when:
       - rhel_08_040340
