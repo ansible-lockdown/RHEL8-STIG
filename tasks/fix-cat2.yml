@@ -851,10 +851,6 @@
       regexp: '^(.*)\+VERS-ALL:'
       line: '\1{{ rhel8stig_gnutls_encryption }}'
       backrefs: true
-      create: true
-      owner: root
-      group: root
-      mode: 0640
   notify: change_requires_reboot
   when:
       - rhel_08_010295
