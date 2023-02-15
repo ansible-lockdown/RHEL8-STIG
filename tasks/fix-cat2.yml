@@ -1306,8 +1306,8 @@
       - { regexp: 'ocsp_dgst=sha1', state: present, line: 'certificate_verification = ocsp_dgst=sha1' }
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_010400
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-010400
       - CAT2
@@ -3453,8 +3453,8 @@
       - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020090
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020090
       - CAT2
@@ -4044,8 +4044,8 @@
         notify: restart sssd
         when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020250
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020250
       - CAT2
@@ -4125,8 +4125,8 @@
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020290
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020290
       - CAT2
