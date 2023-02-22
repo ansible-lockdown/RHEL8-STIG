@@ -772,7 +772,7 @@
     "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
   lineinfile:
       path: /etc/crypto-policies/back-ends/opensshserver.config
-      regexp: '^CRYPTO_POLICY='
+      regexp: "^CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'"
       line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
   notify: change_requires_reboot
   when:
@@ -7323,8 +7323,8 @@
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms."
   lineinfile:
       path: /etc/crypto-policies/back-ends/opensshserver.config
-      regexp: "^CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
-      line: "CRYPTO_POLICY={{ FIPS_KEX_ALGO }}"
+      regexp: "^CRYPTO_POLICY='{{ FIPS_KEX_ALGO }}'"
+      line: "CRYPTO_POLICY='{{ FIPS_KEX_ALGO }}'"
   when:
       - rhel_08_040342
       - rhel8stig_ssh_required
