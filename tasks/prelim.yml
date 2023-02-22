@@ -140,7 +140,7 @@
   args:
       warn: false
   register: rhel_08_010690_getent
-  changed_when: rhel_08_010690_getent.stdout_lines is defined
+  changed_when: false
   failed_when: false
   tags:
       - RHEL-08-010690
