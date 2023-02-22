@@ -4389,9 +4389,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^disk_full_action ='
       line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
-      owner: root
-      group: root
-      mode: 0644
   when:
       - rhel_08_030060
   tags:
@@ -4408,9 +4405,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^local_events ='
       line: "local_events = yes"
-      owner: root
-      group: root
-      mode: 0644
   when:
       - rhel_08_030061
   tags:
@@ -4444,7 +4438,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^log_group ='
       line: "log_group = root"
-      mode: 0600
   when:
       - rhel_08_030070
   tags:
