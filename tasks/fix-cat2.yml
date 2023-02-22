@@ -5670,10 +5670,9 @@
       - chrony
 
 - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
-  shell: dnf remove abrt*
-  failed_when: false
-  args:
-      warn: false
+  package:
+    name: "abrt*"
+    state: absent
   when:
       - rhel_08_040001
   tags:
