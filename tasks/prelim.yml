@@ -321,6 +321,12 @@
         rhel_08_020090 or
         rhel_08_020250 or
         rhel_08_020290
+  tags:
+      - RHEL-08-010400
+      - RHEL-08-020250
+      - RHEL-08-020090
+      - RHEL-08-020290
+      - pamd
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
