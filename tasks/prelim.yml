@@ -133,8 +133,6 @@
     - RHEL-08-010690
     - complexity-high    
 
-## NOTE: You will need to adjust the UID range in parenthases below.
-## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   shell: "{{ local_interactive_user_dir_command }}" 
   register: rhel_08_010690_getent

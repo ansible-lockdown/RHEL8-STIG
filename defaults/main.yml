@@ -484,6 +484,8 @@ rhel8stig_autofs_remote_home_dirs: false
 rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
   
 #The default shell command to gather local interactive user directories
+## NOTE: You will need to adjust the UID range in parenthases below.
+## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 local_interactive_user_dir_command: "getent passwd {% raw %}{{% endraw %}{{ rhel8stig_int_gid }}..24339{% raw %}}{% endraw %} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'" 
   
 # IPv6 required
