@@ -482,7 +482,7 @@ rhel8stig_autofs_remote_home_dirs: false
 
 #The local mount point used by autofs to mount remote home directory to.  This location will be excluded during getent user enumeration, if rhel8stig_autofs_remote_home_dirs is true
 rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
-    
+
 #The default shell command to gather local interactive user directories
 ## NOTE: You will need to adjust the UID range in parenthesis below.
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
