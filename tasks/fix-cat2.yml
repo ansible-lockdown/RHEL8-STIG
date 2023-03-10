@@ -776,9 +776,6 @@
       changed_when: false
       register: rhel8stig_current_macs
 
-    - debug:
-        var: rhel8stig_current_macs
-
     - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
       ansible.builtin.lineinfile:
         path: /etc/crypto-policies/back-ends/opensshserver.config
@@ -804,9 +801,6 @@
       ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
       changed_when: false
       register: rhel8stig_current_ciphers
-
-    - debug:
-        var: rhel8stig_current_ciphers
 
     - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
       ansible.builtin.lineinfile:
@@ -7370,9 +7364,6 @@
       ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
       changed_when: false
       register: rhel8stig_current_kex
-
-    - debug:
-        var: rhel8stig_current_kex
 
     - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
       ansible.builtin.lineinfile:
