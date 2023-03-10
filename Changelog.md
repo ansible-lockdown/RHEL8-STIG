@@ -3,6 +3,7 @@
 ## Release 2.8.1
 
 - updates to pamd logic thanks to @JacobBuskirk for highlighting
+- improvements to openssh configs and seperated tasks
 
  Also following issues/PRs
 
