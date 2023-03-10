@@ -793,7 +793,6 @@
       - SV-230251r743937_rule
       - V-230251
       - fips
-      - bolly
 
 - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Add Ciphers"
   block:
@@ -819,7 +818,6 @@
       - SV-230252r877394_rule
       - V-230252
       - fips
-      - bolly
 
 - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
   block:
@@ -7382,7 +7380,6 @@
       - SRG-OS-000250-GPOS-00093
       - SV-255924r880733_rule
       - fips
-      - bolly
 
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms."
   lineinfile:
