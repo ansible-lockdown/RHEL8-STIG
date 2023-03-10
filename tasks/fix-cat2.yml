@@ -7381,22 +7381,6 @@
       - SV-255924r880733_rule
       - fips
 
-- name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms."
-  lineinfile:
-      path: /etc/crypto-policies/back-ends/opensshserver.config
-      regexp: "^CRYPTO_POLICY='{{ FIPS_KEX_ALGO }}'"
-      line: "CRYPTO_POLICY='{{ FIPS_KEX_ALGO }}'"
-  when:
-      - rhel_08_040342
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-040342
-      - CAT2
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-255924r880733_rule
-      - ssh
-
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   lineinfile:
       path: /etc/xinetd.d/tftp
