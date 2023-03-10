@@ -1,9 +1,12 @@
 # Changes to RHEL8STIG
 
-## Release 2.8.1
+## Relase 2.8.3
+
+- improvements to openssh configs and seperated tasks
+
+## Release 2.8.2
 
 - updates to pamd logic thanks to @JacobBuskirk for highlighting
-- improvements to openssh configs and seperated tasks
 
  Also following issues/PRs
 
