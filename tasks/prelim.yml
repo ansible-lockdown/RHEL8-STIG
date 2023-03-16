@@ -116,7 +116,7 @@
       - RHEL-08-010750
       - RHEL-08-020320
 
-- name: "PRELIM | RHEL-08-010690 Ensure user enumeration command is modified when autofs remote home directories are used"
+- name: "PRELIM | RHEL-08-010690 Ensure user enumeration command is modified when autofs remote home directories are in use"
   block:
       - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
         assert:
