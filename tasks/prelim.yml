@@ -116,11 +116,26 @@
       - RHEL-08-010750
       - RHEL-08-020320
 
-## NOTE: You will need to adjust the UID range in parenthases below.
-## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
+- name: "PRELIM | RHEL-08-010690 Ensure user enumeration command is modified when autofs remote home directories are in use"
+  block:
+      - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
+        assert:
+          that:
+              - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
+              - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
+
+      - name: Modify local_interactive_user_dir_command to exclude remote automounted home directories
+        set_fact:
+            local_interactive_user_dir_command: "{{ local_interactive_user_dir_command }} | grep -v '{{ rhel8stig_auto_mount_home_dirs_local_mount_point }}"
+
+  when:
+    - rhel8stig_autofs_remote_home_dirs
+  tags:
+    - RHEL-08-010690
+    - complexity-high
+
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
-  # shell: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
-  shell: "getent passwd {% raw %}{{% endraw %}{{ rhel8stig_int_gid }}..24339{% raw %}}{% endraw %} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+  shell: "{{ local_interactive_user_dir_command }}"
   register: rhel_08_010690_getent
   changed_when: false
   failed_when: false
