@@ -1,6 +1,6 @@
 
 ## metadata for Audit benchmark
-benchmark_version: '1.8'
+benchmark_version: '1.9'
 
 rhel8stig_os_distribution: {{ ansible_distribution | lower }}
 
@@ -138,7 +138,6 @@ RHEL_08_010472: {{ rhel_08_010472 }}
 RHEL_08_010480: {{ rhel_08_010480 }}
 RHEL_08_010490: {{ rhel_08_010490 }}
 RHEL_08_010500: {{ rhel_08_010500 }}
-RHEL_08_010510: {{ rhel_08_010510 }}
 RHEL_08_010520: {{ rhel_08_010520 }}
 RHEL_08_010521: {{ rhel_08_010521 }}
 RHEL_08_010522: {{ rhel_08_010522 }}
@@ -385,6 +384,7 @@ RHEL_08_040321: {{ rhel_08_040321 }}
 RHEL_08_040330: {{ rhel_08_040330 }}
 RHEL_08_040340: {{ rhel_08_040340 }}
 RHEL_08_040341: {{ rhel_08_040341 }}
+RHEL_08_040342: {{ rhel_08_040342 }}
 RHEL_08_040350: {{ rhel_08_040350 }}
 RHEL_08_040370: {{ rhel_08_040370 }}
 RHEL_08_040380: {{ rhel_08_040380 }}
@@ -434,7 +434,7 @@ MAX_UID: {{ rhel8stig_interactive_uid_stop }}
 rhel8stig_banner_file: /etc/issue
 rhel8stig_logon_banner:
 - You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
-- By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+- By using this IS (which includes any device attached to this IS), you consent to the following conditions
 - -The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
 - -At any time, the USG may inspect and seize data stored on this IS.
 - -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.

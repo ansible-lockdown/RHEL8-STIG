@@ -287,7 +287,7 @@
       - CAT2
       - CCI-000196
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r809273_rule
+      - SV-230233r880705_rule
       - V-230233
       - pamd
 
@@ -558,28 +558,29 @@
       - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"
         lineinfile:
             path: /etc/pam.d/system-auth
-            regexp: '^auth.*required.*pam_faillock.so preauth'
-            line: "auth        required                                     pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth\s+required\s+pam_env.so'
         notify: restart sssd
 
       - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set authfail"
         lineinfile:
             path: /etc/pam.d/system-auth
-            regexp: '^auth.*required.*pam_faillock.so authfail'
-            line: 'auth        required                                     pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
 
       - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set account faillock"
         lineinfile:
             path: /etc/pam.d/system-auth
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
   when:
       - rhel_08_020025
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020025
       - CAT2
@@ -594,15 +595,15 @@
       - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"
         lineinfile:
             path: /etc/pam.d/password-auth
-            regexp: '^auth       required pam_faillock.so preauth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
             line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
+            insertafter: '^auth\s+required\s+pam_env.so'
         notify: restart sssd
 
       - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set authfail"
         lineinfile:
             path: /etc/pam.d/password-auth
-            regexp: '^auth       required pam_faillock.so authfail'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
             line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
@@ -610,12 +611,13 @@
       - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set account faillock"
         lineinfile:
             path: /etc/pam.d/password-auth
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
   when:
       - rhel_08_020026
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020026
       - CAT2
@@ -767,26 +769,53 @@
       - V-244526
       - ssh
 
-- name: |
-    "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add ssh ciphers"
-    "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH connections. | Add ssh ciphers"
-  lineinfile:
-      path: /etc/crypto-policies/back-ends/opensshserver.config
-      regexp: '^CRYPTO_POLICY='
-      line: CRYPTO_POLICY='{{ rhel8stig_ssh_server_crypto_settings }}'
+- name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
+  block:
+    - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
+      ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
+      changed_when: false
+      register: rhel8stig_current_macs
+
+    - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
+      ansible.builtin.lineinfile:
+        path: /etc/crypto-policies/back-ends/opensshserver.config
+        regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_macs.stdout }}(.*$)'
+        line: '\g<1>-o{{ rhel8stig_ssh_macs }}\g<2>'
+        backrefs: true
   notify: change_requires_reboot
   when:
-      - rhel_08_010290 or
-        rhel_08_010291
+      - rhel_08_010290
   tags:
       - CAT2
       - RHEL-08-010290
-      - RHEL-08-010291
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
       - SV-230251r743937_rule
-      - SV-230252r743940_rule
       - V-230251
+      - fips
+
+- name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Add Ciphers"
+  block:
+    - name: "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
+      ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
+      changed_when: false
+      register: rhel8stig_current_ciphers
+
+    - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
+      ansible.builtin.lineinfile:
+        path: /etc/crypto-policies/back-ends/opensshserver.config
+        regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
+        line: '\g<1>-o{{ rhel8stig_ssh_ciphers }}\g<2>'
+        backrefs: true
+  notify: change_requires_reboot
+  when:
+      - rhel_08_010291
+  tags:
+      - CAT2
+      - RHEL-08-010291
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230252r877394_rule
       - V-230252
       - fips
 
@@ -851,10 +880,6 @@
       regexp: '^(.*)\+VERS-ALL:'
       line: '\1{{ rhel8stig_gnutls_encryption }}'
       backrefs: true
-      create: true
-      owner: root
-      group: root
-      mode: 0640
   notify: change_requires_reboot
   when:
       - rhel_08_010295
@@ -1079,19 +1104,19 @@
       - V-251709
       - permissions
 
-- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions."
+- name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
   package:
       name: aide
       state: present
   when:
-      - rhel_08_010359
       - "'aide' not in ansible_facts.packages"
+      - rhel_08_010359
   tags:
       - RHEL-08-010359
       - CAT2
       - CCI-002696
       - SRG-OS-000445-GPOS-00199
-      - SV-251710r809354_rule
+      - SV-251710r880730_rule
       - V-251710
       - aide
 
@@ -1125,7 +1150,7 @@
       - CAT2
       - CCI-001744
       - SRG-OS-000363-GPOS-00150
-      - SV-230263r858725_rule
+      - SV-230263r880708_rule
       - V-230263
       - aide
       - cron
@@ -1310,8 +1335,8 @@
       - { regexp: 'ocsp_dgst=sha1', state: present, line: 'certificate_verification = ocsp_dgst=sha1' }
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_010400
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-010400
       - CAT2
@@ -1553,9 +1578,9 @@
       - V-230286
       - ssh
 
-- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive."
+- name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
-      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Find files"
+      - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
         find:
             paths: /etc/ssh
             recurse: true
@@ -1566,7 +1591,7 @@
         failed_when: false
         register: rhel_08_010490_private_host_key_files
 
-      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0600 or less permissive. | Set permissions"
+      - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
         file:
             path: "{{ item.path }}"
             mode: "{{ rhel8stig_ssh_priv_key_perm }}"
@@ -1583,7 +1608,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230287r743951_rule
+      - SV-230287r880714_rule
       - V-230287
       - ssh
 
@@ -1603,24 +1628,6 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230288r858701_rule
       - V-230288
-      - ssh
-
-- name: "MEDIUM | RHEL-08-010510 | PATCH | The RHEL 8 SSH daemon must not allow compression or must only allow compression after successful authentication."
-  lineinfile:
-      path: /etc/ssh/sshd_config
-      regexp: '(?i)^#?Compression'
-      line: 'Compression {{ rhel8stig_sshd_compression }}'
-  notify: restart sshd
-  when:
-      - rhel_08_010510
-      - rhel8stig_ssh_required
-  tags:
-      - RHEL-08-010510
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230289r858703_rule
-      - V-230289
       - ssh
 
 - name: "MEDIUM | RHEL-08-010520 | PATCH | The RHEL 8 SSH daemon must not allow authentication using known host’s authentication."
@@ -2172,7 +2179,7 @@
 - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
   block:
       - name: "MEDIUM | RHEL-08-010671 | AUDIT | RHEL 8 must disable the kernel.core_pattern."
-        shell: grep -rs 'kernel.core_pattern =.*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        shell: grep -rs 'kernel.core_pattern\s+=\s*[?<!\|\/bin\/false]$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
         changed_when: false
         failed_when: false
         register: rhel_08_010671_conflicting_settings
@@ -2547,7 +2554,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230322r743963_rule
+      - SV-230322r880717_rule
       - V-230322
       - permissions
 
@@ -2744,7 +2751,7 @@
       - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
             line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
@@ -2755,7 +2762,7 @@
       - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
             line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
@@ -2766,7 +2773,7 @@
       - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
             insertafter: '^account'
         notify: restart sssd
@@ -2775,6 +2782,7 @@
             - password-auth
   when:
       - rhel_08_020010
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020010
       - CAT2
@@ -2791,6 +2799,7 @@
       line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
   when:
       - rhel_08_020011
+      - ansible_distribution_version|int >= 8.2
   tags:
       - RHEL-08-020011
       - CAT2
@@ -2805,7 +2814,7 @@
       - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
             line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
@@ -2816,7 +2825,7 @@
       - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
             line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
@@ -2827,7 +2836,7 @@
       - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
             insertafter: '^account'
         notify: restart sssd
@@ -2836,6 +2845,7 @@
             - password-auth
   when:
       - rhel_08_020012
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020012
       - CAT2
@@ -2852,6 +2862,7 @@
       line: "fail_interval = {{ rhel8stig_pam_faillock.interval }}"
   when:
       - rhel_08_020013
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020013
       - CAT2
@@ -2866,9 +2877,9 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth\s+required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth       required pam_env.so'
         notify: restart sssd
         with_items:
             - system-auth
@@ -2877,8 +2888,8 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth\s+required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2888,15 +2899,16 @@
       - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account\s+required pam_faillock.so'
+            regexp: '^account\s+requireds+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
         with_items:
             - system-auth
             - password-auth
   when:
       - rhel_08_020014
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020014
       - CAT2
@@ -2913,6 +2925,7 @@
       line: "unlock_time = {{ rhel8stig_pam_faillock.unlock_time }}"
   when:
       - rhel_08_020015
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020015
       - CAT2
@@ -2928,7 +2941,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2939,7 +2952,7 @@
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
             regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -2958,6 +2971,7 @@
             - password-auth
   when:
       - rhel_08_020016
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020016
       - CAT2
@@ -2974,6 +2988,7 @@
       line: "dir = {{ rhel8stig_pam_faillock.dir }}"
   when:
       - rhel_08_020017
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020017
       - CAT2
@@ -2988,9 +3003,9 @@
       - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur.| Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth       required pam_env.so'
         notify: restart sssd
         with_items:
             - system-auth
@@ -2999,8 +3014,8 @@
       - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -3010,15 +3025,16 @@
       - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
         with_items:
             - system-auth
             - password-auth
   when:
       - rhel_08_020018
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020018
       - CAT2
@@ -3035,6 +3051,7 @@
       line: "silent"
   when:
       - rhel_08_020019
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020019
       - CAT2
@@ -3046,12 +3063,12 @@
 
 - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   block:
-      - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"
+      - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth       required pam_env.so'
         notify: restart sssd
         with_items:
             - system-auth
@@ -3060,8 +3077,8 @@
       - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} nlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
         with_items:
@@ -3071,15 +3088,16 @@
       - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
         with_items:
             - system-auth
             - password-auth
   when:
       - rhel_08_020020
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020020
       - CAT2
@@ -3089,13 +3107,14 @@
       - V-230342
       - pamd
 
-- name: "MEDIUM | RHEL-08-020021| PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
+- name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   lineinfile:
       path: "/etc/security/faillock.conf"
       regexp: '^audit|^\# audit'
       line: "audit"
   when:
       - rhel_08_020021
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020021
       - CAT2
@@ -3110,9 +3129,9 @@
       - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so preauth'
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
             line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth'
+            insertafter: '^auth       required pam_env.so'
         notify: restart sssd
         with_items:
             - system-auth
@@ -3121,7 +3140,7 @@
       - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^auth       required pam_faillock.so authfail'
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
             line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
             insertafter: '^auth'
         notify: restart sssd
@@ -3132,15 +3151,16 @@
       - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
         lineinfile:
             path: "/etc/pam.d/{{ item }}"
-            regexp: '^account    required pam_faillock.so'
+            regexp: '^account\s+required\s+pam_faillock.so'
             line: 'account    required pam_faillock.so'
-            insertafter: '^account'
+            insertbefore: '^account'
         notify: restart sssd
         with_items:
             - system-auth
             - password-auth
   when:
       - rhel_08_020022
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020022
       - CAT2
@@ -3157,6 +3177,7 @@
       line: "even_deny_root"
   when:
       - rhel_08_020023
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020023
       - CAT2
@@ -3256,12 +3277,15 @@
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
         lineinfile:
             path: /etc/tmux.conf
-            regexp: '^set -g lock-command'
-            line: "set -g lock-command vlock"
+            regexp: "{{ item.regexp }}"
+            line: "{{ item.line }}"
             create: true
             owner: root
             group: root
             mode: 0644
+        loop:
+            - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
+            - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
   when:
       - rhel_08_020040
   tags:
@@ -3269,7 +3293,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230348r743987_rule
+      - SV-230348r880720_rule
       - V-230348
       - tmux
 
@@ -3291,7 +3315,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r833388_rule
+      - SV-230349r880737_rule
       - V-230349
       - tmux
 
@@ -3472,8 +3496,8 @@
       - { regexp: 'domains = {{ rhel8stig_sssd.domains }}', line: 'domains = {{ rhel8stig_sssd.domains }}' }
   notify: restart sssd
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020090
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020090
       - CAT2
@@ -3486,7 +3510,7 @@
 - name: "MEDIUM | RHEL-08-020100 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the password-auth file."
   lineinfile:
       path: /etc/pam.d/password-auth
-      regexp: '^password   required pam_pwquality.so'
+      regexp: '^password\s+required\s+pam_pwquality.so'
       line: 'password   required pam_pwquality.so'
       insertafter: '^password'
       owner: root
@@ -3506,7 +3530,7 @@
 - name: "MEDIUM | RHEL-08-020101 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the system-auth file."
   lineinfile:
       path: /etc/pam.d/system-auth
-      regexp: '^password   required pam_pwquality.so'
+      regexp: '^password\s+required\s+pam_pwquality.so'
       line: 'password   required pam_pwquality.so'
       insertafter: '^password'
       owner: root
@@ -3534,7 +3558,7 @@
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Set if no pw required pam_pwquality"
         lineinfile:
             path: /etc/pam.d/system-auth
-            line: 'ppassword   required pam_pwquality.so retry={{ rhel8stig_pam_pwquality_retry }}'
+            line: 'password   required pam_pwquality.so retry={{ rhel8stig_pam_pwquality_retry }}'
             insertafter: '^password'
             owner: root
             group: root
@@ -3552,7 +3576,7 @@
         when: rhel_08_020102_pwquality_status.stdout | length > 0
   when:
       - rhel_08_020102
-      - ansible_distribution_version <= "8.4"
+      - ansible_distribution_version is version('8.3', '<=')
   tags:
       - RHEL-08-020102
       - CAT2
@@ -3591,7 +3615,7 @@
         when: rhel_08_020103_pwquality_status.stdout | length > 0
   when:
       - rhel_08_020103
-      - ansible_distribution_version <= "8.4"
+      - ansible_distribution_version is version('8.3', '<=')
   tags:
       - RHEL-08-020103
       - CAT2
@@ -3608,7 +3632,7 @@
       line: retry = {{ rhel8stig_pam_pwquality_retry }}
   when:
       - rhel_08_020104
-      - ansible_distribution_version >= "8.4"
+      - ansible_distribution_version is version('8.4', '>=')
   tags:
       - RHEL-08-020104
       - CAT2
@@ -3861,7 +3885,7 @@
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pw_history"
         lineinfile:
             path: /etc/pam.d/password-auth
-            line: "password required pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
+            line: "password    required pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
             insertafter: '^password'
             owner: root
             group: root
@@ -3899,7 +3923,7 @@
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pwhistory"
         lineinfile:
             path: /etc/pam.d/system-auth
-            line: "password required pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
+            line: "password    required pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
             insertafter: '^password'
             owner: root
             group: root
@@ -4063,8 +4087,8 @@
         notify: restart sssd
         when: rhel_08_020250_system_auth_sss.stdout | length > 0
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020250
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020250
       - CAT2
@@ -4144,8 +4168,8 @@
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
   when:
-      - rhel8stig_sssd_conf_present.stat.exists
       - rhel_08_020290
+      - rhel8stig_sssd_conf_present.stat.exists
   tags:
       - RHEL-08-020290
       - CAT2
@@ -4234,9 +4258,6 @@
       regexp: '(?i)^(#PrintLastLog yes?|^#?.rintLastLog no)'
       line: 'PrintLastLog yes'
       validate: /usr/sbin/sshd -t -f %s
-      owner: root
-      group: root
-      mode: 0644
   notify: restart sshd
   when:
       - rhel_08_020350
@@ -4411,9 +4432,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^disk_full_action ='
       line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
-      owner: root
-      group: root
-      mode: 0644
   when:
       - rhel_08_030060
   tags:
@@ -4430,9 +4448,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^local_events ='
       line: "local_events = yes"
-      owner: root
-      group: root
-      mode: 0644
   when:
       - rhel_08_030061
   tags:
@@ -4466,7 +4481,6 @@
       path: /etc/audit/auditd.conf
       regexp: '^log_group ='
       line: "log_group = root"
-      mode: 0600
   when:
       - rhel_08_030070
   tags:
@@ -5497,7 +5511,7 @@
       - CAT2
       - CCI-001496
       - SRG-OS-000278-GPOS-00108
-      - SV-230475r833333_rule
+      - SV-230475r880722_rule
       - V-230475
       - aide
 
@@ -5692,10 +5706,9 @@
       - chrony
 
 - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
-  shell: dnf remove abrt*
-  failed_when: false
-  args:
-      warn: false
+  package:
+    name: "abrt*"
+    state: absent
   when:
       - rhel_08_040001
   tags:
@@ -5988,12 +6001,12 @@
               shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
               changed_when: false
               failed_when: false
-              register: rhel8stig-target_drop_set
+              register: rhel8stig_target_drop_set
 
             - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
               shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
               when:
-                  - rhel8stig-target_drop_set.rc != 0
+                  - rhel8stig_target_drop_set.rc != 0
         when: ansible_version.full is version_compare('2.10 | int', '<')
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
@@ -6363,7 +6376,7 @@
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on newer than 8.4"
         lineinfile:
-            path: "{{ '/etc/fapolicyd/rules.d/99-stig.rules' if rhel_08_040137_rules_dir.stat.exists else '/etc/fapolicyd/fapolicyd.rules' }}"
+            path: '/etc/fapolicyd/rules.d/99-stig.rules'
             line: "{{ item }}"
             create: true
         with_items:
@@ -6372,7 +6385,9 @@
         notify:
             - generate fapolicyd rules
             - restart fapolicyd
-        when: ansible_distribution_version is version('8.4', '>=')
+        when:
+            - ansible_distribution_version is version('8.4', '>=')
+            - rhel_08_040137_rules_dir.stat.isdir
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy whitelist on older than 8.4"
         lineinfile:
@@ -6385,7 +6400,7 @@
         notify:
             - generate fapolicyd rules
             - restart fapolicyd
-        when: ansible_distribution_version is version('8.4', '<=')
+        when: ansible_distribution_version is version('8.3', '<=')
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
         lineinfile:
@@ -7311,10 +7326,6 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding no'
-      create: true
-      owner: root
-      group: root
-      mode: 0640
   notify: restart sshd
   when:
       - rhel_08_040340
@@ -7343,6 +7354,32 @@
       - SRG-OS-000480-GPOS-00227
       - SV-230556r858723_rule
       - ssh
+
+
+- name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
+  block:
+    - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
+      ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
+      changed_when: false
+      register: rhel8stig_current_kex
+
+    - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
+      ansible.builtin.lineinfile:
+        path: /etc/crypto-policies/back-ends/opensshserver.config
+        regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
+        line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
+        backrefs: true
+  notify: change_requires_reboot
+  when:
+      - rhel_08_040342
+      - rhel8stig_ssh_required
+  tags:
+      - RHEL-08-040342
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-255924r880733_rule
+      - fips
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   lineinfile:
