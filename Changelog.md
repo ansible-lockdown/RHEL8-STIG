@@ -3,6 +3,7 @@
 ## Release 2.8.4
 
 - updated to ansible user check for passwd rule 010380
+  - thanks to discord community member PoundsOfFlesh
 - update readme layout and latest audit example
 - changed disruptive back to false to allow users to control the settings
 
