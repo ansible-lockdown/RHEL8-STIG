@@ -1,6 +1,12 @@
 # Changes to RHEL8STIG
 
-## Relase 2.8.3
+## Release 2.8.4
+
+- updated to ansible user check for passwd rule 010380
+- update readme layout and latest audit example
+- changed disruptive back to false to allow users to control the settings
+
+## Release 2.8.3
 
 - improvements to openssh configs and seperated tasks
 
