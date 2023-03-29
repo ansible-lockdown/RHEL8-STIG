@@ -2,6 +2,7 @@
 
 ## Release 2.8.4
 
+- ansible version updated to 2.10.1 minimum
 - updated to ansible user check for passwd rule 010380
   - thanks to discord community member PoundsOfFlesh
 - update readme layout and latest audit example
