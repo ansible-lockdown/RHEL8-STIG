@@ -69,7 +69,6 @@
       gather_subset: chroot,!all,!min
       filter: ansible_is_chroot
   when:
-      - ansible_version.string is version_compare('2.7', '>=')
       - ansible_is_chroot is not defined
   tags:
       - always
