@@ -2799,7 +2799,7 @@
       line: "deny = {{ rhel8stig_pam_faillock.attempts }}"
   when:
       - rhel_08_020011
-      - ansible_distribution_version|int >= 8.2
+      - ansible_distribution_version is version('8.2', '>=')
   tags:
       - RHEL-08-020011
       - CAT2
