@@ -119,19 +119,19 @@
   block:
       - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
         assert:
-          that:
-              - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
-              - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
+            that:
+                - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
+                - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
 
       - name: Modify local_interactive_user_dir_command to exclude remote automounted home directories
         set_fact:
             local_interactive_user_dir_command: "{{ local_interactive_user_dir_command }} | grep -v '{{ rhel8stig_auto_mount_home_dirs_local_mount_point }}"
 
   when:
-    - rhel8stig_autofs_remote_home_dirs
+      - rhel8stig_autofs_remote_home_dirs
   tags:
-    - RHEL-08-010690
-    - complexity-high
+      - RHEL-08-010690
+      - complexity-high
 
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   shell: "{{ local_interactive_user_dir_command }}"
