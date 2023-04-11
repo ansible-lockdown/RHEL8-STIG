@@ -91,7 +91,6 @@ rhel_08_030731: false
 rhel_08_030063: false
 # rhel_08_030602: false # Also grub
 
-
 # rsyslog
 rhel_08_010070: false
 rhel_08_010561: false

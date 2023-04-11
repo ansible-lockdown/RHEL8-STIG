@@ -1,4 +1,5 @@
 ---
+
 parseable: true
 quiet: true
 skip_list:
@@ -7,6 +8,7 @@ skip_list:
     - 'var-spacing'
     - 'fqcn-builtins'
     - 'experimental'
+    - 'name[play]'
     - 'name[casing]'
     - 'name[template]'
     - 'fqcn[action]'
