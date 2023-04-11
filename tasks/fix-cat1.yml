@@ -120,7 +120,7 @@
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
             - rhel8stig_boot_part not in ['/', ''] or
-              "'boot=' not in item"
+              'boot=' not in item
         changed_when:
             - ansible_check_mode
             - rhel_08_010020_audit is failed
