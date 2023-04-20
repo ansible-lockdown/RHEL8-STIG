@@ -1,5 +1,9 @@
 # Changes to RHEL8STIG
 
+## Release 2.8.5
+- updated to /var/log mount check
+- added commnets for /mnt and removeable media on Azure systems
+
 ## Release 2.8.4
 
 - ansible version updated to 2.10.1 minimum
