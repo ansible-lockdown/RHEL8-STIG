@@ -1908,6 +1908,9 @@
       - mounts
       - home
 
+## Note Azure is currently default mounting /mnt for cloud-init this will cause issues
+## refer to https://github.com/Azure/WALinuxAgent/issues/1971
+
 - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media."
   block:
       - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media. | Set nodev to /media"
@@ -6206,7 +6209,7 @@
             "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
             "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
             "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-        ansible.builtin.shell: mount | grep /var/log
+        ansible.builtin.shell: mount | grep -w "/var/log "
         changed_when: false
         failed_when: false
         register: rhel8stig_040126_var_log_status
