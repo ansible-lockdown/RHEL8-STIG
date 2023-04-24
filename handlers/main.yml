@@ -104,8 +104,6 @@
 
 - name: restart auditd
   ansible.builtin.shell: /usr/sbin/service auditd restart
-  args:
-      warn: false
   when:
       - not rhel8stig_skip_for_travis
       - not rhel8stig_system_is_chroot

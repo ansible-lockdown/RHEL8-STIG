@@ -248,8 +248,6 @@
 
       - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Lock user not using FIPS 140-2 hashing"
         ansible.builtin.shell: "passwd -l {{ item }}"
-        args:
-            warn: false
         with_items:
             - "{{ rhel_08_010120_non_fips_hashed_accounts.stdout_lines }}"
         when:
@@ -902,8 +900,6 @@
               "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root. | Get commands not owned by root"
               "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root or a system account. | Get commands no group-owned by root"
         ansible.builtin.shell: "find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin -perm /0022 -o ! -user root -o ! -group root"
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010300_commands
@@ -949,8 +945,6 @@
               "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
         ansible.builtin.shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010330_library_files
@@ -1396,8 +1390,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010421_grub_cmdline_linux
@@ -1436,8 +1428,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
         ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010422_grub_cmdline_linux
@@ -1476,8 +1466,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear SLUB/SLAB objects to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
         ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_010423_grub_cmdline_linux
@@ -1834,8 +1822,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Get mounts"
         ansible.builtin.shell: mount | grep '^/dev\S* on /\S' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'
-        args:
-            warn: false
         changed_when: false
         check_mode: false
         register: rhel8stig_010580_mounts_nodev
@@ -2116,8 +2102,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
         ansible.builtin.shell: find {{ item.mount }} -xdev -type f -perm -002
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010660_world_writable_files
@@ -2642,8 +2626,6 @@
   block:
       - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
         ansible.builtin.shell: find / -nouser
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_010780_nouser_files
@@ -3326,8 +3308,6 @@
   block:
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
         ansible.builtin.shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action
@@ -3392,8 +3372,6 @@
   block:
       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
         ansible.builtin.shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_020060_idle_delay_param
@@ -4574,8 +4552,6 @@
   block:
       - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
         ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel_08_030110_audit_log_dir
@@ -6039,8 +6015,6 @@
   block:
       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"
         ansible.builtin.shell: rpm -q NetworkManager
-        args:
-            warn: false
         check_mode: false
         changed_when: false
         register: rhel_08_nmcli_available
@@ -6048,8 +6022,6 @@
 
       - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
         ansible.builtin.shell: nmcli radio wifi
-        args:
-            warn: false
         register: rhel_08_wifi_enabled
         check_mode: false
         changed_when: rhel_08_wifi_enabled.stdout != "disabled"
@@ -6117,8 +6089,6 @@
             "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
             "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
         ansible.builtin.shell: mount | grep /dev/shm
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_040120_dev_shm_status
