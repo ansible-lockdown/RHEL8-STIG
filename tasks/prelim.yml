@@ -166,8 +166,6 @@
 
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
-  args:
-      warn: false
   changed_when: false
   check_mode: false
   register: rhel_08_boot_part
@@ -288,8 +286,6 @@
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
-  args:
-      warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
   changed_when: false

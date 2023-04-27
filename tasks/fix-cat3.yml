@@ -303,8 +303,6 @@
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit to 1 as active"
         ansible.builtin.shell: grubby --update-kernel=ALL --args="audit=1"
-        args:
-            warn: false
         when: (ansible_proc_cmdline.audit is defined and ansible_proc_cmdline.audit != '1') or
               (ansible_proc_cmdline.audit is not defined)
 
@@ -342,8 +340,6 @@
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | set audit_backlog_limit active"
         ansible.builtin.shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
-        args:
-            warn: false
         when: (ansible_proc_cmdline.audit_backlog_limit is defined and ansible_proc_cmdline.audit_backlog_limit != '8192') or
               (ansible_proc_cmdline.audit_backlog_limit is not defined)
 
@@ -429,15 +425,11 @@
   block:
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
         ansible.builtin.shell: grubby --update-kernel=ALL --args="pti=on"
-        args:
-            warn: false
         when: (ansible_proc_cmdline.pti is defined and ansible_proc_cmdline.pti != 'on') or
               (ansible_proc_cmdline.pti is not defined )
 
       - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
         ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-        args:
-            warn: false
         changed_when: false
         failed_when: false
         register: rhel8stig_040004_grub_cmdline_linux
