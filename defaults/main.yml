@@ -190,9 +190,12 @@ rhel_08_010571: true
 rhel_08_010572: true
 rhel_08_010580: true
 rhel_08_010590: true
+## Note Azure is currently default mounting /mnt for cloud-init this will cause issues with these controls
+## refer to https://github.com/Azure/WALinuxAgent/issues/1971
 rhel_08_010600: true
 rhel_08_010610: true
 rhel_08_010620: true
+##
 rhel_08_010630: true
 rhel_08_010640: true
 rhel_08_010650: true
