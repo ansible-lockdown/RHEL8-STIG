@@ -427,7 +427,7 @@
 - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   block:
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
-        ansible.builtin.shell: grep -s logout /etc/dconf/db/local.d/*
+        ansible.builtin.shell: grep -sl logout /etc/dconf/db/local.d/*
         changed_when: false
         failed_when: false
         register: rhel_08_040171_logout_settings_status
