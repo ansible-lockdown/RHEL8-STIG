@@ -1,6 +1,15 @@
 # Changes to RHEL8STIG
 
+## Release 2.8.6
+
+- [#194](https://github.com/ansible-lockdown/RHEL8-STIG/issues/194) thanks to @JacobBuskirk
+- [#196](https://github.com/ansible-lockdown/RHEL8-STIG/issues/196) thanks to @jmalpede
+
+- [#195](https://github.com/ansible-lockdown/RHEL8-STIG/pull/195) thanks to PoundsOfFlesh
+- [#197](https://github.com/ansible-lockdown/RHEL8-STIG/pull/197) thanks to PoundsOfFlesh
+
 ## Release 2.8.5
+
 - updated to /var/log mount check
 - added commnets for /mnt and removeable media on Azure systems
 
