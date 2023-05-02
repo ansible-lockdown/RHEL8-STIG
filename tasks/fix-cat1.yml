@@ -2,7 +2,7 @@
 
 - name: "HIGH | RHEL-08-010000 | AUDIT | The RHEL 8 must be a vendor-supported release."
   ansible.builtin.debug:
-      msg: Minimum supported version of  {{ ansible_distribution }}  is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
+      msg: Minimum supported version of {{ ansible_distribution }}  is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
   changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
   when:
       - rhel_08_010000
