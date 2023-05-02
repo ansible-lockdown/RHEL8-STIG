@@ -1,6 +1,37 @@
 # Changes to RHEL8STIG
 
+## 2.9.0 Stig V1R10 27th April 2023
+
+- Added new controls
+  - RHEL-08-10019
+  - RHEL-08-10358
+- updated control IDs
+  - RHEL-08-10360
+  - RHEL-08-10540
+  - RHEL-08-10541
+  - RHEL-08-10544
+  - RHEL-08-10800
+  - RHEL-08-20040
+  - RHEL-08-20100
+  - RHEL-08-20101
+  - RHEL-08-20102
+  - RHEL-08-20103
+  - RHEL-08-20220
+  - RHEL-08-20221
+  - RHEL-08-20270
+  - RHEL-08-30070
+  - RHEL-08-40150
+
+## Release 2.8.6
+
+- [#194](https://github.com/ansible-lockdown/RHEL8-STIG/issues/194) thanks to @JacobBuskirk
+- [#196](https://github.com/ansible-lockdown/RHEL8-STIG/issues/196) thanks to @jmalpede
+
+- [#195](https://github.com/ansible-lockdown/RHEL8-STIG/pull/195) thanks to PoundsOfFlesh
+- [#197](https://github.com/ansible-lockdown/RHEL8-STIG/pull/197) thanks to PoundsOfFlesh
+
 ## Release 2.8.5
+
 - updated to /var/log mount check
 - added commnets for /mnt and removeable media on Azure systems
 
