@@ -1,8 +1,15 @@
 
 ## metadata for Audit benchmark
-benchmark_version: '1.9'
+benchmark_version: '1.10'
 
 rhel8stig_os_distribution: {{ ansible_distribution | lower }}
+
+gpg_keys:
+{% for info in gpg_keys %}
+  - name: {{ info.name }}
+    fingerprint: {{ info.fingerprint }}
+{% endfor %}
+gpg_package: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ gpg_package }}
 
 rhel8stig_os_version_pre_8_2: {% if ansible_distribution_version >= '8.2' %}false{% else %}true{% endif %}
 
@@ -67,6 +74,7 @@ RHEL_08_040360: {{ rhel_08_040360 }}
 # Cat 2 rules
 RHEL_08_010001: {{ rhel_08_010001 }}
 RHEL_08_010010: {{ rhel_08_010010 }}
+RHEL_08_010019: {{ rhel_08_010019 }}
 RHEL_08_010030: {{ rhel_08_010030 }}
 RHEL_08_010040: {{ rhel_08_010040 }}  # Variable options below
 RHEL_08_010049: {{ rhel_08_010049 }}  # Variable options below
@@ -113,6 +121,7 @@ RHEL_08_010340: {{ rhel_08_010340 }}
 RHEL_08_010341: {{ rhel_08_010341 }}
 RHEL_08_010350: {{ rhel_08_010350 }}
 RHEL_08_010351: {{ rhel_08_010351 }}
+RHEL_08_010358: {{ rhel_08_010358 }}
 RHEL_08_010359: {{ rhel_08_010359 }}
 RHEL_08_010360: {{ rhel_08_010360 }}
 RHEL_08_010372: {{ rhel_08_010372 }}
