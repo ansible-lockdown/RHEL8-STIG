@@ -90,6 +90,11 @@
       - container_discovery
       - always
 
+- name: Include OS specific variables
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+  tags:
+      - always
+
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
   ansible.builtin.assert:
       that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'
