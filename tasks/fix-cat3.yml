@@ -177,7 +177,7 @@
       - CAT3
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230292r627750_rule
+      - SV-230292r902718_rule
       - V-230292
       - complexity-high
       - mounts
@@ -198,7 +198,7 @@
       - CAT3
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230293r627750_rule
+      - SV-230293r902720_rule
       - V-230293
       - complexity_high
       - mounts
