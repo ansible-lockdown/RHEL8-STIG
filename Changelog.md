@@ -22,6 +22,8 @@
   - RHEL-08-30070
   - RHEL-08-40150
 
+- OracleLinux tested and added
+
 ## Release 2.8.6
 
 - [#194](https://github.com/ansible-lockdown/RHEL8-STIG/issues/194) thanks to @JacobBuskirk
