@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
-  package:
+  ansible.builtin.package:
       name: policycoreutils
   when:
       - rhel_08_010171
@@ -15,7 +15,7 @@
       - policycoreutils
 
 - name: "LOW | RHEL-08-010292 | PATCH | RHEL 8 must ensure the SSH server uses strong entropy."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/sysconfig/sshd
       regexp: '^(#)?SSH_USE_STRONG_RNG='
       line: SSH_USE_STRONG_RNG=32
@@ -35,13 +35,13 @@
 - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
   block:
       - name: "LOW | RHEL-08-010375 | AUIDT | RHEL 8 must restrict access to the kernel message buffer. | Find conflicting instances"
-        shell: grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        ansible.builtin.shell: grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
         changed_when: false
         failed_when: false
         register: rhel_08_010375_conflicting_settings
 
       - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Remove conflicting instances"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: "{{ item }}"
             regexp: '^kernel.dmesg_restrict = 0'
             state: absent
@@ -49,7 +49,7 @@
         when: rhel_08_010375_conflicting_settings.stdout | length > 0
 
       - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-        debug:
+        ansible.builtin.debug:
             msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
         changed_when: true
         notify: update sysctl
@@ -67,13 +67,13 @@
 - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
   block:
       - name: "LOW | RHEL-08-010376 | AUDIT | RHEL 8 must prevent kernel profiling by unprivileged users. | Find conflicting instances"
-        shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+        ansible.builtin.shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
         changed_when: false
         failed_when: false
         register: rhel_08_010376_conflicting_settings
 
       - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Remove conflicting instances"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: "{{ item }}"
             regexp: '^kernel.perf_event_paranoid = [^2]'
             state: absent
@@ -81,7 +81,7 @@
         when: rhel_08_010376_conflicting_settings.stdout | length > 0
 
       - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-        debug:
+        ansible.builtin.debug:
             msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
         changed_when: true
         notify: update sysctl
@@ -99,7 +99,7 @@
 - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8."
   block:
       - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Find .conf files"
-        find:
+        ansible.builtin.find:
             paths: /etc
             recurse: true
             file_type: any
@@ -110,7 +110,7 @@
         register: rhel_08_010440_package_confs
 
       - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Set settings"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: "{{ item.path }}"
             regexp: '^.*clean_requirements_on_remove'
             line: 'clean_requirements_on_remove=True'
@@ -133,7 +133,7 @@
      LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
   block:
       - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
-        package:
+        ansible.builtin.package:
             name: rng-tools
             state: present
         when:
@@ -141,7 +141,7 @@
             - "'rng-tools' not in ansible_facts.packages"
 
       - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
-        systemd:
+        ansible.builtin.systemd:
             name: rngd.service
             state: started
             enabled: true
@@ -164,7 +164,7 @@
       - V-244527
 
 - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
-  debug:
+  ansible.builtin.debug:
       msg: "WARNING!! /var is not mounted on a separate partition"
   changed_when:
       - rhel8stig_audit_complex
@@ -184,7 +184,7 @@
       - var
 
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
-  debug:
+  ansible.builtin.debug:
       msg:
           - "WARNING!! /var/log is not mounted on a separate partition"
   changed_when:
@@ -204,7 +204,7 @@
       - mounts
 
 - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
-  debug:
+  ansible.builtin.debug:
       msg:
           - "WARNING!! /var/log/audit is not mounted on a seperate partition"
   changed_when:
@@ -225,7 +225,7 @@
       - auditd
 
 - name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/security/limits.conf
       regexp: '^\*               hard    maxlogins'
       line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
@@ -245,7 +245,7 @@
       - V-230346
 
 - name: "LOW | RHEL-08-020042 | PATCH | RHEL 8 must prevent users from disabling session control mechanisms."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/shells
       regexp: 'tmux'
       state: absent
@@ -261,7 +261,7 @@
       - tmux
 
 - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/pam.d/postlogin
       regexp: 'session.*required.*pam_lastlog\.so.*showfailed'
       line: "session     required                   pam_lastlog.so showfailed"
@@ -277,7 +277,7 @@
       - V-230381
 
 - name: "LOW | RHEL-08-030063 | PATCH | RHEL 8 must resolve audit information before writing to disk."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/audit/auditd.conf
       regexp: '^log_format ='
       line: "log_format = ENRICHED"
@@ -296,27 +296,25 @@
 - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon."
   block:
       - name: "LOW | RHEL-08-030601 | AUDIT | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Get GRUB_CMDLINE_LINUX settings"
-        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         changed_when: false
         failed_when: false
         register: rhel8stig_030601_grub_cmdline_linux
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit to 1 as active"
-        shell: grubby --update-kernel=ALL --args="audit=1"
-        args:
-            warn: false
+        ansible.builtin.shell: grubby --update-kernel=ALL --args="audit=1"
         when: (ansible_proc_cmdline.audit is defined and ansible_proc_cmdline.audit != '1') or
               (ansible_proc_cmdline.audit is not defined)
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if doesnt exist"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: /etc/default/grub
             regexp: '^GRUB_CMDLINE_LINUX='
             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_030601_grub_cmdline_linux.stdout }} audit=1"'
         when: '"audit=" not in rhel8stig_030601_grub_cmdline_linux.stdout'
 
       - name: "LOW | RHEL-08-030601 | PATCH | RHEL 8 must enable auditing of processes that start prior to the audit daemon. | Set audit=1 for kernel updates if exists"
-        replace:
+        ansible.builtin.replace:
             path: /etc/default/grub
             regexp: 'audit=([^\s|"])+'
             replace: "audit=1"
@@ -335,27 +333,25 @@
 - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon."
   block:
       - name: "LOW | RHEL-08-030602 | AUDIT | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Get GRUB_CMDLINE_LINUX settings"
-        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
+        ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         changed_when: false
         failed_when: false
         register: rhel8stig_030602_grub_cmdline_linux
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | set audit_backlog_limit active"
-        shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
-        args:
-            warn: false
+        ansible.builtin.shell: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
         when: (ansible_proc_cmdline.audit_backlog_limit is defined and ansible_proc_cmdline.audit_backlog_limit != '8192') or
               (ansible_proc_cmdline.audit_backlog_limit is not defined)
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if doesn't exist"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: /etc/default/grub
             regexp: '^GRUB_CMDLINE_LINUX='
             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_030602_grub_cmdline_linux.stdout }} audit_backlog_limit=8192"'
         when: '"audit_backlog_limit=" not in rhel8stig_030602_grub_cmdline_linux.stdout'
 
       - name: "LOW | RHEL-08-030602 | PATCH | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Set audit audit_backlog_limit for kernel updates if exists"
-        replace:
+        ansible.builtin.replace:
             path: /etc/default/grub
             regexp: 'audit_backlog_limit=([^\s|"])+'
             replace: "audit_backlog_limit=8192"
@@ -373,7 +369,7 @@
       - auditd
 
 - name: "LOW | RHEL-08-030603 | PATCH | RHEL 8 must enable Linux audit logging for the USBGuard daemon"
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/usbguard/usbguard-daemon.conf
       regexp: '^AuditBackend='
       line: "AuditBackend=LinuxAudit"
@@ -393,7 +389,7 @@
       - usb
 
 - name: "LOW | RHEL-08-030741 | PATCH | RHEL 8 must disable the chrony daemon from acting as a server."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/chrony.conf
       regexp: '^port|#port'
       line: "port 0"
@@ -410,7 +406,7 @@
       - chrony
 
 - name: "LOW | RHEL-08-030742 | PATCH | RHEL 8 must disable network management of the chrony daemon."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/chrony.conf
       regexp: '^cmdport|#cmdport'
       line: "cmdport 0"
@@ -428,29 +424,25 @@
 - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
   block:
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
-        shell: grubby --update-kernel=ALL --args="pti=on"
-        args:
-            warn: false
+        ansible.builtin.shell: grubby --update-kernel=ALL --args="pti=on"
         when: (ansible_proc_cmdline.pti is defined and ansible_proc_cmdline.pti != 'on') or
               (ansible_proc_cmdline.pti is not defined )
 
       - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
-        shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
-        args:
-            warn: false
+        ansible.builtin.shell: grep GRUB_CMDLINE_LINUX= /etc/default/grub | cut -f2 -d'"'
         changed_when: false
         failed_when: false
         register: rhel8stig_040004_grub_cmdline_linux
 
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti if doesn't exist"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: /etc/default/grub
             regexp: '^GRUB_CMDLINE_LINUX='
             line: 'GRUB_CMDLINE_LINUX="{{ rhel8stig_040004_grub_cmdline_linux.stdout }} pti=on"'
         when: '"pti=on" not in rhel8stig_040004_grub_cmdline_linux.stdout'
 
       - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti exists"
-        replace:
+        ansible.builtin.replace:
             path: /etc/default/grub
             regexp: 'pti=([^\s|"])+'
             replace: "pti=on"
@@ -467,7 +459,7 @@
       - grub
 
 - name: "LOW | RHEL-08-040021 | PATCH | RHEL 8 must disable the asynchronous transfer mode (ATM) protocol."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -493,7 +485,7 @@
       - atm
 
 - name: "LOW | RHEL-08-040022 | PATCH | RHEL 8 must disable the controller area network (CAN) protocol."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -519,7 +511,7 @@
       - can
 
 - name: "LOW | RHEL-08-040023 | PATCH | RHEL 8 must disable the stream control transmission (SCTP) protocol."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -545,7 +537,7 @@
       - sctp
 
 - name: "LOW | RHEL-08-040024 | PATCH | RHEL 8 must disable the transparent inter-process communication (TIPC) protocol."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -571,7 +563,7 @@
       - tipc
 
 - name: "LOW | RHEL-08-040025 | PATCH | RHEL 8 must disable mounting of cramfs."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -597,7 +589,7 @@
       - cramfs
 
 - name: "LOW | RHEL-08-040026 | PATCH | RHEL 8 must disable IEEE 1394 (FireWire) Support."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/modprobe.d/blacklist.conf
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
@@ -625,7 +617,7 @@
 - name: |
         "LOW | RHEL-08-040300 | PATCH | The RHEL 8 file integrity tool must be configured to verify extended attributes."
         "LOW | RHEL-08-040310 | PATCH | The RHEL 8 file integrity tool must be configured to verify Access Control Lists (ACLs)."
-  template:
+  ansible.builtin.template:
       src: aide.conf.j2
       dest: /etc/aide.conf
       owner: root

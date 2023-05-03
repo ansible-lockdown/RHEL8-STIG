@@ -26,11 +26,11 @@ rhel8stig_audit_complex: true
 # We've defined disruption-high to indicate items that are likely to cause
 # disruption in a normal workflow.  These items can be remediated automatically
 # but are disabled by default to avoid disruption.
-rhel8stig_disruption_high: true
+rhel8stig_disruption_high: false
 
 # Show "changed" for disruptive items not remediated per disruption-high
 # setting to make them stand out.
-rhel8stig_audit_disruptive: true
+rhel8stig_audit_disruptive: false
 
 rhel8stig_skip_for_travis: false
 
@@ -190,9 +190,12 @@ rhel_08_010571: true
 rhel_08_010572: true
 rhel_08_010580: true
 rhel_08_010590: true
+## Note Azure is currently default mounting /mnt for cloud-init this will cause issues with these controls
+## refer to https://github.com/Azure/WALinuxAgent/issues/1971
 rhel_08_010600: true
 rhel_08_010610: true
 rhel_08_010620: true
+##
 rhel_08_010630: true
 rhel_08_010640: true
 rhel_08_010650: true
@@ -477,13 +480,13 @@ rhel8stig_smartcard: false
 # Configure your smartcard driver
 rhel8stig_smartcarddriver: cackey
 
-#Whether or not system uses remote automounted home directories via autofs
+# Whether or not system uses remote automounted home directories via autofs
 rhel8stig_autofs_remote_home_dirs: false
 
-#The local mount point used by autofs to mount remote home directory to.  This location will be excluded during getent user enumeration, if rhel8stig_autofs_remote_home_dirs is true
+# The local mount point used by autofs to mount remote home directory to.  This location will be excluded during getent user enumeration, if rhel8stig_autofs_remote_home_dirs is true
 rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
 
-#The default shell command to gather local interactive user directories
+# The default shell command to gather local interactive user directories
 ## NOTE: You will need to adjust the UID range in parenthesis below.
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
 local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
@@ -532,7 +535,6 @@ rhel8stig_ssh_priv_key_perm: 0600
 # rhel_08_020720_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
-
 
 # RHEL-08-010700
 # rhel8stig_ww_dir_owner is the owenr of all world-writable directories
@@ -794,7 +796,6 @@ rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 
 # REHL-08-010020
 rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 
-
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
 
@@ -878,7 +879,7 @@ rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-ctr,aes192-ctr,aes128-ct
 # RHEL-08-010295
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
 # to conform to STIG standards this variable must contain +VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
-rhel8stig_gnutls_encryption: "+VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
+rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
 
 # RHEL-08-020070
 # This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
@@ -888,7 +889,6 @@ rhel8stig_tmux_lock_after_time: 900
 # The value given to Defaults timestamp timeout= in the sudo file.
 # Value must be greater than 0 to conform to STIG standards
 rhel8stig_sudo_timestamp_timeout: 1
-
 
 #### Goss Configuration Settings ####
 # Set correct env for the run_audit.sh script from https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"

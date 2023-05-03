@@ -1,7 +1,7 @@
 ---
 
 - name: "HIGH | RHEL-08-010000 | AUDIT | The RHEL 8 must be a vendor-supported release."
-  debug:
+  ansible.builtin.debug:
       msg: Minimum supported version of  {{ ansible_distribution }}  is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
   changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
   when:
@@ -17,7 +17,7 @@
 - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
   block:
       - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | install FIPS"
-        package:
+        ansible.builtin.package:
             name:
                 - dracut-fips
                 - crypto-policies-scripts
@@ -28,7 +28,7 @@
         when: "'dracut-fips' not in ansible_facts.packages"
 
       - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
-        command: fips-mode-setup --enable
+        ansible.builtin.shell: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
         changed_when: rhel_08_010020_kernel_fips_enable.rc == 0
         notify: change_requires_reboot
@@ -37,7 +37,7 @@
               (ansible_proc_cmdline.fips is defined and ansible_proc_cmdline.fips != '1')
 
       - name: "HIGH | RHEL-08-010020 | PATCH | Disable prelinking."
-        lineinfile:
+        ansible.builtin.lineinfile:
             dest: /etc/sysconfig/prelink
             regexp: ^#?PRELINKING
             line: PRELINKING=no
@@ -45,14 +45,14 @@
         notify: undo existing prelinking
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Check for GRUB_CMDLINE_LINUX in /etc/default/grub"
-        command: grep -P '^\s*GRUB_CMDLINE_LINUX=".*"$' /etc/default/grub
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*"$' /etc/default/grub
         check_mode: false
         failed_when: false
         changed_when: rhel_08_010020_default_grub_missing_audit.rc > 0
         register: rhel_08_010020_default_grub_missing_audit
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
-        command: grep -oP ' ro \K.*?(?= ?LANG=)' /proc/cmdline
+        ansible.builtin.shell: grep -oP ' ro \K.*?(?= ?LANG=)' /proc/cmdline
         check_mode: false
         changed_when: false
         failed_when: rhel_08_010020_grub_cmdline_linux_audit.rc > 1
@@ -60,7 +60,7 @@
         register: rhel_08_010020_grub_cmdline_linux_audit
 
       - name: "HIGH | RHEL-08-010020 | PATCH | Copy over a sane /etc/default/grub"
-        template:
+        ansible.builtin.template:
             src: etc_default_grub.j2
             dest: /etc/default/grub
             owner: root
@@ -71,7 +71,7 @@
         when: rhel_08_010020_default_grub_missing_audit is changed
 
       - name: "HIGH | RHEL-08-010020 | PATCH | fips=1 must be in /etc/default/grub"
-        replace:
+        ansible.builtin.replace:
             path: /etc/default/grub
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
             replace: "{{ rhel8stig_replace_quoted_params }}"
@@ -88,7 +88,7 @@
             - change_requires_reboot
 
       - name: "HIGH | RHEL-08-010020 | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
-        replace:
+        ansible.builtin.replace:
             path: /etc/default/grub
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
             replace: "{{ rhel8stig_replace_quoted_params }}"
@@ -108,7 +108,7 @@
         register: result
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Verify kernel parameters in /etc/default/grub"
-        command: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ]){{ item | regex_escape }}(?=[" ]).*"$' /etc/default/grub
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ]){{ item | regex_escape }}(?=[" ]).*"$' /etc/default/grub
         check_mode: false
         with_items:
             - fips=1
@@ -119,8 +119,8 @@
         when:
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
-            - rhel8stig_boot_part not in ['/', ''] or
-              'boot=' not in item
+            - "rhel8stig_boot_part not in ['/', ''] or
+              'boot=' not in item"
         changed_when:
             - ansible_check_mode
             - rhel_08_010020_audit is failed
@@ -142,14 +142,14 @@
 - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
   block:
       - name: "HIGH | RHEL-08-010121 | AUDIT | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Get users with no pw set"
-        shell: "awk -F: '!$2 {print $1}' /etc/shadow"
+        ansible.builtin.shell: "awk -F: '!$2 {print $1}' /etc/shadow"
         changed_when: false
         failed_when: false
         check_mode: false
         register: rhel_08_010121_no_pw_users
 
       - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Warn on accounts with no passwords"
-        debug:
+        ansible.builtin.debug:
             msg:
                 - "Alert! You have users that are not using passwords. Please either set a password, lock, or remove the accounts below:"
                 - "{{ rhel_08_010121_no_pw_users.stdout_lines }}"
@@ -158,7 +158,7 @@
             - not rhel8stig_disruption_high
 
       - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Lock accounts with no passwords, disruptive"
-        user:
+        ansible.builtin.user:
             name: "{{ item }}"
             password_lock: true
         with_items:
@@ -183,7 +183,7 @@
       - name: |
             "HIGH | RHEL-08-010140 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) implemented must require authentication upon booting into single-user mode and maintenance. | Set Grub Password"
             "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes. | Set Grub Password"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: "{{ rhel8stig_bootloader_path }}/user.cfg"
             create: true
             regexp: ^GRUB2_PASSWORD=
@@ -213,23 +213,23 @@
 - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
       - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Dnf Default"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: /etc/dnf/dnf.conf
             regexp: '^gpgcheck='
             line: gpgcheck=1
 
       - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Gather Repos"
-        find:
+        ansible.builtin.find:
             paths: /etc/yum.repos.d
             pattern: '*.repo'
         register: rhel_08_010370_repos_files_list_full
 
       - name: "HIGH | RHEL-08-010370 | AUDIT | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Flatten result"
-        set_fact:
+        ansible.builtin.set_fact:
             rhel_08_010370_repos_files_list: "{{ rhel_08_010370_repos_files_list_full.files | map(attribute='path') | flatten }}"
 
       - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization. | Set gpgcheck"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: "{{ item }}"
             regexp: '^gpgcheck'
             line: gpgcheck=1
@@ -247,7 +247,7 @@
       - yum
 
 - name: "HIGH | RHEL-08-010371 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/dnf/dnf.conf
       regexp: '^localpkg_gpgcheck='
       line: localpkg_gpgcheck=True
@@ -263,7 +263,7 @@
       - dnf
 
 - name: "HIGH | RHEL-08-010460 | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
-  file:
+  ansible.builtin.file:
       path: /etc/ssh/shosts.equiv
       state: absent
   when:
@@ -280,14 +280,14 @@
 - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system."
   block:
       - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
-        find:
+        ansible.builtin.find:
             path: '/'
             recurse: true
             patterns: '*.shosts'
         register: rhel_08_010470_shost_files
 
       - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Remove .shosts files"
-        file:
+        ansible.builtin.file:
             path: "{{ item.path }}"
             state: absent
         with_items:
@@ -304,7 +304,7 @@
       - shosts
 
 - name: "HIGH | RHEL-08-010820 | PATCH | Unattended or automatic logon via the RHEL 8 graphical user interface must not be allowed."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/gdm/custom.conf
       regexp: (?i)automaticloginenable
       line: AutomaticLoginEnable=false
@@ -321,7 +321,7 @@
       - V-230329
 
 - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitEmptyPasswords'
       line: 'PermitEmptyPasswords no'
@@ -340,7 +340,7 @@
       - disruption_high
 
 - name: "HIGH | RHEL-08-020331 | PATCH | RHEL 8 must not allow blank or null passwords in the system-auth file."
-  replace:
+  ansible.builtin.replace:
       path: /etc/pam.d/system-auth
       regexp: ' nullok'
       replace: ''
@@ -355,7 +355,7 @@
       - V-244540
 
 - name: "HIGH | RHEL-08-020332 | PATCH | RHEL 8 must not allow blank or null passwords in the password-auth file."
-  replace:
+  ansible.builtin.replace:
       path: /etc/pam.d/password-auth
       regexp: ' nullok'
       replace: ''
@@ -370,7 +370,7 @@
       - V-244541
 
 - name: "HIGH | RHEL-08-040000 | PATCH | RHEL 8 must not have the telnet-server package installed."
-  package:
+  ansible.builtin.package:
       name: telnet-server
       state: absent
   when:
@@ -385,7 +385,7 @@
       - V-230487
 
 - name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not have the rsh-server package installed."
-  package:
+  ansible.builtin.package:
       name: rsh-server
       state: absent
   when:
@@ -402,13 +402,13 @@
 - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
   block:
       - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Mask ctrl-alt-del.target"
-        systemd:
+        ansible.builtin.systemd:
             name: ctrl-alt-del.target
             masked: true
         notify: systemctl daemon-reload
 
       - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
-        file:
+        ansible.builtin.file:
             src: /dev/null
             dest: /etc/systemd/system/ctrl-alt-del.target
             state: link
@@ -427,13 +427,13 @@
 - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   block:
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
-        command: grep -s logout /etc/dconf/db/local.d/*
+        ansible.builtin.shell: grep -sl logout /etc/dconf/db/local.d/*
         changed_when: false
         failed_when: false
         register: rhel_08_040171_logout_settings_status
 
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Add if missing"
-        lineinfile:
+        ansible.builtin.lineinfile:
             path: /etc/dconf/db/local.d/00-disable-CAD
             regexp: "{{ item.regexp }}"
             line: "{{ item.line }}"
@@ -450,7 +450,7 @@
         when: rhel_08_040171_logout_settings_status.stdout | length == 0
 
       - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
-        replace:
+        ansible.builtin.replace:
             path: "{{ rhel_08_040171_logout_settings_status.stdout }}"
             regexp: '^[L|l]ogout=.*'
             replace: "logout=''"
@@ -467,7 +467,7 @@
       - V-230530
 
 - name: "HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
-  lineinfile:
+  ansible.builtin.lineinfile:
       path: /etc/systemd/system.conf
       regexp: '^CtrlAltDelBurstAction=|^#CtrlAltDelBurstAction='
       line: CtrlAltDelBurstAction=none
@@ -484,7 +484,7 @@
       - V-230531
 
 - name: "HIGH | RHEL-08-040190 | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
-  package:
+  ansible.builtin.package:
       name: tftp-server
       state: absent
   when:
@@ -503,19 +503,19 @@
 - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
   block:
       - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
-        shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
+        ansible.builtin.shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
         changed_when: false
         failed_when: false
         register: rhel_08_040200_nonroot_uid
 
       - name: "HIGH | HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
-        command: "passwd -l {{ item }}"
+        ansible.builtin.shell: "passwd -l {{ item }}"
         with_items:
             - "{{ rhel_08_040200_nonroot_uid.stdout_lines }}"
         when: rhel_08_040200_nonroot_uid.stdout | length > 0
 
       - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
-        debug:
+        ansible.builtin.debug:
             msg:
                 - "WARNING!! The following accounts were locked since they had UID of 0 and were not the root user"
                 - " {{ rhel_08_040200_nonroot_uid.stdout_lines }}"
@@ -533,7 +533,7 @@
       - disruption_high
 
 - name: "HIGH | RHEL-08-040360 | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
-  package:
+  ansible.builtin.package:
       name: vsftpd
       state: absent
   when:

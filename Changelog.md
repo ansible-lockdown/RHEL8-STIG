@@ -1,6 +1,27 @@
 # Changes to RHEL8STIG
 
-## Relase 2.8.3
+## Release 2.8.6
+
+- [#194](https://github.com/ansible-lockdown/RHEL8-STIG/issues/194) thanks to @JacobBuskirk
+- [#196](https://github.com/ansible-lockdown/RHEL8-STIG/issues/196) thanks to @jmalpede
+
+- [#195](https://github.com/ansible-lockdown/RHEL8-STIG/pull/195) thanks to PoundsOfFlesh
+- [#197](https://github.com/ansible-lockdown/RHEL8-STIG/pull/197) thanks to PoundsOfFlesh
+
+## Release 2.8.5
+
+- updated to /var/log mount check
+- added commnets for /mnt and removeable media on Azure systems
+
+## Release 2.8.4
+
+- ansible version updated to 2.10.1 minimum
+- updated to ansible user check for passwd rule 010380
+  - thanks to discord community member PoundsOfFlesh
+- update readme layout and latest audit example
+- changed disruptive back to false to allow users to control the settings
+
+## Release 2.8.3
 
 - improvements to openssh configs and seperated tasks
 

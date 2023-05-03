@@ -1,7 +1,7 @@
 ---
 
 - name: Gather distribution info
-  setup:
+  ansible.builtin.setup:
       gather_subset: distribution,!all,!min
   when:
       - ansible_distribution is not defined
@@ -9,7 +9,7 @@
       - always
 
 - name: Check OS version and family
-  assert:
+  ansible.builtin.assert:
       that: (ansible_distribution != 'CentOS' and ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
       fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
       success_msg: "This role is running against a supported OS {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
@@ -19,27 +19,27 @@
       - always
 
 - name: Check ansible version
-  assert:
+  ansible.builtin.assert:
       that: ansible_version.full is version_compare(rhel8stig_min_ansible_version, '>=')
       fail_msg: "You must use Ansible {{ rhel8stig_min_ansible_version }} or greater"
       success_msg: "This role is running a supported version of ansible {{ ansible_version.full }} >= {{ rhel8stig_min_ansible_version }}"
   tags:
       - always
 
-- name: "Check password set for {{ ansible_user }}"
+- name: "Check password set for connecting user"
   block:
-      - name: Capture current password state of "{{ ansible_user }}"
-        shell: "grep {{ ansible_user }} /etc/shadow | awk -F: '{print $2}'"
+      - name: Capture current password state of connecting user"
+        ansible.builtin.shell: "grep {{ ansible_env.SUDO_USER }} /etc/shadow | awk -F: '{print $2}'"
         changed_when: false
         failed_when: false
         check_mode: false
         register: ansible_user_password_set
 
-      - name: "Assert that password set for {{ ansible_user }} and account not locked"
-        assert:
+      - name: "Assert that password set for {{ ansible_env.SUDO_USER }} and account not locked"
+        ansible.builtin.assert:
             that: ansible_user_password_set.stdout | length != 0 and ansible_user_password_set.stdout != "!!"
-            fail_msg: "You have {{ sudo_password_rule }} enabled but the user = {{ ansible_user }} has no password set - It can break access"
-            success_msg: "You a password set for the {{ ansible_user }}"
+            fail_msg: "You have {{ sudo_password_rule }} enabled but the user = {{ ansible_env.SUDO_USER }} has no password set - It can break access"
+            success_msg: "You a password set for the {{ ansible_env.SUDO_USER }}"
         vars:
             sudo_password_rule: RHEL-08-010380
   when:
@@ -51,14 +51,14 @@
 - name: "Ensure superuser for grub does not match existing user"
   block:
       - name: "Ensure superuser for grub does not match existing user | capture users"
-        shell: cat /etc/passwd | cut -d':' -f1
+        ansible.builtin.shell: cat /etc/passwd | cut -d':' -f1
         changed_when: false
         failed_when: false
         check_mode: false
         register: rhel8stig_user_list
 
       - name: "Ensure superuser for grub does not match existing user"
-        assert:
+        ansible.builtin.assert:
             that: rhel8stig_boot_superuser not in rhel8stig_user_list.stdout_lines
             fail_msg: "A unique name must be used for bootloader access user='{{ rhel8stig_boot_superuser }}' already exists refer to variable rhel8stig_boot_superuser"
   when:
@@ -71,15 +71,15 @@
 - name: Setup rules if container
   block:
       - name: Discover and set container variable if required
-        set_fact:
+        ansible.builtin.set_fact:
             system_is_container: true
 
       - name: Load variable for container
-        include_vars:
+        ansible.builtin.include_vars:
             file: "{{ container_vars_file }}"
 
       - name: output if discovered is a container
-        debug:
+        ansible.builtin.debug:
             msg: system has been discovered as a container
         when:
             - system_is_container
@@ -91,7 +91,7 @@
       - always
 
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
-  assert:
+  ansible.builtin.assert:
       that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'
       msg: "This role will not be able to run single user password commands as rhel8stig_bootloader_password_hash variable has not been set"
 
@@ -104,7 +104,7 @@
       - grub
 
 - name: Check if using resolv.conf template settings are changed
-  assert:
+  ansible.builtin.assert:
       that:
           - rhel8_stig_resolv_domain != 'example.com'
           - rhel8_stig_resolv_search | length > 0
@@ -117,19 +117,19 @@
       - always
 
 - name: Gather the package facts
-  package_facts:
+  ansible.builtin.package_facts:
       manager: auto
   tags:
       - always
 
 - name: Include prelim tasks
-  import_tasks: prelim.yml
+  ansible.builtin.import_tasks: prelim.yml
   tags:
       - prelim_tasks
       - run_audit
 
 - name: Include pre-remediation tasks
-  import_tasks: pre_remediation_audit.yml
+  ansible.builtin.import_tasks: pre_remediation_audit.yml
   when:
       - run_audit
       - setup_audit
@@ -137,51 +137,50 @@
       - run_audit
 
 - name: Include CAT I patches
-  import_tasks: fix-cat1.yml
+  ansible.builtin.import_tasks: fix-cat1.yml
   when: rhel8stig_cat1_patch
   tags:
       - CAT1
       - high
 
 - name: Include CAT II patches
-  import_tasks: fix-cat2.yml
+  ansible.builtin.import_tasks: fix-cat2.yml
   when: rhel8stig_cat2_patch
   tags:
       - CAT2
       - medium
 
 - name: Include CAT III patches
-  import_tasks: fix-cat3.yml
+  ansible.builtin.import_tasks: fix-cat3.yml
   when: rhel8stig_cat3_patch | bool
   tags:
       - CAT3
       - low
 
 - name: flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
   tags:
       - CAT1
       - CAT2
       - CAT3
 
-
 - name: reboot system if changes require it and not skipped
-  reboot:
+  ansible.builtin.reboot:
   when:
-    - change_requires_reboot
-    - not rhel8stig_skip_reboot
+      - change_requires_reboot
+      - not rhel8stig_skip_reboot
   tags:
       - CAT1
       - CAT2
       - CAT3
 
 - name: Include post-remediation tasks
-  import_tasks: post_remediation_audit.yml
+  ansible.builtin.import_tasks: post_remediation_audit.yml
   when:
       - run_audit
 
 - name: Show Audit Summary
-  debug:
+  ansible.builtin.debug:
       msg: "{{ audit_results.split('\n') }}"
   when:
       - run_audit
@@ -189,12 +188,12 @@
       - run_audit
 
 - name: Warning a reboot required but skip option set
-  debug:
+  ansible.builtin.debug:
       msg: "Warning!! changes have been made that require a reboot to be implemented but skip reboot was set - Can affect compliance check results"
   changed_when: true
   when:
-    - change_requires_reboot
-    - rhel8stig_skip_reboot
+      - change_requires_reboot
+      - rhel8stig_skip_reboot
   tags:
       - CAT1
       - CAT2

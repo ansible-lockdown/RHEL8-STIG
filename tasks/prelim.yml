@@ -69,7 +69,6 @@
       gather_subset: chroot,!all,!min
       filter: ansible_is_chroot
   when:
-      - ansible_version.string is version_compare('2.7', '>=')
       - ansible_is_chroot is not defined
   tags:
       - always
@@ -120,19 +119,19 @@
   block:
       - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
         assert:
-          that:
-              - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
-              - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
+            that:
+                - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
+                - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
 
       - name: Modify local_interactive_user_dir_command to exclude remote automounted home directories
         set_fact:
             local_interactive_user_dir_command: "{{ local_interactive_user_dir_command }} | grep -v '{{ rhel8stig_auto_mount_home_dirs_local_mount_point }}"
 
   when:
-    - rhel8stig_autofs_remote_home_dirs
+      - rhel8stig_autofs_remote_home_dirs
   tags:
-    - RHEL-08-010690
-    - complexity-high
+      - RHEL-08-010690
+      - complexity-high
 
 - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
   shell: "{{ local_interactive_user_dir_command }}"
@@ -167,8 +166,6 @@
 
 - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
   shell: df --output=target /boot | tail -n 1
-  args:
-      warn: false
   changed_when: false
   check_mode: false
   register: rhel_08_boot_part
@@ -289,8 +286,6 @@
 
 - name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
-  args:
-      warn: false
   with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
   register: rhel_08_010770_ini_file_list
   changed_when: false
