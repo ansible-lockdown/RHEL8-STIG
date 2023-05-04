@@ -14,7 +14,7 @@ jobs:
     update_role:
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
         - uses: hspaans/ansible-galaxy-action@master
           with:
             api_key: ${{ secrets.GALAXY_API_KEY }}
