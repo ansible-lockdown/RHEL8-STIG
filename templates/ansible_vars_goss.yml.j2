@@ -9,7 +9,7 @@ gpg_keys:
   - name: {{ info.name }}
     fingerprint: {{ info.fingerprint }}
 {% endfor %}
-gpg_package: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ gpg_package }}
+rpm_gpg_key: {{ rpm_gpg_key }}
 
 rhel8stig_os_version_pre_8_2: {% if ansible_distribution_version >= '8.2' %}false{% else %}true{% endif %}
 
