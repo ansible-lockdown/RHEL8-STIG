@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v1r9'
+benchmark_version: 'v1r10'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -108,6 +108,7 @@ rhel_08_040360: true
 # CAT 2 rules
 rhel_08_010001: true
 rhel_08_010010: true
+rhel_08_010019: true
 rhel_08_010030: true
 rhel_08_010040: true
 rhel_08_010049: true
@@ -154,6 +155,7 @@ rhel_08_010340: true
 rhel_08_010341: true
 rhel_08_010350: true
 rhel_08_010351: true
+rhel_08_010358: true
 rhel_08_010359: true
 rhel_08_010360: true
 rhel_08_010372: true
@@ -571,6 +573,7 @@ rhel8stig_min_supported_os_ver:
     CentOS: "8.7"
     Rocky: "8.7"
     AlmaLinux: "8.7"
+    OracleLinux: "8.7"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -614,7 +617,7 @@ rhel8stig_aide_cron:
     special_time: daily
     # Disable the notification check rule to disable mailing notifications
     notify_by_mail: true
-    notify_cmd: ' | /var/spool/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
+    notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
 
 rhel8stig_cron_special_disable: "{{
         rhel8stig_workaround_for_disa_benchmark or

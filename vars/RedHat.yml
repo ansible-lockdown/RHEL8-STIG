@@ -1,0 +1,13 @@
+---
+
+gpg_keys:
+    - name: 'release key 2'
+      packager: 'security@redhat.com'
+      fingerprint: '567E 347A D004 4ADE 55BA  8A5F 199E 2F91 FD43 1D51'
+
+    - name: 'auxiliary key'
+      packager: 'security@redhat.com'
+      fingerprint: '6A6A A7C9 7C88 90AE C6AE  BFE2 F76F 66C3 D408 2792'
+
+gpg_package: redhat-release
+rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ ansible_distribution | lower }}-release

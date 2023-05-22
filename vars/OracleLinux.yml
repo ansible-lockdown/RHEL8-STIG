@@ -1,0 +1,9 @@
+---
+
+gpg_keys:
+    - name: 'Oracle OSS group'
+      packager: "build@oss.oracle.com"
+      fingerprint: "76FD 3DB1 3AB6 7410 B89D  B10E 8256 2EA9 AD98 6DA3"
+
+gpg_package: oraclelinux-release
+rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-oracle

@@ -1,0 +1,9 @@
+---
+
+gpg_keys:
+    - name: 'AlmaLinux'
+      packager: "packager@almalinux.org"
+      fingerprint: "5E9B 8F56 17B5 066C E920  57C3 488F CF7C 3ABB 34F8"
+
+gpg_package: almalinux-release
+rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux
