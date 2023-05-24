@@ -1,4 +1,3 @@
----
 # Container vars file
 
 rhel8stig_ssh_required: false
@@ -94,12 +93,21 @@ rhel_08_030063: false
 # rsyslog
 rhel_08_010070: false
 rhel_08_010561: false
+rhel_08_010210: false
+rhel_08_010220: false
+rhel_08_010230: false
 rhel_08_030010: false
 rhel_08_030670: false
 rhel_08_030680: false
 rhel_08_030690: false
 rhel_08_030710: false
 rhel_08_030720: false
+
+# selinux
+rhel_08_010170: false
+rhel_08_010450: false
+rhel_08_020027: false
+rhel_08_020028: false
 
 ## mounts
 # /tmp
@@ -133,6 +141,7 @@ rhel_08_010572: false
 #
 rhel_08_010580: false
 # /media
+rhel_08_010600: false
 rhel_08_010610: false
 # /mnt
 rhel_08_010620: false
@@ -149,6 +158,7 @@ rhel_08_010540: false
 
 # firewall
 rhel8stig_firewall_service: not_required
+rhel_08_040030: false
 
 # fapolicy
 rhel_08_040135: false
@@ -197,3 +207,14 @@ rhel_08_010381: false
 rhel_08_010382: false
 rhel_08_010383: false
 rhel_08_010384: false
+
+# Other
+rhel_08_010410: false
+rhel_08_010672: false
+rhel_08_010680: false
+rhel_08_040111: false
+rhel_08_040139: false
+rhel_08_040140: false
+rhel_08_040141: false
+rhel_08_040180: false
+rhel_08_040330: false

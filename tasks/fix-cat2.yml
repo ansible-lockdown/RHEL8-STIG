@@ -478,7 +478,6 @@
   notify: change_requires_reboot
   when:
       - rhel_08_010170 or rhel_08_010450
-      - not system_is_container
       - rhel8stig_disruption_high
   tags:
       - CAT2
@@ -569,7 +568,6 @@
       - rhel_08_010210 or
         rhel_08_010220 or
         rhel_08_010230
-      - not system_is_container
   tags:
       - CAT2
       - RHEL-08-010210
@@ -1398,7 +1396,6 @@
       state: present
   when:
       - rhel_08_010410
-      - not system_is_container
   tags:
       - RHEL-08-010410
       - CAT2
@@ -1975,7 +1972,7 @@
             removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
   when:
       - rhel_08_010600
-      - not (rhel8stig_system_is_chroot and system_is_container)
+      - not rhel8stig_system_is_chroot
   tags:
       - RHEL-08-010600
       - CAT2
@@ -2376,7 +2373,6 @@
   when:
       - rhel_08_010680
       - not rhel8stig_system_is_chroot
-      - not system_is_container
       - not system_is_ec2
   tags:
       - RHEL-08-010680
@@ -3242,7 +3238,6 @@
   when:
       - rhel_08_020027 or
         rhel_08_020028
-      - not system_is_container
   tags:
       - RHEL-08-020027
       - RHEL-08-020028
@@ -5837,7 +5832,6 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not system_is_container
             - rhel8stig_firewall_service == "firewalld"
             - rhel8stig_start_firewall_service
         tags:
@@ -5872,7 +5866,6 @@
         when:
             - rhel_08_040030
             - not rhel8stig_system_is_chroot
-            - not system_is_container
             - rhel8stig_firewall_service == "iptables"
             - rhel8stig_start_firewall_service
         tags:
@@ -6132,7 +6125,6 @@
             - { regexp: '^blacklist bluetooth', line: 'blacklist bluetooth', insertafter: '#blacklist bluetooth kernel module' }
   when:
       - rhel_08_040111
-      - not system_is_container
   tags:
       - RHEL-08-040111
       - CAT2
@@ -6490,7 +6482,6 @@
       - rhel_08_040139 or
         rhel_08_040140 or
         rhel_08_040141
-      - not system_is_container
   tags:
       - RHEL-08-040139
       - RHEL-08-040140
@@ -7347,7 +7338,6 @@
   when:
       - rhel_08_040330
       - not rhel8stig_net_promisc_mode_required
-      - not system_is_container
   tags:
       - RHEL-08-040330
       - CAT2
