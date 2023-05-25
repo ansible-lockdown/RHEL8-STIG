@@ -210,6 +210,7 @@ rhel_08_010384: false
 
 # Other
 rhel_08_010410: false
+rhel_08_010472: false
 rhel_08_010672: false
 rhel_08_010680: false
 rhel_08_040111: false
