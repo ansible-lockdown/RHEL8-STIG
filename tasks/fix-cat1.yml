@@ -25,9 +25,6 @@
             - change_requires_reboot
         when: "'dracut-fips' not in ansible_facts.packages"
 
-      - name: pause
-        ansible.builtin.pause:
-
       - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enables FIPS mode on kernel"
         ansible.builtin.shell: fips-mode-setup --enable
         register: rhel_08_010020_kernel_fips_enable
