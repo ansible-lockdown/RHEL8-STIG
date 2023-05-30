@@ -111,6 +111,8 @@
 
 - name: rebuild initramfs
   ansible.builtin.shell: dracut -f
+  when:
+      - not system_is_container
 
 - name: undo existing prelinking
   ansible.builtin.shell: prelink -ua
