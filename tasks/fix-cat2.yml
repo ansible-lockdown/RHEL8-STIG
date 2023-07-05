@@ -799,6 +799,30 @@
       - V-244526
       - ssh
 
+- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
+  block:
+      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
+        ansible.builtin.shell: fips-mode-setup --check
+        changed_when: false
+        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
+        register: rhel_08_010293_pre_fips_check
+
+      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
+        ansible.builtin.shell: fips-mode-setup --enable
+        register: rhel_08_010290_fips_enable
+        notify: change_requires_reboot
+        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
+  when:
+      - rhel_08_010293
+  tags:
+      - RHEL-08-010293
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230254r627750_rule
+      - V-230254
+      - fips
+
 - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
   block:
       - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
@@ -831,7 +855,7 @@
         changed_when: false
         register: rhel8stig_current_ciphers
 
-      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
+      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Apply Ciphers"
         ansible.builtin.lineinfile:
             path: /etc/crypto-policies/back-ends/opensshserver.config
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
@@ -847,30 +871,6 @@
       - SRG-OS-000250-GPOS-00093
       - SV-230252r877394_rule
       - V-230252
-      - fips
-
-- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
-  block:
-      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
-        ansible.builtin.shell: fips-mode-setup --check
-        changed_when: false
-        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
-        register: rhel_08_010293_pre_fips_check
-
-      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
-        ansible.builtin.shell: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
-        notify: change_requires_reboot
-        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
-  when:
-      - rhel_08_010293
-  tags:
-      - RHEL-08-010293
-      - CAT2
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230254r627750_rule
-      - V-230254
       - fips
 
 - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
