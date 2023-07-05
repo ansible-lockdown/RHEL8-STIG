@@ -7394,6 +7394,10 @@
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
             line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
             backrefs: true
+        when:
+            - rhel8stig_current_kex is defined
+            - rhel8stig_current_kex.stdout | length > 0
+
   notify: change_requires_reboot
   when:
       - rhel_08_040342
