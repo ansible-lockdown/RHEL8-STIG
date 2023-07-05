@@ -497,7 +497,7 @@
 - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
   block:
       - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
-        ansible.builtin.shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+        ansible.builtin.shell: "find / -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
         changed_when: false
         failed_when: false
         register: rhel_08_010190_world_writable_files
