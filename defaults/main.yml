@@ -732,7 +732,7 @@ rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
     unlock_time: 0
-    fail_for_root: true
+    fail_for_root: "{{ rhel_08_020023 }}"
     dir: /var/log/faillock
 
 # RHEL-08-020035
