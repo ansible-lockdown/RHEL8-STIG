@@ -188,6 +188,17 @@
       - RHEL-08-010070
       - RHEL-08-030010
 
+- name: "PRELIM | RHEL-08-010730 | RHEL-08-20352 | Get local interactive user home directories"
+  ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
+  changed_when: false
+  failed_when: false
+  register: local_home_directories
+  when:
+      - rhel_08_010730
+      - rhel_08_020352
+  tags:
+      - always
+
 - name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
   ansible.builtin.package:
       name: audispd-plugins
