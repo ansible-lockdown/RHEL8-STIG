@@ -2505,22 +2505,14 @@
       - V-230320
 
 - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-  block:
-      - name: "MEDIUM | RHEL-08-010730 | AUDIT | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010730_home_directories
-
-      - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.file:
-            path: "{{ item }}"
-            mode: "{{ rhel8stig_local_int_home_perms }}"
-        with_items:
-            - "{{ rhel_08_010730_home_directories.stdout_lines }}"
-        when: rhel_08_010730_home_directories.stdout | length > 0
+  ansible.builtin.file:
+      path: "{{ item }}"
+      mode: "{{ rhel8stig_local_int_home_perms }}"
+  with_items:
+      - "{{ local_home_directories.stdout_lines }}"
   when:
       - rhel_08_010730
+      - local_home_directories.stdout | length > 0
   tags:
       - RHEL-08-010730
       - CAT2
@@ -4338,22 +4330,25 @@
   block:
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
         ansible.builtin.find:
-            paths: /home
+            paths: "{{ item }}"
             patterns: '^\.'
             contains: 'umask'
             recurse: true
             hidden: true
             use_regex: true
-        register: rhel8stig_020352_files
+        register: rhel8stig_020352_file
+        loop: "{{ local_home_directories.stdout_lines }}"
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         ansible.builtin.lineinfile:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
-            - "{{ rhel8stig_020352_files.files }}"
-        when: rhel8stig_020352_files.matched > 0
+            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
+        when:
+            - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
+
   when:
       - rhel_08_020352
   tags:
