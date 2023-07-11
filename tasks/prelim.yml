@@ -3,10 +3,10 @@
 - name: "PRELIM | RHEL-08-010020"
   block:
       - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
-        ansible.builtin.shell: df --ouAtput=target /boot | tail -n 1
+        ansible.builtin.shell: df --output=target /boot | tail -n 1
         changed_when: false
         check_mode: false
-        register: rhel_08_boot_part
+        register: rhel8stig_boot_part
 
       - name: "PRELIM | RHEL-08-010020 | crypto-policies-scripts package for FIPS"
         ansible.builtin.package:
