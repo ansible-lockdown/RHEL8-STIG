@@ -175,9 +175,7 @@
       - change_requires_reboot
       - not rhel8stig_skip_reboot
   tags:
-      - CAT1
-      - CAT2
-      - CAT3
+      - always
 
 - name: Include post-remediation tasks
   ansible.builtin.import_tasks: post_remediation_audit.yml
@@ -200,6 +198,4 @@
       - change_requires_reboot
       - rhel8stig_skip_reboot
   tags:
-      - CAT1
-      - CAT2
-      - CAT3
+      - always
