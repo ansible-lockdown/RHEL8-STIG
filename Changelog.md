@@ -1,5 +1,13 @@
 # Changes to RHEL8STIG
 
+## 2.9.1
+
+- Issue #204 address
+  - tidy up of prelim
+- update to allow against container
+  - vars/is_container.yml updated and aligned
+- prelim fqcn
+
 ## 2.9.0 Stig V1R10 27th April 2023
 
 - Added new controls
