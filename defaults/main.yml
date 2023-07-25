@@ -539,12 +539,12 @@ rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
 
 # RHEL-08-010700
-# rhel8stig_ww_dir_owner is the owenr of all world-writable directories
+# rhel8stig_ww_dir_owner is the owner of all world-writable directories
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_owner: root
 
 # RHEL-08-010710
-# rhel8stig_ww_dir_grpowner is the owenr of all world-writable directories
+# rhel8stig_ww_dir_grpowner is the owner of all world-writable directories
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_grpowner: root
 
