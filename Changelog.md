@@ -1,5 +1,10 @@
 # Changes to RHEL8STIG
 
+## 2.9.2
+
+- #216 check that sudo user has a password check improvement
+  - thanks to manish on discord for highlighting this
+
 ## 2.9.1
 
 - Issue #204 address
