@@ -66,6 +66,7 @@
             sudo_password_rule: RHEL-08-010380
   when:
       - rhel_08_010380
+      - ansible_env.SUDO_USER is defined
       - not system_is_ec2
   tags:
       - user_passwd
