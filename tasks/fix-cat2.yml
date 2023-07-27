@@ -243,7 +243,7 @@
             mode: '0700'
 
       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create key pair"
-        openssh_keypair:
+        community.crypto.openssh_keypair:
             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
   when:
       - rhel_08_010100
@@ -3234,7 +3234,7 @@
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
         ansible.builtin.shell: "restorecon -irvF {{ rhel8stig_pam_faillock.dir }}"
-        when: add_faillock_secontext.changed
+        when: add_faillock_secontext.changed  # noqa no-handler
   when:
       - rhel_08_020027 or
         rhel_08_020028
@@ -4280,10 +4280,10 @@
         with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
-        include_tasks: parse_etc_passwd.yml
+        ansible.builtin.include_tasks: parse_etc_passwd.yml
         vars:
             rhel8stig_passwd_tasks: "RHEL-08-020320"
-        when: rhel_08_020320_accounts_removed is changed
+        when: rhel_08_020320_accounts_removed is changed  # noqa no-handler
   when:
       - rhel_08_020320
   tags:
@@ -6101,7 +6101,7 @@
 
       - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
         ansible.builtin.shell: nmcli radio wifi off
-        when: rhel_08_wifi_enabled is changed
+        when: rhel_08_wifi_enabled is changed  # noqa no-handler
   when:
       - rhel_08_040110
   tags:

@@ -54,7 +54,7 @@
         check_mode: false
         changed_when: false
         failed_when: rhel_08_010020_grub_cmdline_linux_audit.rc > 1
-        when: rhel_08_010020_default_grub_missing_audit is changed
+        when: rhel_08_010020_default_grub_missing_audit is changed  # noqa no-handler
         register: rhel_08_010020_grub_cmdline_linux_audit
 
       - name: "HIGH | RHEL-08-010020 | PATCH | Copy over a sane /etc/default/grub"
@@ -66,7 +66,7 @@
             mode: 0644
         vars:
             grub_cmdline_linux: "{{ rhel_08_010020_grub_cmdline_linux_audit.stdout }}"
-        when: rhel_08_010020_default_grub_missing_audit is changed
+        when: rhel_08_010020_default_grub_missing_audit is changed  # noqa no-handler
 
       - name: "HIGH | RHEL-08-010020 | PATCH | fips=1 must be in /etc/default/grub"
         ansible.builtin.replace:
