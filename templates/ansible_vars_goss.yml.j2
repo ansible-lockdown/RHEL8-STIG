@@ -475,26 +475,10 @@ rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 # RHEL_08_030690 if using remote syslog server
 rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
 rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
-rhel8stig_remotelog_protocol: {{ rhel8stig_remotelog_server.protocol }}
+rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server.protocol }}'
 
 # RHEL_08_040137
 python_bin: {{ ansible_python.executable }}
 
 # RHEL_08_040260-62
 rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
-
-# RHEL-08-020010
-# RHEL-08-020011
-# RHEL-08-020012
-# RHEL-08-020013
-# RHEL-08-020014
-# RHEL-08-020015
-# RHEL-08-020016
-# RHEL-08-020017
-# RHEL-08-020018
-# RHEL-08-020019
-# RHEL-08-020020
-# RHEL-08-020021
-# RHEL-08-020022
-# RHEL-08-020023
-
