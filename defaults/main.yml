@@ -878,6 +878,8 @@ rhel8stig_white_list_services:
 # to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
 rhel8stig_ssh_macs: 'MACS=hmac-sha2-512,hmac-sha2-256,hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com'
 rhel8stig_ssh_ciphers: "Ciphers=aes256-ctr,aes192-ctr,aes128-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com"
+# RHEL-08-040342
+# Expected Values for FIPS KEX algorithims
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
 
 # This will be the CRYPTO_POLICY settings in the opensshserver.conf file. It will be a string for the entirety of the setting
