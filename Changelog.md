@@ -1,5 +1,28 @@
 # Changes to RHEL8STIG
 
+## Stig V1R11 - 26th July 2023
+
+### 3.0.0
+
+Controls updated
+
+- CAT2:
+  - 010030 - ruleid
+  - 010200 - ruleid
+  - 010201 - ruleid
+  - 010290 - ruleid and SSH MACS updated
+  - 010291 - ruleid and SSH Ciphers updated
+  - 010770 - ruleid
+  - 020035 - new control idlesession timeout new var rhel_08_020035_idlesessiontimeout
+  - 020041 - ruleid and tmux script update
+  - 030690 - ruleid and protocol options added
+  - 040159 - ruleid
+  - 040160 - ruleid
+  - 040342 - ruleid and SSH KEX algorithms updated
+
+- CAT3
+  - 010471 - ruleid
+
 ## 2.9.2
 
 - #216 check that sudo user has a password check improvement
