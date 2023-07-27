@@ -23,6 +23,8 @@ Controls updated
 - CAT3
   - 010471 - ruleid
 
+- audit updated new version and variable naming
+
 ## 2.9.2
 
 - #216 check that sudo user has a password check improvement
