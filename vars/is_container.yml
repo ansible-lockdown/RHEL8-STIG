@@ -1,3 +1,5 @@
+---
+
 # Container vars file
 
 rhel8stig_ssh_required: false
