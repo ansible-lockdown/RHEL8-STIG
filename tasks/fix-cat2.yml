@@ -98,7 +98,7 @@
       - CAT2
       - CCI-001199
       - SRG-OS-000185-GPOS-00079
-      - SV-230224r809268_rule
+      - SV-230224r917864_rule
       - V-230224
 
 - name: |
@@ -533,7 +533,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r858697_rule
+      - SV-230244r917867_rule
       - V-230244
       - ssh
 
@@ -551,7 +551,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-244525r858699_rule
+      - SV-244525r917886_rule
       - V-244525
       - ssh
 
@@ -820,7 +820,7 @@
       - RHEL-08-010290
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230251r743937_rule
+      - SV-230251r917870_rule
       - V-230251
       - fips
 
@@ -845,7 +845,7 @@
       - RHEL-08-010291
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-230252r877394_rule
+      - SV-230252r917873_rule
       - V-230252
       - fips
 
@@ -2661,7 +2661,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230325r627750_rule
+      - SV-230325r917879_rule
       - V-230325
       - complexity-high
 
@@ -3293,6 +3293,22 @@
       - V-230347
       - gui
 
+- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
+  ansible.builtin.lineinfile:
+      path: "/etc/systemd/logind.conf"
+      regexp: '^StopIdleSessionSec=|^\# StopIdleSessionSec='
+      line: "StopIdleSessionSec= {{ rhel_08_020035_idlesessiontimeout }}"
+  when:
+      - rhel_08_020035
+  tags:
+      - RHEL-08-020035
+      - CAT2
+      - CCI-001133
+      - SRG-OS-000163-GPOS-00072
+      - SV-257258r917891_rule
+      - V-257258
+      - session
+
 - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
   block:
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
@@ -3332,7 +3348,7 @@
           if [ "$PS1" ]; then
           parent=$(ps -o ppid= -p $$)
           name=$(ps -o comm= -p $parent)
-          case "$name" in (sshd|login) exec tmux ;; esac
+          case "$name" in (sshd|login) tmux ;; esac
           fi
       create: true
   when:
@@ -3342,7 +3358,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r880737_rule
+      - SV-230349r917920_rule
       - V-230349
       - tmux
 
@@ -5620,7 +5636,7 @@
   ansible.builtin.lineinfile:
       path: /etc/rsyslog.conf
       regexp: '^.*\@\@'
-      line: "*.* @@{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
+      line: "*.* {{ rhel8stig_remotelog_server.protocol }}{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
   when:
       - rhel_08_030690
   tags:
@@ -5628,7 +5644,7 @@
       - CAT2
       - CCI-001851
       - SRG-OS-000342-GPOS-00133
-      - SV-230479r627750_rule
+      - SV-230479r917883_rule
       - V-230479
       - auditd
       - rsyslog
@@ -6545,8 +6561,8 @@
       - CAT2
       - CCI-002418
       - SRG-OS-000423-GPOS-00187
-      - SV-244549r743896_rule
-      - SV-230526r744032_rule
+      - SV-244549r916422_rule
+      - SV-230526r916422_rule
       - V-244549
       - V-230526
       - ssh
@@ -7403,7 +7419,8 @@
       - CAT2
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-255924r880733_rule
+      - SV-255924r917888_rule
+      - V-255924
       - fips
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
