@@ -23,7 +23,8 @@ Controls updated
 - CAT3
   - 010471 - ruleid
 
-- audit updated new version and variable naming
+- audit variables updated, new version
+- tidied up the end of the playbook ordering with reboot taking place(if set and enabled) prior to audit now.
 
 ## 2.9.2
 
