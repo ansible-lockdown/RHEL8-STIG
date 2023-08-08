@@ -2,6 +2,17 @@
 
 ## Stig V1R11 - 26th July 2023
 
+### 3.0.1
+
+Issues:
+
+- [#207](https://github.com/ansible-lockdown/RHEL8-STIG/issues/207)
+- [#208](https://github.com/ansible-lockdown/RHEL8-STIG/issues/208)
+- [#209](https://github.com/ansible-lockdown/RHEL8-STIG/issues/209)
+- [#210](https://github.com/ansible-lockdown/RHEL8-STIG/issues/210)
+- [#211](https://github.com/ansible-lockdown/RHEL8-STIG/issues/211)
+- [#212](https://github.com/ansible-lockdown/RHEL8-STIG/issues/212)
+
 ### 3.0.0
 
 Controls updated
