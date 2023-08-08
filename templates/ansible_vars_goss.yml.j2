@@ -1,6 +1,6 @@
 
 ## metadata for Audit benchmark
-benchmark_version: '1.10'
+benchmark_version: '1.11'
 
 rhel8stig_os_distribution: {{ ansible_distribution | lower }}
 
@@ -210,6 +210,7 @@ RHEL_08_020028: {{ rhel_08_020028 }}
 RHEL_08_020030: {{ rhel_08_020030 }}
 RHEL_08_020031: {{ rhel_08_020031 }}
 RHEL_08_020032: {{ rhel_08_020032 }}
+RHEL_08_020035: {{ rhel_08_020035 }}
 RHEL_08_020039: {{ rhel_08_020039 }}
 RHEL_08_020040: {{ rhel_08_020040 }}
 RHEL_08_020041: {{ rhel_08_020041 }}
@@ -459,6 +460,9 @@ rhel8stig_aide_cron_file: /etc/cron.d/aide
 # RHEL_08_200027 &28
 rhel8stig_pam_faillock_dir: {{ rhel8stig_pam_faillock.dir }}
 
+# RHEL_08_020035
+rhel_08_020035_idlesessiontimeout: {{ rhel_08_020035_idlesessiontimeout }}
+
 # RHEL_08_030040 - Options are SYSLOG, SINGLE, and HALT to fit STIG standards
 rhel8stig_auditd_disk_error_action: {{ rhel8stig_auditd_disk_error_action }}
 
@@ -471,25 +475,10 @@ rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 # RHEL_08_030690 if using remote syslog server
 rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
 rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
+rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server.protocol }}'
 
 # RHEL_08_040137
 python_bin: {{ ansible_python.executable }}
 
 # RHEL_08_040260-62
 rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
-
-# RHEL-08-020010
-# RHEL-08-020011
-# RHEL-08-020012
-# RHEL-08-020013
-# RHEL-08-020014
-# RHEL-08-020015
-# RHEL-08-020016
-# RHEL-08-020017
-# RHEL-08-020018
-# RHEL-08-020019
-# RHEL-08-020020
-# RHEL-08-020021
-# RHEL-08-020022
-# RHEL-08-020023
-
