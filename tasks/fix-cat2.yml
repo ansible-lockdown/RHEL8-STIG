@@ -497,7 +497,7 @@
 - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
   block:
       - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
-        ansible.builtin.shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+        ansible.builtin.shell: "find / -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
         changed_when: false
         failed_when: false
         register: rhel_08_010190_world_writable_files
@@ -799,6 +799,30 @@
       - V-244526
       - ssh
 
+- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
+  block:
+      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
+        ansible.builtin.shell: fips-mode-setup --check
+        changed_when: false
+        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
+        register: rhel_08_010293_pre_fips_check
+
+      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
+        ansible.builtin.shell: fips-mode-setup --enable
+        register: rhel_08_010290_fips_enable
+        notify: change_requires_reboot
+        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
+  when:
+      - rhel_08_010293
+  tags:
+      - RHEL-08-010293
+      - CAT2
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230254r627750_rule
+      - V-230254
+      - fips
+
 - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
   block:
       - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
@@ -831,7 +855,7 @@
         changed_when: false
         register: rhel8stig_current_ciphers
 
-      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
+      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Apply Ciphers"
         ansible.builtin.lineinfile:
             path: /etc/crypto-policies/back-ends/opensshserver.config
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
@@ -847,30 +871,6 @@
       - SRG-OS-000250-GPOS-00093
       - SV-230252r917873_rule
       - V-230252
-      - fips
-
-- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
-  block:
-      - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
-        ansible.builtin.shell: fips-mode-setup --check
-        changed_when: false
-        failed_when: rhel_08_010293_pre_fips_check.stdout is not defined
-        register: rhel_08_010293_pre_fips_check
-
-      - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
-        ansible.builtin.shell: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
-        notify: change_requires_reboot
-        when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
-  when:
-      - rhel_08_010293
-  tags:
-      - RHEL-08-010293
-      - CAT2
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230254r627750_rule
-      - V-230254
       - fips
 
 - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
@@ -2505,22 +2505,14 @@
       - V-230320
 
 - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-  block:
-      - name: "MEDIUM | RHEL-08-010730 | AUDIT | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010730_home_directories
-
-      - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.file:
-            path: "{{ item }}"
-            mode: "{{ rhel8stig_local_int_home_perms }}"
-        with_items:
-            - "{{ rhel_08_010730_home_directories.stdout_lines }}"
-        when: rhel_08_010730_home_directories.stdout | length > 0
+  ansible.builtin.file:
+      path: "{{ item }}"
+      mode: "{{ rhel8stig_local_int_home_perms }}"
+  with_items:
+      - "{{ local_home_directories.stdout_lines }}"
   when:
       - rhel_08_010730
+      - local_home_directories.stdout | length > 0
   tags:
       - RHEL-08-010730
       - CAT2
@@ -4338,22 +4330,25 @@
   block:
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
         ansible.builtin.find:
-            paths: /home
+            paths: "{{ item }}"
             patterns: '^\.'
             contains: 'umask'
             recurse: true
             hidden: true
             use_regex: true
-        register: rhel8stig_020352_files
+        register: rhel8stig_020352_file
+        loop: "{{ local_home_directories.stdout_lines }}"
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         ansible.builtin.lineinfile:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
-            - "{{ rhel8stig_020352_files.files }}"
-        when: rhel8stig_020352_files.matched > 0
+            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
+        when:
+            - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
+
   when:
       - rhel_08_020352
   tags:
@@ -7410,6 +7405,10 @@
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
             line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
             backrefs: true
+        when:
+            - rhel8stig_current_kex is defined
+            - rhel8stig_current_kex.stdout | length > 0
+
   notify: change_requires_reboot
   when:
       - rhel_08_040342
