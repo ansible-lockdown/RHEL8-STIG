@@ -194,8 +194,8 @@
   failed_when: false
   register: local_home_directories
   when:
-      - rhel_08_010730
-      - rhel_08_020352
+      - rhel_08_010730 or
+        rhel_08_020352
   tags:
       - always
 
