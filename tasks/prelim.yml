@@ -188,6 +188,17 @@
       - RHEL-08-010070
       - RHEL-08-030010
 
+- name: "PRELIM | RHEL-08-010730 | RHEL-08-20352 | Get local interactive user home directories"
+  ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
+  changed_when: false
+  failed_when: false
+  register: local_home_directories
+  when:
+      - rhel_08_010730 or
+        rhel_08_020352
+  tags:
+      - always
+
 - name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
   ansible.builtin.package:
       name: audispd-plugins
@@ -323,11 +334,7 @@
         rhel_08_020250 or
         rhel_08_020290
   tags:
-      - RHEL-08-010400
-      - RHEL-08-020250
-      - RHEL-08-020090
-      - RHEL-08-020290
-      - pamd
+      - always
 
 - name: "PRELIM | Gather interactive user ID min"
   block:
@@ -347,6 +354,8 @@
         ansible.builtin.set_fact:
             rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | string }}"
             rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | string }}"
+  tags:
+      - always
 
 - name: Gather the package facts
   ansible.builtin.package_facts:

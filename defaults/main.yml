@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v1r10'
+benchmark_version: 'v1r11'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -61,7 +61,7 @@ setup_audit: false
 # How to retrieve audit binary
 # Options are copy or download - detailed settings at the bottom of this file
 # you will need to access to either github or the file already dowmloaded
-get_goss_file: download
+get_audit_binary_method: download
 
 # how to get audit files onto host options
 # options are git/copy/get_url other e.g. if you wish to run from already downloaded conf
@@ -246,6 +246,7 @@ rhel_08_020028: true
 rhel_08_020030: true
 rhel_08_020031: true
 rhel_08_020032: true
+rhel_08_020035: true
 rhel_08_020039: true
 rhel_08_020040: true
 rhel_08_020041: true
@@ -275,6 +276,7 @@ rhel_08_020210: true
 rhel_08_020220: true
 rhel_08_020221: true
 rhel_08_020230: true
+rhel_08_020235: true
 rhel_08_020231: true
 rhel_08_020240: true
 rhel_08_020250: true
@@ -491,7 +493,7 @@ rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
 # The default shell command to gather local interactive user directories
 ## NOTE: You will need to adjust the UID range in parenthesis below.
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
-local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65535} | cut -d: -f6 | sort -u | grep -v '/var/' | grep -v '/nonexistent/*' | grep -v '/run/*'"
+local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65535} | grep -v '/sbin/nologin' | cut -d: -f6 | sort -u | grep -Ev '/var/|/nonexistent/|/run/*'"
 
 # IPv6 required
 rhel8stig_ipv6_required: true
@@ -539,12 +541,12 @@ rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
 
 # RHEL-08-010700
-# rhel8stig_ww_dir_owner is the owenr of all world-writable directories
+# rhel8stig_ww_dir_owner is the owner of all world-writable directories
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_owner: root
 
 # RHEL-08-010710
-# rhel8stig_ww_dir_grpowner is the owenr of all world-writable directories
+# rhel8stig_ww_dir_grpowner is the owner of all world-writable directories
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_grpowner: root
 
@@ -730,8 +732,11 @@ rhel8stig_pam_faillock:
     attempts: 3
     interval: 900
     unlock_time: 0
-    fail_for_root: true
+    fail_for_root: "{{ rhel_08_020023 }}"
     dir: /var/log/faillock
+
+# RHEL-08-020035
+rhel_08_020035_idlesessiontimeout: 900
 
 # RHEL-08-030670
 # rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards
@@ -773,9 +778,11 @@ rhel8stig_login_defaults:
     create_home: 'yes'
 
 # RHEL-08-030690 uncomment and set the value to a remote IP address that can receive audit logs
+# NOTE different protocol configs '@''=UDP '@@''=TCP '':omrelp:'=RELP
 rhel8stig_remotelog_server:
     server: 10.10.10.10
     port: 9999
+    protocol: '@@'
 
 # RHEL-08-030020
 rhel8stig_auditd_mail_acct: root
@@ -870,8 +877,10 @@ rhel8stig_white_list_services:
 # This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
 # to conform to STIG standard control RHEL-08-010290 this variable must include hmac-sha2-512,hmac-sha2-256
 # to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_macs: 'MACS=hmac-sha2-512,hmac-sha2-256'
-rhel8stig_ssh_ciphers: "Ciphers=aes256-ctr,aes192-ctr,aes128-ctr"
+rhel8stig_ssh_macs: 'MACS=hmac-sha2-512,hmac-sha2-256,hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com'
+rhel8stig_ssh_ciphers: "Ciphers=aes256-ctr,aes192-ctr,aes128-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com"
+# RHEL-08-040342
+# Expected Values for FIPS KEX algorithims
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
 
 # This will be the CRYPTO_POLICY settings in the opensshserver.conf file. It will be a string for the entirety of the setting
@@ -901,29 +910,29 @@ audit_run_script_environment:
     AUDIT_CONTENT_LOCATION: "{{ audit_out_dir }}"
 
 ### Goss binary settings ###
-goss_version:
-    release: v0.3.21
-    checksum: 'sha256:9a9200779603acf0353d2c0e85ae46e083596c10838eaf4ee050c924678e4fe3'
+audit_bin_version:
+    release: v0.3.23
+    checksum: 'sha256:9e9f24e25f86d6adf2e669a9ffbe8c3d7b9b439f5f877500dea02ba837e10e4d'
 audit_bin_path: /usr/local/bin/
 audit_bin: "{{ audit_bin_path }}goss"
 audit_format: json
 
-# if get_goss_file == download change accordingly
-goss_url: "https://github.com/goss-org/goss/releases/download/{{ goss_version.release }}/goss-linux-amd64"
+# if get_audit_binary_method == download change accordingly
+audit_bin_url: "https://github.com/goss-org/goss/releases/download/{{ audit_bin_version.release }}/goss-linux-amd64"
 
-## if get_goss_file - copy the following needs to be updated for your environment
+## if get_audit_binary_method - copy the following needs to be updated for your environment
 ## it is expected that it will be copied from somewhere accessible to the control node
 ## e.g copy from ansible control node to remote host
-copy_goss_from_path: /some/accessible/path
+audit_bin_copy_location: /some/accessible/path
 
-### Goss Audit Benchmark file ###
+#### Goss Audit Benchmark file ###
 ## managed by the control audit_content
 # git
 audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
 audit_git_version: "benchmark_{{ benchmark_version }}_rh8"
 
-# copy:
-audit_local_copy: "some path to copy from"
+# archive or copy:
+audit_conf_copy: "some path to copy from"
 
 # get_url:
 audit_files_url: "some url maybe s3?"
@@ -932,14 +941,13 @@ audit_files_url: "some url maybe s3?"
 # Where the goss configs and outputs are stored
 audit_out_dir: '/opt'
 # Where the goss audit configuration will be stored
-audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit/"
+audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit"
 
 # If changed these can affect other products
-pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
-post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}-{{ benchmark_version }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
+post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}-{{ benchmark_version }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
 
 ## The following should not need changing
-goss_file: "{{ audit_conf_dir }}goss.yml"
 audit_vars_path: "{{ audit_conf_dir }}/vars/{{ ansible_hostname }}.yml"
 audit_results: |
       The pre remediation results are: {{ pre_audit_summary }}.

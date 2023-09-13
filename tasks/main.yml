@@ -66,6 +66,7 @@
             sudo_password_rule: RHEL-08-010380
   when:
       - rhel_08_010380
+      - ansible_env.SUDO_USER is defined
       - not system_is_ec2
   tags:
       - user_passwd
@@ -164,23 +165,29 @@
 
 - name: flush handlers
   ansible.builtin.meta: flush_handlers
-  tags:
-      - CAT1
-      - CAT2
-      - CAT3
 
-- name: reboot system if changes require it and not skipped
-  ansible.builtin.reboot:
-  when:
-      - change_requires_reboot
-      - not rhel8stig_skip_reboot
-  tags:
-      - always
+- name: reboot system
+  block:
+      - name: reboot system if not skipped
+        ansible.builtin.reboot:
+        when:
+            - change_requires_reboot
+            - not rhel8stig_skip_reboot
 
-- name: Include post-remediation tasks
+      - name: Warning a reboot required but skip option set
+        ansible.builtin.debug:
+            msg: "Warning!! changes have been made that require a reboot to be implemented but skip reboot was set - Can affect compliance check results"
+        changed_when: true
+        when:
+            - change_requires_reboot
+            - rhel8stig_skip_reboot
+
+- name: run post remediation audit
   ansible.builtin.import_tasks: post_remediation_audit.yml
   when:
       - run_audit
+  tags:
+      - always
 
 - name: Show Audit Summary
   ansible.builtin.debug:
@@ -189,13 +196,4 @@
       - run_audit
   tags:
       - run_audit
-
-- name: Warning a reboot required but skip option set
-  ansible.builtin.debug:
-      msg: "Warning!! changes have been made that require a reboot to be implemented but skip reboot was set - Can affect compliance check results"
-  changed_when: true
-  when:
-      - change_requires_reboot
-      - rhel8stig_skip_reboot
-  tags:
       - always

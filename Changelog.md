@@ -1,5 +1,47 @@
 # Changes to RHEL8STIG
 
+## Stig V1R11 - 26th July 2023
+
+### 3.0.1
+
+Issues:
+
+- [#207](https://github.com/ansible-lockdown/RHEL8-STIG/issues/207)
+- [#208](https://github.com/ansible-lockdown/RHEL8-STIG/issues/208)
+- [#209](https://github.com/ansible-lockdown/RHEL8-STIG/issues/209)
+- [#210](https://github.com/ansible-lockdown/RHEL8-STIG/issues/210)
+- [#211](https://github.com/ansible-lockdown/RHEL8-STIG/issues/211)
+- [#212](https://github.com/ansible-lockdown/RHEL8-STIG/issues/212)
+
+### 3.0.0
+
+Controls updated
+
+- CAT2:
+  - 010030 - ruleid
+  - 010200 - ruleid
+  - 010201 - ruleid
+  - 010290 - ruleid and SSH MACS updated
+  - 010291 - ruleid and SSH Ciphers updated
+  - 010770 - ruleid
+  - 020035 - new control idlesession timeout new var rhel_08_020035_idlesessiontimeout
+  - 020041 - ruleid and tmux script update
+  - 030690 - ruleid and protocol options added
+  - 040159 - ruleid
+  - 040160 - ruleid
+  - 040342 - ruleid and SSH KEX algorithms updated
+
+- CAT3
+  - 010471 - ruleid
+
+- audit variables updated, new version
+- tidied up the end of the playbook ordering with reboot taking place(if set and enabled) prior to audit now.
+
+## 2.9.2
+
+- #216 check that sudo user has a password check improvement
+  - thanks to manish on discord for highlighting this
+
 ## 2.9.1
 
 - Issue #204 address

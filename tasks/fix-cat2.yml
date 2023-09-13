@@ -98,7 +98,7 @@
       - CAT2
       - CCI-001199
       - SRG-OS-000185-GPOS-00079
-      - SV-230224r809268_rule
+      - SV-230224r917864_rule
       - V-230224
 
 - name: |
@@ -243,7 +243,7 @@
             mode: '0700'
 
       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create key pair"
-        openssh_keypair:
+        community.crypto.openssh_keypair:
             path: "{{ rhel8stig_path_to_sshkey }}/id_rsa"
   when:
       - rhel_08_010100
@@ -497,7 +497,7 @@
 - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
   block:
       - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
-        ansible.builtin.shell: "find / -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
+        ansible.builtin.shell: "find / -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
         changed_when: false
         failed_when: false
         register: rhel_08_010190_world_writable_files
@@ -533,7 +533,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r858697_rule
+      - SV-230244r917867_rule
       - V-230244
       - ssh
 
@@ -551,7 +551,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-244525r858699_rule
+      - SV-244525r917886_rule
       - V-244525
       - ssh
 
@@ -799,56 +799,6 @@
       - V-244526
       - ssh
 
-- name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
-  block:
-      - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
-        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
-        changed_when: false
-        register: rhel8stig_current_macs
-
-      - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
-        ansible.builtin.lineinfile:
-            path: /etc/crypto-policies/back-ends/opensshserver.config
-            regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_macs.stdout }}(.*$)'
-            line: '\g<1>-o{{ rhel8stig_ssh_macs }}\g<2>'
-            backrefs: true
-  notify: change_requires_reboot
-  when:
-      - rhel_08_010290
-  tags:
-      - CAT2
-      - RHEL-08-010290
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230251r743937_rule
-      - V-230251
-      - fips
-
-- name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Add Ciphers"
-  block:
-      - name: "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
-        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
-        changed_when: false
-        register: rhel8stig_current_ciphers
-
-      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
-        ansible.builtin.lineinfile:
-            path: /etc/crypto-policies/back-ends/opensshserver.config
-            regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
-            line: '\g<1>-o{{ rhel8stig_ssh_ciphers }}\g<2>'
-            backrefs: true
-  notify: change_requires_reboot
-  when:
-      - rhel_08_010291
-  tags:
-      - CAT2
-      - RHEL-08-010291
-      - CCI-001453
-      - SRG-OS-000250-GPOS-00093
-      - SV-230252r877394_rule
-      - V-230252
-      - fips
-
 - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
   block:
       - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
@@ -871,6 +821,56 @@
       - SRG-OS-000250-GPOS-00093
       - SV-230254r627750_rule
       - V-230254
+      - fips
+
+- name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
+  block:
+      - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
+        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
+        changed_when: false
+        register: rhel8stig_current_macs
+
+      - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
+        ansible.builtin.lineinfile:
+            path: /etc/crypto-policies/back-ends/opensshserver.config
+            regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_macs.stdout }}(.*$)'
+            line: '\g<1>-o{{ rhel8stig_ssh_macs }}\g<2>'
+            backrefs: true
+  notify: change_requires_reboot
+  when:
+      - rhel_08_010290
+  tags:
+      - CAT2
+      - RHEL-08-010290
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230251r917870_rule
+      - V-230251
+      - fips
+
+- name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Add Ciphers"
+  block:
+      - name: "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
+        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
+        changed_when: false
+        register: rhel8stig_current_ciphers
+
+      - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Apply Ciphers"
+        ansible.builtin.lineinfile:
+            path: /etc/crypto-policies/back-ends/opensshserver.config
+            regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
+            line: '\g<1>-o{{ rhel8stig_ssh_ciphers }}\g<2>'
+            backrefs: true
+  notify: change_requires_reboot
+  when:
+      - rhel_08_010291
+  tags:
+      - CAT2
+      - RHEL-08-010291
+      - CCI-001453
+      - SRG-OS-000250-GPOS-00093
+      - SV-230252r917873_rule
+      - V-230252
       - fips
 
 - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
@@ -2505,22 +2505,14 @@
       - V-230320
 
 - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-  block:
-      - name: "MEDIUM | RHEL-08-010730 | AUDIT | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010730_home_directories
-
-      - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
-        ansible.builtin.file:
-            path: "{{ item }}"
-            mode: "{{ rhel8stig_local_int_home_perms }}"
-        with_items:
-            - "{{ rhel_08_010730_home_directories.stdout_lines }}"
-        when: rhel_08_010730_home_directories.stdout | length > 0
+  ansible.builtin.file:
+      path: "{{ item }}"
+      mode: "{{ rhel8stig_local_int_home_perms }}"
+  with_items:
+      - "{{ local_home_directories.stdout_lines }}"
   when:
       - rhel_08_010730
+      - local_home_directories.stdout | length > 0
   tags:
       - RHEL-08-010730
       - CAT2
@@ -2661,7 +2653,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230325r627750_rule
+      - SV-230325r917879_rule
       - V-230325
       - complexity-high
 
@@ -3234,7 +3226,7 @@
           "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
            MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
         ansible.builtin.shell: "restorecon -irvF {{ rhel8stig_pam_faillock.dir }}"
-        when: add_faillock_secontext.changed
+        when: add_faillock_secontext.changed  # noqa no-handler
   when:
       - rhel_08_020027 or
         rhel_08_020028
@@ -3293,6 +3285,22 @@
       - V-230347
       - gui
 
+- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
+  ansible.builtin.lineinfile:
+      path: "/etc/systemd/logind.conf"
+      regexp: '^StopIdleSessionSec=|^\# StopIdleSessionSec='
+      line: "StopIdleSessionSec= {{ rhel_08_020035_idlesessiontimeout }}"
+  when:
+      - rhel_08_020035
+  tags:
+      - RHEL-08-020035
+      - CAT2
+      - CCI-001133
+      - SRG-OS-000163-GPOS-00072
+      - SV-257258r917891_rule
+      - V-257258
+      - session
+
 - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
   block:
       - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
@@ -3332,7 +3340,7 @@
           if [ "$PS1" ]; then
           parent=$(ps -o ppid= -p $$)
           name=$(ps -o comm= -p $parent)
-          case "$name" in (sshd|login) exec tmux ;; esac
+          case "$name" in (sshd|login) tmux ;; esac
           fi
       create: true
   when:
@@ -3342,7 +3350,7 @@
       - CAT2
       - CCI-000056
       - SRG-OS-000028-GPOS-00009
-      - SV-230349r880737_rule
+      - SV-230349r917920_rule
       - V-230349
       - tmux
 
@@ -4264,10 +4272,10 @@
         with_items: "{{ rhel8stig_unnecessary_accounts }}"
 
       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
-        include_tasks: parse_etc_passwd.yml
+        ansible.builtin.include_tasks: parse_etc_passwd.yml
         vars:
             rhel8stig_passwd_tasks: "RHEL-08-020320"
-        when: rhel_08_020320_accounts_removed is changed
+        when: rhel_08_020320_accounts_removed is changed  # noqa no-handler
   when:
       - rhel_08_020320
   tags:
@@ -4322,22 +4330,25 @@
   block:
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
         ansible.builtin.find:
-            paths: /home
+            paths: "{{ item }}"
             patterns: '^\.'
             contains: 'umask'
             recurse: true
             hidden: true
             use_regex: true
-        register: rhel8stig_020352_files
+        register: rhel8stig_020352_file
+        loop: "{{ local_home_directories.stdout_lines }}"
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         ansible.builtin.lineinfile:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
-            - "{{ rhel8stig_020352_files.files }}"
-        when: rhel8stig_020352_files.matched > 0
+            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
+        when:
+            - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
+
   when:
       - rhel_08_020352
   tags:
@@ -5620,7 +5631,7 @@
   ansible.builtin.lineinfile:
       path: /etc/rsyslog.conf
       regexp: '^.*\@\@'
-      line: "*.* @@{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
+      line: "*.* {{ rhel8stig_remotelog_server.protocol }}{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
   when:
       - rhel_08_030690
   tags:
@@ -5628,7 +5639,7 @@
       - CAT2
       - CCI-001851
       - SRG-OS-000342-GPOS-00133
-      - SV-230479r627750_rule
+      - SV-230479r917883_rule
       - V-230479
       - auditd
       - rsyslog
@@ -6085,7 +6096,7 @@
 
       - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
         ansible.builtin.shell: nmcli radio wifi off
-        when: rhel_08_wifi_enabled is changed
+        when: rhel_08_wifi_enabled is changed  # noqa no-handler
   when:
       - rhel_08_040110
   tags:
@@ -6545,8 +6556,8 @@
       - CAT2
       - CCI-002418
       - SRG-OS-000423-GPOS-00187
-      - SV-244549r743896_rule
-      - SV-230526r744032_rule
+      - SV-244549r916422_rule
+      - SV-230526r916422_rule
       - V-244549
       - V-230526
       - ssh
@@ -7394,6 +7405,10 @@
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
             line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
             backrefs: true
+        when:
+            - rhel8stig_current_kex is defined
+            - rhel8stig_current_kex.stdout | length > 0
+
   notify: change_requires_reboot
   when:
       - rhel_08_040342
@@ -7403,7 +7418,8 @@
       - CAT2
       - CCI-001453
       - SRG-OS-000250-GPOS-00093
-      - SV-255924r880733_rule
+      - SV-255924r917888_rule
+      - V-255924
       - fips
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
