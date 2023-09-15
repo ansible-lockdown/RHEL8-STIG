@@ -91,7 +91,7 @@
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
             replace: "{{ rhel8stig_replace_quoted_params }}"
         with_items:
-            - "{{ ansible_mounts | json_query(query) }}"
+            - "{{ ansible_mounts | json_query(query) }}"  # noqa: jinja[invalid]
         vars:
             query: "[?mount=='{{ rhel8stig_boot_part.stdout }}'] | [0]"
             key: GRUB_CMDLINE_LINUX
@@ -112,7 +112,7 @@
             - fips=1
             - boot=UUID={{ ansible_mounts | json_query(query) }}
         vars:
-            query: "[?mount=='{{ rhel8stig_boot_part.stdout }}'].uuid | [0]"
+            query: "[?mount=='{{ rhel8stig_boot_part.stdout }}'].uuid | [0]"  # noqa: jinja[invalid]
         register: rhel_08_010020_audit
         when:
             - not ansible_check_mode or
