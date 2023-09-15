@@ -2125,9 +2125,9 @@
       opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
       state: mounted
   vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
+      device_query: '[?mount == `{{ item }}`] | [0].device'  # noqa: jinja[invalid]
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'  # noqa: jinja[invalid]
+      options_query: '[?mount == `{{ item }}`] | [0].options'  # noqa: jinja[invalid]
   with_items: "{{ rhel8stig_nfs_mounts }}"
   when:
       - rhel_08_010650
@@ -4345,7 +4345,7 @@
             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
-            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
+            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"  # noqa: jinja[invalid]
         when:
             - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
   when:
