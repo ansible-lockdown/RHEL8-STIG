@@ -4348,7 +4348,6 @@
             - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
         when:
             - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
-
   when:
       - rhel_08_020352
   tags:
