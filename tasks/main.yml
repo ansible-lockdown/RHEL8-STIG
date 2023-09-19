@@ -187,7 +187,7 @@
   when:
       - run_audit
   tags:
-      - always
+      - run_audit
 
 - name: Show Audit Summary
   ansible.builtin.debug:
@@ -196,4 +196,3 @@
       - run_audit
   tags:
       - run_audit
-      - always
