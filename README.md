@@ -16,9 +16,9 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 11 released on July 26, 
 ![Discord Badge](https://img.shields.io/discord/925818806838919229?logo=discord)
 
 ![Devel Build Status](https://img.shields.io/github/actions/workflow/status/ansible-lockdown/rhel8-stig/linux_benchmark_testing.yml?label=Devel%20Build%20Status)
-![Devel Commits](https://img.shields.io/github/commit-activity/m/ansible-lockdown/rhel8-stig/devel?color=dark%20green&label=Devel%20Branch%20commits)
+![Devel Commits](https://img.shields.io/github/commit-activity/m/ansible-lockdown/rhel8-stig/devel?color=dark%20green&label=Devel%20Branch%20Commits)
 
-![Release Branch](https://img.shields.io/badge/Release%20Branch-Main-brightgreen) 
+![Release Branch](https://img.shields.io/badge/Release%20Branch-Main-brightgreen)
 ![Main Build Status](https://img.shields.io/github/actions/workflow/status/ansible-lockdown/rhel8-stig/linux_benchmark_testing.yml?label=Build%20Status)
 ![Main Release Date](https://img.shields.io/github/release-date/ansible-lockdown/rhel8-stig?label=Release%20Date)
 ![Release Tag](https://img.shields.io/github/v/tag/ansible-lockdown/rhel8-stig?label=Release%20Tag&&color=success)
@@ -39,7 +39,7 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 11 released on July 26, 
 
 ### Community
 
-On our [Discord Server](https://discord.io/ansible-lockdown) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
+On our [Discord Server](https://www.lockdownenterprise.com/discord) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
 
 ---
 
@@ -112,14 +112,14 @@ This is based on a vagrant image with selections enabled. e.g. No Gui or firewal
 Note: More tests are run during audit as we check config and running state.
 
 ```sh
-ok: [rocky8_efi] => 
+ok: [rocky8_efi] =>
   msg:
   - 'The pre remediation results are: Count: 804, Failed: 416, Duration: 6.488s.'
   - 'The post remediation results are: Count: 804, Failed: 28, Duration: 68.687s.'
   - Full breakdown can be found in /opt
 
 PLAY RECAP ****************************************************************************************************************
-rocky8_efi                 : ok=482  changed=269  unreachable=0    failed=0    skipped=207  rescued=0    ignored=0   
+rocky8_efi                 : ok=482  changed=269  unreachable=0    failed=0    skipped=207  rescued=0    ignored=0
 ```
 
 ## Branches
@@ -180,3 +180,12 @@ If you would are interested in dedicated support to assist or provide bespoke se
 ## Credits
 
 This repo originated from work done by [Sam Doran](https://github.com/samdoran/ansible-role-stig)
+
+## Added Extras
+
+- makefile - this is there purely for testing and initial setup purposes.
+- [pre-commit](https://pre-commit.com) can be tested and can be run from within the directory
+
+```sh
+pre-commit run
+```
