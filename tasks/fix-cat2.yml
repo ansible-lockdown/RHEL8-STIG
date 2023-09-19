@@ -1805,7 +1805,7 @@
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
       - "'nosuid' not in home_mount.options"
   vars:
-      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"  # noqa: jinja[invalid]
   tags:
       - RHEL-08-010570
       - CAT2
@@ -1828,7 +1828,7 @@
       - ansible_mounts | selectattr('mount', 'match', '^/boot$') | list | length != 0
       - "'nosuid' not in boot_mount.options"
   vars:
-      boot_mount: "{{ ansible_mounts | json_query('[?mount == `/boot`] | [0]') }}"
+      boot_mount: "{{ ansible_mounts | json_query('[?mount == `/boot`] | [0]') }}"  # noqa: jinja[invalid]
   tags:
       - RHEL-08-010571
       - CAT2
@@ -1843,7 +1843,7 @@
   ansible.posix.mount:
       path: /boot/efi
       state: mounted
-      src: "{{ boot_efi_mount.device }}"
+      src: "UUID={{ boot_efi_mount.uuid }}"
       fstype: "{{ boot_efi_mount.fstype }}"
       opts: "{{ boot_efi_mount.options }},nosuid"
   when:
@@ -1851,7 +1851,7 @@
       - ansible_mounts | selectattr('mount', 'match', '^/boot/efi$') | list | length != 0
       - "'nosuid' not in boot_efi_mount.options"
   vars:
-      boot_efi_mount: "{{ ansible_mounts | json_query('[?mount == `/boot/efi`] | [0]') }}"
+      boot_efi_mount: "{{ ansible_mounts | json_query('[?mount == `/boot/efi`] | [0]') }}"  # noqa: jinja[invalid]
   tags:
       - RHEL-08-010572
       - CAT2
@@ -1927,7 +1927,7 @@
       - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length != 0
       - "'noexec' not in home_mount.options"
   vars:
-      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"
+      home_mount: "{{ ansible_mounts | json_query('[?mount == `/home`] | [0]') }}"  # noqa: jinja[invalid]
   tags:
       - RHEL-08-010590
       - CAT2
@@ -1955,7 +1955,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nodev' not in home_mount.options"
         vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"  # noqa: jinja[invalid]
 
       - name: "MEDIUM | RHEL-08-010600 | PATCH | RHEL 8 must prevent special devices on file systems that are used with removable media. | Set nodev to /mnt"
         ansible.posix.mount:
@@ -1969,7 +1969,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nodev' not in home_mount.options"
         vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"  # noqa: jinja[invalid]
   when:
       - rhel_08_010600
       - not rhel8stig_system_is_chroot
@@ -1997,7 +1997,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'noexec' not in home_mount.options"
         vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"  # noqa: jinja[invalid]
 
       - name: "MEDIUM | RHEL-08-010610 | PATCH | RHEL 8 must prevent code from being executed on file systems that are used with removable media. | Set noexec to /mnt"
         ansible.posix.mount:
@@ -2011,7 +2011,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'noexec' not in home_mount.options"
         vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"  # noqa: jinja[invalid]
   when:
       - rhel_08_010610
       - not rhel8stig_system_is_chroot
@@ -2039,7 +2039,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/media$') | list | length != 0
             - "'nosuid' not in home_mount.options"
         vars:
-            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"
+            removable_mount: "{{ ansible_mounts | json_query('[?mount == `/media`] | [0]') }}"  # noqa: jinja[invalid]
 
       - name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
         ansible.posix.mount:
@@ -2053,7 +2053,7 @@
             - ansible_mounts | selectattr('mount', 'match', '^/mnt$') | list | length != 0
             - "'nosuid' not in home_mount.options"
         vars:
-            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"
+            removable_mount2: "{{ ansible_mounts | json_query('[?mount == `/mnt`] | [0]') }}"  # noqa: jinja[invalid]
   when:
       - rhel_08_010620
       - not rhel8stig_system_is_chroot
@@ -2075,9 +2075,9 @@
       opts: "{{ ansible_mounts | json_query(options_query) }},noexec"
       state: mounted
   vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
+      device_query: '[?mount == `{{ item }}`] | [0].device'  # noqa: jinja[invalid]
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'  # noqa: jinja[invalid]
+      options_query: '[?mount == `{{ item }}`] | [0].options'  # noqa: jinja[invalid]
   with_items: "{{ rhel8stig_nfs_mounts }}"
   when:
       - rhel_08_010630
@@ -2100,9 +2100,9 @@
       opts: "{{ ansible_mounts | json_query(options_query) }},nodev"
       state: mounted
   vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
+      device_query: '[?mount == `{{ item }}`] | [0].device'  # noqa: jinja[invalid]
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'  # noqa: jinja[invalid]
+      options_query: '[?mount == `{{ item }}`] | [0].options'  # noqa: jinja[invalid]
   with_items: "{{ rhel8stig_nfs_mounts }}"
   when:
       - rhel_08_010640
@@ -2125,9 +2125,9 @@
       opts: "{{ ansible_mounts | json_query(options_query) }},nosuid"
       state: mounted
   vars:
-      device_query: '[?mount == `{{ item }}`] | [0].device'
-      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'
-      options_query: '[?mount == `{{ item }}`] | [0].options'
+      device_query: '[?mount == `{{ item }}`] | [0].device'  # noqa: jinja[invalid]
+      fstype_query: '[?mount == `{{ item }}`] | [0].fstype'  # noqa: jinja[invalid]
+      options_query: '[?mount == `{{ item }}`] | [0].options'  # noqa: jinja[invalid]
   with_items: "{{ rhel8stig_nfs_mounts }}"
   when:
       - rhel_08_010650
@@ -4345,10 +4345,9 @@
             regexp: "umask\\s+(?!{{ rhel8stig_login_defaults.umask | default('077') }})"
             state: absent
         with_items:
-            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"
+            - "{{ rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten }}"  # noqa: jinja[invalid]
         when:
             - (rhel8stig_020352_file | json_query('results[*].files[*].path') | flatten ) is defined
-
   when:
       - rhel_08_020352
   tags:
@@ -6214,7 +6213,7 @@
             fstype: "{{ tmp_mount.fstype }}"
             opts: "defaults{{ rhel_08_040123 | ternary (',nodev', '') }}{{ rhel_08_040124 | ternary (',nosuid', '') }}{{ rhel_08_040125 | ternary (',noexec', '') }}"
         vars:
-            tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"
+            tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/tmp`] | [0]') }}"  # noqa: jinja[invalid]
         when: rhel8stig_040123_dev_status.stdout | length > 0
 
   when:
@@ -6261,7 +6260,7 @@
             fstype: "{{ var_log_mount.fstype }}"
             opts: "defaults{{ rhel_08_040126 | ternary (',nodev', '') }}{{ rhel_08_040127 | ternary (',nosuid', '') }}{{ rhel_08_040128 | ternary (',noexec', '') }}"
         vars:
-            var_log_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log`] | [0]') }}"
+            var_log_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log`] | [0]') }}"  # noqa: jinja[invalid]
         when: rhel8stig_040126_var_log_status.stdout | length > 0
   when:
       - rhel_08_040126 or
@@ -6307,7 +6306,7 @@
             fstype: "{{ audit_mount.fstype }}"
             opts: "defaults{{ rhel_08_040129 | ternary (',nodev', '') }}{{ rhel_08_040130 | ternary (',nosuid', '') }}{{ rhel_08_040131 | ternary (',noexec', '') }}"
         vars:
-            audit_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log/audit`] | [0]') }}"
+            audit_mount: "{{ ansible_mounts | json_query('[?mount == `/var/log/audit`] | [0]') }}"  # noqa: jinja[invalid]
         when: rhel8stig_040129_var_log_audit_status.stdout | length > 0
   when:
       - rhel_08_040129 or
@@ -6353,7 +6352,7 @@
             fstype: "{{ var_tmp_mount.fstype }}"
             opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
         vars:
-            var_tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/var/tmp`] | [0]') }}"
+            var_tmp_mount: "{{ ansible_mounts | json_query('[?mount == `/var/tmp`] | [0]') }}"  # noqa: jinja[invalid]
         when: rhel8stig_040132_var_tmp_status.stdout | length > 0
   when:
       - rhel_08_040132 or
