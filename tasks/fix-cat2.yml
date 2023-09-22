@@ -836,7 +836,7 @@
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_macs.stdout }}(.*$)'
             line: '\g<1>-o{{ rhel8stig_ssh_macs }}\g<2>'
             backrefs: true
-  notify: change_requires_reboot
+        notify: change_requires_reboot
   when:
       - rhel_08_010290
   tags:
@@ -861,7 +861,7 @@
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_ciphers.stdout }}(.*$)'
             line: '\g<1>-o{{ rhel8stig_ssh_ciphers }}\g<2>'
             backrefs: true
-  notify: change_requires_reboot
+        notify: change_requires_reboot
   when:
       - rhel_08_010291
   tags:
@@ -7407,8 +7407,7 @@
         when:
             - rhel8stig_current_kex is defined
             - rhel8stig_current_kex.stdout | length > 0
-
-  notify: change_requires_reboot
+        notify: change_requires_reboot
   when:
       - rhel_08_040342
       - rhel8stig_ssh_required
