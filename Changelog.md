@@ -1,8 +1,16 @@
 # Changes to RHEL8STIG
 
-## Stig V1R11 - 26th July 2023
+## 3.0.2 - Stig V1R11 - 26th July 2023
 
-### 3.0.1
+- workflow and pipeline updates
+- links updates in documentation
+- #222 thanks to @BJSmithIEEE
+- #226 thanks to @jmalpede
+- lint config updates
+- lint updates
+- precommit added and configured
+
+### 3.0.1 - Stig V1R11 - 26th July 2023
 
 Issues:
 
