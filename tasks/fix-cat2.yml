@@ -4274,7 +4274,7 @@
       - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
         ansible.builtin.include_tasks: parse_etc_passwd.yml
         vars:
-            rhel8stig_passwd_tasks: "RHEL-08-020320"
+            rhel8stig_passwd_tasks: "RHEL-08-020320"  # pragma: allowlist secret
         when: rhel_08_020320_accounts_removed is changed  # noqa no-handler
   when:
       - rhel_08_020320
