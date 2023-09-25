@@ -121,7 +121,7 @@
 - name: "PRELIM | RHEL-08-010740 | RHEL-08-010750 | RHEL-08-020320 | Parse /etc/passwd"
   ansible.builtin.import_tasks: parse_etc_passwd.yml
   vars:
-      rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"
+      rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"  # pragma: allowlist secret
   when:
       - rhel_08_010141 or
         rhel_08_010149 or
