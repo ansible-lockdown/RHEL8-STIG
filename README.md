@@ -15,19 +15,21 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 11 released on July 26, 
 ![Ansible Galaxy Quality](https://img.shields.io/ansible/quality/56380?label=Quality&&logo=ansible)
 ![Discord Badge](https://img.shields.io/discord/925818806838919229?logo=discord)
 
-![Devel Build Status](https://img.shields.io/github/actions/workflow/status/ansible-lockdown/rhel8-stig/linux_benchmark_testing.yml?label=Devel%20Build%20Status)
-![Devel Commits](https://img.shields.io/github/commit-activity/m/ansible-lockdown/rhel8-stig/devel?color=dark%20green&label=Devel%20Branch%20Commits)
-
 ![Release Branch](https://img.shields.io/badge/Release%20Branch-Main-brightgreen)
-![Main Build Status](https://img.shields.io/github/actions/workflow/status/ansible-lockdown/rhel8-stig/linux_benchmark_testing.yml?label=Build%20Status)
-![Main Release Date](https://img.shields.io/github/release-date/ansible-lockdown/rhel8-stig?label=Release%20Date)
-![Release Tag](https://img.shields.io/github/v/tag/ansible-lockdown/rhel8-stig?label=Release%20Tag&&color=success)
+![Release Tag](https://img.shields.io/github/v/release/ansible-lockdown/RHEL8-STIG)
+![Release Date](https://img.shields.io/github/release-date/ansible-lockdown/RHEL8-STIG)
 
-![Issues Open](https://img.shields.io/github/issues-raw/ansible-lockdown/rhel8-stig?label=Open%20Issues)
-![Issues Closed](https://img.shields.io/github/issues-closed-raw/ansible-lockdown/rhel8-stig?label=Closed%20Issues&&color=success)
-![Pull Requests](https://img.shields.io/github/issues-pr/ansible-lockdown/rhel8-stig?label=Pull%20Requests)
+[![Main Pipeline Status](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/main_pipeline_validation.yml/badge.svg?)](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/main_pipeline_validation.yml)
 
-![License](https://img.shields.io/github/license/ansible-lockdown/rhel8-stig?label=License)
+[![Devel Pipeline Status](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/devel_pipeline_validation.yml/badge.svg?)](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/devel_pipeline_validation.yml)
+![Devel Commits](https://img.shields.io/github/commit-activity/m/ansible-lockdown/RHEL8-STIG/devel?color=dark%20green&label=Devel%20Branch%20Commits)
+
+![Issues Open](https://img.shields.io/github/issues-raw/ansible-lockdown/RHEL8-STIG?label=Open%20Issues)
+![Issues Closed](https://img.shields.io/github/issues-closed-raw/ansible-lockdown/RHEL8-STIG?label=Closed%20Issues&&color=success)
+![Pull Requests](https://img.shields.io/github/issues-pr/ansible-lockdown/RHEL8-STIG?label=Pull%20Requests)
+
+![License](https://img.shields.io/github/license/ansible-lockdown/RHEL8-STIG?label=License)
+
 
 ---
 
