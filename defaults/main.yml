@@ -484,6 +484,9 @@ rhel8stig_smartcard: false
 # Configure your smartcard driver
 rhel8stig_smartcarddriver: cackey
 
+# Set the file that sysctl should write to
+rhel8stig_sysctl_file: /etc/sysctl.d/99_stig_sysctl.conf
+
 # Whether or not system uses remote automounted home directories via autofs
 rhel8stig_autofs_remote_home_dirs: false
 

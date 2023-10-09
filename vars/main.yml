@@ -10,7 +10,7 @@ rhel8stig_service_started: "{{ rhel8stig_system_is_chroot | ternary(omit, 'start
 # !!!!!!!!possibly delete
 # rhel8stig_systemd_daemon_reload: "{{ not rhel8stig_system_is_chroot }}"
 
-rhel8stig_sysctl_reload: "{{ not rhel8stig_system_is_container }}"
+rhel8stig_sysctl_reload: "{{ not system_is_container }}"
 
 # these variables are for enabling tasks to run that will be further controled
 # by check_mode to prevent the remediation task from making changes as
