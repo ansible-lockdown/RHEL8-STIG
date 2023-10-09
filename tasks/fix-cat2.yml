@@ -1202,10 +1202,13 @@
 - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution."
   block:
       - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.kexec_load_disabled
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
       - name: "MEDIUM | RHEL-08-010372 | AUDIT | RHEL 8 must prevent the loading of a new kernel for later execution. | Find conflicting instances"
         ansible.builtin.shell: grep -rs "kernel.kexec_load_disabled = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
@@ -1247,11 +1250,14 @@
         loop: "{{ rhel_08_010373_conflicting_settings.stdout_lines }}"
         when: rhel_08_010373_conflicting_settings.stdout | length > 0
 
-      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+      - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Set sysctl"
+        ansible.posix.sysctl:
+            name: fs.protected_symlinks
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010373
   tags:
@@ -1280,10 +1286,13 @@
         when: rhel_08_010374_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-010374 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks."
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: fs.protected_hardlinks
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010374
   tags:
@@ -1566,10 +1575,13 @@
         when: rhel_08_010430_conflicting_settings.stdout | length > 0
 
       - name: " MEDIUM | RHEL-08-010430 | PATCH | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.randomize_va_space
+            value: 2
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010430
   tags:
@@ -2224,10 +2236,13 @@
         when: rhel_08_010671_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.core_pattern
+            value: "|/bin/false"
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010671
   tags:
@@ -3340,7 +3355,7 @@
           if [ "$PS1" ]; then
           parent=$(ps -o ppid= -p $$)
           name=$(ps -o comm= -p $parent)
-          case "$name" in (sshd|login) tmux ;; esac
+          case "$name" in (sshd|login) exec tmux ;; esac
           fi
       create: true
   when:
@@ -6615,10 +6630,13 @@
         when: rhel_08_040209_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.default.accept_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040209
   tags:
@@ -6647,10 +6665,13 @@
         when: rhel_08_040210_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.default.accept_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
   when:
       - rhel_08_040210
@@ -6681,10 +6702,13 @@
         when: rhel_08_040220_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.all.send_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040220
   tags:
@@ -6713,10 +6737,13 @@
         when: rhel_08_040230_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.icmp_echo_ignore_broadcasts
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040230
   tags:
@@ -6745,10 +6772,13 @@
         when: rhel_08_040239_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.all.accept_source_route
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040239
   tags:
@@ -6777,10 +6807,13 @@
         when: rhel_08_040240_conflicting_settings.stdout |length > 0
 
       - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.all.accept_source_route
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040240
       - rhel8stig_ipv6_required
@@ -6810,10 +6843,13 @@
         when: rhel_08_040249_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.default.accept_source_route
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040249
   tags:
@@ -6842,10 +6878,13 @@
         when: rhel_08_040250_conflicting_findings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.default.accept_source_route
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040250
       - rhel8stig_ipv6_required
@@ -6875,10 +6914,13 @@
         when: rhel_08_040259_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.all.forwarding
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040259
       - not rhel8stig_system_is_router
@@ -6908,10 +6950,13 @@
         when: rhel_08_040260_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.all.forwarding
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040260
       - not rhel8stig_system_is_router
@@ -6941,10 +6986,13 @@
         when: rhel_08_040261_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.all.accept_ra
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040261
       - rhel8stig_ipv6_required
@@ -6975,10 +7023,13 @@
         when: rhel_08_040262_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.default.accept_ra
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040262
       - rhel8stig_ipv6_required
@@ -7009,10 +7060,13 @@
         when: rhel_08_040270_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.default.send_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040270
   tags:
@@ -7041,10 +7095,13 @@
         when: rhel_08_040279_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.all.send_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040279
   tags:
@@ -7073,10 +7130,13 @@
         when: rhel_08_040280_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv6.conf.all.accept_redirects
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040280
       - rhel8stig_ipv6_required
@@ -7106,10 +7166,13 @@
         when: rhel_08_040281_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.unprivileged_bpf_disabled
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040281
   tags:
@@ -7138,10 +7201,13 @@
         when: rhel_08_040282_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.yama.ptrace_scope
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040282
   tags:
@@ -7170,10 +7236,13 @@
         when: rhel_08_040283_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.kptr_restrict
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040283
   tags:
@@ -7202,10 +7271,13 @@
         when: rhel_08_040284_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: user.max_user_namespaces
+            value: 0
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040284
   tags:
@@ -7234,10 +7306,13 @@
         when: rhel_08_040285_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.ipv4.conf.all.rp_filter
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040285
   tags:
@@ -7266,10 +7341,13 @@
         when: rhel_08_040286_conflicting_settings.stdout | length > 0
 
       - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler. | Use template to create file"
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: net.core.bpf_jit_harden
+            value: 2
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040286
   tags:

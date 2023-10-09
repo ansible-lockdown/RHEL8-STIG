@@ -49,10 +49,13 @@
         when: rhel_08_010375_conflicting_settings.stdout | length > 0
 
       - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.dmesg_restrict
+            value: 1
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010375
   tags:
@@ -81,10 +84,13 @@
         when: rhel_08_010376_conflicting_settings.stdout | length > 0
 
       - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
-        ansible.builtin.debug:
-            msg: "Control being set via Handler 'update sysctl' which writes to /etc/sysctl.d/99-sysctl.conf"
-        changed_when: true
-        notify: update sysctl
+        ansible.posix.sysctl:
+            name: kernel.perf_event_paranoid
+            value: 2
+            state: present
+            reload: "{{ rhel8stig_sysctl_reload }}"
+            sysctl_set: true
+            sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_010376
   tags:
