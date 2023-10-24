@@ -1,5 +1,12 @@
 # Changes to RHEL8STIG
 
+## 3.0.3 - Stig V1R11 - 26th July 2023
+q
+- updates to collections since galaxy updated
+- updates to audit
+
+- #229 thanks to @JacobBuskirk
+
 ## 3.0.2 - Stig V1R11 - 26th July 2023
 
 - workflow and pipeline updates
