@@ -1,7 +1,17 @@
 # Changes to RHEL8STIG
 
+## 3.1 - STIG V1R12 - 25th Oct 2023
+
+ruleid updated
+
+- 010020
+- 010471
+- 030741
+- 030742
+- 040400
+
 ## 3.0.3 - Stig V1R11 - 26th July 2023
-q
+
 - updates to collections since galaxy updated
 - updates to audit
 
