@@ -49,7 +49,7 @@
             - "'dconf' not in ansible_facts.packages"
             - rhel8stig_gui
 
-      - name: dconf directory structure
+      - name: "PRELIM | dconf directory structure setup"
         ansible.builtin.file:
             path: /etc/dconf/db/local.d/locks
             state: directory
@@ -106,7 +106,7 @@
   tags:
       - always
 
-- name: ensure cronie is available
+- name: "PRELIM | ensure cronie is available"
   ansible.builtin.package:
       name: cronie
   when:
@@ -302,7 +302,7 @@
       - RHEL-08-010770
       - complexity-high
 
-- name: "MEDIUM | RHEL-08-010660 | RHEL-08-010770 | Set fact for home directory paths for interactive users"
+- name: "PRELIM | RHEL-08-010660 | RHEL-08-010770 | Set fact for home directory paths for interactive users"
   ansible.builtin.set_fact:
       rhel_08_stig_interactive_homedir_inifiles: "{{ rhel_08_010770_ini_file_list.results | map(attribute='stdout_lines') | list }}"
   when:
