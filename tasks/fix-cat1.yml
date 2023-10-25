@@ -133,7 +133,7 @@
       - CAT1
       - CCI-000068
       - SRG-OS-000033-GPOS-00014
-      - SV-230223r792855_rule
+      - SV-230223r928585_rule
       - V-230223
 
 - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
