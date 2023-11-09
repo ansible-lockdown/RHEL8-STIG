@@ -867,10 +867,6 @@ rhel8stig_path_to_sshkey: "/root/.ssh/"
 # To conform to STIG standards these directories need to be 755 or less permissive
 rhel8stig_lib_dir_perms: 0755
 
-# RHEL-08-010510
-# rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
-rhel8stig_sshd_compression: "no"
-
 # now in prelim
 # rhel8stig_interactive_uid_start: '1000'
 
