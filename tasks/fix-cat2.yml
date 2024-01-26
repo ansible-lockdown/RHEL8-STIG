@@ -3260,7 +3260,7 @@
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
       - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
-        ansible.builtin.shell: "grep lock-enabled /etc/dconf/db/* -r | cut -f1 -d:"
+        ansible.builtin.shell: "grep lock-enabled /etc/dconf/db/* -rI | sort -u | tail -n 1 | cut -f1 -d:"
         changed_when: false
         failed_when: false
         register: rhel_08_020030_lock_enabled
