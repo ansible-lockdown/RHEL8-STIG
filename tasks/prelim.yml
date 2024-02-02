@@ -386,7 +386,7 @@
             rhel8stig_legacy_boot: false
         when:
             - rhel8_efi_boot.stat.exists
-            - ansible_distribution == 'Oracle Linux'
+            - ansible_distribution == 'OracleLinux'
 
       - name: "PRELIM | set if not UEFI boot"
         ansible.builtin.set_fact:
