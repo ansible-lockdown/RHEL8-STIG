@@ -191,11 +191,39 @@
       - V-230226
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
-  ansible.builtin.lineinfile:
-      path: /etc/rsyslog.conf
-      line: "auth.*;authpriv.*;daemon.* /var/log/secure"
-      create: true
-      mode: '0644'
+  block:
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings"
+        ansible.builtin.shell: grep "*.info" /etc/rsyslog.conf
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010070_info_set_rsyslog
+
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings"
+        ansible.builtin.shell: grep "authpriv.* /var/log/secure" /etc/rsyslog.conf
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010070_authpriv_set_rsyslog
+
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | Adjust settings"
+        path: /etc/rsyslog.conf
+        regexp: ^(?#).*\/var\/log\/secure
+        line: "auth.*;authpriv.*;daemon.* /var/log/secure"
+        create: true
+        mode: '0644'
+        when:
+            - rhel_08_010070_info_set_rsyslog.stdout == 0
+            - rhel_08_010070_authpriv_set_rsyslog.stdout > 0
+
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | Adjust settings"
+        path: /etc/rsyslog.conf
+        backrefs: true
+        regexp: ^(?!#)(.*)(authpriv\.\*)(.*\/var\/log\/secure)
+        line: \1authpriv.*\2/var/log/secure
+        create: true
+        mode: '0644'
+        when:
+            - rhel_08_010070_info_set_rsyslog.stdout > 0
+            - rhel_08_010070_authpriv_set_rsyslog.stdout == 0
   notify: restart rsyslog
   when:
       - rhel_08_010070
