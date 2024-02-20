@@ -3260,16 +3260,17 @@
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
       - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
-        ansible.builtin.shell: "grep lock-enabled /etc/dconf/db/* -rI | sort -u | tail -n 1 | cut -f1 -d:"
+        ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
         changed_when: false
         failed_when: false
         register: rhel_08_020030_lock_enabled
 
       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020030_lock_enabled.stdout }}"
+            path: "{{ item }}"
             regexp: '^lock-enabled'
             line: lock-enabled=true
+        loop: "{{ rhel_08_020030_lock_enabled.stdout }}"
         when: rhel_08_020030_lock_enabled.stdout | length > 0
         notify: dconf update
 
@@ -3372,13 +3373,13 @@
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   block:
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        ansible.builtin.shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+        ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/*"
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action
 
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        ansible.builtin.shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
+        ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'"
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action_file
@@ -3398,9 +3399,10 @@
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020050_removal_action.stdout }}"
+            path: "{{ item }}"
             regexp: ^removal-action=
             line: removal-action='lock-screen'
+        loop: "{{ rhel_08_020050_removal_action.stdout }}"
         when: rhel_08_020050_removal_action.stdout | length > 0
         notify: dconf update
 
@@ -3436,7 +3438,7 @@
 - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
   block:
       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
-        ansible.builtin.shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+        ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
         changed_when: false
         failed_when: false
         register: rhel_08_020060_idle_delay_param
@@ -3458,14 +3460,15 @@
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
+            path: "{{ item }}"
             regexp: '^idle-delay='
             line: idle-delay=uint32 900
             owner: root
             group: root
             mode: 0640
-        notify: dconf update
+        loop: "{{ rhel_08_020060_idle_delay_param.stdout }}"
         when: rhel_08_020060_idle_delay_param.stdout | length > 0
+        notify: dconf update
   when:
       - rhel_08_020060
       - "'dconf' in ansible_facts.packages"
@@ -7473,7 +7476,7 @@
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
   block:
       - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
-        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
+        ansible.builtin.shell: grep ^CRYPTO_POLICY /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g
         changed_when: false
         register: rhel8stig_current_kex
 
