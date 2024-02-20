@@ -6150,7 +6150,7 @@
       - CCI-001444
       - SRG-OS-000299-GPOS-00117
       - SV-230506r627750_rule
-      - V-23050
+      - V-230506
       - wifi
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
