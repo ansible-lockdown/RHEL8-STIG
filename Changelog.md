@@ -10,6 +10,14 @@ ruleid updated
 - 030742
 - 040400
 
+- added SSH validation
+- added ansible_facts for variable usage
+
+- AUDIT
+  - Audit_only ability now added to run standalone audit
+    - audit_only: true
+  - Related Audit repo updated to improve tests audit binary(goss updated to latest version)
+
 ## 3.0.3 - Stig V1R11 - 26th July 2023
 
 - updates to collections since galaxy updated

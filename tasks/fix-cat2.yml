@@ -112,6 +112,7 @@
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
+            validate: '/usr/sbin/sshd -T -f %s'
         when:
             - rhel8stig_ssh_required
 
@@ -224,7 +225,7 @@
             create: true
             mode: '0644'
         when:
-            - rhel_08_010070_info_set_rsyslog.stdout > 0
+            - rhel_08_010070_info_set_rsyslog.stdout | length > 0
             - rhel_08_010070_authpriv_set_rsyslog.stdout == 0
 
   notify: restart rsyslog
@@ -555,6 +556,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveCountMax.*'
       line: ClientAliveCountMax 1
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010200
@@ -573,6 +575,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveInterval.*'
       line: "ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}"
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010201
@@ -1697,6 +1700,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?StrictModes'
       line: 'StrictModes yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010500
@@ -1715,6 +1719,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?IgnoreUserKnownHosts'
       line: 'IgnoreUserKnownHosts yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010520
@@ -1733,6 +1738,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?KerberosAuthentication'
       line: "KerberosAuthentication no"
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -1751,6 +1757,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?GSSAPIAuthentication'
       line: "GSSAPIAuthentication no"
+      validate: '/usr/sbin/sshd -T -f %s'
   when:
       - rhel_08_010522
       - rhel8stig_ssh_required
@@ -1807,6 +1814,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitRootLogin'
       line: 'PermitRootLogin no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010550
@@ -2778,6 +2786,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010830
@@ -6615,6 +6624,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?RekeyLimit'
       line: 'RekeyLimit 1G 1h'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_040161
@@ -7475,6 +7485,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_040340
@@ -7493,6 +7504,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11UseLocalhost'
       line: 'X11UseLocalhost yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   when:
       - rhel_08_040341
       - rhel8stig_ssh_required
