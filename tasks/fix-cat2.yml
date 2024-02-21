@@ -192,38 +192,41 @@
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
   block:
-      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings"
-        ansible.builtin.shell: grep "*.info" /etc/rsyslog.conf
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings info"
+        ansible.builtin.shell: grep '*.info' /etc/rsyslog.conf
         changed_when: false
         failed_when: false
         register: rhel_08_010070_info_set_rsyslog
 
-      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings"
-        ansible.builtin.shell: grep "authpriv.* /var/log/secure" /etc/rsyslog.conf
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings authpriv"
+        ansible.builtin.shell: grep 'authpriv.* /var/log/secure' /etc/rsyslog.conf
         changed_when: false
         failed_when: false
         register: rhel_08_010070_authpriv_set_rsyslog
 
-      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | Adjust settings"
-        path: /etc/rsyslog.conf
-        regexp: ^(?#).*\/var\/log\/secure
-        line: "auth.*;authpriv.*;daemon.* /var/log/secure"
-        create: true
-        mode: '0644'
+      - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored. | Adjust settings no info"
+        ansible.builtin.lineinfile:
+            path: /etc/rsyslog.conf
+            regexp: ^(?!#).*\/var\/log\/secure
+            line: 'auth.*;authpriv.*;daemon.* /var/log/secure'
+            create: true
+            mode: '0644'
         when:
             - rhel_08_010070_info_set_rsyslog.stdout == 0
             - rhel_08_010070_authpriv_set_rsyslog.stdout > 0
 
-      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | Adjust settings"
-        path: /etc/rsyslog.conf
-        backrefs: true
-        regexp: ^(?!#)(.*)(authpriv\.\*)(.*\/var\/log\/secure)
-        line: \1authpriv.*\2/var/log/secure
-        create: true
-        mode: '0644'
+      - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored. | Adjust settings if info set"
+        ansible.builtin.lineinfile:
+            path: /etc/rsyslog.conf
+            backrefs: true
+            regexp: ^(?!#)(.*)(authpriv\.\*)(.*\/var\/log\/secure)
+            line: \1authpriv.*\2/var/log/secure
+            create: true
+            mode: '0644'
         when:
             - rhel_08_010070_info_set_rsyslog.stdout > 0
             - rhel_08_010070_authpriv_set_rsyslog.stdout == 0
+
   notify: restart rsyslog
   when:
       - rhel_08_010070
@@ -7504,11 +7507,12 @@
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
   block:
       - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
-        ansible.builtin.shell: grep ^CRYPTO_POLICY /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g
+        ansible.builtin.shell: grep -E "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
         changed_when: false
+        failed_when: false
         register: rhel8stig_current_kex
 
-      - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
+      - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | update KEXs"
         ansible.builtin.lineinfile:
             path: /etc/crypto-policies/back-ends/opensshserver.config
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
