@@ -867,10 +867,6 @@ rhel8stig_path_to_sshkey: "/root/.ssh/"
 # To conform to STIG standards these directories need to be 755 or less permissive
 rhel8stig_lib_dir_perms: 0755
 
-# RHEL-08-010510
-# rhel8stig_sshd_compression to meet STIG requirements needs to be set to "no" or "delayed"
-rhel8stig_sshd_compression: "no"
-
 # now in prelim
 # rhel8stig_interactive_uid_start: '1000'
 
@@ -916,7 +912,7 @@ rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-ctr,aes192-ctr,aes128-ct
 # RHEL-08-010295
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
 # to conform to STIG standards this variable must contain +VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
-rhel8stig_gnutls_encryption: "-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
+rhel8stig_gnutls_encryption: "+VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
 
 # RHEL-08-020070
 # This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
