@@ -56,24 +56,46 @@ rhel8stig_skip_reboot: true
 # Defined will change if control requires
 change_requires_reboot: false
 
-### Goss is required on the remote host
+##########################################
+### Goss is required on the remote host ###
+## Refer to vars/auditd.yml for any other settings ##
+
+# Allow audit to setup the requirements including installing git (if option chosen and downloading and adding goss binary to system)
 setup_audit: false
+
+# enable audits to run - this runs the audit and get the latest content
+run_audit: false
+
+# Only run Audit do not remediate
+audit_only: false
+# As part of audit_only
+# This will enable files to be copied back to control node
+fetch_audit_files: false
+# Path to copy the files to will create dir structure
+audit_capture_files_dir: /some/location to copy to on control node
+
 # How to retrieve audit binary
 # Options are copy or download - detailed settings at the bottom of this file
 # you will need to access to either github or the file already dowmloaded
 get_audit_binary_method: download
 
+## if get_audit_binary_method - copy the following needs to be updated for your environment
+## it is expected that it will be copied from somewhere accessible to the control node
+## e.g copy from ansible control node to remote host
+audit_bin_copy_location: /some/accessible/path
+
 # how to get audit files onto host options
 # options are git/copy/get_url other e.g. if you wish to run from already downloaded conf
 audit_content: git
 
-# enable audits to run - this  runs the audit and get the latest content
-run_audit: false
+# archive or copy:
+audit_conf_copy: "some path to copy from"
+
+# get_url:
+audit_files_url: "some url maybe s3?"
 
 # Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
 audit_run_heavy_tests: true
-# Timeout for those cmds that take longer to run where timeout set
-audit_cmd_timeout: 60000
 
 ### End Goss enablements ####
 #### Detailed settings found at the end of this document ####
@@ -904,55 +926,3 @@ rhel8stig_tmux_lock_after_time: 900
 # The value given to Defaults timestamp timeout= in the sudo file.
 # Value must be greater than 0 to conform to STIG standards
 rhel8stig_sudo_timestamp_timeout: 1
-
-#### Goss Configuration Settings ####
-# Set correct env for the run_audit.sh script from https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
-audit_run_script_environment:
-    AUDIT_BIN: "{{ audit_bin }}"
-    AUDIT_FILE: 'goss.yml'
-    AUDIT_CONTENT_LOCATION: "{{ audit_out_dir }}"
-
-### Goss binary settings ###
-audit_bin_version:
-    release: v0.3.23
-    checksum: 'sha256:9e9f24e25f86d6adf2e669a9ffbe8c3d7b9b439f5f877500dea02ba837e10e4d'
-audit_bin_path: /usr/local/bin/
-audit_bin: "{{ audit_bin_path }}goss"
-audit_format: json
-
-# if get_audit_binary_method == download change accordingly
-audit_bin_url: "https://github.com/goss-org/goss/releases/download/{{ audit_bin_version.release }}/goss-linux-amd64"
-
-## if get_audit_binary_method - copy the following needs to be updated for your environment
-## it is expected that it will be copied from somewhere accessible to the control node
-## e.g copy from ansible control node to remote host
-audit_bin_copy_location: /some/accessible/path
-
-#### Goss Audit Benchmark file ###
-## managed by the control audit_content
-# git
-audit_file_git: "https://github.com/ansible-lockdown/{{ benchmark }}-Audit.git"
-audit_git_version: "benchmark_{{ benchmark_version }}_rh8"
-
-# archive or copy:
-audit_conf_copy: "some path to copy from"
-
-# get_url:
-audit_files_url: "some url maybe s3?"
-
-## Goss configuration information
-# Where the goss configs and outputs are stored
-audit_out_dir: '/opt'
-# Where the goss audit configuration will be stored
-audit_conf_dir: "{{ audit_out_dir }}/{{ benchmark }}-Audit"
-
-# If changed these can affect other products
-pre_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}-{{ benchmark_version }}_pre_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
-post_audit_outfile: "{{ audit_out_dir }}/{{ ansible_hostname }}-{{ benchmark }}-{{ benchmark_version }}_post_scan_{{ ansible_date_time.epoch }}.{{ audit_format }}"
-
-## The following should not need changing
-audit_vars_path: "{{ audit_conf_dir }}/vars/{{ ansible_hostname }}.yml"
-audit_results: |
-      The pre remediation results are: {{ pre_audit_summary }}.
-      The post remediation results are: {{ post_audit_summary }}.
-      Full breakdown can be found in {{ audit_out_dir }}

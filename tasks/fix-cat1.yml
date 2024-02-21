@@ -321,6 +321,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitEmptyPasswords'
       line: 'PermitEmptyPasswords no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_020330

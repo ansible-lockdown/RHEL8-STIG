@@ -274,12 +274,12 @@
             state: "{{ rhel8stig_service_started }}"
             enabled: true
 
-      - name: PRELIM | check if ssh host key exists
+      - name: PRELIM | Check if ssh host key exists
         ansible.builtin.stat:
             path: /etc/ssh/ssh_host_rsa_key
         register: rhel8stig_ssh_host_rsa_key_stat
 
-      - name: PRELIM | create ssh host key to allow 'sshd -t -f %s' to succeed
+      - name: PRELIM | Create ssh host key to allow 'sshd -t -f %s' to succeed
         ansible.builtin.shell: ssh-keygen -N '' -f /etc/ssh/ssh_host_rsa_key -t rsa -b 4096
         when: not rhel8stig_ssh_host_rsa_key_stat.stat.exists
         notify: clean up ssh host key
