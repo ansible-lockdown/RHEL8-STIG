@@ -3308,9 +3308,9 @@
       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
         ansible.builtin.lineinfile:
             path: "{{ item }}"
-            regexp: '^lock-enabled'
+            regexp: ^lock-enabled
             line: lock-enabled=true
-        loop: "{{ rhel_08_020030_lock_enabled.stdout }}"
+        loop: "{{ rhel_08_020030_lock_enabled.stdout_lines }}"
         when: rhel_08_020030_lock_enabled.stdout | length > 0
         notify: dconf update
 
