@@ -29,7 +29,6 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 12 released on Oct 25, 2
 
 ![License](https://img.shields.io/github/license/ansible-lockdown/RHEL8-STIG?label=License)
 
-
 ---
 
 ## Looking for support?
