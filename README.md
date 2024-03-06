@@ -190,3 +190,9 @@ This repo originated from work done by [Sam Doran](https://github.com/samdoran/a
 ```sh
 pre-commit run
 ```
+
+## Credits and Thanks
+
+Massive thanks to the fantastic community and all its members.
+This includes a huge thanks and credit to the original authors and maintainers.
+Josh Springer, Daniel Shepherd, Bas Meijeri, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell
