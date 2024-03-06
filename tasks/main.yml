@@ -63,7 +63,7 @@
             fail_msg: "You have {{ sudo_password_rule }} enabled but the user = {{ ansible_env.SUDO_USER }} has no password set - It can break access"
             success_msg: "You have a password set for the {{ ansible_env.SUDO_USER }}"
         vars:
-            sudo_password_rule: RHEL-08-010380
+            sudo_password_rule: RHEL-08-010380  # pragma: allowlist secret
   when:
       - rhel_08_010380
       - ansible_env.SUDO_USER is defined
@@ -98,8 +98,8 @@
 
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
   ansible.builtin.assert:
-      that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'
-      msg: "This role will not be able to run single user password commands as rhel8stig_bootloader_password_hash variable has not been set"
+      that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'  # pragma: allowlist secret
+      msg: "This role will not be able to run single user password commands as rhel8stig_bootloader_password_hash variable has not been set"  # pragma: allowlist secret
 
   when:
       - not system_is_ec2

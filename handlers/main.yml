@@ -5,16 +5,6 @@
   when:
       - not system_is_container
 
-- name: update sysctl
-  ansible.builtin.template:
-      src: 99-sysctl.conf.j2
-      dest: /etc/sysctl.d/99-sysctl.conf
-      owner: root
-      group: root
-      mode: 0644
-  notify: sysctl system
-  when: "'procps-ng' in ansible_facts.packages"
-
 - name: sysctl system
   ansible.builtin.shell: sysctl --system
   when: "'procps-ng' in ansible_facts.packages"
