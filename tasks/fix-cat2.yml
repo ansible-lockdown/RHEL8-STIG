@@ -112,6 +112,7 @@
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
             line: 'Banner /etc/issue'
+            validate: '/usr/sbin/sshd -T -f %s'
         when:
             - rhel8stig_ssh_required
 
@@ -191,11 +192,42 @@
       - V-230226
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
-  ansible.builtin.lineinfile:
-      path: /etc/rsyslog.conf
-      line: "auth.*;authpriv.*;daemon.* /var/log/secure"
-      create: true
-      mode: '0644'
+  block:
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings info"
+        ansible.builtin.shell: grep '*.info' /etc/rsyslog.conf
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010070_info_set_rsyslog
+
+      - name: "MEDIUM | RHEL-08-010070 | AUDIT | All RHEL 8 remote access methods must be monitored. | check settings authpriv"
+        ansible.builtin.shell: grep 'authpriv.* /var/log/secure' /etc/rsyslog.conf
+        changed_when: false
+        failed_when: false
+        register: rhel_08_010070_authpriv_set_rsyslog
+
+      - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored. | Adjust settings no info"
+        ansible.builtin.lineinfile:
+            path: /etc/rsyslog.conf
+            regexp: ^(?!#).*\/var\/log\/secure
+            line: 'auth.*;authpriv.*;daemon.* /var/log/secure'
+            create: true
+            mode: '0644'
+        when:
+            - rhel_08_010070_info_set_rsyslog.stdout == 0
+            - rhel_08_010070_authpriv_set_rsyslog.stdout > 0
+
+      - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored. | Adjust settings if info set"
+        ansible.builtin.lineinfile:
+            path: /etc/rsyslog.conf
+            backrefs: true
+            regexp: ^(?!#)(.*)(authpriv\.\*)(.*\/var\/log\/secure)
+            line: \1authpriv.*\2/var/log/secure
+            create: true
+            mode: '0644'
+        when:
+            - rhel_08_010070_info_set_rsyslog.stdout | length > 0
+            - rhel_08_010070_authpriv_set_rsyslog.stdout == 0
+
   notify: restart rsyslog
   when:
       - rhel_08_010070
@@ -524,6 +556,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveCountMax.*'
       line: ClientAliveCountMax 1
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010200
@@ -542,6 +575,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?ClientAliveInterval.*'
       line: "ClientAliveInterval {{ rhel8stig_ssh_session_timeout }}"
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010201
@@ -1666,6 +1700,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?StrictModes'
       line: 'StrictModes yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010500
@@ -1684,6 +1719,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?IgnoreUserKnownHosts'
       line: 'IgnoreUserKnownHosts yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010520
@@ -1702,6 +1738,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?KerberosAuthentication'
       line: "KerberosAuthentication no"
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010521
@@ -1720,6 +1757,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?GSSAPIAuthentication'
       line: "GSSAPIAuthentication no"
+      validate: '/usr/sbin/sshd -T -f %s'
   when:
       - rhel_08_010522
       - rhel8stig_ssh_required
@@ -1776,6 +1814,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitRootLogin'
       line: 'PermitRootLogin no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010550
@@ -2747,6 +2786,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_010830
@@ -3260,16 +3300,17 @@
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   block:
       - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
-        ansible.builtin.shell: "grep lock-enabled /etc/dconf/db/* -rI | sort -u | tail -n 1 | cut -f1 -d:"
+        ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
         changed_when: false
         failed_when: false
         register: rhel_08_020030_lock_enabled
 
       - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020030_lock_enabled.stdout }}"
-            regexp: '^lock-enabled'
+            path: "{{ item }}"
+            regexp: ^lock-enabled
             line: lock-enabled=true
+        loop: "{{ rhel_08_020030_lock_enabled.stdout_lines }}"
         when: rhel_08_020030_lock_enabled.stdout | length > 0
         notify: dconf update
 
@@ -3372,13 +3413,13 @@
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   block:
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        ansible.builtin.shell: 'grep "removal-action=" /etc/dconf/db/* -R | cut -f1 -d:'
+        ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/*"
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action
 
       - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-        ansible.builtin.shell: "grep removal-action= /etc/dconf/db/* -R | cut -f1 -d: | sed 's:.*/::'"
+        ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'"
         changed_when: false
         failed_when: false
         register: rhel_08_020050_removal_action_file
@@ -3398,9 +3439,10 @@
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020050_removal_action.stdout }}"
+            path: "{{ item }}"
             regexp: ^removal-action=
             line: removal-action='lock-screen'
+        loop: "{{ rhel_08_020050_removal_action.stdout }}"
         when: rhel_08_020050_removal_action.stdout | length > 0
         notify: dconf update
 
@@ -3436,7 +3478,7 @@
 - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
   block:
       - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
-        ansible.builtin.shell: 'grep idle-delay= /etc/dconf/db/* -R | cut -f1 -d:'
+        ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
         changed_when: false
         failed_when: false
         register: rhel_08_020060_idle_delay_param
@@ -3458,14 +3500,15 @@
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         ansible.builtin.lineinfile:
-            path: "{{ rhel_08_020060_idle_delay_param.stdout }}"
+            path: "{{ item }}"
             regexp: '^idle-delay='
             line: idle-delay=uint32 900
             owner: root
             group: root
             mode: 0640
-        notify: dconf update
+        loop: "{{ rhel_08_020060_idle_delay_param.stdout }}"
         when: rhel_08_020060_idle_delay_param.stdout | length > 0
+        notify: dconf update
   when:
       - rhel_08_020060
       - "'dconf' in ansible_facts.packages"
@@ -6119,7 +6162,7 @@
       - CCI-001444
       - SRG-OS-000299-GPOS-00117
       - SV-230506r627750_rule
-      - V-23050
+      - V-230506
       - wifi
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
@@ -6581,6 +6624,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?RekeyLimit'
       line: 'RekeyLimit 1G 1h'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_040161
@@ -7441,6 +7485,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11Forwarding'
       line: 'X11Forwarding no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_040340
@@ -7459,6 +7504,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?X11UseLocalhost'
       line: 'X11UseLocalhost yes'
+      validate: '/usr/sbin/sshd -T -f %s'
   when:
       - rhel_08_040341
       - rhel8stig_ssh_required
@@ -7473,11 +7519,12 @@
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
   block:
       - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
-        ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
+        ansible.builtin.shell: grep -E "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
         changed_when: false
+        failed_when: false
         register: rhel8stig_current_kex
 
-      - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
+      - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | update KEXs"
         ansible.builtin.lineinfile:
             path: /etc/crypto-policies/back-ends/opensshserver.config
             regexp: '(^CRYPTO_POLICY=.*)-o{{ rhel8stig_current_kex.stdout }}(.*$)'
@@ -7586,7 +7633,7 @@
       - CAT2
       - CCI-002265
       - SRG-OS-000324-GPOS-00125
-      - SV-254520r858835_rule
+      - SV-254520r928805_rule
       - V-254520
       - selinux
 
