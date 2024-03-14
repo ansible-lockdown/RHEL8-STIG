@@ -475,7 +475,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install atm', line: 'install atm /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install atm', line: 'install atm /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist atm', line: 'blacklist atm', insertafter: '^install atm /bin/true' }
   when:
       - rhel_08_040021
@@ -484,7 +484,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230494r792911_rule
+      - SV-230494r942918_rule
       - V-230494
       - modprobe
       - atm
@@ -501,7 +501,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install can', line: 'install can /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install can', line: 'install can /bin/false', insertafter: 'EOF' }
       - { regexp: 'blacklist can', line: 'blacklist can', insertafter: '^install can /bin/true' }
   when:
       - rhel_08_040022
@@ -510,7 +510,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230495r792914_rule
+      - SV-230495r942921_rule
       - V-230495
       - modprobe
       - can
@@ -527,7 +527,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install sctp', line: 'install sctp /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install sctp', line: 'install sctp /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist sctp', line: 'blacklist sctp', insertafter: '^install sctp' }
   when:
       - rhel_08_040023
@@ -536,7 +536,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r792917_rule
+      - SV-230496r942924_rule
       - V-230496
       - modprobe
       - sctp
@@ -553,7 +553,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install tipc', line: 'install tipc /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install tipc', line: 'install tipc /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist tipc', line: 'blacklist tipc', insertafter: '^install tipc' }
   when:
       - rhel_08_040024
@@ -562,7 +562,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r792920_rule
+      - SV-230497r942927_rule
       - V-230497
       - modprobe
       - tipc
@@ -579,7 +579,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install cramfs', line: 'install cramfs /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install cramfs', line: 'install cramfs /bin/false', insertafter: 'EOF' }
       - { regexp: 'blacklist cramfs', line: 'blacklist cramfs', insertafter: '^install cramfs' }
   when:
       - rhel_08_040025
@@ -588,7 +588,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230498r792922_rule
+      - SV-230497r942927_rule
       - V-230498
       - modprobe
       - cramfs
@@ -605,7 +605,7 @@
       mode: 0640
   notify: change_requires_reboot
   with_items:
-      - { regexp: '^install firewire-core', line: 'install firewire-core /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install firewire-core', line: 'install firewire-core /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist firewire-core', line: 'blacklist firewire-core', insertafter: '^install firewire-core' }
   when:
       - rhel_08_040026
@@ -614,7 +614,7 @@
       - CAT3
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230499r792924_rule
+      - SV-230499r942933_rule
       - V-230499
       - modprobe
       - firewire

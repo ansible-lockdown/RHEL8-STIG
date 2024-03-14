@@ -25,7 +25,7 @@
       - CAT2
       - CCI-001233
       - SRG-OS-000191-GPOS-00080
-      - SV-245540r754730_rule
+      - SV-245540r942951_rule
       - V-245540
 
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
@@ -3344,8 +3344,12 @@
 - name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
   ansible.builtin.lineinfile:
       path: "/etc/systemd/logind.conf"
-      regexp: '^StopIdleSessionSec=|^\# StopIdleSessionSec='
-      line: "StopIdleSessionSec= {{ rhel_08_020035_idlesessiontimeout }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  loop:
+      - { regexp: '^(?#)\s*StopIdleSessionSec\s*=', line: "StopIdleSessionSec={{ rhel_08_020035_idlesessiontimeout }}" }
+      - { regexp: '^(?#)\s*KillUserProccesses\s*=', line: "KillUserProccesses=no" }
+  notify: Restart_systemdlogin
   when:
       - rhel_08_020035
   tags:
@@ -3353,7 +3357,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-257258r917891_rule
+      - SV-257258r942953_rule
       - V-257258
       - session
 
@@ -4187,7 +4191,7 @@
       - CAT2
       - CCI-000765
       - SRG-OS-000105-GPOS-00052
-      - SV-230372r627750_rule
+      - SV-230372r942945_rule
       - V-230372
       - pamd
 
@@ -4268,7 +4272,7 @@
       - CAT2
       - CCI-002007
       - SRG-OS-000383-GPOS-00166
-      - SV-230376r627750_rule
+      - SV-230376r942948_rule
       - V-230376
       - sssd
 
@@ -5856,7 +5860,7 @@
   notify: change_requires_reboot
   with_items:
       - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
-      - { regexp: '^install uvcvideo', line: 'install uvcvideo /bin/true', insertafter: '##Disable WebCam' }
+      - { regexp: '^install uvcvideo', line: 'install uvcvideo /bin/false', insertafter: '##Disable WebCam' }
       - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
   when:
       - rhel_08_040020
@@ -5865,7 +5869,7 @@
       - CAT2
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230493r809316_rule
+      - SV-230493r942915_rule
       - V-230493
       - camera
 
@@ -6001,7 +6005,7 @@
       group: root
       mode: 0640
   with_items:
-      - { regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install usb-storage', line: 'install usb-storage /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
   when:
       - rhel_08_040080
@@ -6010,7 +6014,7 @@
       - CAT2
       - CCI-000778
       - SRG-OS-000114-GPOS-00059
-      - SV-230503r809319_rule
+      - SV-230503r942936_rule
       - V-230503
       - usb_devices
 
@@ -6131,7 +6135,7 @@
       - CAT2
       - CCI-002314
       - SRG-OS-000297-GPOS-00115
-      - SV-230504r809321_rule
+      - SV-230504r942942_rule
       - V-230504
       - firewall
 
@@ -6171,7 +6175,7 @@
         ansible.builtin.lineinfile:
             path: /etc/modprobe.d/bluetooth.conf
             regexp: '^install bluetooth '
-            line: "install bluetooth /bin/true"
+            line: "install bluetooth /bin/false"
             create: true
             owner: root
             group: root
@@ -6198,7 +6202,7 @@
       - CAT2
       - CCI-001443
       - SRG-OS-000300-GPOS-00118
-      - SV-230507r833336_rule
+      - SV-230507r942939_rule
       - V-230507
       - bluetooth
 
