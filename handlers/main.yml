@@ -10,6 +10,11 @@
   when:
       - not system_is_container
 
+- name: Restart_systemdlogin
+  ansible.builtin.systemd:
+      name: systemd-logind
+      state: restarted
+
 - name: sysctl system
   ansible.builtin.shell: sysctl --system
   when: "'procps-ng' in ansible_facts.packages"
