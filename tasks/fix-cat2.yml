@@ -3434,7 +3434,7 @@
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout | length == 0
+        when: rhel_08_020050_removal_action.stdout_lines | length == 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
@@ -3442,15 +3442,16 @@
             path: "{{ item }}"
             regexp: ^removal-action=
             line: removal-action='lock-screen'
-        loop: "{{ rhel_08_020050_removal_action.stdout }}"
-        when: rhel_08_020050_removal_action.stdout | length > 0
+        loop: "{{ rhel_08_020050_removal_action.stdout_lines }}"
+        when: rhel_08_020050_removal_action.stdout_lines | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
         ansible.builtin.lineinfile:
-            path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
+            path: '/etc/dconf/db/distro.d/locks/{{ item }}'
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout | length > 0
+        loop: "{{ rhel_08_020050_removal_action_file.stdout_lines }}"
+        when: rhel_08_020050_removal_action_file.stdout_lines | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
@@ -3461,7 +3462,7 @@
             owner: root
             group: root
             mode: 0640
-        when: rhel_08_020050_removal_action_file.stdout | length == 0
+        when: rhel_08_020050_removal_action_file.stdout_lines | length == 0
         notify: dconf update
   when:
       - rhel_08_020050
