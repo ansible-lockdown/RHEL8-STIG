@@ -3472,7 +3472,7 @@
                 # Set the lock time out to 900 seconds before the session is considered idle
                 idle-delay=uint32 900
         notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout | length == 0
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length == 0
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         ansible.builtin.lineinfile:
@@ -3482,8 +3482,8 @@
             owner: root
             group: root
             mode: 0640
-        loop: "{{ rhel_08_020060_idle_delay_param.stdout }}"
-        when: rhel_08_020060_idle_delay_param.stdout | length > 0
+        loop: "{{ rhel_08_020060_idle_delay_param.stdout_lines }}"
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length > 0
         notify: dconf update
   when:
       - rhel_08_020060
