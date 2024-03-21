@@ -3438,7 +3438,7 @@
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
-        when: rhel_08_020050_removal_action.stdout | length == 0
+        when: rhel_08_020050_removal_action.stdout_lines | length == 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
@@ -3446,15 +3446,15 @@
             path: "{{ item }}"
             regexp: ^removal-action=
             line: removal-action='lock-screen'
-        loop: "{{ rhel_08_020050_removal_action.stdout }}"
-        when: rhel_08_020050_removal_action.stdout | length > 0
+        loop: "{{ rhel_08_020050_removal_action.stdout_lines }}"
+        when: rhel_08_020050_removal_action.stdout_lines | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
         ansible.builtin.lineinfile:
             path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
-        when: rhel_08_020050_removal_action_file.stdout | length > 0
+        when: rhel_08_020050_removal_action_file.stdout_lines | length > 0
         notify: dconf update
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
@@ -3465,7 +3465,7 @@
             owner: root
             group: root
             mode: 0640
-        when: rhel_08_020050_removal_action_file.stdout | length == 0
+        when: rhel_08_020050_removal_action_file.stdout_lines | length == 0
         notify: dconf update
   when:
       - rhel_08_020050
@@ -3500,7 +3500,7 @@
                 # Set the lock time out to 900 seconds before the session is considered idle
                 idle-delay=uint32 900
         notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout | length == 0
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length == 0
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         ansible.builtin.lineinfile:
@@ -3510,8 +3510,8 @@
             owner: root
             group: root
             mode: 0640
-        loop: "{{ rhel_08_020060_idle_delay_param.stdout }}"
-        when: rhel_08_020060_idle_delay_param.stdout | length > 0
+        loop: "{{ rhel_08_020060_idle_delay_param.stdout_lines }}"
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length > 0
         notify: dconf update
   when:
       - rhel_08_020060
