@@ -6057,8 +6057,8 @@
             zone: "{{ rhel8stig_custom_firewall_zone }}"
             permanent: true
             state: enabled
-            service: "{{ (item == (item | regex_search('^[a-z]+$')))        | bool | ternary(item, omit) }}"
-            port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | bool | ternary(item, omit) }}"
+            service: "{{ (item == (item | regex_search('^[a-z]+$'))) | ternary(item, omit) }}"
+            port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | ternary(item, omit) }}"
         with_items:
             - "{{ rhel8stig_white_list_services }}"
 
