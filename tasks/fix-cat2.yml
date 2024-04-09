@@ -461,19 +461,18 @@
 - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
   block:
       - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
-        ansible.builtin.find:
-            path: /
-            patterns: '*.keytab'
-            recurse: true
+        ansible.builtin.shell: find / -name *.keytab
+        changed_when: false
+        failed_when: rhel8stig_010161_keytab_files.rc not in [ 0, 1 ]
         register: rhel8stig_010161_keytab_files
 
       - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             state: absent
         with_items:
-            - "{{ rhel8stig_010161_keytab_files.files }}"
-        when: rhel8stig_010161_keytab_files.matched > 0
+            - "{{ rhel8stig_010161_keytab_files.stdout_lines }}"
+        when: rhel8stig_010161_keytab_files.stdout | length > 0
   when:
       - rhel_08_010161
   tags:
@@ -1630,25 +1629,19 @@
 - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
-        ansible.builtin.find:
-            paths: /etc/ssh
-            recurse: true
-            file_type: file
-            patterns: 'ssh_host*_key.pub'
-            hidden: true
+        ansible.builtin.shell: find /etc/ssh -name ssh_host*_key.pub
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010480_public_files.rc not in [ 0, 1 ]
         register: rhel_08_010480_public_files
 
       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             mode: "{{ rhel8stig_ssh_pub_key_perm }}"
         with_items:
-            - "{{ rhel_08_010480_public_files.files }}"
-        loop_control:
-            label: "{{ item.path }}"
+            - "{{ rhel_08_010480_public_files.stdout_lines }}"
         notify: restart sshd
+        when: rhel_08_010480_public_files.stdout | length > 0
   when:
       - rhel_08_010480
       - rhel8stig_ssh_required
@@ -1664,25 +1657,19 @@
 - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
-        ansible.builtin.find:
-            paths: /etc/ssh
-            recurse: true
-            file_type: file
-            patterns: 'ssh_host*key'
-            hidden: true
+        ansible.builtin.shell: find /etc/ssh -name ssh_host*_key
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010490_private_host_key_files.rc not in [ 0, 1 ]
         register: rhel_08_010490_private_host_key_files
 
       - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             mode: "{{ rhel8stig_ssh_priv_key_perm }}"
         with_items:
-            - "{{ rhel_08_010490_private_host_key_files.files }}"
-        loop_control:
-            label: "{{ item.path }}"
+            - "{{ rhel_08_010490_private_host_key_files.stdout_lines }}"
         notify: restart sshd
+        when: rhel_08_010490_private_host_key_files.stdout | length > 0
   when:
       - rhel_08_010490
       - rhel8stig_ssh_required
