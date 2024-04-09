@@ -163,15 +163,15 @@
   changed_when: false
   register: discovered_interactive_uids
 
-- name: "PRELIM | RHEL-08-010690 Ensure user enumeration command is modified when autofs remote home directories are in use"
+- name: "PRELIM | RHEL-08-010690 | Ensure user enumeration command is modified when autofs remote home directories are in use"
   block:
-      - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
+      - name: PRELIM | RHEL-08-010690 | AUDIT | Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
         ansible.builtin.assert:
             that:
                 - rhel8stig_auto_mount_home_dirs_local_mount_point is defined
                 - rhel8stig_auto_mount_home_dirs_local_mount_point | length > 0
 
-      - name: Modify local_interactive_user_dir_command to exclude remote automounted home directories
+      - name: PRELIM | RHEL-08-010690 | PATCH | Modify local_interactive_user_dir_command to exclude remote automounted home directories
         ansible.builtin.set_fact:
             local_interactive_user_dir_command: "{{ local_interactive_user_dir_command }} | grep -v '{{ rhel8stig_auto_mount_home_dirs_local_mount_point }}"
 
@@ -381,7 +381,7 @@
   tags:
       - always
 
-- name: Gather the package facts
+- name: "PRELIM | Gather the package facts"
   ansible.builtin.package_facts:
       manager: auto
   tags:
