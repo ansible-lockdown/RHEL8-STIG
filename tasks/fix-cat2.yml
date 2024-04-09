@@ -7125,7 +7125,7 @@
 
       - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
         ansible.posix.sysctl:
-            name: net.ipv4.conf.all.send_redirects
+            name: net.ipv4.conf.all.accept_redirects
             value: 0
             state: present
             reload: "{{ rhel8stig_sysctl_reload }}"
