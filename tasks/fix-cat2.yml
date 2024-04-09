@@ -2230,7 +2230,6 @@
   when:
       - rhel_08_010660
       - rhel8stig_disruption_high
-      # - rhel_08_stig_interactive_homedir_inifiles is defined
   tags:
       - RHEL-08-010660
       - CAT2
@@ -2441,7 +2440,7 @@
   block:
       - name: "MEDIUM | RHEL-08-010690 | AUDIT | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory. | Find path files"
         ansible.builtin.shell: find "{{ item }}" -maxdepth 1 -type f | xargs grep "PATH=" | cut -d':' -f1 | xargs realpath
-        with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
+        with_items: "{{ discovered_interactive_users_home.stdout_list }}"
         register: rhel_08_010690_ini_path_grep_list
         changed_when: false
         failed_when: false
@@ -2558,15 +2557,31 @@
       - SV-230320r627750_rule
       - V-230320
 
+# Required for RHEL-08-010730
+- name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+  with_items: "{{ discovered_interactive_users_home.stdout_lines }}"
+  when:
+      - rhel_08_010750
+  tags:
+      - RHEL-08-010750
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230323r627750_rule
+      - V-230323
+      - permissions
+
 - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
   ansible.builtin.file:
       path: "{{ item }}"
       mode: "{{ rhel8stig_local_int_home_perms }}"
   with_items:
-      - "{{ local_home_directories.stdout_lines }}"
+      - "{{ discovered_interactive_users_home.stdout_lines }}"
   when:
       - rhel_08_010730
-      - local_home_directories.stdout | length > 0
   tags:
       - RHEL-08-010730
       - CAT2
@@ -2578,20 +2593,12 @@
 
 - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive."
   block:
-      - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Find out of compliance files"
-        ansible.builtin.shell: "find {{ item }} -perm -750 ! -perm 750"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010731_files
-        with_items:
-            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start | int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
-
       - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
         ansible.builtin.file:
             path: "{{ item }}"
             mode: "{{ rhel8stig_local_int_home_file_perms }}"
         with_items:
-            - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+            - "{{ discovered_interactive_users_home.stdout_lines }}"
         when: rhel8stig_disruption_high
 
       - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Alert on out of compliance files"
@@ -2599,7 +2606,7 @@
             msg:
                 - "Alert! Below are the files that are in interactive user folders but permissiosn less restrictiv than 0750."
                 - "Please review the files to bring into STIG compliance"
-                - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+                - "{{ discovered_interactive_users_home.stdout_lines }}"
         when: not rhel8stig_disruption_high
   when:
       - rhel_08_010731
@@ -2622,10 +2629,8 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010740
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-      - (item.uid >= rhel8stig_interactive_uid_stop | int)
+      - item.uid is search(discovered_interactive_uids.stdout)
   tags:
-      - skip_ansible_lint
       - RHEL-08-010740
       - CAT2
       - CCI-000366
@@ -2645,8 +2650,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010741
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-      - item.uid != 65534
+      - item.uid is search(discovered_interactive_uids.stdout)
   tags:
       - RHEL-08-010741
       - CAT2
@@ -2654,26 +2658,6 @@
       - SRG-OS-000480-GPOS-00227
       - SV-244532r743845_rule
       - V-244532
-      - permissions
-
-- name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
-  ansible.builtin.file:
-      path: "{{ item.dir }}"
-      state: directory
-  with_items: "{{ rhel8stig_passwd }}"
-  loop_control:
-      label: "{{ rhel8stig_passwd_label }}"
-  when:
-      - rhel_08_010750
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-  tags:
-      - skip_ansible_lint
-      - RHEL-08-010750
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230323r627750_rule
-      - V-230323
       - permissions
 
 - name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
@@ -4396,7 +4380,7 @@
             hidden: true
             use_regex: true
         register: rhel8stig_020352_file
-        loop: "{{ local_home_directories.stdout_lines }}"
+        loop: "{{ discovered_interactive_users_home.stdout_lines }}"
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         ansible.builtin.lineinfile:

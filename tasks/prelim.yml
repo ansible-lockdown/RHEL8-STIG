@@ -139,6 +139,30 @@
       - RHEL-08-010750
       - RHEL-08-020320
 
+- name: "PRELIM | AUDIT | Discover Interactive Users"
+  tags:
+      - always
+  ansible.builtin.shell: >
+      grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $1 }'
+  changed_when: false
+  register: discovered_interactive_usernames
+
+- name: "PRELIM | AUDIT | Discover Interactive User accounts home directories"
+  tags:
+      - always
+  ansible.builtin.shell: >
+      grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $6 }'
+  changed_when: false
+  register: discovered_interactive_users_home
+
+- name: "PRELIM | AUDIT | Discover Interactive user UIDs"
+  tags:
+      - always
+  ansible.builtin.shell: >
+      grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $3 }'
+  changed_when: false
+  register: discovered_interactive_uids
+
 - name: "PRELIM | RHEL-08-010690 Ensure user enumeration command is modified when autofs remote home directories are in use"
   block:
       - name: Ensure that rhel8stig_auto_mount_home_dirs_local_mount_point is defined and not length zero
@@ -188,16 +212,16 @@
       - RHEL-08-010070
       - RHEL-08-030010
 
-- name: "PRELIM | RHEL-08-010730 | RHEL-08-20352 | Get local interactive user home directories"
-  ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
-  changed_when: false
-  failed_when: false
-  register: local_home_directories
-  when:
-      - rhel_08_010730 or
-        rhel_08_020352
-  tags:
-      - always
+# - name: "PRELIM | RHEL-08-010730 | RHEL-08-20352 | Get local interactive user home directories"
+#   ansible.builtin.shell: ls -d $(awk -F':' '($3>=1000)&&($1!="nobody"){print $6}' /etc/passwd)
+#   changed_when: false
+#   failed_when: false
+#   register: local_home_directories
+#   when:
+#       - rhel_08_010730 or
+#         rhel_08_020352
+#   tags:
+#       - always
 
 - name: "PRELIM | RHEL-08-030620 | RHEL-08-030630 | RHEL-08-030640 | RHEL-08-030650 | Install audit remote plugin."
   ansible.builtin.package:
