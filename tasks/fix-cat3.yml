@@ -238,7 +238,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020024
   tags:
@@ -381,7 +381,7 @@
       create: true
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   when:
       - rhel_08_030603
   tags:
@@ -472,7 +472,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install atm', line: 'install atm /bin/false', insertafter: 'EOF' }
@@ -498,7 +498,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install can', line: 'install can /bin/false', insertafter: 'EOF' }
@@ -524,7 +524,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install sctp', line: 'install sctp /bin/false', insertafter: 'EOF' }
@@ -550,7 +550,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install tipc', line: 'install tipc /bin/false', insertafter: 'EOF' }
@@ -576,7 +576,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install cramfs', line: 'install cramfs /bin/false', insertafter: 'EOF' }
@@ -602,7 +602,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install firewire-core', line: 'install firewire-core /bin/false', insertafter: 'EOF' }

@@ -363,7 +363,7 @@
       dest: /etc/grub.d/01_users
       owner: root
       group: root
-      mode: 0755
+      mode: '0755'
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -388,7 +388,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_010151
   tags:
@@ -408,7 +408,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_010152
   tags:
@@ -2398,7 +2398,7 @@
             dest: /etc/resolv.conf
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when:
             - rhel_08_010680_networkmanager_check.stdout == '0'
             - rhel8_stig_use_resolv_template
@@ -3292,7 +3292,7 @@
             regexp: '^lock-enabled'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
             line: |
                 [org/gnome/desktop/screensaver]
                 # Set this to true to lock the screen when the screensaver activates
@@ -3348,7 +3348,7 @@
             create: true
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         loop:
             - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
             - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
@@ -3405,7 +3405,7 @@
             create: true
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
@@ -3436,7 +3436,7 @@
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         when: rhel_08_020050_removal_action_file.stdout_lines | length == 0
         notify: dconf update
   when:
@@ -3465,7 +3465,7 @@
             create: true
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
             regexp: '^idle-delay'
             line: |
                 [org/gnome/desktop/session]
@@ -3481,7 +3481,7 @@
             line: idle-delay=uint32 900
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         loop: "{{ rhel_08_020060_idle_delay_param.stdout_lines }}"
         when: rhel_08_020060_idle_delay_param.stdout_lines | length > 0
         notify: dconf update
@@ -3513,7 +3513,7 @@
             line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
   when:
       - rhel_08_020070
   tags:
@@ -3532,7 +3532,7 @@
       line: /org/gnome/desktop/screensaver/lock-delay
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   when:
       - rhel_08_020080
       - "'dconf' in ansible_facts.packages"
@@ -3553,7 +3553,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
@@ -3580,7 +3580,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020100
   tags:
@@ -3600,7 +3600,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020101
   tags:
@@ -3628,7 +3628,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when: rhel_08_020102_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
@@ -3668,7 +3668,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when: rhel_08_020103_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
@@ -3716,7 +3716,7 @@
       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
       create: true
   when:
       - rhel_08_020110
@@ -3737,7 +3737,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020120
   tags:
@@ -3757,7 +3757,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020130
   tags:
@@ -3777,7 +3777,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020140
   tags:
@@ -3797,7 +3797,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020150
   tags:
@@ -3817,7 +3817,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020160
   tags:
@@ -3837,7 +3837,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020170
   tags:
@@ -3879,7 +3879,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020190
   tags:
@@ -3897,7 +3897,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
       regexp: ^#?PASS_MAX_DAYS
       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
   when:
@@ -3957,7 +3957,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when: rhel_08_020220_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3996,7 +3996,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when: rhel_08_020221_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -4027,7 +4027,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020230
   tags:
@@ -4046,7 +4046,7 @@
       line: "PASS_MIN_LEN 15"
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020231
   tags:
@@ -4104,7 +4104,7 @@
             insertafter: "{{ item.insertafter }}"
             owner: root
             group: root
-            mode: 0600
+            mode: '0600'
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -4116,7 +4116,7 @@
             line: auth       sufficient pam_sss.so try_cert_auth
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         notify: restart sssd
         when: rhel_08_020250_sc_auth_sss.stdout | length == 0
 
@@ -4212,7 +4212,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020280
   tags:
@@ -4232,7 +4232,7 @@
       insertafter: "{{ item.insertafter }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
@@ -4256,7 +4256,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020300
   tags:
@@ -4275,7 +4275,7 @@
       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020310
   tags:
@@ -4347,7 +4347,7 @@
       line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_020351
   tags:
@@ -4691,7 +4691,7 @@
       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
         ansible.builtin.file:
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-            mode: 0700
+            mode: '0700'
             state: directory
         when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
@@ -5477,7 +5477,7 @@
 - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
   ansible.builtin.file:
       path: "{{ item }}"
-      mode: 0640
+      mode: '0640'
   with_items:
       - /etc/audit/rules.d/audit.rules
       - /etc/audit/auditd.conf
@@ -5504,7 +5504,7 @@
       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: 0755
+            mode: '0755'
         with_items:
             - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
@@ -5575,7 +5575,7 @@
       line: "{{ item }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - "# Audit Tools"
       - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
@@ -5700,7 +5700,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
@@ -5827,7 +5827,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
       insertafter: "{{ item.insertafter }}"
   notify: change_requires_reboot
   with_items:
@@ -5975,7 +5975,7 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   with_items:
       - { regexp: '^install usb-storage', line: 'install usb-storage /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
@@ -6178,7 +6178,7 @@
             create: true
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth kernel module"
@@ -6189,7 +6189,7 @@
             line: "{{ item.line }}"
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
             insertafter: "{{ item.insertafter }}"
         notify: change_requires_reboot
         with_items:
