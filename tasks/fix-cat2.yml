@@ -842,7 +842,6 @@
 
       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
         ansible.builtin.shell: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
         notify: change_requires_reboot
         when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
   when:

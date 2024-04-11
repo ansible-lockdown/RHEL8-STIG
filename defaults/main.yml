@@ -35,7 +35,6 @@ rhel8stig_audit_disruptive: false
 rhel8stig_skip_for_travis: false
 
 rhel8stig_workaround_for_disa_benchmark: true
-rhel8stig_workaround_for_ssg_benchmark: true
 
 # tweak role to run in a chroot, such as in kickstart %post script
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
@@ -501,11 +500,6 @@ rhel8stig_kdump_needed: false
 # or rhel8stig_gui)
 rhel8stig_always_configure_dconf: false
 
-# Whether or not to run tasks related to smart card authentication enforcement
-rhel8stig_smartcard: false
-# Configure your smartcard driver
-rhel8stig_smartcarddriver: cackey
-
 # Set the file that sysctl should write to
 rhel8stig_sysctl_file: /etc/sysctl.d/99_stig_sysctl.conf
 
@@ -559,10 +553,6 @@ rhel8stig_ssh_pub_key_perm: 0644
 rhel8stig_ssh_priv_key_perm: 0600
 
 # RHEL-08-010690
-# Set standard user paths here
-# Also set whether we should automatically remediate paths in user ini files.
-# rhel_08_020720_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
-rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
 
 # RHEL-08-010700
@@ -707,13 +697,6 @@ rhel8stig_sssd:
     maprule: (userCertificate;binary={cert!bin})
     domains: "{{ rhel8stig_sssd_domain }}"
 
-# RHEL-08-020070
-# Session timeout setting file (TMOUT setting can be set in multiple files)
-# Timeout value is in seconds. (60 seconds * 10 = 600)
-rhel8stig_shell_session_timeout:
-    file: /etc/profile.d/tmout.sh
-    timeout: 600
-
 # RHEL-08-010200 | All network connections associated with SSH traffic must
 # terminate at the end of the session or after 10 minutes of inactivity, except
 # to fulfill documented and validated mission requirements.
@@ -762,14 +745,6 @@ rhel8stig_pam_faillock:
 
 # RHEL-08-020035
 rhel_08_020035_idlesessiontimeout: 900
-
-# RHEL-08-030670
-# rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards
-rhel8stig_audisp_disk_full_action: single
-
-# RHEL-08-030680
-# rhel8stig_audisp_network_failure_action optoins are syslog, halt, and single
-rhel8stig_audisp_network_failure_action: single
 
 # RHEL-08-030060
 # rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
@@ -909,11 +884,6 @@ rhel8stig_ssh_ciphers: "Ciphers=aes256-ctr,aes192-ctr,aes128-ctr,aes256-gcm@open
 # RHEL-08-040342
 # Expected Values for FIPS KEX algorithims
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
-
-# This will be the CRYPTO_POLICY settings in the opensshserver.conf file. It will be a string for the entirety of the setting
-# to conform to STIG standard control RHEL-08-010290 this variable must contain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256 settings
-# to conform to STIG standard control RHEL-08-010291 this variable must cotnain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256"
 
 # RHEL-08-010295
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
