@@ -414,7 +414,7 @@
         ansible.builtin.file:
             path: "{{ rhel8stig_pam_faillock.dir }}"
             state: directory
-            mode: 0755
+            mode: '0755'
             owner: root
             group: root
             recurse: true
