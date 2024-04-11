@@ -878,7 +878,7 @@ rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
 rhel8stig_fapolicy_white_list:
     - 'deny_audit perm=any pattern=ld_so : all'
-    - deny all all
+    - 'deny perm=any all : all'
 
 # RHEL-08-040090
 # rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
