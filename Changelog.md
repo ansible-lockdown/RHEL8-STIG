@@ -2,6 +2,10 @@
 
 ## 3.2 - STIV V1R13 - 24th Jan 2024
 
+- Audit updated
+  - moved audit into prelim
+  - updates to audit logic for copy and archive options
+
 ruleid updated
 
 - 010001

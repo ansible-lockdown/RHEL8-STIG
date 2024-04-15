@@ -1,5 +1,100 @@
 ---
 
+- name: PRELIM | set bootloader type
+  block:
+      - name: "PRELIM | Check whether machine is UEFI-based"
+        ansible.builtin.stat:
+            path: /sys/firmware/efi
+        register: rhel8_efi_boot
+
+      - name: "PRELIM | set fact if UEFI boot"
+        ansible.builtin.set_fact:
+            rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
+            rhel8stig_legacy_boot: false
+        when:
+            - rhel8_efi_boot.stat.exists
+
+      - name: "PRELIM | set fact if UEFI boot | Oracle Linux"
+        ansible.builtin.set_fact:
+            rhel8stig_bootloader_path: /boot/efi/EFI/redhat
+            rhel8stig_legacy_boot: false
+        when:
+            - rhel8_efi_boot.stat.exists
+            - ansible_distribution == 'OracleLinux'
+
+      - name: "PRELIM | set if not UEFI boot"
+        ansible.builtin.set_fact:
+            rhel8stig_bootloader_path: /boot/grub2/
+            rhel8stig_legacy_boot: true
+        when: not rhel8_efi_boot.stat.exists
+
+      - name: PRELIM | output bootloader and efi state
+        ansible.builtin.debug:
+            msg:
+                - "bootloader path set to {{ rhel8stig_bootloader_path }}"
+                - "legacy boot equals {{ rhel8stig_legacy_boot }}"
+  tags:
+      - always
+
+- name: "PRELIM | Gather interactive user ID min"
+  block:
+      - name: "PRELIM | Gather interactive user ID min"
+        ansible.builtin.shell: grep ^UID_MIN /etc/login.defs | awk '{print $2}'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_min_uid
+
+      - name: "PRELIM | Gather interactive user ID max"
+        ansible.builtin.shell: grep ^UID_MAX /etc/login.defs | awk '{print $2}'
+        changed_when: false
+        failed_when: false
+        register: rhel8stig_max_uid
+
+      - name: "PRELIM | Setting the fact"
+        ansible.builtin.set_fact:
+            rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | string }}"
+            rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | string }}"
+  tags:
+      - always
+
+- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | set sssd.conf location"
+  block:
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
+        ansible.builtin.stat:
+            path: "{{ rhel8stig_sssd_conf }}"
+        register: rhel8stig_sssd_conf_present
+
+      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
+        ansible.builtin.debug:
+            msg: "Warning!! The configured sssd config file {{ rhel8stig_sssd_conf }} has not been found, some items will skip"
+        changed_when: true
+        when:
+            - not rhel8stig_sssd_conf_present.stat.exists
+  when:
+      - rhel_08_010400 or
+        rhel_08_020090 or
+        rhel_08_020250 or
+        rhel_08_020290
+  tags:
+      - always
+
+- name: Include audit specific variables
+  ansible.builtin.include_vars: audit.yml
+  when:
+      - run_audit or audit_only
+      - setup_audit
+  tags:
+      - setup_audit
+      - run_audit
+
+- name: Include pre-remediation audit tasks
+  ansible.builtin.import_tasks: pre_remediation_audit.yml
+  when:
+      - run_audit or audit_only
+      - setup_audit
+  tags:
+      - run_audit
+
 - name: "PRELIM | RHEL-08-010020"
   block:
       - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
@@ -315,90 +410,9 @@
       - RHEL-08-010770
       - complexity-high
 
-- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | set sssd.conf location"
-  block:
-      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
-        ansible.builtin.stat:
-            path: "{{ rhel8stig_sssd_conf }}"
-        register: rhel8stig_sssd_conf_present
-
-      - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location | Warning if not found"
-        ansible.builtin.debug:
-            msg: "Warning!! The configured sssd config file {{ rhel8stig_sssd_conf }} has not been found, some items will skip"
-        changed_when: true
-        when:
-            - not rhel8stig_sssd_conf_present.stat.exists
-  when:
-      - rhel_08_010400 or
-        rhel_08_020090 or
-        rhel_08_020250 or
-        rhel_08_020290
-  tags:
-      - always
-
-- name: "PRELIM | Gather interactive user ID min"
-  block:
-      - name: "PRELIM | Gather interactive user ID min"
-        ansible.builtin.shell: grep ^UID_MIN /etc/login.defs | awk '{print $2}'
-        changed_when: false
-        failed_when: false
-        register: rhel8stig_min_uid
-
-      - name: "PRELIM | Gather interactive user ID max"
-        ansible.builtin.shell: grep ^UID_MAX /etc/login.defs | awk '{print $2}'
-        changed_when: false
-        failed_when: false
-        register: rhel8stig_max_uid
-
-      - name: "PRELIM | Setting the fact"
-        ansible.builtin.set_fact:
-            rhel8stig_interactive_uid_start: "{{ rhel8stig_min_uid.stdout | string }}"
-            rhel8stig_interactive_uid_stop: "{{ rhel8stig_max_uid.stdout | string }}"
-  tags:
-      - always
-
 - name: Gather the package facts
   ansible.builtin.package_facts:
       manager: auto
-  tags:
-      - always
-
-- name: "PRELIM | Check whether machine is UEFI-based"
-  ansible.builtin.stat:
-      path: /sys/firmware/efi
-  register: rhel8_efi_boot
-  tags:
-      - always
-      - goss_template
-
-- name: PRELIM | set bootloader type
-  block:
-      - name: "PRELIM | set fact if UEFI boot"
-        ansible.builtin.set_fact:
-            rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
-            rhel8stig_legacy_boot: false
-        when:
-            - rhel8_efi_boot.stat.exists
-
-      - name: "PRELIM | set fact if UEFI boot | Oracle Linux"
-        ansible.builtin.set_fact:
-            rhel8stig_bootloader_path: /boot/efi/EFI/redhat
-            rhel8stig_legacy_boot: false
-        when:
-            - rhel8_efi_boot.stat.exists
-            - ansible_distribution == 'OracleLinux'
-
-      - name: "PRELIM | set if not UEFI boot"
-        ansible.builtin.set_fact:
-            rhel8stig_bootloader_path: /boot/grub2/
-            rhel8stig_legacy_boot: true
-        when: not rhel8_efi_boot.stat.exists
-
-      - name: PRELIM | output bootloader and efi state
-        ansible.builtin.debug:
-            msg:
-                - "bootloader path set to {{ rhel8stig_bootloader_path }}"
-                - "legacy boot equals {{ rhel8stig_legacy_boot }}"
   tags:
       - always
 
