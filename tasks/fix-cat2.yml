@@ -3451,8 +3451,9 @@
 
       - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
         ansible.builtin.lineinfile:
-            path: '/etc/dconf/db/distro.d/locks/{{ rhel_08_020050_removal_action_file.stdout }}'
+            path: '/etc/dconf/db/distro.d/locks/{{ item }}'
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        loop: "{{ rhel_08_020050_removal_action_file.stdout_lines }}"
         when: rhel_08_020050_removal_action_file.stdout_lines | length > 0
         notify: dconf update
 
