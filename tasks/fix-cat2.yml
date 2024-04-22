@@ -461,19 +461,18 @@
 - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication."
   block:
       - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
-        ansible.builtin.find:
-            path: /
-            patterns: '*.keytab'
-            recurse: true
+        ansible.builtin.shell: find / -name *.keytab
+        changed_when: false
+        failed_when: rhel8stig_010161_keytab_files.rc not in [ 0, 1 ]
         register: rhel8stig_010161_keytab_files
 
       - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             state: absent
         with_items:
-            - "{{ rhel8stig_010161_keytab_files.files }}"
-        when: rhel8stig_010161_keytab_files.matched > 0
+            - "{{ rhel8stig_010161_keytab_files.stdout_lines }}"
+        when: rhel8stig_010161_keytab_files.stdout | length > 0
   when:
       - rhel_08_010161
   tags:
@@ -1630,25 +1629,19 @@
 - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
-        ansible.builtin.find:
-            paths: /etc/ssh
-            recurse: true
-            file_type: file
-            patterns: 'ssh_host*_key.pub'
-            hidden: true
+        ansible.builtin.shell: find /etc/ssh -name ssh_host*_key.pub
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010480_public_files.rc not in [ 0, 1 ]
         register: rhel_08_010480_public_files
 
       - name: "MEDIUM | RHEL-08-010480 | PATCH | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Set permissions"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             mode: "{{ rhel8stig_ssh_pub_key_perm }}"
         with_items:
-            - "{{ rhel_08_010480_public_files.files }}"
-        loop_control:
-            label: "{{ item.path }}"
+            - "{{ rhel_08_010480_public_files.stdout_lines }}"
         notify: restart sshd
+        when: rhel_08_010480_public_files.stdout | length > 0
   when:
       - rhel_08_010480
       - rhel8stig_ssh_required
@@ -1664,25 +1657,19 @@
 - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive."
   block:
       - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
-        ansible.builtin.find:
-            paths: /etc/ssh
-            recurse: true
-            file_type: file
-            patterns: 'ssh_host*key'
-            hidden: true
+        ansible.builtin.shell: find /etc/ssh -name ssh_host*_key
         changed_when: false
-        failed_when: false
+        failed_when: rhel_08_010490_private_host_key_files.rc not in [ 0, 1 ]
         register: rhel_08_010490_private_host_key_files
 
       - name: "MEDIUM | RHEL-08-010490 | PATCH | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Set permissions"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             mode: "{{ rhel8stig_ssh_priv_key_perm }}"
         with_items:
-            - "{{ rhel_08_010490_private_host_key_files.files }}"
-        loop_control:
-            label: "{{ item.path }}"
+            - "{{ rhel_08_010490_private_host_key_files.stdout_lines }}"
         notify: restart sshd
+        when: rhel_08_010490_private_host_key_files.stdout | length > 0
   when:
       - rhel_08_010490
       - rhel8stig_ssh_required
@@ -2230,7 +2217,6 @@
   when:
       - rhel_08_010660
       - rhel8stig_disruption_high
-      # - rhel_08_stig_interactive_homedir_inifiles is defined
   tags:
       - RHEL-08-010660
       - CAT2
@@ -2441,7 +2427,7 @@
   block:
       - name: "MEDIUM | RHEL-08-010690 | AUDIT | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory. | Find path files"
         ansible.builtin.shell: find "{{ item }}" -maxdepth 1 -type f | xargs grep "PATH=" | cut -d':' -f1 | xargs realpath
-        with_items: "{{ rhel_08_stig_interactive_homedir_results }}"
+        with_items: "{{ discovered_interactive_users_home.stdout_list }}"
         register: rhel_08_010690_ini_path_grep_list
         changed_when: false
         failed_when: false
@@ -2558,15 +2544,31 @@
       - SV-230320r627750_rule
       - V-230320
 
+# Required for RHEL-08-010730
+- name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+  with_items: "{{ discovered_interactive_users_home.stdout_lines }}"
+  when:
+      - rhel_08_010750
+  tags:
+      - RHEL-08-010750
+      - CAT2
+      - CCI-000366
+      - SRG-OS-000480-GPOS-00227
+      - SV-230323r627750_rule
+      - V-230323
+      - permissions
+
 - name: "MEDIUM | RHEL-08-010730 | PATCH | All RHEL 8 local interactive user home directories must have mode 0750 or less permissive."
   ansible.builtin.file:
       path: "{{ item }}"
       mode: "{{ rhel8stig_local_int_home_perms }}"
   with_items:
-      - "{{ local_home_directories.stdout_lines }}"
+      - "{{ discovered_interactive_users_home.stdout_lines }}"
   when:
       - rhel_08_010730
-      - local_home_directories.stdout | length > 0
   tags:
       - RHEL-08-010730
       - CAT2
@@ -2578,20 +2580,12 @@
 
 - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive."
   block:
-      - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Find out of compliance files"
-        ansible.builtin.shell: "find {{ item }} -perm -750 ! -perm 750"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010731_files
-        with_items:
-            - "{{ rhel8stig_passwd | selectattr('uid', '>=', rhel8stig_interactive_uid_start | int) | selectattr('uid', '!=', 65534) | map(attribute='dir') | list }}"
-
       - name: "MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Bring files into compliance"
         ansible.builtin.file:
             path: "{{ item }}"
             mode: "{{ rhel8stig_local_int_home_file_perms }}"
         with_items:
-            - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+            - "{{ discovered_interactive_users_home.stdout_lines }}"
         when: rhel8stig_disruption_high
 
       - name: "MEDIUM | RHEL-08-010731 | AUDIT | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Alert on out of compliance files"
@@ -2599,7 +2593,7 @@
             msg:
                 - "Alert! Below are the files that are in interactive user folders but permissiosn less restrictiv than 0750."
                 - "Please review the files to bring into STIG compliance"
-                - "{{ rhel_08_010731_files.results | map(attribute='stdout_lines') | flatten }}"
+                - "{{ discovered_interactive_users_home.stdout_lines }}"
         when: not rhel8stig_disruption_high
   when:
       - rhel_08_010731
@@ -2622,10 +2616,8 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010740
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-      - (item.uid >= rhel8stig_interactive_uid_stop | int)
+      - item.uid is search(discovered_interactive_uids.stdout)
   tags:
-      - skip_ansible_lint
       - RHEL-08-010740
       - CAT2
       - CCI-000366
@@ -2645,8 +2637,7 @@
       label: "{{ rhel8stig_passwd_label }}"
   when:
       - rhel_08_010741
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-      - item.uid != 65534
+      - item.uid is search(discovered_interactive_uids.stdout)
   tags:
       - RHEL-08-010741
       - CAT2
@@ -2654,26 +2645,6 @@
       - SRG-OS-000480-GPOS-00227
       - SV-244532r743845_rule
       - V-244532
-      - permissions
-
-- name: "MEDIUM | RHEL-08-010750 | PATCH | All RHEL 8 local interactive user home directories defined in the /etc/passwd file must exist."
-  ansible.builtin.file:
-      path: "{{ item.dir }}"
-      state: directory
-  with_items: "{{ rhel8stig_passwd }}"
-  loop_control:
-      label: "{{ rhel8stig_passwd_label }}"
-  when:
-      - rhel_08_010750
-      - (item.uid >= rhel8stig_interactive_uid_start | int)
-  tags:
-      - skip_ansible_lint
-      - RHEL-08-010750
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-230323r627750_rule
-      - V-230323
       - permissions
 
 - name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
@@ -4396,7 +4367,7 @@
             hidden: true
             use_regex: true
         register: rhel8stig_020352_file
-        loop: "{{ local_home_directories.stdout_lines }}"
+        loop: "{{ discovered_interactive_users_home.stdout_lines }}"
 
       - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
         ansible.builtin.lineinfile:
@@ -6081,15 +6052,38 @@
             permanent: true
             state: present
 
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Copy existing rules to new zone"
+        ansible.builtin.copy:
+            src: "/etc/firewalld/zones/{{ rhel8stig_existing_zone_to_copy }}.xml"
+            dest: "/etc/firewalld/zones/{{ rhel8stig_custom_firewall_zone }}.xml"
+            remote_src: true
+        when:
+            - rhel8stig_copy_existing_zone
+            - rhel8stig_existing_zone_to_copy | length > 0
+
+      - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Amend copied file"
+        ansible.builtin.replace:
+            path: "/etc/firewalld/zones/{{ rhel8stig_custom_firewall_zone }}.xml"
+            regexp: "{{ item.regexp }}"
+            replace: \1{{ item.replace }}\2
+        loop:
+            - { regexp: (\s*<zone)>(\s*$), replace: ' target="DROP">' }
+            - { regexp: (\s*<short>).*(<\/short>), replace: "{{ rhel8stig_custom_firewall_zone }}" }
+        when:
+            - rhel8stig_copy_existing_zone
+            - rhel8stig_existing_zone_to_copy | length > 0
+
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Allow internet and ssh"
         ansible.posix.firewalld:
             zone: "{{ rhel8stig_custom_firewall_zone }}"
             permanent: true
             state: enabled
-            service: "{{ (item == (item | regex_search('^[a-z]+$')))        | bool | ternary(item, omit) }}"
-            port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | bool | ternary(item, omit) }}"
+            service: "{{ (item == (item | regex_search('^[a-z]+$'))) | ternary(item, omit) }}"
+            port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | ternary(item, omit) }}"
         with_items:
             - "{{ rhel8stig_white_list_services }}"
+        when:
+            - not rhel8stig_copy_existing_zone
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.10+"
         ansible.posix.firewalld:
@@ -6097,7 +6091,9 @@
             permanent: true
             state: enabled
             target: DROP
-        when: ansible_version.full is version_compare('2.10.0 | int', '>=')
+        when:
+            - ansible_version.full is version_compare('2.10.0 | int', '>=')
+            - not rhel8stig_copy_existing_zone
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
         block:
@@ -6111,7 +6107,9 @@
               ansible.builtin.shell: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
               when:
                   - rhel8stig_target_drop_set.rc != 0
-        when: ansible_version.full is version_compare('2.10 | int', '<')
+        when:
+            - ansible_version.full is version_compare('2.10 | int', '<')
+            - not rhel8stig_copy_existing_zone
 
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
         ansible.builtin.shell: firewall-cmd --reload
@@ -7141,7 +7139,7 @@
 
       - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Use template to create file"
         ansible.posix.sysctl:
-            name: net.ipv4.conf.all.send_redirects
+            name: net.ipv4.conf.all.accept_redirects
             value: 0
             state: present
             reload: "{{ rhel8stig_sysctl_reload }}"
