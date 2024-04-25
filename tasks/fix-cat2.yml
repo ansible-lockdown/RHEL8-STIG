@@ -3206,7 +3206,7 @@
             - password-auth
   when:
       - rhel_08_020022
-      - ansible_distribution_version is version('8.2', '>=')
+      - ansible_distribution_version is version('8.1', '<=')
   tags:
       - RHEL-08-020022
       - CAT2
