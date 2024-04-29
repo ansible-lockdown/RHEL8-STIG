@@ -36,7 +36,7 @@
         ansible.builtin.include_vars:
             file: "{{ container_vars_file }}"
 
-      - name: output if discovered is a container
+      - name: Output if discovered is a container
         ansible.builtin.debug:
             msg: system has been discovered as a container
         when:
@@ -150,17 +150,17 @@
 
 - name: Include CAT III patches
   ansible.builtin.import_tasks: fix-cat3.yml
-  when: rhel8stig_cat3_patch | bool
+  when: rhel8stig_cat3_patch
   tags:
       - CAT3
       - low
 
-- name: flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: reboot system
+- name: Reboot system
   block:
-      - name: reboot system if not skipped
+      - name: Reboot system if not skipped
         ansible.builtin.reboot:
         when:
             - change_requires_reboot
@@ -174,7 +174,7 @@
             - change_requires_reboot
             - rhel8stig_skip_reboot
 
-- name: run post remediation audit
+- name: Run post remediation audit
   ansible.builtin.import_tasks: post_remediation_audit.yml
   when:
       - run_audit
