@@ -472,7 +472,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install atm', line: 'install atm /bin/false', insertafter: 'EOF' }
@@ -498,7 +498,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install can', line: 'install can /bin/false', insertafter: 'EOF' }
@@ -524,7 +524,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install sctp', line: 'install sctp /bin/false', insertafter: 'EOF' }
@@ -550,7 +550,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install tipc', line: 'install tipc /bin/false', insertafter: 'EOF' }
@@ -576,7 +576,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install cramfs', line: 'install cramfs /bin/false', insertafter: 'EOF' }
@@ -602,7 +602,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '^install firewire-core', line: 'install firewire-core /bin/false', insertafter: 'EOF' }

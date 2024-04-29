@@ -529,6 +529,11 @@ rhel8stig_ipv6_required: true
 # When set to anything other than mcafee it will skip this control assuming localized threat prevention management
 rhel8stig_av_sftw: mcafee
 
+# RHEL-08-010110 & 010130 & 010760 & 020190 & 020200 & 020231 & 020310 & 020351
+# rhel8stig_login_defs_file_perms
+# Permissions set on /etc/login.defs
+rhel8stig_login_defs_file_perms: 0644
+
 # RHEL-08-010210
 # rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
 # To conform to STIG standards this needs to be 0640 or more restrictive
@@ -587,6 +592,19 @@ rhel8stig_local_int_home_file_perms: 0750
 # rhel8stig_local_int_perm is the permissions set to the local initialization files
 # To connform to STIG standards this needs to be set to 0740 or less permissive
 rhel8stig_local_int_perm: 0740
+
+# RHEL-08-020100 pamd file permissions - /etc/pam.d/(password-auth|system-auth) files
+# rhel8stig_pamd_file_perms
+# This needs a minimum of 0644 ( more restrictive may cause issues testing will be required)
+rhel8stig_pamd_file_perms: 0644
+
+# RHEL-08-020110 - pwquality file permissions
+# mode: "{{ rhel8stig_pamd_file_perms }}"
+rhel8stig_pwquality_file_perms: 0644
+
+# RHEL-08-0400xx
+# blacklist.conf - /etc/modprobe.d/blacklist.conf file permissions
+rhel8stig_blacklist_conf_file_perms: 0640
 
 # RHEL-08-020250
 # This is a check for a "supported release"

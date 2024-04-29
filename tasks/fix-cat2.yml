@@ -293,6 +293,9 @@
       path: /etc/login.defs
       regexp: '^ENCRYPT_METHOD.*'
       line: "ENCRYPT_METHOD {{ rhel8stig_login_defaults.encrypt_method | default('SHA512') }}"
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010110
   tags:
@@ -344,6 +347,9 @@
       path: /etc/login.defs
       regexp: ^.*SHA_CRYPT_MIN_ROUNDS\s
       line: SHA_CRYPT_MIN_ROUNDS {{ rhel8stig_hashing_rounds }}
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010130
   tags:
@@ -2651,6 +2657,9 @@
       path: /etc/login.defs
       regexp: '.*?CREATE_HOME.*'
       line: CREATE_HOME     yes
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010760
   tags:
@@ -3579,7 +3588,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pamd_file_perms }}"
   when:
       - rhel_08_020100
   tags:
@@ -3599,7 +3608,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pamd_file_perms }}"
   when:
       - rhel_08_020101
   tags:
@@ -3627,7 +3636,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: '0644'
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020102_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
@@ -3667,7 +3676,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: '0644'
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020103_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
@@ -3696,6 +3705,7 @@
       path: /etc/security/pwquality.conf
       regexp: '^retry =|^#.*retry ='
       line: retry = {{ rhel8stig_pam_pwquality_retry }}
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020104
       - ansible_distribution_version is version('8.4', '>=')
@@ -3715,7 +3725,7 @@
       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
       create: true
   when:
       - rhel_08_020110
@@ -3736,7 +3746,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020120
   tags:
@@ -3756,7 +3766,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020130
   tags:
@@ -3776,7 +3786,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020140
   tags:
@@ -3796,7 +3806,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020150
   tags:
@@ -3816,7 +3826,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020160
   tags:
@@ -3836,7 +3846,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020170
   tags:
@@ -3878,7 +3888,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020190
   tags:
@@ -3894,11 +3904,11 @@
   ansible.builtin.lineinfile:
       path: /etc/login.defs
       create: true
-      owner: root
-      group: root
-      mode: '0644'
       regexp: ^#?PASS_MAX_DAYS
       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020200
   tags:
@@ -3956,7 +3966,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: '0644'
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020220_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3995,7 +4005,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: '0644'
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020221_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -4026,7 +4036,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020230
   tags:
@@ -4045,7 +4055,7 @@
       line: "PASS_MIN_LEN 15"
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020231
   tags:
@@ -4211,7 +4221,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020280
   tags:
@@ -4255,7 +4265,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020300
   tags:
@@ -4274,7 +4284,7 @@
       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020310
   tags:
@@ -4346,7 +4356,7 @@
       line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
       owner: root
       group: root
-      mode: '0644'
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020351
   tags:
@@ -4562,7 +4572,7 @@
         ansible.builtin.file:
             path: "{{ rhel08_030070_auditlog_location.stdout }}"
             state: "{{ (rhel08_030070_auditlog.stat.exists) | ternary('file', 'touch') }}"
-            mode: '0600'
+            mode: o-x,go-rwx
   when:
       - rhel_08_030070
   tags:
@@ -4690,7 +4700,7 @@
       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
         ansible.builtin.file:
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-            mode: '0700'
+            mode: go-rwx
             state: directory
         when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
@@ -5503,7 +5513,7 @@
       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: '0755'
+            mode: go-w
         with_items:
             - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
@@ -5826,7 +5836,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
       insertafter: "{{ item.insertafter }}"
   notify: change_requires_reboot
   with_items:
@@ -5974,7 +5984,7 @@
       create: true
       owner: root
       group: root
-      mode: '0640'
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   with_items:
       - { regexp: '^install usb-storage', line: 'install usb-storage /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
@@ -6188,7 +6198,7 @@
             line: "{{ item.line }}"
             owner: root
             group: root
-            mode: '0640'
+            mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
             insertafter: "{{ item.insertafter }}"
         notify: change_requires_reboot
         with_items:
