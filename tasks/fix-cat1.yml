@@ -133,7 +133,7 @@
       - CAT1
       - CCI-000068
       - SRG-OS-000033-GPOS-00014
-      - SV-230223r792855_rule
+      - SV-230223r928585_rule
       - V-230223
 
 - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
@@ -276,18 +276,18 @@
 - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system."
   block:
       - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
-        ansible.builtin.find:
-            path: '/'
-            recurse: true
-            patterns: '*.shosts'
+        ansible.builtin.shell: find / -name "*.shosts"
+        changed_when: false
+        failed_when: rhel_08_010470_shost_files.rc not in [ 0, 1 ]
         register: rhel_08_010470_shost_files
 
       - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system. | Remove .shosts files"
         ansible.builtin.file:
-            path: "{{ item.path }}"
+            path: "{{ item }}"
             state: absent
         with_items:
-            - "{{ rhel_08_010470_shost_files.files }}"
+            - "{{ rhel_08_010470_shost_files.stdout_lines }}"
+        when: rhel_08_010470_shost_files.stdout | length > 0
   when:
       - rhel_08_010470
   tags:
@@ -321,6 +321,7 @@
       path: /etc/ssh/sshd_config
       regexp: '(?i)^#?PermitEmptyPasswords'
       line: 'PermitEmptyPasswords no'
+      validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
   when:
       - rhel_08_020330

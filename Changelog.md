@@ -1,7 +1,25 @@
 # Changes to RHEL8STIG
 
+## 3.1 - STIG V1R12 - 25th Oct 2023
+
+ruleid updated
+
+- 010020
+- 010471
+- 030741
+- 030742
+- 040400
+
+- added SSH validation
+- added ansible_facts for variable usage
+
+- AUDIT
+  - Audit_only ability now added to run standalone audit
+    - audit_only: true
+  - Related Audit repo updated to improve tests audit binary(goss updated to latest version)
+
 ## 3.0.3 - Stig V1R11 - 26th July 2023
-q
+
 - updates to collections since galaxy updated
 - updates to audit
 

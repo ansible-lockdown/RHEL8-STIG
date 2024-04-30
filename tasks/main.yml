@@ -4,15 +4,15 @@
   ansible.builtin.setup:
       gather_subset: distribution,!all,!min
   when:
-      - ansible_distribution is not defined
+      - ansible_facts.distribution is not defined
   tags:
       - always
 
 - name: Check OS version and family
   ansible.builtin.assert:
-      that: (ansible_distribution != 'CentOS' and ansible_os_family == 'RedHat' or ansible_os_family == "Rocky") and ansible_distribution_major_version is version_compare('8', '==')
-      fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported."
-      success_msg: "This role is running against a supported OS {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
+      that: (ansible_facts.distribution != 'CentOS' and ansible_facts.os_family == 'RedHat' or ansible_facts.os_family == "Rocky") and ansible_facts.distribution_major_version is version_compare('8', '==')
+      fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_facts.distribution }} {{ ansible_facts.distribution_major_version }} is not supported."
+      success_msg: "This role is running against a supported OS {{ ansible_facts.distribution }} {{ ansible_facts.distribution_major_version }}"
   when:
       - not skip_os_check
   tags:
@@ -36,14 +36,14 @@
         ansible.builtin.include_vars:
             file: "{{ container_vars_file }}"
 
-      - name: output if discovered is a container
+      - name: Output if discovered is a container
         ansible.builtin.debug:
             msg: system has been discovered as a container
         when:
             - system_is_container
   when:
       - ansible_connection == 'docker' or
-        ansible_virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
+        ansible_facts.virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
       - container_discovery
       - always
@@ -92,7 +92,7 @@
       - RHEL-08-010149
 
 - name: Include OS specific variables
-  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
   tags:
       - always
 
@@ -134,10 +134,19 @@
       - prelim_tasks
       - run_audit
 
-- name: Include pre-remediation tasks
+- name: Include audit specific variables
+  ansible.builtin.include_vars: audit.yml
+  when:
+      - run_audit or audit_only
+      - setup_audit
+  tags:
+      - setup_audit
+      - run_audit
+
+- name: Include pre-remediation audit tasks
   ansible.builtin.import_tasks: pre_remediation_audit.yml
   when:
-      - run_audit
+      - run_audit or audit_only
       - setup_audit
   tags:
       - run_audit
@@ -158,17 +167,17 @@
 
 - name: Include CAT III patches
   ansible.builtin.import_tasks: fix-cat3.yml
-  when: rhel8stig_cat3_patch | bool
+  when: rhel8stig_cat3_patch
   tags:
       - CAT3
       - low
 
-- name: flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: reboot system
+- name: Reboot system
   block:
-      - name: reboot system if not skipped
+      - name: Reboot system if not skipped
         ansible.builtin.reboot:
         when:
             - change_requires_reboot
@@ -182,7 +191,7 @@
             - change_requires_reboot
             - rhel8stig_skip_reboot
 
-- name: run post remediation audit
+- name: Run post remediation audit
   ansible.builtin.import_tasks: post_remediation_audit.yml
   when:
       - run_audit
