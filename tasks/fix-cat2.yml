@@ -139,7 +139,7 @@
             - RHEL-08-010060
             - CCI-000048
             - SRG-OS-000023-GPOS-00006
-            - SV-230225r858694_rule
+            - SV-230225r951590_rule
             - SV-230227r627750_rule
             - V-230225
             - V-230227
@@ -236,7 +236,7 @@
       - CAT2
       - CCI-000067
       - SRG-OS-000032-GPOS-00013
-      - SV-230228r627750_rule
+      - SV-230228r951592_rule
       - V-230228
       - rsyslog
 
@@ -571,7 +571,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r917867_rule
+      - SV-230244r951594_rule
       - V-230244
       - ssh
 
@@ -590,7 +590,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-244525r917886_rule
+      - SV-244525r951596_rule
       - V-244525
       - ssh
 
@@ -1592,7 +1592,7 @@
       - CAT2
       - CCI-001084
       - SRG-OS-000134-GPOS-00068
-      - SV-230279r792888_rule
+      - SV-230279r951598_rule
       - V-230279
       - grub
 
@@ -1721,7 +1721,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230290r858705_rule
+      - SV-230290r951602_rule
       - V-230290
       - ssh
 
@@ -1740,7 +1740,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230291r858707_rule
+      - SV-230291r952105_rule
       - V-230291
       - ssh
 
@@ -1758,7 +1758,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244528r858709_rule
+      - SV-244528r952106_rule
       - V-244528
       - ssh
 
@@ -1816,7 +1816,7 @@
       - CAT2
       - CCI-000770
       - SRG-OS-000109-GPOS-00056
-      - SV-230296r858711_rule
+      - SV-230296r951608_rule
       - V-230296
       - ssh
 
@@ -2777,7 +2777,7 @@
       - V-230330
       - CCI-000366
       - SRG-OS-000480-GPOS-00229
-      - SV-230330r858713_rule
+      - SV-230330r951610_rule
       - V-230330
       - ssh
       - disruption_high
@@ -4345,7 +4345,7 @@
       - CAT2
       - CCI-000052
       - SRG-OS-000480-GPOS-00227
-      - SV-230382r858717_rule
+      - SV-230382r951614_rule
       - V-230382
       - ssh
 
@@ -6645,8 +6645,8 @@
       - RHEL-08-040161
       - CAT2
       - CCI-000068
-      - RG-OS-000033-GPOS-00014
-      - SV-230527r858719_rule
+      - SRG-OS-000033-GPOS-00014
+      - SV-230527r951616_rule
       - V-230527
       - ssh
 
@@ -7507,7 +7507,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230555r858721_rule
+      - V-230555r951618_rule
       - V-230555
       - ssh
 
@@ -7525,7 +7525,8 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230556r858723_rule
+      - SV-230556r951620_rule
+      - V-230556
       - ssh
 
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
