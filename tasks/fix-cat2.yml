@@ -25,7 +25,7 @@
       - CAT2
       - CCI-001233
       - SRG-OS-000191-GPOS-00080
-      - SV-245540r754730_rule
+      - SV-245540r942951_rule
       - V-245540
 
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
@@ -293,6 +293,9 @@
       path: /etc/login.defs
       regexp: '^ENCRYPT_METHOD.*'
       line: "ENCRYPT_METHOD {{ rhel8stig_login_defaults.encrypt_method | default('SHA512') }}"
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010110
   tags:
@@ -344,6 +347,9 @@
       path: /etc/login.defs
       regexp: ^.*SHA_CRYPT_MIN_ROUNDS\s
       line: SHA_CRYPT_MIN_ROUNDS {{ rhel8stig_hashing_rounds }}
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010130
   tags:
@@ -363,7 +369,7 @@
       dest: /etc/grub.d/01_users
       owner: root
       group: root
-      mode: 0755
+      mode: '0755'
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -388,7 +394,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_010151
   tags:
@@ -408,7 +414,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
   when:
       - rhel_08_010152
   tags:
@@ -842,7 +848,6 @@
 
       - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
         ansible.builtin.shell: fips-mode-setup --enable
-        register: rhel_08_010290_fips_enable
         notify: change_requires_reboot
         when: '"disabled" in rhel_08_010293_pre_fips_check.stdout'
   when:
@@ -2398,7 +2403,7 @@
             dest: /etc/resolv.conf
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         when:
             - rhel_08_010680_networkmanager_check.stdout == '0'
             - rhel8_stig_use_resolv_template
@@ -2652,6 +2657,9 @@
       path: /etc/login.defs
       regexp: '.*?CREATE_HOME.*'
       line: CREATE_HOME     yes
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_010760
   tags:
@@ -3292,7 +3300,7 @@
             regexp: '^lock-enabled'
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
             line: |
                 [org/gnome/desktop/screensaver]
                 # Set this to true to lock the screen when the screensaver activates
@@ -3315,8 +3323,12 @@
 - name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
   ansible.builtin.lineinfile:
       path: "/etc/systemd/logind.conf"
-      regexp: '^StopIdleSessionSec=|^\# StopIdleSessionSec='
-      line: "StopIdleSessionSec= {{ rhel_08_020035_idlesessiontimeout }}"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+  loop:
+      - { regexp: '^(?#)\s*StopIdleSessionSec\s*=', line: "StopIdleSessionSec={{ rhel_08_020035_idlesessiontimeout }}" }
+      - { regexp: '^(?#)\s*KillUserProccesses\s*=', line: "KillUserProccesses=no" }
+  notify: Restart_systemdlogin
   when:
       - rhel_08_020035
   tags:
@@ -3324,7 +3336,7 @@
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-257258r917891_rule
+      - SV-257258r942953_rule
       - V-257258
       - session
 
@@ -3344,7 +3356,7 @@
             create: true
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         loop:
             - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
             - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
@@ -3401,7 +3413,7 @@
             create: true
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
@@ -3432,7 +3444,7 @@
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         when: rhel_08_020050_removal_action_file.stdout_lines | length == 0
         notify: dconf update
   when:
@@ -3461,14 +3473,14 @@
             create: true
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
             regexp: '^idle-delay'
             line: |
                 [org/gnome/desktop/session]
                 # Set the lock time out to 900 seconds before the session is considered idle
                 idle-delay=uint32 900
         notify: dconf update
-        when: rhel_08_020060_idle_delay_param.stdout | length == 0
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length == 0
 
       - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
         ansible.builtin.lineinfile:
@@ -3477,9 +3489,9 @@
             line: idle-delay=uint32 900
             owner: root
             group: root
-            mode: 0640
-        loop: "{{ rhel_08_020060_idle_delay_param.stdout }}"
-        when: rhel_08_020060_idle_delay_param.stdout | length > 0
+            mode: '0640'
+        loop: "{{ rhel_08_020060_idle_delay_param.stdout_lines }}"
+        when: rhel_08_020060_idle_delay_param.stdout_lines | length > 0
         notify: dconf update
   when:
       - rhel_08_020060
@@ -3509,7 +3521,7 @@
             line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
   when:
       - rhel_08_020070
   tags:
@@ -3528,7 +3540,7 @@
       line: /org/gnome/desktop/screensaver/lock-delay
       owner: root
       group: root
-      mode: 0640
+      mode: '0640'
   when:
       - rhel_08_020080
       - "'dconf' in ansible_facts.packages"
@@ -3549,7 +3561,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
@@ -3576,7 +3588,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pamd_file_perms }}"
   when:
       - rhel_08_020100
   tags:
@@ -3596,7 +3608,7 @@
       insertafter: '^password'
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pamd_file_perms }}"
   when:
       - rhel_08_020101
   tags:
@@ -3624,7 +3636,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020102_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020102 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the system-auth file is configured for three retries or less. | Replace if already exists"
@@ -3664,7 +3676,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020103_pwquality_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020103 | PATCH | RHEL 8 systems below version 8.4 must ensure the password complexity module in the password-auth file is configured for three retries or less. | Replace if already exists"
@@ -3693,6 +3705,7 @@
       path: /etc/security/pwquality.conf
       regexp: '^retry =|^#.*retry ='
       line: retry = {{ rhel8stig_pam_pwquality_retry }}
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020104
       - ansible_distribution_version is version('8.4', '>=')
@@ -3712,7 +3725,7 @@
       line: "ucredit = {{ rhel8stig_password_complexity.ucredit | default('-1') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
       create: true
   when:
       - rhel_08_020110
@@ -3733,7 +3746,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020120
   tags:
@@ -3753,7 +3766,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020130
   tags:
@@ -3773,7 +3786,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020140
   tags:
@@ -3793,7 +3806,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020150
   tags:
@@ -3813,7 +3826,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020160
   tags:
@@ -3833,7 +3846,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020170
   tags:
@@ -3875,7 +3888,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020190
   tags:
@@ -3891,11 +3904,11 @@
   ansible.builtin.lineinfile:
       path: /etc/login.defs
       create: true
-      owner: root
-      group: root
-      mode: 0644
       regexp: ^#?PASS_MAX_DAYS
       line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults.pass_max_days | default('60') }}"
+      owner: root
+      group: root
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020200
   tags:
@@ -3953,7 +3966,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020220_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -3992,7 +4005,7 @@
             insertafter: '^password'
             owner: root
             group: root
-            mode: 0644
+            mode: "{{ rhel8stig_pamd_file_perms }}"
         when: rhel_08_020221_pwhistory_status.stdout | length == 0
 
       - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
@@ -4023,7 +4036,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020230
   tags:
@@ -4042,7 +4055,7 @@
       line: "PASS_MIN_LEN 15"
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020231
   tags:
@@ -4100,7 +4113,7 @@
             insertafter: "{{ item.insertafter }}"
             owner: root
             group: root
-            mode: 0600
+            mode: '0600'
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -4112,7 +4125,7 @@
             line: auth       sufficient pam_sss.so try_cert_auth
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         notify: restart sssd
         when: rhel_08_020250_sc_auth_sss.stdout | length == 0
 
@@ -4159,7 +4172,7 @@
       - CAT2
       - CCI-000765
       - SRG-OS-000105-GPOS-00052
-      - SV-230372r627750_rule
+      - SV-230372r942945_rule
       - V-230372
       - pamd
 
@@ -4208,7 +4221,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020280
   tags:
@@ -4228,7 +4241,7 @@
       insertafter: "{{ item.insertafter }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
@@ -4240,7 +4253,7 @@
       - CAT2
       - CCI-002007
       - SRG-OS-000383-GPOS-00166
-      - SV-230376r627750_rule
+      - SV-230376r942948_rule
       - V-230376
       - sssd
 
@@ -4252,7 +4265,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_pwquality_file_perms }}"
   when:
       - rhel_08_020300
   tags:
@@ -4271,7 +4284,7 @@
       line: "FAIL_DELAY {{ rhel8stig_login_defaults.fail_delay_secs | default('4') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020310
   tags:
@@ -4343,7 +4356,7 @@
       line: "UMASK           {{ rhel8stig_login_defaults.umask | default('077') }}"
       owner: root
       group: root
-      mode: 0644
+      mode: "{{ rhel8stig_login_defs_file_perms }}"
   when:
       - rhel_08_020351
   tags:
@@ -4559,7 +4572,7 @@
         ansible.builtin.file:
             path: "{{ rhel08_030070_auditlog_location.stdout }}"
             state: "{{ (rhel08_030070_auditlog.stat.exists) | ternary('file', 'touch') }}"
-            mode: '0600'
+            mode: o-x,go-rwx
   when:
       - rhel_08_030070
   tags:
@@ -4687,7 +4700,7 @@
       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
         ansible.builtin.file:
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-            mode: 0700
+            mode: go-rwx
             state: directory
         when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
@@ -5473,7 +5486,7 @@
 - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
   ansible.builtin.file:
       path: "{{ item }}"
-      mode: 0640
+      mode: '0640'
   with_items:
       - /etc/audit/rules.d/audit.rules
       - /etc/audit/auditd.conf
@@ -5500,7 +5513,7 @@
       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: 0755
+            mode: go-w
         with_items:
             - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
@@ -5571,7 +5584,7 @@
       line: "{{ item }}"
       owner: root
       group: root
-      mode: 0600
+      mode: '0600'
   with_items:
       - "# Audit Tools"
       - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
@@ -5696,7 +5709,7 @@
       create: true
       owner: root
       group: root
-      mode: 0644
+      mode: '0644'
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
@@ -5823,12 +5836,12 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: 0640
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
       insertafter: "{{ item.insertafter }}"
   notify: change_requires_reboot
   with_items:
       - { regexp: '##Disable WebCam', line: '##Disable WebCam', insertafter: 'EOF' }
-      - { regexp: '^install uvcvideo', line: 'install uvcvideo /bin/true', insertafter: '##Disable WebCam' }
+      - { regexp: '^install uvcvideo', line: 'install uvcvideo /bin/false', insertafter: '##Disable WebCam' }
       - { regexp: '^blacklist uvcvideo', line: 'blacklist uvcvideo', insertafter: '##Disable WebCam' }
   when:
       - rhel_08_040020
@@ -5837,7 +5850,7 @@
       - CAT2
       - CCI-000381
       - SRG-OS-000095-GPOS-00049
-      - SV-230493r809316_rule
+      - SV-230493r942915_rule
       - V-230493
       - camera
 
@@ -5971,9 +5984,9 @@
       create: true
       owner: root
       group: root
-      mode: 0640
+      mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
   with_items:
-      - { regexp: '^install usb-storage', line: 'install usb-storage /bin/true', insertafter: 'EOF' }
+      - { regexp: '^install usb-storage', line: 'install usb-storage /bin/false', insertafter: 'EOF' }
       - { regexp: '^blacklist usb-storage', line: 'blacklist usb-storage', insertafter: '#blacklist usb-storage'}
   when:
       - rhel_08_040080
@@ -5982,7 +5995,7 @@
       - CAT2
       - CCI-000778
       - SRG-OS-000114-GPOS-00059
-      - SV-230503r809319_rule
+      - SV-230503r942936_rule
       - V-230503
       - usb_devices
 
@@ -6130,7 +6143,7 @@
       - CAT2
       - CCI-002314
       - SRG-OS-000297-GPOS-00115
-      - SV-230504r809321_rule
+      - SV-230504r942942_rule
       - V-230504
       - firewall
 
@@ -6170,11 +6183,11 @@
         ansible.builtin.lineinfile:
             path: /etc/modprobe.d/bluetooth.conf
             regexp: '^install bluetooth '
-            line: "install bluetooth /bin/true"
+            line: "install bluetooth /bin/false"
             create: true
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth kernel module"
@@ -6185,7 +6198,7 @@
             line: "{{ item.line }}"
             owner: root
             group: root
-            mode: 0640
+            mode: "{{ rhel8stig_blacklist_conf_file_perms }}"
             insertafter: "{{ item.insertafter }}"
         notify: change_requires_reboot
         with_items:
@@ -6197,7 +6210,7 @@
       - CAT2
       - CCI-001443
       - SRG-OS-000300-GPOS-00118
-      - SV-230507r833336_rule
+      - SV-230507r942939_rule
       - V-230507
       - bluetooth
 
