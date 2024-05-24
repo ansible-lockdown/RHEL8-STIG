@@ -7015,6 +7015,7 @@
             sysctl_file: "{{ rhel8stig_sysctl_file }}"
   when:
       - rhel_08_040260
+      - rhel8stig_ipv6_required
       - not rhel8stig_system_is_router
   tags:
       - RHEL-08-040260
