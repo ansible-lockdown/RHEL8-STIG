@@ -879,6 +879,7 @@ rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 rhel8stig_fapolicy_white_list:
     - 'deny_audit perm=any pattern=ld_so : all'
     - 'deny perm=any all : all'
+    - 'deny perm=any all : all'
 
 # RHEL-08-040090
 # rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
@@ -892,9 +893,12 @@ rhel8stig_existing_zone_to_copy: public
 # RHEL-08-040090
 # This designed not work with rhel8stig_existing_zone_to_copy and when deploy new rules
 # rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
+# This designed not work with rhel8stig_existing_zone_to_copy and when deploy new rules
+# rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
 # http and ssh need to be enabled for the role to run.
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
+    - ssh
     - ssh
     - http
     - https
