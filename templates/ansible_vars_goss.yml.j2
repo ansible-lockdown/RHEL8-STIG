@@ -11,9 +11,9 @@ gpg_keys:
 {% endfor %}
 rpm_gpg_key: {{ rpm_gpg_key }}
 
-rhel8stig_os_version_pre_8_2: {% if ansible_facts.distribution_version >= '8.2' %}false{% else %}true{% endif %}
+rhel8stig_os_version_pre_8_2: {% if ansible_facts['distribution_version'] is version('8.1', '<=') %}true{% else %}false{% endif %}
 
-OS_ver: {{ ansible_facts.distribution_version }}
+OS_ver: {{ ansible_facts['distribution_version'] }}
 
 # Some tests may need to scan every filesystem or have an impact on a system
 # these may need be scheduled to minimise impact also ability to set a timeout if taking too long
