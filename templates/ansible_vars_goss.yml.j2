@@ -226,7 +226,7 @@ RHEL_08_020100: {{ rhel_08_020100 }}
 RHEL_08_020101: {{ rhel_08_020101 }}
 RHEL_08_020102: {{ rhel_08_020102 }}
 RHEL_08_020103: {{ rhel_08_020103 }}
-RHEL_08_020104: {{ rhel_08_020104 }}
+RHEL_08_020104: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or greater
 RHEL_08_020110: {{ rhel_08_020110 }}
 RHEL_08_020120: {{ rhel_08_020120 }}
 RHEL_08_020130: {{ rhel_08_020130 }}
@@ -408,7 +408,7 @@ RHEL_08_010292: {{ rhel_08_010292 }}
 RHEL_08_010375: {{ rhel_08_010375 }}
 RHEL_08_010376: {{ rhel_08_010376 }}
 RHEL_08_010440: {{ rhel_08_010440 }}
-RHEL_08_010471: {% if ansible_facts['distribution_version'] is version('8.4', '<=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or less
+RHEL_08_010471: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}false{% else %}true{% endif %}  # Only runs if 8.3 or less
 RHEL_08_010540: {{ rhel_08_010540 }}
 RHEL_08_010541: {{ rhel_08_010541 }}
 RHEL_08_010542: {{ rhel_08_010542 }}
