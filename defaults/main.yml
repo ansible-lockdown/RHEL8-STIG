@@ -892,7 +892,6 @@ rhel8stig_existing_zone_to_copy: public
 # RHEL-08-040090
 # This designed not work with rhel8stig_existing_zone_to_copy and when deploy new rules
 # rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
-# http and ssh need to be enabled for the role to run.
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
     - ssh
