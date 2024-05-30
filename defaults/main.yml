@@ -899,7 +899,6 @@ rhel8stig_existing_zone_to_copy: public
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
     - ssh
-    - ssh
     - http
     - https
 
