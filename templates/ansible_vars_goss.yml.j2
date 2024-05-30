@@ -408,7 +408,7 @@ RHEL_08_010292: {{ rhel_08_010292 }}
 RHEL_08_010375: {{ rhel_08_010375 }}
 RHEL_08_010376: {{ rhel_08_010376 }}
 RHEL_08_010440: {{ rhel_08_010440 }}
-RHEL_08_010471: {{ rhel_08_010471 }}
+RHEL_08_010471: {% if ansible_facts['distribution_version'] is version('8.4', '<=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or less
 RHEL_08_010540: {{ rhel_08_010540 }}
 RHEL_08_010541: {{ rhel_08_010541 }}
 RHEL_08_010542: {{ rhel_08_010542 }}
