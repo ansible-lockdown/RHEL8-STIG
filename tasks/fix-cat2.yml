@@ -6664,8 +6664,8 @@
             state: absent
         loop: "{{ rhel_08_040209_conflicting_settings.stdout_lines }}"
         when:
-             - rhel_08_040209_conflicting_settings.stdout | length > 0
-             - item != rhel8stig_sysctl_file
+            - rhel_08_040209_conflicting_settings.stdout | length > 0
+            - item != rhel8stig_sysctl_file
 
       - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Use template to create file"
         ansible.posix.sysctl:
@@ -6777,8 +6777,8 @@
             state: absent
         loop: "{{ rhel_08_040230_conflicting_settings.stdout_lines }}"
         when:
-             - rhel_08_040230_conflicting_settings.stdout | length > 0
-             - item != rhel8stig_sysctl_file
+            - rhel_08_040230_conflicting_settings.stdout | length > 0
+            - item != rhel8stig_sysctl_file
 
       - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Use template to create file"
         ansible.posix.sysctl:
