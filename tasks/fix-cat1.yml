@@ -63,7 +63,7 @@
             dest: /etc/default/grub
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         vars:
             grub_cmdline_linux: "{{ rhel_08_010020_grub_cmdline_linux_audit.stdout }}"
         when: rhel_08_010020_default_grub_missing_audit is changed  # noqa no-handler
@@ -187,7 +187,7 @@
             line: "GRUB2_PASSWORD={{ rhel8stig_bootloader_password_hash }}"
             owner: root
             group: root
-            mode: 0640
+            mode: '0640'
         notify: confirm grub2 user cfg
   when:
       - not system_is_ec2
@@ -437,7 +437,7 @@
             create: true
             owner: root
             group: root
-            mode: 0644
+            mode: '0644'
         with_items:
             - { regexp: '^\[org/gnome/settings-daemon/plugins/media-keys\]', line: '[org/gnome/settings-daemon/plugins/media-keys]', insertafter: 'EOF' }
             - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }

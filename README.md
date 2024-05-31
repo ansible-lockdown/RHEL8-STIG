@@ -2,7 +2,7 @@
 
 ## Configure a RHEL8 based system to be complaint with Disa STIG
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 12 released on Oct 25, 2023](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R12_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 1, Rel 13 released on Jan 24, 2024](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R13_STIG.zip).
 
 ---
 
@@ -28,7 +28,6 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 12 released on Oct 25, 2
 ![Pull Requests](https://img.shields.io/github/issues-pr/ansible-lockdown/RHEL8-STIG?label=Pull%20Requests)
 
 ![License](https://img.shields.io/github/license/ansible-lockdown/RHEL8-STIG?label=License)
-
 
 ---
 
@@ -195,4 +194,5 @@ pre-commit run
 
 Massive thanks to the fantastic community and all its members.
 This includes a huge thanks and credit to the original authors and maintainers.
+
 Josh Springer, Daniel Shepherd, Bas Meijeri, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell
