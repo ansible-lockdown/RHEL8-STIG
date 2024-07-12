@@ -24,6 +24,7 @@
       name: sshd
       state: restarted
   when:
+      - rhel_08_040159
       - not rhel8stig_system_is_chroot
       - "'openssh-server' in ansible_facts.packages"
       - not change_requires_reboot
@@ -43,19 +44,41 @@
       - not rhel8stig_system_is_chroot
       - not change_requires_reboot
 
+- name: restart rngd
+  ansible.builtin.service:
+      name: rngd.service
+      state: restarted
+  when:
+      - rhel_08_010471
+
 - name: restart rsyslog
   ansible.builtin.service:
       name: rsyslog
       state: restarted
+  when:
+      - rhel_08_010561
 
-- name: generate fapolicyd rules
-  ansible.builtin.shell: fagenrules --load
-  when: rhel_08_040137_rules_dir.stat.exists
+- name: restart firewalld
+  ansible.builtin.service:
+      name: firewalld
+      state: restarted
+  when: rhel_08_040101
 
 - name: restart fapolicyd
   ansible.builtin.service:
       name: fapolicyd
       state: restarted
+  when: rhel_08_040136
+
+- name: generate fapolicyd rules
+  ansible.builtin.shell: fagenrules --load
+  when: rhel_08_040137_rules_dir.stat.exists
+
+- name: restart usbguard
+  ansible.builtin.service:
+      name: usbguard
+      state: restarted
+  when: rhel_08_040141
 
 - name: confirm grub2 user cfg
   ansible.builtin.stat:
@@ -112,6 +135,7 @@
       - not rhel8stig_system_is_chroot
       - not system_is_container
       - not change_requires_reboot
+      - rhel_08_030181
 
 - name: rebuild initramfs
   ansible.builtin.shell: dracut -f

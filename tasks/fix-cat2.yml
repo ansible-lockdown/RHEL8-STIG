@@ -1801,8 +1801,8 @@
 - name: "MEDIUM | RHEL-08-010561 | PATCH | The rsyslog service must be running in RHEL 8."
   ansible.builtin.service:
       name: rsyslog.service
-      state: started
       enabled: true
+  notify: restart rsyslog
   when:
       - rhel_08_010561
   tags:
@@ -4848,17 +4848,9 @@
       - auditd
 
 - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed."
-  block:
-      - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed. | Install audit"
-        ansible.builtin.package:
-            name: audit
-            state: present
-
-      - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed. | Enable and start service"
-        ansible.builtin.service:
-            name: auditd
-            enabled: true
-            state: started
+  ansible.builtin.package:
+      name: audit
+      state: present
   when:
       - rhel_08_030180
   tags:
@@ -4874,8 +4866,8 @@
 - name: "MEDIUM | RHEL-08-030181 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
   ansible.builtin.service:
       name: auditd
-      state: started
       enabled: true
+  notify: restart auditd
   when:
       - rhel_08_030181
   tags:
@@ -5992,12 +5984,6 @@
             name: iptables-services
             state: present
         when: rhel8stig_firewall_service == "iptables"
-
-      - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8. | Start and enable service"
-        ansible.builtin.service:
-            name: "{{ rhel8stig_firewall_service }}"
-            state: started
-            enabled: true
   when:
       - rhel_08_040100
       - rhel8stig_firewall_service != "not_required"
@@ -6022,7 +6008,7 @@
       - name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8 | Enable the service"
         ansible.builtin.systemd:
             name: firewalld
-            state: started
+            state: started  # Needs to start here or subsequent controls will fail
             enabled: true
   when:
       - rhel_08_040101
@@ -6442,7 +6428,6 @@
 - name: "MEDIUM | RHEL-08-040136 | PATCH | The RHEL 8 fapolicy module must be enabled."
   ansible.builtin.systemd:
       name: fapolicyd
-      state: started
       enabled: true
   when:
       - rhel_08_040136
@@ -6472,7 +6457,6 @@
             - "{{ rhel8stig_fapolicy_white_list }}"
         notify:
             - generate fapolicyd rules
-            - restart fapolicyd
         when:
             - ansible_distribution_version is version('8.4', '>=')
             - rhel_08_040137_rules_dir.stat.isdir
@@ -6487,7 +6471,6 @@
             - "{{ rhel8stig_fapolicy_white_list }}"
         notify:
             - generate fapolicyd rules
-            - restart fapolicyd
         when: ansible_distribution_version is version('8.3', '<=')
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
@@ -6496,8 +6479,8 @@
             regexp: '^permissive ='
             line: 'permissive = 0'
             create: true
-        notify:
-            - restart fapolicyd
+  notify:
+      - restart fapolicyd
   when:
       - rhel_08_040137
   tags:
@@ -6532,8 +6515,8 @@
       - name: "MEDIUM | RHEL-08-040141 | PATCH | RHEL 8 must enable the USBGuard. | Start/Enable service"
         ansible.builtin.service:
             name: usbguard
-            state: started
             enabled: true
+        notify: restart usbguard
         when:
             - rhel_08_040141
             - rhel_08_040139 or
@@ -6590,8 +6573,8 @@
       - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
         ansible.builtin.service:
             name: sshd
-            state: started
             enabled: true
+        notify: restart sshd
         when:
             - rhel_08_040159 or
               "'openssh-server' in ansible_facts.packages"
