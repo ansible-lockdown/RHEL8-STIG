@@ -550,9 +550,16 @@ rhel8stig_var_log_perm: 0755
 rhel8stig_sys_commands_perm: 0755
 
 # RHEL-08-010330
-# rhel8stig_lib_file_perm is the permissions teh library files will be set to
+# rhel8stig_lib_file_perm is the permissions the library files will be set to
 # To conform to STIG standards this needs to be set to 755 or more restrictive
 rhel8stig_lib_file_perm: 755
+
+# RHEL-08-010380
+# rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
+#
+rhel8stig_sudoers_exclude_nopasswd_list:
+#  - ec2-user
+#  - vagrant
 
 # RHEL-08-010480
 # rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
