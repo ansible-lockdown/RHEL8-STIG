@@ -1338,7 +1338,7 @@
 - name: "MEDIUM | RHEL-08-010380 | PATCH | RHEL 8 must require users to provide a password for privilege escalation."
   ansible.builtin.replace:
       path: "{{ item }}"
-      regexp: '^([^#|{% if system_is_ec2 %}ec2-user{% endif %}].*)NOPASSWD(.*)'
+      regexp: '^((?!#|{% for name in rhel8stig_sudoers_exclude_nopasswd_list %}{{ name }}{% if not loop.last -%}|{%- endif -%}{% endfor %}).*)NOPASSWD(.*)'
       replace: '\1PASSWD\2'
   with_items:
       - "{{ rhel8stig_sudoers_files.stdout_lines }}"
@@ -6280,7 +6280,7 @@
             "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
             "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
             "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-        ansible.builtin.shell: mount | grep -w "/var/log "
+        ansible.builtin.shell: mount | grep '\s\+/var/log\s\+'
         changed_when: false
         failed_when: false
         register: rhel8stig_040126_var_log_status
