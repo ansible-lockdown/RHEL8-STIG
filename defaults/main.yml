@@ -558,8 +558,8 @@ rhel8stig_lib_file_perm: 755
 # rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
 #
 rhel8stig_sudoers_exclude_nopasswd_list:
-    - replaceme
-#    - ec2-user
+    - rocky
+    - ec2-user
 #    - vagrant
 
 # RHEL-08-010480
