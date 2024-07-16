@@ -105,6 +105,12 @@
         check_mode: false
         register: rhel8stig_boot_part
 
+      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions | get UUID"
+        ansible.builtin.shell: lsblk -f | grep -E "{{ rhel8stig_boot_part.stdout }}$" | awk '{ print $3 }'
+        changed_when: false
+        check_mode: false
+        register: rhel8stig_boot_uuid
+
       - name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
         ansible.builtin.package:
             name: crypto-policies-scripts
