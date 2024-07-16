@@ -841,10 +841,6 @@ rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
 
-# RHEL-08-010630/RHEL-08-010640/RHEL-08-010650
-rhel8stig_nfs_mounts: "{{ ansible_mounts | to_json | from_json | json_query(rhel8stig_nfs_mounts_query) }}"
-rhel8stig_nfs_mounts_query: "[?starts_with(fstype, 'nfs')].mount"
-
 # RHEL-08-010680
 # This can be managed using a template ensure settings are correct
 rhel8_stig_use_resolv_template: false
