@@ -2079,14 +2079,15 @@
 
 - name: "MEDIUM | RHEL-08-010630 | PATCH | RHEL 8 must prevent code from being executed on file systems that are imported via Network File System (NFS)."
   ansible.posix.mount:
-      path: "{{ item }}"
-      src: "{{ item.src }}"
+      path: "{{ item.mount }}"
+      fstype: "{{ item.fstype }}"
+      src: "{{ item.device }}"
       opts: "{{ item.options }},noexec"
       state: mounted
   loop: "{{ ansible_facts.mounts }}"
   when:
       - rhel_08_010630
-      - item.fstype =="nfs"
+      - "'nfs' in item.fstype"
       - "'noexec' not in item.options"
   tags:
       - RHEL-08-010630
@@ -2100,14 +2101,15 @@
 
 - name: "MEDIUM | RHEL-08-010640 | PATCH | RHEL 8 must prevent special devices on file systems that are imported via Network File System (NFS)."
   ansible.posix.mount:
-      path: "{{ item }}"
-      src: "{{ item.src }}"
+      path: "{{ item.mount }}"
+      fstype: "{{ item.fstype }}"
+      src: "{{ item.device }}"
       opts: "{{ item.options }},{% if rhel_08_010630 is sameas true %}noexec,{% endif %}nodev"
       state: mounted
   loop: "{{ ansible_facts.mounts }}"
   when:
       - rhel_08_010640
-      - item.fstype =="nfs"
+      - "'nfs' in item.fstype"
       - "'nodev' not in item.options"
   tags:
       - RHEL-08-010640
@@ -2121,14 +2123,15 @@
 
 - name: "MEDIUM | RHEL-08-010650 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are imported via Network File System (NFS)"
   ansible.posix.mount:
-      path: "{{ item }}"
-      src: "{{ item.src }}"
+      path: "{{ item.mount }}"
+      fstype: "{{ item.fstype }}"
+      src: "{{ item.device }}"
       opts: "{{ item.options }},{% if rhel_08_010630 is sameas true %}noexec,{% endif %}{% if rhel_08_010640 is sameas true %}nodev,{% endif %}nosuid"
       state: mounted
   loop: "{{ ansible_facts.mounts }}"
   when:
       - rhel_08_010650
-      - item.fstype =="nfs"
+      - "'nfs' in item.fstype"
       - "'nosuid' not in item.options"
   tags:
       - RHEL-08-010650
