@@ -1,20 +1,20 @@
 ---
 
-- name: PRELIM | set bootloader type
+- name: PRELIM | Set bootloader type
   block:
       - name: "PRELIM | Check whether machine is UEFI-based"
         ansible.builtin.stat:
             path: /sys/firmware/efi
         register: rhel8_efi_boot
 
-      - name: "PRELIM | set fact if UEFI boot"
+      - name: "PRELIM | Set fact if UEFI boot"
         ansible.builtin.set_fact:
             rhel8stig_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
             rhel8stig_legacy_boot: false
         when:
             - rhel8_efi_boot.stat.exists
 
-      - name: "PRELIM | set fact if UEFI boot | Oracle Linux"
+      - name: "PRELIM | Set fact if UEFI boot | Oracle Linux"
         ansible.builtin.set_fact:
             rhel8stig_bootloader_path: /boot/efi/EFI/redhat
             rhel8stig_legacy_boot: false
@@ -22,7 +22,7 @@
             - rhel8_efi_boot.stat.exists
             - ansible_distribution == 'OracleLinux'
 
-      - name: "PRELIM | set if not UEFI boot"
+      - name: "PRELIM | Set if not UEFI boot"
         ansible.builtin.set_fact:
             rhel8stig_bootloader_path: /boot/grub2/
             rhel8stig_legacy_boot: true
@@ -57,7 +57,7 @@
   tags:
       - always
 
-- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | set sssd.conf location"
+- name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Set sssd.conf location"
   block:
       - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Get sssd.conf location"
         ansible.builtin.stat:
@@ -79,7 +79,8 @@
       - always
 
 - name: "PRELIM | Include audit specific variables"
-  ansible.builtin.include_vars: audit.yml
+  ansible.builtin.include_vars:
+      file: audit.yml
   when:
       - run_audit or audit_only
       - setup_audit
@@ -88,7 +89,8 @@
       - run_audit
 
 - name: "PRELIM | Include pre-remediation audit tasks"
-  ansible.builtin.import_tasks: pre_remediation_audit.yml
+  ansible.builtin.import_tasks:
+      file: pre_remediation_audit.yml
   when:
       - run_audit or audit_only
       - setup_audit
@@ -103,7 +105,13 @@
         check_mode: false
         register: rhel8stig_boot_part
 
-      - name: "PRELIM | RHEL-08-010020 | crypto-policies-scripts package for FIPS"
+      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions | get UUID"
+        ansible.builtin.shell: lsblk -f | grep -E "{{ rhel8stig_boot_part.stdout }}$" | awk '{ print $3 }'
+        changed_when: false
+        check_mode: false
+        register: rhel8stig_boot_uuid
+
+      - name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
         ansible.builtin.package:
             name: crypto-policies-scripts
             state: present
@@ -201,7 +209,7 @@
   tags:
       - always
 
-- name: "PRELIM | ensure cronie is available"
+- name: "PRELIM | Ensure cronie is available"
   ansible.builtin.package:
       name: cronie
   when:

@@ -92,7 +92,8 @@
       - RHEL-08-010149
 
 - name: Include OS specific variables
-  ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
+  ansible.builtin.include_vars:
+      file: "{{ ansible_facts.distribution }}.yml"
   tags:
       - always
 
@@ -129,27 +130,31 @@
       - always
 
 - name: Include prelim tasks
-  ansible.builtin.import_tasks: prelim.yml
+  ansible.builtin.import_tasks:
+      file: prelim.yml
   tags:
       - prelim_tasks
       - run_audit
 
 - name: Include CAT I patches
-  ansible.builtin.import_tasks: fix-cat1.yml
+  ansible.builtin.import_tasks:
+      file: fix-cat1.yml
   when: rhel8stig_cat1_patch
   tags:
       - CAT1
       - high
 
 - name: Include CAT II patches
-  ansible.builtin.import_tasks: fix-cat2.yml
+  ansible.builtin.import_tasks:
+      file: fix-cat2.yml
   when: rhel8stig_cat2_patch
   tags:
       - CAT2
       - medium
 
 - name: Include CAT III patches
-  ansible.builtin.import_tasks: fix-cat3.yml
+  ansible.builtin.import_tasks:
+      file: fix-cat3.yml
   when: rhel8stig_cat3_patch
   tags:
       - CAT3
@@ -175,7 +180,8 @@
             - rhel8stig_skip_reboot
 
 - name: Run post remediation audit
-  ansible.builtin.import_tasks: post_remediation_audit.yml
+  ansible.builtin.import_tasks:
+      file: post_remediation_audit.yml
   when:
       - run_audit
   tags:

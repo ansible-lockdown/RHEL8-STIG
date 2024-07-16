@@ -49,7 +49,7 @@
         changed_when: rhel_08_010020_default_grub_missing_audit.rc > 0
         register: rhel_08_010020_default_grub_missing_audit
 
-      - name: "HIGH | RHEL-08-010020 | AUDIT | parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
+      - name: "HIGH | RHEL-08-010020 | AUDIT | Parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
         ansible.builtin.shell: grep -oP ' ro \K.*?(?= ?LANG=)' /proc/cmdline
         check_mode: false
         changed_when: false
@@ -68,6 +68,13 @@
             grub_cmdline_linux: "{{ rhel_08_010020_grub_cmdline_linux_audit.stdout }}"
         when: rhel_08_010020_default_grub_missing_audit is changed  # noqa no-handler
 
+      - name: "HIGH | RHEL-08-010020 | AUDIT | Verify fips kernel parameters in /etc/default/grub"
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])fips=1(?=[" ]).*"$' /etc/default/grub
+        check_mode: false
+        changed_when: false
+        failed_when: rhel_08_010020_fips_kernel_set.rc not in [ 0, 1 ]
+        register: rhel_08_010020_fips_kernel_set
+
       - name: "HIGH | RHEL-08-010020 | PATCH | fips=1 must be in /etc/default/grub"
         ansible.builtin.replace:
             path: /etc/default/grub
@@ -81,27 +88,35 @@
         when:
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
+            - rhel_08_010020_fips_kernel_set.stdout | length == 0
         notify:
             - confirm grub2 user cfg
             - change_requires_reboot
+
+      - name: "HIGH | RHEL-08-010020 | AUDIT | Verify boot kernel parameters in /etc/default/grub"
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])boot=UUID={{ rhel8stig_boot_uuid.stdout }}(?=[" ]).*"$' /etc/default/grub
+        check_mode: false
+        changed_when: false
+        failed_when: rhel_08_010020_boot_kernel_set.rc not in [ 0, 1 ]
+        register: rhel_08_010020_boot_kernel_set
 
       - name: "HIGH | RHEL-08-010020 | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
         ansible.builtin.replace:
             path: /etc/default/grub
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
             replace: "{{ rhel8stig_replace_quoted_params }}"
-        with_items:
-            - "{{ ansible_mounts | json_query(query) }}"  # noqa: jinja[invalid]
         vars:
-            query: "[?mount=='{{ rhel8stig_boot_part.stdout }}'] | [0]"
+            query: "{{ rhel8stig_boot_part.stdout }}"
             key: GRUB_CMDLINE_LINUX
             param: boot
-            value: UUID={{ item.uuid }}
+            value: UUID={{ rhel8stig_boot_uuid.stdout }}
             insert: true
         when:
             - rhel8stig_boot_part.stdout not in ['/', '']
+            - rhel_08_010020_boot_kernel_set.stdout | length == 0
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
+
         notify: confirm grub2 user cfg
         register: result
 
@@ -110,9 +125,7 @@
         check_mode: false
         with_items:
             - fips=1
-            - boot=UUID={{ ansible_mounts | json_query(query) }}
-        vars:
-            query: "[?mount=='{{ rhel8stig_boot_part.stdout }}'].uuid | [0]"  # noqa: jinja[invalid]
+            - boot=UUID={{ rhel8stig_boot_uuid.stdout }}
         register: rhel_08_010020_audit
         when:
             - not ansible_check_mode or
