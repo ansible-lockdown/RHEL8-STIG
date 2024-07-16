@@ -558,8 +558,9 @@ rhel8stig_lib_file_perm: 755
 # rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
 #
 rhel8stig_sudoers_exclude_nopasswd_list:
-#  - ec2-user
-#  - vagrant
+    - replaceme
+#    - ec2-user
+#    - vagrant
 
 # RHEL-08-010480
 # rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
