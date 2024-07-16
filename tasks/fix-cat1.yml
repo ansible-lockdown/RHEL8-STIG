@@ -72,6 +72,7 @@
         ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])fips=1(?=[" ]).*"$' /etc/default/grub
         check_mode: false
         changed_when: false
+        failed_when: rhel_08_010020_fips_kernel_set.rc not in [ 0, 1 ]
         register: rhel_08_010020_fips_kernel_set
 
       - name: "HIGH | RHEL-08-010020 | PATCH | fips=1 must be in /etc/default/grub"
@@ -93,9 +94,10 @@
             - change_requires_reboot
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Verify boot kernel parameters in /etc/default/grub"
-        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])boot=UUID={{rhel8stig_boot_uuid.stdout }}(?=[" ]).*"$' /etc/default/grub
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])boot=UUID={{ rhel8stig_boot_uuid.stdout }}(?=[" ]).*"$' /etc/default/grub
         check_mode: false
         changed_when: false
+        failed_when: rhel_08_010020_boot_kernel_set.rc not in [ 0, 1 ]
         register: rhel_08_010020_boot_kernel_set
 
       - name: "HIGH | RHEL-08-010020 | PATCH | If /boot or /boot/efi reside on separate partitions, the kernel parameter boot=<partition> must be added to the kernel command line."
