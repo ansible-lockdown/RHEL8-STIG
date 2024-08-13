@@ -44,9 +44,9 @@
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Check for GRUB_CMDLINE_LINUX in /etc/default/grub"
         ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*"$' /etc/default/grub
-        check_mode: false
-        failed_when: false
         changed_when: rhel_08_010020_default_grub_missing_audit.rc > 0
+        failed_when: false
+        check_mode: false
         register: rhel_08_010020_default_grub_missing_audit
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Parse sane GRUB_CMDLINE_LINUX from /proc/cmdline"
