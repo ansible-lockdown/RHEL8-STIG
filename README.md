@@ -84,9 +84,8 @@ The following packages must be installed on the controlling host/host where ansi
 - python2-passlib (or just passlib, if using python3)
 - python-lxml
 - python-xmltodict
-- python-jmespath
 
-Package 'python-xmltodict' is required if you enable the OpenSCAP tool installation and run a report. Packages python(2)-passlib and python-jmespath are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
+Package 'python-xmltodict' is required if you enable the OpenSCAP tool installation and run a report. Packages python(2)-passlib are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
 
 ## Role Variables
 

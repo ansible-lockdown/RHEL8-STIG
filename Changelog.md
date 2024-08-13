@@ -1,6 +1,16 @@
 # Changes to RHEL8STIG
 
-## 3.2 - STIV V1R13 - 24th Jan 2024
+## 3.3 - STIG V1R13 - 24th Jan 2024
+
+- updated audit variables
+- workflow updates
+- #277 thanks to @BJSmithIEEE
+- #278 thanks to @prestonSeaman2
+- #299 thanks to @derekbentson
+- removed dependency on jmespath
+- updated 010120 prelim and idempotency
+
+## 3.2 - STIG V1R13 - 24th Jan 2024
 
 - Audit updated
   - moved audit into prelim
