@@ -6442,6 +6442,7 @@
             - "{{ rhel8stig_fapolicy_white_list }}"
         notify:
             - generate fapolicyd rules
+            - restart fapolicyd
         when:
             - ansible_distribution_version is version('8.4', '>=')
             - rhel_08_040137_rules_dir.stat.isdir
@@ -6456,6 +6457,7 @@
             - "{{ rhel8stig_fapolicy_white_list }}"
         notify:
             - generate fapolicyd rules
+            - restart fapolicyd
         when: ansible_distribution_version is version('8.3', '<=')
 
       - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs. | Set fapolicy permissive 0"
@@ -6464,8 +6466,6 @@
             regexp: '^permissive ='
             line: 'permissive = 0'
             create: true
-  notify:
-      - restart fapolicyd
   when:
       - rhel_08_040137
   tags:
