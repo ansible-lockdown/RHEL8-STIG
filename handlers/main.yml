@@ -174,13 +174,3 @@
   when:
       - "'dconf' in ansible_facts.packages"
       - rhel8stig_always_configure_dconf
-
-- name: prereport score
-  ansible.builtin.debug:
-      msg: "Pre-run OpenSCAP score is {{ rhel8stig_prescanresults.Benchmark.TestResult.score['#text'] }}"
-  when: rhel8stig_oscap_scan
-
-- name: postreport score
-  ansible.builtin.debug:
-      msg: "Post-run OpenSCAP score is {{ rhel8stig_postscanresults.Benchmark.TestResult.score['#text'] }}"
-  when: rhel8stig_oscap_scan
