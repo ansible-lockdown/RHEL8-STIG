@@ -58,9 +58,9 @@ This contains rewrites and ID reference changes as per STIG documentation.
 
 This can be turned on or off within the defaults/main.yml file with the variable rhel7cis_run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
 
-This is a much quicker, very lightweight, checking (where possible) config compliance and live/running settings.
+This is a quick, very lightweight, check (where possible) of config compliance and live/running settings.
 
-A new form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/goss-org/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
+A form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/goss-org/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
 This audit will not only check the config has the correct setting but aims to capture if it is running with that configuration also trying to remove [false positives](https://www.mindpointgroup.com/blog/is-compliance-scanning-still-relevant/) in the process.
 
 ## Documentation
@@ -83,9 +83,8 @@ The following packages must be installed on the controlling host/host where ansi
 
 - python2-passlib (or just passlib, if using python3)
 - python-lxml
-- python-xmltodict
 
-Package 'python-xmltodict' is required if you enable the OpenSCAP tool installation and run a report. Packages python(2)-passlib are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
+Packages python(2)-passlib are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
 
 ## Role Variables
 
