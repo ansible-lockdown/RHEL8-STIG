@@ -19,4 +19,6 @@ skip_list:
     - '602'
     - '208'
 use_default_rules: true
+rulesdir:
+    - ./rules/
 verbosity: 0
