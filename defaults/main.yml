@@ -6,6 +6,8 @@ benchmark_version: 'v1r13'
 # The audit variable found at the base
 benchmark: RHEL8-STIG
 
+hosts: all
+
 # Whether to skip the OS check for supported OS's
 skip_os_check: false
 
