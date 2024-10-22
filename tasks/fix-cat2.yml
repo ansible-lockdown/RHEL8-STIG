@@ -1390,16 +1390,17 @@
       - multifactor
 
 - name: "MEDIUM | RHEL-08-010400 | PATCH | RHEL 8 must implement certificate status checking for multifactor authentication."
-  ansible.builtin.lineinfile:
+  community.general.ini_file:
       path: '{{ rhel8stig_sssd_conf }}'
-      regexp: '^certificate_verification = {{ item.regexp }}'
       state: "{{ item.state }}"
-      line: "{{ item.line | default(omit) }}"
+      section: "{{ item.section | default(omit) }}"
+      option: "certificate_verification"
+      value: "{{ item.value }}"
   with_items:
-      - { regexp: 'no_ocsp, no_verification', state: absent }
-      - { regexp: 'no_ocsp', state: absent }
-      - { regexp: 'no_verification', state: absent }
-      - { regexp: 'ocsp_dgst=sha1', state: present, line: 'certificate_verification = ocsp_dgst=sha1' }
+      - { value: 'no_ocsp, no_verification', state: absent }
+      - { value: 'no_ocsp', state: absent }
+      - { value: 'no_verification', state: absent }
+      - { value: 'ocsp_dgst=sha1', state: present, section: "sssd" }
   notify: restart sssd
   when:
       - rhel_08_010400
