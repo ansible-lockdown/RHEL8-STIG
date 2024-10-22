@@ -2,6 +2,10 @@
 
 ## 3.3 STIG V1R14
 
+- #232 - thanks to  @eday87 @BJSmithIEEE
+  - #301 - thansk to @dglider
+
+
 Updated ruleids
 
 - CAT I
