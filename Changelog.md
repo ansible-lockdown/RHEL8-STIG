@@ -1,26 +1,14 @@
 # Changes to RHEL8STIG
 
-## 3.3 STIG V1R14
+## 3.3 - STIG V1R13 - 24th Jan 2024
 
-Updated ruleids
-
-- CAT I
-  - RHEL-08-020330 - cat1
-- CAT II
-  - RHEL-08-010040
-  - RHEL-08-010070
-  - RHEL-08-010200
-  - RHEL-08-010201
-  - RHEL-08-010423
-  - RHEL-08-010520
-  - RHEL-08-010521
-  - RHEL-08-010522
-  - RHEL-08-010550
-  - RHEL-08-010830
-  - RHEL-08-020350
-  - RHEL-08-040161
-  - RHEL-08-040340
-  - RHEL-08-040341
+- updated audit variables
+- workflow updates
+- #277 thanks to @BJSmithIEEE
+- #278 thanks to @prestonSeaman2
+- #299 thanks to @derekbentson
+- removed dependency on jmespath
+- updated 010120 prelim and idempotency
 
 ## 3.2 - STIG V1R13 - 24th Jan 2024
 
