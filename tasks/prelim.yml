@@ -97,27 +97,22 @@
   tags:
       - run_audit
 
-- name: "PRELIM | RHEL-08-010020"
-  block:
-      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
-        ansible.builtin.shell: df --output=target /boot | tail -n 1
-        changed_when: false
-        check_mode: false
-        register: rhel8stig_boot_part
-
-      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions | get UUID"
-        ansible.builtin.shell: lsblk -f | grep -E "{{ rhel8stig_boot_part.stdout }}$" | awk '{ print $3 }'
-        changed_when: false
-        check_mode: false
-        register: rhel8stig_boot_uuid
-
-      - name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
-        ansible.builtin.package:
-            name: crypto-policies-scripts
-            state: present
-        when:
-            - "'crypto-policies-scripts' not in ansible_facts.packages"
+- name: "PRELIM | Find boot partition UUID"
+  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then lsblk -l -o +UUID | grep -i efi | awk '{print $NF}'; else lsblk -l -o +UUID | grep -w '/boot' | awk '{print $NF}'; fi
+  changed_when: false
+  check_mode: false
+  register: rhel8stig_boot_uuid
   when:
+      - rhel_08_010020
+  tags:
+      - always
+
+- name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
+  ansible.builtin.package:
+      name: crypto-policies-scripts
+      state: present
+  when:
+      - "'crypto-policies-scripts' not in ansible_facts.packages"
       - rhel_08_010020
   tags:
       - RHEL-08-010020

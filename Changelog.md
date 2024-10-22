@@ -3,10 +3,12 @@
 ## 3.3 STIG V1R14
 
 - #232 - thanks to  @eday87 @BJSmithIEEE
-  - #301 - thansk to @dglider
+  - #301 - thanks to @dglider
 
+- #298 thanks to mikefrompsu
 
-Updated ruleids
+- Added gui discovery option
+updated ruleids
 
 - CAT I
   - RHEL-08-020330 - cat1
