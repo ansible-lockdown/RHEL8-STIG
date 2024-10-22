@@ -2733,7 +2733,6 @@
   tags:
       - RHEL-08-010830
       - CAT2
-      - V-230330
       - CCI-000366
       - SRG-OS-000480-GPOS-00229
       - SV-230330r858713_rule
@@ -5973,7 +5972,8 @@
       - SV-230505r744020_rule
       - V-230505
       - firewall
-      - "{{ rhel8stig_firewall_service }}"
+      - iptables
+      - firewalld
 
 - name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8"
   block:
