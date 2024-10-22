@@ -1,5 +1,5 @@
 ---
-- hosts: all  # noqa: name[play]
+- hosts: "{{ hosts }}"  # noqa: name[play]
   become: true
 
   roles:
