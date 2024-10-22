@@ -143,6 +143,13 @@
       - RHEL-08-010140
       - RHEL-08-010150
 
+- name: "PRELIM | Discover Gnome Desktop Environment"
+  tags:
+      - always
+  ansible.builtin.stat:
+      path: /usr/share/gnome/gnome-version.xml
+  register: prelim_gnome_present
+
 - name: "PRELIM | dconf"
   block:
       - name: "PRELIM | Install dconf"

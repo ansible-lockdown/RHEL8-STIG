@@ -498,7 +498,7 @@ rhel_08_040300: true
 rhel_08_040310: true
 
 # Whether or not to run tasks related to auditing/patching the desktop environment
-rhel8stig_gui: false
+rhel8stig_gui: "{{ prelim_gnome_present.stat.exists | default(false) }}"
 
 # Whether or not you need kdump. False will disable service and true will leave service
 rhel8stig_kdump_needed: false
