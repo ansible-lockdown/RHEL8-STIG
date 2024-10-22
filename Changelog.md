@@ -3,10 +3,12 @@
 ## 3.3 STIG V1R14
 
 - #232 - thanks to  @eday87 @BJSmithIEEE
-  - #301 - thanks to @dglider
-
 - #298 thanks to @mikefrompsu
 - #299 thanks to @cpu010100
+- thanks to @dglinder
+  - #301
+  - #302
+- ansible config update
 
 - Added gui discovery option
 updated ruleids
