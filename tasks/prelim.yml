@@ -97,11 +97,17 @@
   tags:
       - run_audit
 
+- name: "PRELIM | Find boot partition"
+  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then echo "/boot/efi" ; else echo "/boot"; fi
+  changed_when: false
+  check_mode: false
+  register: prelim_rhel8stig_boot_part
+
 - name: "PRELIM | Find boot partition UUID"
   ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then lsblk -l -o +UUID | grep -i efi | awk '{print $NF}'; else lsblk -l -o +UUID | grep -w '/boot' | awk '{print $NF}'; fi
   changed_when: false
   check_mode: false
-  register: rhel8stig_boot_uuid
+  register: prelim_rhel8stig_boot_uuid
   when:
       - rhel_08_010020
   tags:
@@ -351,7 +357,7 @@
             path: "{{ rhel8stig_aide_db_file }}"
         register: rhel8stig_aide_db_status
         check_mode: false
-        changed_when: not rhel8stig_aide_db_status.stat.exists
+        changed_when: false
         notify: "{{ rhel8stig_aide_handler }}"
   when:
       - not system_is_container

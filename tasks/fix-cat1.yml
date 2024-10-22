@@ -94,7 +94,7 @@
             - change_requires_reboot
 
       - name: "HIGH | RHEL-08-010020 | AUDIT | Verify boot kernel parameters in /etc/default/grub"
-        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])boot=UUID={{ rhel8stig_boot_uuid.stdout }}(?=[" ]).*"$' /etc/default/grub
+        ansible.builtin.shell: grep -P '^\s*GRUB_CMDLINE_LINUX=".*(?<=[" ])boot=UUID={{ prelim_rhel8stig_boot_uuid.stdout }}(?=[" ]).*"$' /etc/default/grub
         check_mode: false
         changed_when: false
         failed_when: rhel_08_010020_boot_kernel_set.rc not in [ 0, 1 ]
@@ -106,13 +106,13 @@
             regexp: "{{ rhel8stig_regexp_quoted_params }}"
             replace: "{{ rhel8stig_replace_quoted_params }}"
         vars:
-            query: "{{ rhel8stig_boot_part.stdout }}"
+            query: "{{ prelim_rhel8stig_boot_part.stdout }}"
             key: GRUB_CMDLINE_LINUX
             param: boot
-            value: UUID={{ rhel8stig_boot_uuid.stdout }}
+            value: UUID={{ prelim_rhel8stig_boot_uuid.stdout }}
             insert: true
         when:
-            - rhel8stig_boot_part.stdout not in ['/', '']
+            - prelim_rhel8stig_boot_part.stdout not in ['/', '']
             - rhel_08_010020_boot_kernel_set.stdout | length == 0
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
@@ -125,12 +125,12 @@
         check_mode: false
         with_items:
             - fips=1
-            - boot=UUID={{ rhel8stig_boot_uuid.stdout }}
+            - boot=UUID={{ prelim_rhel8stig_boot_uuid.stdout }}
         register: rhel_08_010020_audit
         when:
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
-            - "rhel8stig_boot_part.stdout not in ['/', ''] or
+            - "prelim_rhel8stig_boot_part.stdout not in ['/', ''] or
               'boot=' not in item"
         changed_when:
             - ansible_check_mode
