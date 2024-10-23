@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v1r13'
+benchmark_version: 'v1r14'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -498,7 +498,7 @@ rhel_08_040300: true
 rhel_08_040310: true
 
 # Whether or not to run tasks related to auditing/patching the desktop environment
-rhel8stig_gui: false
+rhel8stig_gui: "{{ prelim_gnome_present.stat.exists | default(false) }}"
 
 # Whether or not you need kdump. False will disable service and true will leave service
 rhel8stig_kdump_needed: false

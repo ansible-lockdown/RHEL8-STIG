@@ -97,27 +97,30 @@
   tags:
       - run_audit
 
-- name: "PRELIM | RHEL-08-010020"
-  block:
-      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions"
-        ansible.builtin.shell: df --output=target /boot | tail -n 1
-        changed_when: false
-        check_mode: false
-        register: rhel8stig_boot_part
+- name: "PRELIM | Find boot partition"
+  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then echo "/boot/efi" ; else echo "/boot"; fi
+  changed_when: false
+  check_mode: false
+  register: prelim_rhel8stig_boot_part
+  tags:
+      - always
 
-      - name: "PRELIM | RHEL-08-010020 | Check if /boot or /boot/efi reside on separate partitions | get UUID"
-        ansible.builtin.shell: lsblk -f | grep -E "{{ rhel8stig_boot_part.stdout }}$" | awk '{ print $3 }'
-        changed_when: false
-        check_mode: false
-        register: rhel8stig_boot_uuid
-
-      - name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
-        ansible.builtin.package:
-            name: crypto-policies-scripts
-            state: present
-        when:
-            - "'crypto-policies-scripts' not in ansible_facts.packages"
+- name: "PRELIM | Find boot partition UUID"
+  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then lsblk -l -o +UUID | grep -i efi | awk '{print $NF}'; else lsblk -l -o +UUID | grep -w '/boot' | grep -v efi | awk '{print $NF}'; fi
+  changed_when: false
+  check_mode: false
+  register: prelim_rhel8stig_boot_uuid
   when:
+      - rhel_08_010020
+  tags:
+      - always
+
+- name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
+  ansible.builtin.package:
+      name: crypto-policies-scripts
+      state: present
+  when:
+      - "'crypto-policies-scripts' not in ansible_facts.packages"
       - rhel_08_010020
   tags:
       - RHEL-08-010020
@@ -142,6 +145,13 @@
       - RHEL-08-010020
       - RHEL-08-010140
       - RHEL-08-010150
+
+- name: "PRELIM | Discover Gnome Desktop Environment"
+  tags:
+      - always
+  ansible.builtin.stat:
+      path: /usr/share/gnome/gnome-version.xml
+  register: prelim_gnome_present
 
 - name: "PRELIM | dconf"
   block:
@@ -349,7 +359,7 @@
             path: "{{ rhel8stig_aide_db_file }}"
         register: rhel8stig_aide_db_status
         check_mode: false
-        changed_when: not rhel8stig_aide_db_status.stat.exists
+        changed_when: false
         notify: "{{ rhel8stig_aide_handler }}"
   when:
       - not system_is_container
