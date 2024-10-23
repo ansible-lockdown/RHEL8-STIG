@@ -102,6 +102,8 @@
   changed_when: false
   check_mode: false
   register: prelim_rhel8stig_boot_part
+  tags:
+      - always
 
 - name: "PRELIM | Find boot partition UUID"
   ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then lsblk -l -o +UUID | grep -i efi | awk '{print $NF}'; else lsblk -l -o +UUID | grep -w '/boot' | awk '{print $NF}'; fi
