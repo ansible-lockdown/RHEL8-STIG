@@ -1,32 +1,5 @@
 ---
 # TODO: ansible-lint: schema
-- name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
-  block:
-      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
-        ansible.builtin.debug:
-            msg:
-                - "WARNING!! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
-                - "McAfee is the suggested by STIG"
-        when:
-            - "'mcafeetp' not in ansible_facts.packages or
-               'mfetpd' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
-        ansible.builtin.debug:
-            msg: "Congratulations! You have McAfee installed"
-        when:
-            - "'mcafeetp' in ansible_facts.packages or
-               'mfetpd' in ansible_facts.packages"
-  when:
-      - rhel_08_040286
-      - rhel8stig_av_sftw == 'mcafee'
-  tags:
-      - RHEL-08-010001
-      - CAT2
-      - CCI-001233
-      - SRG-OS-000191-GPOS-00080
-      - SV-245540r942951_rule
-      - V-245540
 
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
   ansible.builtin.package:
@@ -707,22 +680,6 @@
       - V-244536
       - dconf
 
-- name: "MEDIUM | RHEL-08-020039 | PATCH | RHEL 8 must have the tmux package installed."
-  ansible.builtin.package:
-      name: tmux
-      state: present
-  when:
-      - rhel_08_020039
-      - "'tmux' not in ansible_facts.packages"
-  tags:
-      - RHEL-08-020039
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-244537r743860_rule
-      - V-244537
-      - tmux
-
 - name: |
         "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
         "MEDIUM | RHEL-08-010250 | PATCH | The RHEL 8 /var/log directory must be owned by root."
@@ -984,7 +941,7 @@
               "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
               "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
-        ansible.builtin.shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+        ansible.builtin.shell: "find /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
         changed_when: false
         failed_when: false
         register: rhel_08_010330_library_files
@@ -1013,7 +970,7 @@
       - SRG-OS-000259-GPOS-00100
       - SV-230260r792867_rule
       - SV-230261r627750_rule
-      - SV-230262r627750_rule
+      - SV-230262r1017082_rule
       - V-230260
       - V-230261
       - V-230262
@@ -3279,7 +3236,7 @@
       - V-230347
       - gui
 
-- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
+- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8.7 and higher must terminate idle user sessions."
   ansible.builtin.lineinfile:
       path: "/etc/systemd/logind.conf"
       regexp: "{{ item.regexp }}"
@@ -3290,65 +3247,15 @@
   notify: Restart_systemdlogin
   when:
       - rhel_08_020035
+      - ansible_facts.distribution_version is version_compare('8.7', '>=')
   tags:
       - RHEL-08-020035
       - CAT2
       - CCI-001133
       - SRG-OS-000163-GPOS-00072
-      - SV-257258r942953_rule
+      - SV-257258r1017375_rule
       - V-257258
       - session
-
-- name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
-  block:
-      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
-        ansible.builtin.package:
-            name: tmux
-            state: present
-        when: "'tmux' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
-        ansible.builtin.lineinfile:
-            path: /etc/tmux.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-            create: true
-            owner: root
-            group: root
-            mode: '0644'
-        loop:
-            - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
-            - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
-  when:
-      - rhel_08_020040
-  tags:
-      - RHEL-08-020040
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-230348r902725_rule
-      - V-230348
-      - tmux
-
-- name: "MEDIUM | RHEL-08-020041 | PATCH | RHEL 8 must ensure session control is automatically started at shell initialization. | Set tmux.sh if file exists"
-  ansible.builtin.blockinfile:
-      path: /etc/profile.d/tmux.sh
-      marker: "# <!-- {mark} ANSIBLE LOCKDOWN RHEL-08-020041 MANAGED BLOCK -->"
-      block: |
-          ### Updated to recognize other session control per Red Hat Case 03115293
-          [ $( /bin/id -u ) -eq 0 ] && [ x$TMUX = x ] && exec tmux
-          [[ $( /bin/tty ) =~ '/dev/tty' ]] && [ -n "$PS1" -a -z "$TMUX" ] && exec tmux
-      create: true
-  when:
-      - rhel_08_020041
-  tags:
-      - RHEL-08-020041
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-230349r917920_rule
-      - V-230349
-      - tmux
 
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   block:
@@ -3462,33 +3369,6 @@
       - SV-230352r646876_rule
       - V-230352
       - gui
-
-- name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
-  block:
-      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Install tmux if needed"
-        ansible.builtin.package:
-            name: tmux
-            state: present
-        when: "'tmux' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Set tmux settings"
-        ansible.builtin.lineinfile:
-            path: /etc/tmux.conf
-            regexp: '^set -g lock-after-time'
-            line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
-            owner: root
-            group: root
-            mode: '0644'
-  when:
-      - rhel_08_020070
-  tags:
-      - RHEL-08-020070
-      - CAT2
-      - CCI-000057
-      - SRG-OS-000029-GPOS-00010
-      - SV-230353r627750_rule
-      - V-230353
-      - tmux
 
 - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
   ansible.builtin.lineinfile:
@@ -3907,84 +3787,6 @@
       - disruption-high
       - password
 
-- name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations."
-  block:
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Get pam_pwhistory status"
-        ansible.builtin.shell: cat /etc/pam.d/password-auth | grep "password.*requisite.*pam_pwhistory.so"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020220_pwhistory_status
-
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pw_history"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/password-auth
-            regexp: 'password\s+(required|requisite)\s+pam_pwhistory.so use_authtok remember='
-            line: "password    requisite pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
-            insertafter: '^password'
-            owner: root
-            group: root
-            mode: "{{ rhel8stig_pamd_file_perms }}"
-        when: rhel_08_020220_pwhistory_status.stdout | length == 0
-
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
-        community.general.pamd:
-            name: password-auth
-            type: password
-            control: requisite
-            module_path: pam_pwhistory.so
-            module_arguments: 'remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}'
-            state: args_present
-        when: rhel_08_020220_pwhistory_status.stdout | length > 0
-  when:
-      - rhel_08_020220
-  tags:
-      - RHEL-08-020220
-      - CAT2
-      - CCI-000200
-      - SRG-OS-000077-GPOS-00045
-      - SV-230368r902759_rule
-      - V-230368
-      - pamd
-
-- name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations."
-  block:
-      - name: "MEDIUM | RHEL-08-020221 | AUDIT | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Get pam_pwhistory state "
-        ansible.builtin.shell: cat /etc/pam.d/system-auth | grep "password.*requisite.*pam_pwhistory.so"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020221_pwhistory_status
-
-      - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pwhistory"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/system-auth
-            regexp: 'password\s+(required|requisite)\s+pam_pwhistory.so use_authtok remember='
-            line: "password    requisite pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
-            insertafter: '^password'
-            owner: root
-            group: root
-            mode: "{{ rhel8stig_pamd_file_perms }}"
-        when: rhel_08_020221_pwhistory_status.stdout | length == 0
-
-      - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
-        community.general.pamd:
-            name: system-auth
-            type: password
-            control: requisite
-            module_path: pam_pwhistory.so
-            module_arguments: 'remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}'
-            state: args_present
-        when: rhel_08_020221_pwhistory_status.stdout | length > 0
-  when:
-      - rhel_08_020221
-  tags:
-      - RHEL-08-020221
-      - CAT2
-      - CCI-000200
-      - SRG-OS-000077-GPOS-00045
-      - SV-251717r902749_rule
-      - V-251717
-      - pamd
-
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
   ansible.builtin.lineinfile:
       path: /etc/security/pwquality.conf
@@ -4283,7 +4085,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230379r627750_rule
+      - SV-230379r1017190_rule
       - V-230379
       - accounts
 
@@ -6516,9 +6318,9 @@
       - CAT2
       - CCI-001958
       - SRG-OS-000378-GPOS-00163
-      - SV-244547r743890_rule
-      - SV-230524r744026_rule
-      - SV-244548r743893_rule
+      - SV-244547r1014811_rule
+      - SV-230524r1014813_rule
+      - SV-244548r1014815_rule
       - V-244547
       - V-230524
       - V-244548
@@ -7324,7 +7126,7 @@
       - CAT2
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r858828_rule
+      - SV-230548r1017310_rule
       - V-230548
       - sysctl
 
@@ -7582,7 +7384,7 @@
       - CAT2
       - CCI-000381
       - SRG-OS-000480-GPOS-00227
-      - SV-230559r646887_rule
+      - SV-230559r1014820_rule
       - V-230559
       - dnf
       - gssproxy

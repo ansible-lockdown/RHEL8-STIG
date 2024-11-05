@@ -158,6 +158,7 @@
   when:
       - rhel_08_010471 or
         rhel_08_010472
+      - not rhel_08_010020 or ansible_fips # Can't enable if FIPS
   tags:
       - RHEL-08-010471
       - RHEL-08-010472
@@ -165,7 +166,7 @@
       - CCI-000366
       - SRG-OS-000480-GPOS-00227
       - SV-230285r928587_rule
-      - SV-244527r743830_rule
+      - SV-244527r1017333_rule
       - V-230285
       - V-244527
 
@@ -229,26 +230,6 @@
       - complexity_high
       - mounts
       - auditd
-
-- name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
-  ansible.builtin.lineinfile:
-      path: /etc/security/limits.conf
-      regexp: '^\*               hard    maxlogins'
-      line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
-      insertbefore: '^# End of file'
-      create: true
-      owner: root
-      group: root
-      mode: '0644'
-  when:
-      - rhel_08_020024
-  tags:
-      - RHEL-08-020024
-      - CAT3
-      - CCI-000054
-      - SRG-OS-000027-GPOS-00008
-      - SV-230346r627750_rule
-      - V-230346
 
 - name: "LOW | RHEL-08-020042 | PATCH | RHEL 8 must prevent users from disabling session control mechanisms."
   ansible.builtin.lineinfile:
@@ -390,7 +371,7 @@
       - CAT3
       - CCI-000169
       - SRG-OS-000062-GPOS-00031
-      - SV-230470r744006_rule
+      - SV-230470r1017261_rule
       - V-230470
       - usb
 
