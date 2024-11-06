@@ -3,10 +3,10 @@
 ## 3.4 STIG v2r1
 
 RuleIDs updated for all controls
-NIst Control ID associations added
+Nist Control ID associations added
 
 - RHEL-08-010350 - command updated
-- RHEL-08-010472 - Not Applicabel if fips
+- RHEL-08-010472 - Not Applicable if fips
 - RHEL-08-020035 - version 8.7+
 - RHEL-08-020039 RHEL-08-020040 RHEL-08-020041 RHEL-08-020042, RHEL-08-020070 - TMUX removed
 - RHEL-08-020220, RHEL-08-020221 - remember not required for PAM
@@ -15,6 +15,8 @@ NIst Control ID associations added
 - RHEL-08-040284
 - RHEL-08-040370
 - RHEL-08-010001 - removed as not a NIST value
+
+Min OS version updated to 8.10
 
 ## 3.3 STIG V1R14
 
