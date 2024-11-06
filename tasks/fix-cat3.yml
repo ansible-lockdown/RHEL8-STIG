@@ -9,8 +9,9 @@
       - RHEL-08-010171
       - CAT3
       - CCI-001084
+      - NIST800-53R4_SC-3
       - SRG-OS-000134-GPOS-00068
-      - SV-230241r627750_rule
+      - SV-230241r1017060_rule
       - V-230241
       - policycoreutils
 
@@ -27,8 +28,9 @@
       - RHEL-08-010292
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230253r627750_rule
+      - SV-230253r1017071_rule
       - V-230253
       - ssh
 
@@ -62,8 +64,9 @@
       - RHEL-08-010375
       - CAT3
       - CCI-001090
+      - NIST800-53R4_SC-4
       - SRG-OS-000138-GPOS-00069
-      - SV-230269r833296_rule
+      - SV-230269r1017087_rule
       - V-230269
       - sysctl
 
@@ -97,8 +100,9 @@
       - RHEL-08-010376
       - CAT3
       - CCI-001090
+      - NIST800-53R4_SC-4
       - SRG-OS-000138-GPOS-00069
-      - SV-230270r833298_rule
+      - SV-230270r1017088_rule
       - V-230270
       - sysctl
 
@@ -130,8 +134,9 @@
       - RHEL-08-010440
       - CAT3
       - CCI-002617
+      - NIST800-53R4_SI-2
       - SRG-OS-000437-GPOS-00194
-      - SV-230281r627750_rule
+      - SV-230281r958936_rule
       - V-230281
 
 - name: |
@@ -164,8 +169,9 @@
       - RHEL-08-010472
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230285r928587_rule
+      - SV-230285r1017096_rule
       - SV-244527r1017333_rule
       - V-230285
       - V-244527
@@ -183,8 +189,9 @@
       - RHEL-08-010540
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230292r902718_rule
+      - SV-230292r1017103_rule
       - V-230292
       - complexity-high
       - mounts
@@ -204,8 +211,9 @@
       - RHEL-08-010541
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230293r902720_rule
+      - SV-230293r1017104_rule
       - V-230293
       - complexity_high
       - mounts
@@ -224,28 +232,34 @@
       - RHEL-08-010542
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230294r627750_rule
+      - SV-230294r1017105_rule
       - V-230294
       - complexity_high
       - mounts
       - auditd
 
-- name: "LOW | RHEL-08-020042 | PATCH | RHEL 8 must prevent users from disabling session control mechanisms."
+- name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
   ansible.builtin.lineinfile:
-      path: /etc/shells
-      regexp: 'tmux'
-      state: absent
+      path: /etc/security/limits.conf
+      regexp: '^\*               hard    maxlogins'
+      line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
+      insertbefore: '^# End of file'
+      create: true
+      owner: root
+      group: root
+      mode: '0644'
   when:
-      - rhel_08_020042
+      - rhel_08_020024
   tags:
-      - RHEL-08-020042
+      - RHEL-08-020024
       - CAT3
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-230350r627750_rule
-      - V-230350
-      - tmux
+      - CCI-000054
+      - NIST800-53R4_AC-10
+      - SRG-OS-000027-GPOS-00008
+      - SV-230346r1017159_rule
+      - V-230346
 
 - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
   ansible.builtin.lineinfile:
@@ -259,8 +273,9 @@
       - RHEL-08-020340
       - CAT3
       - CCI-000052
+      - NIST800-53R4_AC-9
       - SRG-OS-000480-GPOS-00227
-      - SV-230381r858726_rule
+      - SV-230381r991589_rule
       - V-230381
 
 - name: "LOW | RHEL-08-030063 | PATCH | RHEL 8 must resolve audit information before writing to disk."
@@ -275,8 +290,9 @@
       - RHEL-08-030063
       - CAT3
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230395r627750_rule
+      - SV-230395r1017201_rule
       - V-230395
       - auditd
 
@@ -312,8 +328,16 @@
       - RHEL-08-030601
       - CAT3
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230468r792904_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000473-GPOS-00218
+      - SV-230468r1017260_rule
       - V-230468
       - grub
 
@@ -349,8 +373,9 @@
       - RHEL-08-030602
       - CAT3
       - CCI-001849
+      - NIST800-53R4_AU-4
       - SRG-OS-000341-GPOS-00132
-      - SV-230469r792906_rule
+      - SV-230469r958752_rule
       - V-230469
       - grub
       - auditd
@@ -370,7 +395,9 @@
       - RHEL-08-030603
       - CAT3
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000471-GPOS-00215
       - SV-230470r1017261_rule
       - V-230470
       - usb
@@ -387,8 +414,9 @@
       - RHEL-08-030741
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230485r928590_rule
+      - SV-230485r1017269_rule
       - V-230485
       - chrony
 
@@ -403,8 +431,9 @@
       - RHEL-08-030742
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230486r928593_rule
+      - SV-230486r1017270_rule
       - V-230486
       - chrony
 
@@ -440,8 +469,9 @@
       - RHEL-08-040004
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230491r818842_rule
+      - SV-230491r1017274_rule
       - V-230491
       - grub
 
@@ -465,8 +495,9 @@
       - RHEL-08-040021
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230494r942918_rule
+      - SV-230494r1017277_rule
       - V-230494
       - modprobe
       - atm
@@ -491,8 +522,9 @@
       - RHEL-08-040022
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230495r942921_rule
+      - SV-230495r1017278_rule
       - V-230495
       - modprobe
       - can
@@ -517,8 +549,9 @@
       - RHEL-08-040023
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230496r942924_rule
+      - V-230496r1017279_rule
       - V-230496
       - modprobe
       - sctp
@@ -543,8 +576,9 @@
       - RHEL-08-040024
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r942927_rule
+      - SV-230497r1017280_rule
       - V-230497
       - modprobe
       - tipc
@@ -569,8 +603,9 @@
       - RHEL-08-040025
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230497r942927_rule
+      - SV-230498r1017281_rule
       - V-230498
       - modprobe
       - cramfs
@@ -595,8 +630,9 @@
       - RHEL-08-040026
       - CAT3
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230499r942933_rule
+      - SV-230499r1017282_rule
       - V-230499
       - modprobe
       - firewire
@@ -618,9 +654,10 @@
       - RHEL-08-040300
       - RHEL-08-040310
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230551r627750_rule
-      - SV-230552r880724_rule
+      - SV-230551r1017313_rule
+      - SV-230552r1017314_rule
       - V-230551
       - V-230552
       - aide
