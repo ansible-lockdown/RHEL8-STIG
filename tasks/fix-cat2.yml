@@ -4429,9 +4429,10 @@
       - RHEL-08-030000
       - CAT2
       - CCI-002233
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-6
       - SRG-OS-000326-GPOS-00126
-      - SV-230386r627750_rule
+      - SRG-OS-000327-GPOS-00127
+      - SV-230386r958730_rule
       - V-230386
       - auditd
 
@@ -4448,7 +4449,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230387r743996_rule
+      - SV-230387r1017195_rule
       - V-230387
       - cron
       - rsyslog
@@ -4468,9 +4469,9 @@
       - RHEL-08-030020
       - CAT2
       - CCI-000139
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000046-GPOS-00022
-      - SV-230388r627750_rule
+      - SV-230388r1017196_rule
       - V-230388
       - auditd
 
@@ -4485,9 +4486,9 @@
       - RHEL-08-030030
       - CAT2
       - CCI-000139
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000046-GPOS-00022
-      - SV-230389r627750_rule
+      - SV-230389r1017197_rule
       - V-230389
       - aliases
 
@@ -4502,9 +4503,9 @@
       - RHEL-08-030040
       - CAT2
       - CCI-000140
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000047-GPOS-00023
-      - SV-230390r627750_rule
+      - SV-230390r1017198_rule
       - V-230390
       - auditd
 
@@ -4519,9 +4520,9 @@
       - RHEL-08-030060
       - CAT2
       - CCI-000140
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000047-GPOS-00023
-      - SV-230392r627750_rule
+      - SV-230392r1017199_rule
       - V-230392
       - auditd
 
@@ -4538,7 +4539,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230393r627750_rule
+      - SV-230393r1017200_rule
       - V-230393
       - auditd
 
@@ -4554,9 +4555,9 @@
       - RHEL-08-030062
       - CAT2
       - CCI-001851
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
-      - SV-230394r627750_rule
+      - SV-230394r958754_rule
       - V-230394
       - auditd
 
@@ -4583,9 +4584,9 @@
       - RHEL-08-030070
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230396r902733_rule
+      - SV-230396r1017202_rule
       - V-230396
       - permissions
       - log
@@ -4610,9 +4611,12 @@
       - RHEL-08-030080
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230397r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SRG-OS-000206-GPOS-00084
+      - SV-230397r1017203_rule
       - V-230397
       - permissions
       - log
@@ -4629,9 +4633,11 @@
       - RHEL-08-030090
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230398r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230398r1017204_rule
       - V-230398
       - permissions
       - log
@@ -4659,9 +4665,11 @@
       - RHEL-08-030100
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230399r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230399r1017205_rule
       - V-230399
       - permissions
       - log
@@ -4690,9 +4698,11 @@
       - RHEL-08-030110
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230400r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230400r1017206_rule
       - V-230400
       - permissions
       - log
@@ -4718,9 +4728,11 @@
       - RHEL-08-030120
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230401r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230401r1017207_rule
       - V-230401
       - permissions
       - log
@@ -4737,9 +4749,11 @@
       - RHEL-08-030121
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230402r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230402r1017208_rule
       - V-230402
       - auditd
 
@@ -4754,9 +4768,11 @@
       - RHEL-08-030122
       - CAT2
       - CCI-000162
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230403r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230403r1017209_rule
       - V-230403
       - auditd
 
@@ -4772,9 +4788,25 @@
       - RHEL-08-030130
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230404r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000466-GPOS-00210
+      - SRG-OS-000476-GPOS-00221
+      - SV-230404r1017210_rule
       - V-230404
       - auditd
 
@@ -4790,9 +4822,24 @@
       - RHEL-08-030140
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230405r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230405r1017211_rule
       - V-230405
       - auditd
 
@@ -4808,9 +4855,24 @@
       - RHEL-08-030150
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230406r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230406r1017212_rule
       - V-230406
       - auditd
 
@@ -4826,9 +4888,24 @@
       - RHEL-08-030160
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230407r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230407r1017213_rule
       - V-230407
       - auditd
 
@@ -4844,9 +4921,24 @@
       - RHEL-08-030170
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230408r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230408r1017214_rule
       - V-230408
       - auditd
 
@@ -4862,9 +4954,24 @@
       - RHEL-08-030171
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230409r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230409r1017215_rule
       - V-230409
       - auditd
 
@@ -4880,9 +4987,24 @@
       - RHEL-08-030172
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230410r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230410r1017216_rule
       - V-230410
       - auditd
 
@@ -4896,9 +5018,24 @@
       - rhel_08_030180
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230411r744000_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-230411r1017217_rule
       - V-230411
       - dnf
       - auditd
@@ -4914,9 +5051,24 @@
       - RHEL-08-030181
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-244542r818838_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000476-GPOS-00221
+      - SV-244542r1017348_rule
       - V-244542
       - auditd
 
@@ -4931,9 +5083,17 @@
       - RHEL-08-030190
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230412r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000064-GPOS-00032
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000466-GPOS-00210
+      - SV-230412r1017218_rule
       - V-230412
       - auditd
 
@@ -4948,9 +5108,19 @@
       - RHEL-08-030200
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230413r810463_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000458-GPOS-00203
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000463-GPOS-00207
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000474-GPOS-00219
+      - SRG-OS-000466-GPOS-00210
+      - SV-230413r1017219_rule
       - V-230413
       - auditd
 
@@ -4965,9 +5135,16 @@
       - RHEL-08-030250
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230418r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SV-230418r1017220_rule
       - V-230418
       - auditd
 
@@ -4982,9 +5159,16 @@
       - RHEL-08-030260
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230419r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SV-230419r1017221_rule
       - V-230419
       - auditd
 
@@ -4999,9 +5183,15 @@
       - RHEL-08-030280
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230421r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230421r1017222_rule
       - V-230421
       - auditd
 
@@ -5016,9 +5206,15 @@
       - RHEL-08-030290
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230422r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230422r1017223_rule
       - V-230422
       - auditd
 
@@ -5033,9 +5229,15 @@
       - RHEL-08-030300
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230423r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230423r1017224_rule
       - V-230423
       - auditd
 
@@ -5050,9 +5252,15 @@
       - RHEL-08-030301
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230424r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230424r1017225_rule
       - V-230424
       - auditd
 
@@ -5067,9 +5275,15 @@
       - RHEL-08-030302
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230425r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230425r1017226_rule
       - V-230425
       - auditd
 
@@ -5084,9 +5298,15 @@
       - RHEL-08-030310
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230426r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230426r1017227_rule
       - V-230426
       - auditd
 
@@ -5101,9 +5321,15 @@
       - RHEL-08-030311
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230427r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230427r1017228_rule
       - V-230427
       - auditd
 
@@ -5118,9 +5344,15 @@
       - RHEL-08-030312
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230428r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230428r1017229_rule
       - V-230428
       - auditd
 
@@ -5135,9 +5367,15 @@
       - RHEL-08-030313
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230429r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230429r1017230_rule
       - V-230429
       - auditd
 
@@ -5152,9 +5390,15 @@
       - RHEL-08-030314
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230430r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230430r1017231_rule
       - V-230430
       - auditd
 
@@ -5169,9 +5413,15 @@
       - RHEL-08-030315
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230431r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230431r1017232_rule
       - V-230431
       - auditd
 
@@ -5186,9 +5436,15 @@
       - RHEL-08-030316
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230432r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230432r1017233_rule
       - V-230432
       - auditd
 
@@ -5203,9 +5459,15 @@
       - RHEL-08-030317
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230433r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230433r1017234_rule
       - V-230433
       - auditd
 
@@ -5220,9 +5482,15 @@
       - RHEL-08-030320
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230434r744002_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230434r1017235_rule
       - V-230434
       - auditd
 
@@ -5237,9 +5505,15 @@
       - RHEL-08-030330
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230435r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230435r1017236_rule
       - V-230435
       - auditd
 
@@ -5254,9 +5528,15 @@
       - RHEL-08-030340
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230436r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230436r1017237_rule
       - V-230436
       - auditd
 
@@ -5271,9 +5551,15 @@
       - RHEL-08-030350
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230437r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230437r1017238_rule
       - V-230437
       - auditd
 
@@ -5288,9 +5574,15 @@
       - RHEL-08-030360
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230438r810464_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230438r1017241_rule
       - V-230438
       - auditd
 
@@ -5305,9 +5597,15 @@
       - RHEL-08-030361
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230439r810465_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230439r1017243_rule
       - V-230439
       - auditd
 
@@ -5322,9 +5620,15 @@
       - RHEL-08-030370
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230444r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230444r1017244_rule
       - V-230444
       - auditd
 
@@ -5339,9 +5643,15 @@
       - RHEL-08-030390
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230446r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230446r1017245_rule
       - V-230446
       - auditd
 
@@ -5356,9 +5666,15 @@
       - RHEL-08-030400
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230447r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230447r1017246_rule
       - V-230447
       - auditd
 
@@ -5373,9 +5689,15 @@
       - RHEL-08-030410
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230448r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230448r1017247_rule
       - V-230448
       - auditd
 
@@ -5390,9 +5712,15 @@
       - RHEL-08-030420
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230449r810455_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SV-230449r1017249_rule
       - V-230449
       - auditd
 
@@ -5407,9 +5735,16 @@
       - RHEL-08-030480
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230455r810459_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230455r1017251_rule
       - V-230455
       - auditd
 
@@ -5424,9 +5759,16 @@
       - RHEL-08-030490
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230456r810462_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230456r1017253_rule
       - V-230456
       - auditd
 
@@ -5441,9 +5783,16 @@
       - RHEL-08-030550
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230462r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230462r1017254_rule
       - V-230462
       - auditd
 
@@ -5458,9 +5807,16 @@
       - RHEL-08-030560
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230463r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230463r1017255_rule
       - V-230463
       - auditd
 
@@ -5475,9 +5831,16 @@
       - RHEL-08-030570
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230464r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230464r1017256_rule
       - V-230464
       - auditd
 
@@ -5492,9 +5855,17 @@
       - RHEL-08-030580
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230465r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000471-GPOS-00216
+      - SRG-OS-000477-GPOS-00222
+      - SV-230465r1017257_rule
       - V-230465
       - auditd
 
@@ -5509,9 +5880,16 @@
       - RHEL-08-030590
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230466r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000473-GPOS-00218
+      - SV-230466r1017258_rule
       - V-230466
       - auditd
 
@@ -5526,9 +5904,16 @@
       - RHEL-08-030600
       - CAT2
       - CCI-000169
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230467r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000062-GPOS-00031
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000473-GPOS-00218
+      - SV-230467r1017259_rule
       - V-230467
       - auditd
 
@@ -5545,9 +5930,9 @@
       - RHEL-08-030610
       - CAT2
       - CCI-000171
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-12
       - SRG-OS-000063-GPOS-00032
-      - SV-230471r627750_rule
+      - SV-230471r1017262_rule
       - V-230471
       - permissions
       - auditd
@@ -5572,9 +5957,9 @@
       - RHEL-08-030620
       - CAT2
       - CCI-001493
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230472r627750_rule
+      - SV-230472r1017263_rule
       - V-230472
       - permissions
       - auditd
@@ -5598,9 +5983,11 @@
       - RHEL-08-030630
       - CAT2
       - CCI-001493
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230473r744008_rule
+      - SRG-OS-000257-GPOS-00098
+      - SRG-OS-000258-GPOS-00099
+      - SV-230473r1017264_rule
       - V-230473
       - permissions
       - auditd
@@ -5623,10 +6010,12 @@
   tags:
       - RHEL-08-030640
       - CAT2
-      - CCI-00149
-      - NIST800-53R4_CM-6
+      - CCI-001493
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230474r627750_rule
+      - SRG-OS-000257-GPOS-00098
+      - SRG-OS-000258-GPOS-00099
+      - SV-230474r1017265_rule
       - V-230474
       - permissions
       - auditd
@@ -5653,9 +6042,9 @@
       - RHEL-08-030650
       - CAT2
       - CCI-001496
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-9
       - SRG-OS-000278-GPOS-00108
-      - SV-230475r880722_rule
+      - SV-230475r1017266_rule
       - V-230475
       - aide
 
@@ -5685,9 +6074,9 @@
       - RHEL-08-030660
       - CAT2
       - CCI-001849
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-4
       - SRG-OS-000341-GPOS-00132
-      - SV-230476r809313_rule
+      - SV-230476r958752_rule
       - V-230476
       - auditd
 
@@ -5704,7 +6093,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230477r627750_rule
+      - SV-230477r1017267_rule
       - V-230477
       - rsyslog
 
@@ -5721,7 +6110,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230478r744011_rule
+      - SV-230478r1017268_rule
       - V-230478
       - gnutls
       - rsyslog
@@ -5737,8 +6126,9 @@
       - RHEL-08-030690
       - CAT2
       - CCI-001851
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
+      - SRG-OS-000479-GPOS-00224
       - SV-230479r917883_rule
       - V-230479
       - auditd
@@ -5758,7 +6148,8 @@
       - CCI-001851
       - NIST800-53R4_CM-6
       - SRG-OS-000342-GPOS-00133
-      - SV-230480r627750_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230480r958754_rule
       - V-230480
       - auditd
 
@@ -5782,7 +6173,8 @@
       - CCI-001851
       - NIST800-53R4_CM-6
       - SRG-OS-000342-GPOS-00133
-      - SV-230481r818840_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230481r958754_rule
       - V-230481
       - auditd
       - rsyslog
@@ -5799,9 +6191,10 @@
       - rhel_08_030720
       - CAT2
       - CCI-001851
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
-      - SV-230482r627750_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230482r958754_rule
       - V-230482
       - auditd
       - rsyslog
@@ -5817,9 +6210,9 @@
       - RHEL-08-030730
       - CAT2
       - CCI-001855
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000343-GPOS-00134
-      - SV-230483r744014_rule
+      - SV-230483r971542_rule
       - V-230483
       - auditd
 
@@ -5834,9 +6227,9 @@
       - RHEL-08-030731
       - CAT2
       - CCI-001855
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-5
       - SRG-OS-000343-GPOS-00134
-      - SV-244543r743878_rule
+      - SV-244543r971542_rule
       - V-244543
       - auditd
 
@@ -5853,9 +6246,11 @@
       - RHEL-08-030740
       - CAT2
       - CCI-001891
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AU-8
       - SRG-OS-000355-GPOS-00143
-      - SV-230484r627750_rule
+      - SRG-OS-000356-GPOS-00144
+      - SRG-OS-000359-GPOS-00146
+      - SV-230484r1017382_rule
       - V-230484
       - chrony
 
@@ -5869,9 +6264,9 @@
       - RHEL-08-040001
       - CAT2
       - CCI-000381
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230488r627750_rule
+      - SV-230488r1017272_rule
       - V-230488
       - dnf
       - abrt
@@ -5887,9 +6282,9 @@
       - RHEL-08-040002
       - CAT2
       - CCI-00038
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230489r627750_rule
+      - SV-230489r1017273_rule
       - V-230489
       - dnf
       - sendmail
@@ -5915,9 +6310,9 @@
       - RHEL-08-040020
       - CAT2
       - CCI-000381
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230493r942915_rule
+      - SV-230493r1017276_rule
       - V-230493
       - camera
 
@@ -5931,11 +6326,6 @@
               changed_when: false
               failed_when: false
               check_mode: false
-              when:
-                  - rhel_08_040030
-              tags:
-                  - RHEL-08-040030
-                  - firewall
 
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
               ansible.builtin.debug:
@@ -5944,19 +6334,10 @@
                       - "{{ rhel8stig_ppsm_clsa_check_firewalld.stdout_lines }}"
               changed_when: true
               when:
-                  - rhel_08_040030
                   - rhel8stig_ppsm_clsa_check_firewalld.stdout_lines is defined
-              tags:
-                  - RHEL-08-040030
-                  - firewall
         when:
-            - rhel_08_040030
-            - not rhel8stig_system_is_chroot
             - rhel8stig_firewall_service == "firewalld"
             - rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
 
       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | IPTables block"
         block:
@@ -5966,10 +6347,6 @@
               changed_when: false
               failed_when: false
               check_mode: false
-              when: rhel_08_040030
-              tags:
-                  - RHEL-08-040030
-                  - firewall
 
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
               ansible.builtin.debug:
@@ -5978,43 +6355,29 @@
                       - "{{ rhel8stig_ppsm_clsa_check_iptables.stdout_lines }}"
               changed_when: true
               when:
-                  - rhel_08_040030
-                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is defined
-              tags:
-                  - RHEL-08-040030
-                  - firewall
+                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is definedl
         when:
-            - rhel_08_040030
-            - not rhel8stig_system_is_chroot
             - rhel8stig_firewall_service == "iptables"
             - rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
 
       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Warn no firewall is in use"
         ansible.builtin.debug:
             msg: "Your configured firewall service is {{ rhel8stig_firewall_service }}, but you have set the variable rhel8stig_start_firewall_service to false. We cannot audit control RHEL-08-040030 - RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
         changed_when: true
         when:
-            - rhel_08_040030
             - not rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
   when:
       - rhel_08_040030
       - not rhel8stig_system_is_chroot
       - rhel8stig_firewall_service != "not_required"
-
       - rhel8stig_disruptive
   tags:
       - RHEL-08-040030
       - CAT2
       - CCI-000382
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000096-GPOS-00050
-      - SV-230500r627750_rule
+      - SV-230500r1017283_rule
       - V-230500
       - firewall
 
@@ -6038,9 +6401,9 @@
       - RHEL-08-040070
       - CAT2
       - CCI-000778
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_IA-3
       - SRG-OS-000114-GPOS-00059
-      - SV-230502r627750_rule
+      - SV-230502r1017284_rule
       - V-230502
       - autofs
 
@@ -6063,9 +6426,10 @@
       - RHEL-08-040080
       - CAT2
       - CCI-000778
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_IA-3
       - SRG-OS-000114-GPOS-00059
-      - SV-230503r942936_rule
+      - SRG-OS-000378-GPOS-00163
+      - SV-230503r1017285_rule
       - V-230503
       - usb_devices
 
@@ -6089,9 +6453,9 @@
       - RHEL-08-040100
       - CAT2
       - CCI-002314
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-230505r744020_rule
+      - SV-230505r958672_rule
       - V-230505
       - firewall
       - iptables
@@ -6117,13 +6481,14 @@
       - RHEL-08-040101
       - CAT2
       - CCI-002314
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-244544r743881_rule
+      - SV-244544r958672_rule
       - V-244544
       - firewalld
       - firewall
 
+# After previous controls as they are dependancies
 - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
   block:
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone"
@@ -6209,9 +6574,9 @@
       - RHEL-08-040090
       - CAT2
       - CCI-002314
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-230504r942942_rule
+      - SV-230504r958672_rule
       - V-230504
       - firewall
 
@@ -6240,9 +6605,9 @@
       - RHEL-08-040110
       - CAT2
       - CCI-001444
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-18
       - SRG-OS-000299-GPOS-00117
-      - SV-230506r627750_rule
+      - SV-230506r1017286_rule
       - V-230506
       - wifi
 
@@ -6278,9 +6643,9 @@
       - RHEL-08-040111
       - CAT2
       - CCI-001443
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-18
       - SRG-OS-000300-GPOS-00118
-      - SV-230507r942939_rule
+      - SV-230507r1017287_rule
       - V-230507
       - bluetooth
 
@@ -6322,11 +6687,11 @@
       - RHEL-08-040121
       - RHEL-08-040122
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230508r627750_rule
-      - SV-230509r627750_rule
-      - SV-230510r627750_rule
+      - SV-230508r958804_rule
+      - SV-230509r958804_rule
+      - SV-230510r958804_rule
       - V-230508
       - V-230509
       - V-230510
@@ -6369,13 +6734,13 @@
       - CAT2
       - RHEL-08-040123
       - RHEL-08-040124
-      - RHEL-08-04125
+      - RHEL-08-040125
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230511r627750_rule
-      - SV-230512r627750_rule
-      - SV-230513r627750_rule
+      - SV-230511r958804_rule
+      - SV-230512r958804_rule
+      - SV-230513r958804_rule
       - V-230511
       - V-230512
       - V-230513
@@ -6419,11 +6784,11 @@
       - RHEL-08-040127
       - RHEL-08-040128
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230514r627750_rule
-      - SV-230515r627750_rule
-      - SV-230516r627750_rule
+      - SV-230514r958804_rule
+      - SV-230515r958804_rule
+      - SV-230516r958804_rule
       - V-230514
       - V-230515
       - V-230516
@@ -6467,11 +6832,11 @@
       - RHEL-08-040130
       - RHEL-08-040131
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230517r627750_rule
-      - SV-230518r627750_rule
-      - SV-230519r627750_rule
+      - SV-230517r958804_rule
+      - SV-230518r958804_rule
+      - SV-230519r958804_rule
       - V-230517
       - V-230518
       - V-230519
@@ -6515,11 +6880,11 @@
       - RHEL-08-040133
       - RHEL-08-040134
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230520r792927_rule
-      - SV-230521r792930_rule
-      - SV-230522r792933_rule
+      - SV-230520r958804_rule
+      - SV-230521r958804_rule
+      - SV-230522r958804_rule
       - V-230520
       - V-230521
       - V-230522
@@ -6536,9 +6901,11 @@
       - RHEL-08-040135
       - CAT2
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230523r744023_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-230523r958804_rule
       - V-230523
       - fapolicy
 
@@ -6552,9 +6919,11 @@
       - RHEL-08-040136
       - CAT2
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-244545r743884_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-244545r958804_rule
       - V-244545
       - fapolicy
 
@@ -6605,9 +6974,11 @@
       - RHEL-08-040137
       - CAT2
       - CCI-001764
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-244546r858730_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-244546r1017349_rule
       - V-244546
       - fapolicy
 
@@ -6650,7 +7021,7 @@
       - RHEL-08-040141
       - CAT2
       - CCI-001958
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_IA-3
       - SRG-OS-000378-GPOS-00163
       - SV-244547r1014811_rule
       - SV-230524r1014813_rule
@@ -6672,9 +7043,9 @@
       - RHEL-08-040150
       - CAT2
       - CCI-002385
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_SC-5
       - SRG-OS-000420-GPOS-00186
-      - SV-230525r902735_rule
+      - SV-230525r958902_rule
       - V-230525
       - firewall
       - nftables
@@ -6708,10 +7079,13 @@
       - RHEL-08-040160
       - CAT2
       - CCI-002418
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_SC-8
       - SRG-OS-000423-GPOS-00187
-      - SV-244549r916422_rule
-      - SV-230526r916422_rule
+      - SRG-OS-000424-GPOS-00188
+      - SRG-OS-000425-GPOS-00189
+      - SRG-OS-000426-GPOS-00190
+      - SV-244549r958908_rule
+      - SV-230526r958908_rule
       - V-244549
       - V-230526
       - ssh
@@ -6730,9 +7104,11 @@
       - RHEL-08-040161
       - CAT2
       - CCI-000068
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-17
       - SRG-OS-000033-GPOS-00014
-      - SV-230527r951616_rule
+      - SRG-OS-000420-GPOS-00186
+      - SRG-OS-000424-GPOS-00188
+      - SV-230527r1017288_rule
       - V-230527
       - ssh
 
@@ -6752,7 +7128,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230532r627750_rule
+      - SV-230532r1017294_rule
       - V-230532
       - debug-shell
 
@@ -6789,7 +7165,7 @@
       - CAT2
       - CI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244550r858791_rule
+      - SV-244550r1017350_rule
       - V-244550
       - ipv4
 
@@ -6829,7 +7205,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r858793_rule
+      - SV-230535r1017297_rule
       - V-230535
       - icmp
 
@@ -6867,7 +7243,7 @@
       - CCI-00036
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r858795_rule
+      - SV-230536r1017298_rule
       - V-230536
       - icmp
 
@@ -6906,7 +7282,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r858797_rule
+      - SV-230537r1017299_rule
       - V-230537
       - icmp
 
@@ -6944,7 +7320,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r858799_rule
+      - SV-244551r1017351_rule
       - V-244551
       - ip4
 
@@ -6981,7 +7357,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r858801_rule
+      - SV-230538r1017300_rule
       - V-230538
       - icmp
 
@@ -7019,7 +7395,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r858803_rule
+      - SV-244552r1017352_rule
       - V-244552
       - ipv4
 
@@ -7056,7 +7432,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r861085_rule
+      - SV-230539r1017301_rule
       - V-230539
       - icmp
 
@@ -7095,7 +7471,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-250317r858808_rule
+      - SV-250317r1017358_rule
       - V-250317
       - icmp
 
@@ -7135,7 +7511,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r858810_rule
+      - SV-230540r1017302_rule
       - V-230540
       - icmp
 
@@ -7175,7 +7551,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r858812_rule
+      - SV-230541r1017303_rule
       - V-230541
       - icmp
 
@@ -7215,7 +7591,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r858814_rule
+      - SV-230542r1017304_rule
       - V-230542
       - icmp
 
@@ -7253,7 +7629,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r858816_rule
+      - SV-230543r1017305_rule
       - V-230543
       - icmp
 
@@ -7291,7 +7667,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r858818_rule
+      - SV-244553r1017353_rule
       - V-244553
       - ipv4
 
@@ -7330,7 +7706,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r858820_rule
+      - SV-230544r1017306_rule
       - V-230544
       - icmp
 
@@ -7368,7 +7744,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r858822_rule
+      - SV-230545r1017307_rule
       - V-230545
       - sysctl
 
@@ -7406,7 +7782,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r858824_rule
+      - SV-230546r1017308_rule
       - V-230546
       - sysctl
 
@@ -7444,7 +7820,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r858826_rule
+      - SV-230547r1017309_rule
       - V-230547
       - sysctl
 
@@ -7520,7 +7896,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r858830_rule
+      - SV-230549r1017311_rule
       - V-230549
       - sysctl
 
@@ -7558,7 +7934,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244554r858832_rule
+      - SV-244554r1017354_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
@@ -7572,7 +7948,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230550r627750_rule
+      - SV-230550r1017312_rule
       - V-230550
       - mail
 
@@ -7595,7 +7971,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230553r809324_rule
+      - SV-230553r1017315_rule
       - V-230553
       - gui
 
@@ -7613,7 +7989,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251718r809378_rule
+      - SV-251718r1017371_rule
       - V-251718
       - systemctl
 
@@ -7639,7 +8015,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230554r627750_rule
+      - SV-230554r1017316_rule
       - V-230554
       - network
 
@@ -7659,7 +8035,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - V-230555r951618_rule
+      - SV-230555r1017317_rule
       - V-230555
       - ssh
 
@@ -7678,7 +8054,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230556r951620_rule
+      - SV-230556r1017318_rule
       - V-230556
       - ssh
 
@@ -7709,7 +8085,7 @@
       - CCI-001453
       - NIST800-53R4_CM-6
       - SRG-OS-000250-GPOS-00093
-      - SV-255924r917888_rule
+      - SV-255924r1017372_rule
       - V-255924
       - fips
 
@@ -7734,7 +8110,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230557r627750_rule
+      - SV-230557r1017319_rule
       - V-230557
       - tftp
 
@@ -7749,7 +8125,7 @@
       - RHEL-08-040370
       - CAT2
       - CCI-000381
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_CM-7
       - SRG-OS-000480-GPOS-00227
       - SV-230559r1014820_rule
       - V-230559
@@ -7769,7 +8145,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230560r627750_rule
+      - SV-230560r1017321_rule
       - V-230560
       - iprutils
 
@@ -7786,7 +8162,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230561r627750_rule
+      - SV-230561r1017322_rule
       - V-230561
       - tuned
 
@@ -7803,9 +8179,9 @@
       - RHEL-08-040400
       - CAT2
       - CCI-002265
-      - NIST800-53R4_CM-6
+      - NIST800-53R4_AC-16
       - SRG-OS-000324-GPOS-00125
-      - SV-254520r928805_rule
+      - SV-254520r958726_rule
       - V-254520
       - selinux
 
