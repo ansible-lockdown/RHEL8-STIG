@@ -2,7 +2,8 @@
 
 ## 3.4 STIG v2r1
 
-RuleIDs updated for all controls where applicable
+RuleIDs updated for all controls
+NIst Control ID associations added
 
 - RHEL-08-010350 - command updated
 - RHEL-08-010472 - Not Applicabel if fips
