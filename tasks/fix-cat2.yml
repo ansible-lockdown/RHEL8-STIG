@@ -6372,7 +6372,7 @@
             opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
         loop: "{{ ansible_facts.mounts }}"
         when:
-            - item.mount == '/var/log/audit'
+            - item.mount == '/var/tmp'
             - rhel8stig_040132_var_tmp_status.stdout | length > 0
   when:
       - rhel_08_040132 or
