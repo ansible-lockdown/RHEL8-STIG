@@ -102,7 +102,7 @@
       remote_src: true
       owner: root
       group: root
-      mode: '0755'
+      mode: 'u+x,go-w'
   when:
       - rhel8stig_grub2_user_cfg.stat.exists
       - rhel8stig_workaround_for_disa_benchmark
@@ -125,7 +125,7 @@
       dest: /etc/audit/rules.d/99_auditd.rules
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   notify: restart auditd
 
 - name: restart auditd

@@ -166,7 +166,7 @@
         ansible.builtin.file:
             path: /etc/dconf/db/local.d/locks
             state: directory
-            mode: '0755'
+            mode: 'u+x,go-w'
         when:
             - rhel8stig_always_configure_dconf
   when:
@@ -459,7 +459,7 @@
         ansible.builtin.file:
             path: "{{ rhel8stig_pam_faillock.dir }}"
             state: directory
-            mode: '0755'
+            mode: 'u+x,go-w'
             owner: root
             group: root
             recurse: true
