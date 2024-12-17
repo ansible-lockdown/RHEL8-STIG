@@ -239,7 +239,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: 'u-x,go-wx'
   when:
       - rhel_08_020024
   tags:
@@ -382,7 +382,7 @@
       create: true
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   when:
       - rhel_08_030603
   tags:
@@ -628,7 +628,7 @@
       dest: /etc/aide.conf
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   when:
       - rhel_08_040300
       - rhel_08_040310
