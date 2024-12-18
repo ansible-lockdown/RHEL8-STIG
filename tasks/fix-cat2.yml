@@ -3393,7 +3393,7 @@
       line: "{{ item.line }}"
   loop:
       - { regexp: '^(?#)\s*StopIdleSessionSec\s*=', line: "StopIdleSessionSec={{ rhel_08_020035_idlesessiontimeout }}" }
-      - { regexp: '^(?#)\s*KillUserProccesses\s*=', line: "KillUserProccesses=no" }
+      - { regexp: '^(?#)\s*KillUserProcesses\s*=', line: "KillUserProcesses=no" }
   notify: Restart_systemdlogin
   when:
       - rhel_08_020035
