@@ -2673,7 +2673,7 @@
 - name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
   ansible.builtin.lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '(?i)^#?PermitUserEnvironment'
+      regexp: '(?i)^PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
       validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
