@@ -6653,30 +6653,13 @@
       "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
       "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
       "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-  block:
-      - name: |
-            "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
-            "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
-            "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
-        ansible.builtin.shell: mount | grep /dev/shm
-        changed_when: false
-        failed_when: false
-        register: rhel8stig_040120_dev_shm_status
-
-      - name: |
-            "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
-            "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
-            "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-        ansible.posix.mount:
-            path: "{{ item.mount }}"
-            state: mounted
-            src: "{{ item.device }}"
-            fstype: "{{ item.fstype }}"
-            opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
-        loop: "{{ ansible_facts.mounts }}"
-        when:
-            - item.mount == '/dev/shm'
-            - rhel8stig_040120_dev_shm_status.stdout | length > 0
+  ansible.posix.mount:
+      path: /dev/shm
+      state: mounted
+      src: tmpfs
+      fstype: tmpfs
+      opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
+  notify: systemctl daemon-reload
   when:
       - rhel_08_040120 or
         rhel_08_040121 or
