@@ -112,6 +112,7 @@ audit_log_dir: '/opt'
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
+rhel_08_010030: true
 rhel_08_010121: true
 rhel_08_010140: true
 rhel_08_010150: true
@@ -136,7 +137,6 @@ rhel_08_040360: true
 # CAT 2 rules
 rhel_08_010010: true
 rhel_08_010019: true
-rhel_08_010030: true
 rhel_08_010040: true
 rhel_08_010049: true
 rhel_08_010050: true
