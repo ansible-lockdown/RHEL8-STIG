@@ -124,7 +124,7 @@
             content: "{{ rhel8stig_logon_banner }}"
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
         notify: restart sshd
         with_items:
             - /etc/issue
@@ -150,7 +150,7 @@
       regexp: 'banner-message-enabled='
       line: banner-message-enable=true
       create: true
-      mode: '0644'
+      mode: 'u-x,go-wx'
       owner: root
       group: root
       insertafter: '[org/gnome/login-screen]'
@@ -173,7 +173,7 @@
           [org/gnome/login-screen]
           banner-message-text='{{ rhel8stig_logon_banner | replace(newline, "\n") }}'
           banner-message-enable=true
-      mode: '0644'
+      mode: 'u-x,go-wx'
       owner: root
       group: root
   vars:
@@ -197,7 +197,7 @@
       regexp: ^(?!#).*\/var\/log\/secure
       line: 'auth.*;authpriv.*;daemon.* /var/log/secure'
       create: true
-      mode: '0644'
+      mode: 'u-x,go-wx'
   notify: restart rsyslog
   when:
       - rhel_08_010070
@@ -242,7 +242,7 @@
         ansible.builtin.file:
             path: "{{ rhel8stig_path_to_sshkey }}"
             state: directory
-            mode: '0700'
+            mode: 'u+x,go-rwx'
 
       - name: "MEDIUM | RHEL-08-010100 | PATCH | RHEL 8, for certificate-based authentication, must enforce authorized access to the corresponding private key. | Create key pair"
         community.crypto.openssh_keypair:
@@ -339,7 +339,7 @@
       dest: /etc/grub.d/01_users
       owner: root
       group: root
-      mode: '0755'
+      mode: 'u+x,go-w'
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -364,7 +364,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: 'u-x,go-wx'
   when:
       - rhel_08_010151
   tags:
@@ -384,7 +384,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: 'u-x,go-wx'
   when:
       - rhel_08_010152
   tags:
@@ -512,7 +512,7 @@
       - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: '1777'
+            mode: '+t'
         with_items:
             - "{{ rhel_08_010190_world_writable_files.stdout_lines }}"
   when:
@@ -672,7 +672,7 @@
       content: |
           [org/gnome/desktop/screensaver]
           lock-delay=uint32 5
-      mode: '0644'
+      mode: 'u-x,go-wx'
   notify: dconf update
   when:
       - rhel_08_020031
@@ -693,7 +693,7 @@
       content: |
           [org/gnome/login-screen]
           disable-user-list=true
-      mode: '0644'
+      mode: 'u-x,go-wx'
   when:
       - rhel_08_020032
       - rhel8stig_always_configure_dconf
@@ -756,7 +756,7 @@
       dest: /etc/dconf/db/local.d/locks/session_rhel_08_020081
       content: |
           /org/gnome/desktop/session/idle-delay
-      mode: '0644'
+      mode: 'u-x,go-wx'
   notify: dconf update
   when:
       - rhel_08_020081
@@ -775,7 +775,7 @@
       dest: /etc/dconf/db/local.d/locks/session_rhel_08_020082
       content: |
           /org/gnome/desktop/screensaver/lock-enabled
-      mode: '0644'
+      mode: 'u-x,go-wx'
   notify: dconf update
   when:
       - rhel_08_020082
@@ -2171,7 +2171,7 @@
       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: '0755'
+            mode: 'u+x,go-w'
             state: file
         with_items:
             - "{{ rhel_08_010660_change_perms }}"
@@ -2363,7 +2363,7 @@
             dest: /etc/resolv.conf
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
         when:
             - rhel_08_010680_networkmanager_check.stdout == '0'
             - rhel8_stig_use_resolv_template
@@ -2723,7 +2723,7 @@
 - name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
   ansible.builtin.lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: '(?i)^#?PermitUserEnvironment'
+      regexp: (?i)^\s*PermitUserEnvironment
       line: 'PermitUserEnvironment no'
       validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
@@ -3259,7 +3259,7 @@
             regexp: '^lock-enabled'
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
             line: |
                 [org/gnome/desktop/screensaver]
                 # Set this to true to lock the screen when the screensaver activates
@@ -3286,7 +3286,7 @@
       line: "{{ item.line }}"
   loop:
       - { regexp: '^(?#)\s*StopIdleSessionSec\s*=', line: "StopIdleSessionSec={{ rhel_08_020035_idlesessiontimeout }}" }
-      - { regexp: '^(?#)\s*KillUserProccesses\s*=', line: "KillUserProccesses=no" }
+      - { regexp: '^(?#)\s*KillUserProcesses\s*=', line: "KillUserProcesses=no" }
   notify: Restart_systemdlogin
   when:
       - rhel_08_020035
@@ -3315,7 +3315,7 @@
             create: true
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
         loop:
             - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
             - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
@@ -3370,7 +3370,7 @@
             create: true
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
             line: |
                 [org/gnome/settings-daemon/peripherals/smartcard]
                 removal-action='lock-screen'
@@ -3401,7 +3401,7 @@
             line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
             owner: root
             group: root
-            mode: '0640'
+            mode: 'u-x,g-wx,o-rwx'
         when: rhel_08_020050_removal_action_file.stdout_lines | length == 0
         notify: dconf update
   when:
@@ -3430,7 +3430,7 @@
             create: true
             owner: root
             group: root
-            mode: '0640'
+            mode: 'u-x,g-wx,o-rwx'
             regexp: '^idle-delay'
             line: |
                 [org/gnome/desktop/session]
@@ -3446,7 +3446,7 @@
             line: idle-delay=uint32 900
             owner: root
             group: root
-            mode: '0640'
+            mode: 'u-x,g-wx,o-rwx'
         loop: "{{ rhel_08_020060_idle_delay_param.stdout_lines }}"
         when: rhel_08_020060_idle_delay_param.stdout_lines | length > 0
         notify: dconf update
@@ -3478,7 +3478,7 @@
             line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
   when:
       - rhel_08_020070
   tags:
@@ -3497,7 +3497,7 @@
       line: /org/gnome/desktop/screensaver/lock-delay
       owner: root
       group: root
-      mode: '0640'
+      mode: 'u-x,g-wx,o-rwx'
   when:
       - rhel_08_020080
       - "'dconf' in ansible_facts.packages"
@@ -3518,7 +3518,7 @@
       line: "{{ item.line }}"
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   with_items:
       - { regexp: '^\[{{ rhel8stig_sssd.certmap }}\]', line: '[{{ rhel8stig_sssd.certmap }}]' }
       - { regexp: '^matchrule {{ rhel8stig_sssd.matchrule }}', line: 'matchrule {{ rhel8stig_sssd.matchrule }}' }
@@ -4070,7 +4070,7 @@
             insertafter: "{{ item.insertafter }}"
             owner: root
             group: root
-            mode: '0600'
+            mode: 'u-x,go-rwx'
         notify: restart sssd
         with_items:
             - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
@@ -4082,7 +4082,7 @@
             line: auth       sufficient pam_sss.so try_cert_auth
             owner: root
             group: root
-            mode: '0644'
+            mode: 'u-x,go-wx'
         notify: restart sssd
         when: rhel_08_020250_sc_auth_sss.stdout | length == 0
 
@@ -4198,7 +4198,7 @@
       insertafter: "{{ item.insertafter }}"
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   with_items:
       - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
       - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
@@ -4528,7 +4528,7 @@
         ansible.builtin.file:
             path: "{{ rhel08_030070_auditlog_location.stdout }}"
             state: "{{ (rhel08_030070_auditlog.stat.exists) | ternary('file', 'touch') }}"
-            mode: o-x,go-rwx
+            mode: 'o-x,go-rwx'
   when:
       - rhel_08_030070
   tags:
@@ -4656,7 +4656,7 @@
       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
         ansible.builtin.file:
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-            mode: go-rwx
+            mode: 'go-rwx'
             state: directory
         when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
@@ -5434,7 +5434,7 @@
 - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
   ansible.builtin.file:
       path: "{{ item }}"
-      mode: '0640'
+      mode: 'u-x,g-wx,o-rwx'
   with_items:
       - /etc/audit/rules.d/audit.rules
       - /etc/audit/auditd.conf
@@ -5461,7 +5461,7 @@
       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: go-w
+            mode: 'go-w'
         with_items:
             - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
@@ -5532,7 +5532,7 @@
       line: "{{ item }}"
       owner: root
       group: root
-      mode: '0600'
+      mode: 'u-x,go-rwx'
   with_items:
       - "# Audit Tools"
       - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
@@ -5657,7 +5657,7 @@
       create: true
       owner: root
       group: root
-      mode: '0644'
+      mode: 'u-x,go-wx'
       regexp: "{{ item.regexp }}"
       line: "{{ item.line }}"
   with_items:
@@ -6130,7 +6130,7 @@
             create: true
             owner: root
             group: root
-            mode: '0640'
+            mode: 'u-x,g-wx,o-rwx'
         notify: change_requires_reboot
 
       - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled. | Disable Bluetooth kernel module"
@@ -6161,30 +6161,12 @@
       "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
       "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
       "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-  block:
-      - name: |
-            "MEDIUM | RHEL-08-040120 | AUDIT | RHEL 8 must mount /dev/shm with the nodev option."
-            "MEDIUM | RHEL-08-040121 | AUDIT | RHEL 8 must mount /dev/shm with the nosuid option."
-            "MEDIUM | RHEL-08-040122 | AUDIT | RHEL 8 must mount /dev/shm with the noexec option."
-        ansible.builtin.shell: mount | grep /dev/shm
-        changed_when: false
-        failed_when: false
-        register: rhel8stig_040120_dev_shm_status
-
-      - name: |
-            "MEDIUM | RHEL-08-040120 | PATCH | RHEL 8 must mount /dev/shm with the nodev option."
-            "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
-            "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
-        ansible.posix.mount:
-            path: "{{ item.mount }}"
-            state: mounted
-            src: "{{ item.device }}"
-            fstype: "{{ item.fstype }}"
-            opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
-        loop: "{{ ansible_facts.mounts }}"
-        when:
-            - item.mount == '/dev/shm'
-            - rhel8stig_040120_dev_shm_status.stdout | length > 0
+  ansible.posix.mount:
+      path: /dev/shm
+      state: mounted
+      src: tmpfs
+      fstype: tmpfs
+      opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
   when:
       - rhel_08_040120 or
         rhel_08_040121 or
@@ -6372,7 +6354,7 @@
             opts: "defaults{{ rhel_08_040132 | ternary (',nodev', '') }}{{ rhel_08_040133 | ternary (',nosuid', '') }}{{ rhel_08_040134 | ternary (',noexec', '') }}"
         loop: "{{ ansible_facts.mounts }}"
         when:
-            - item.mount == '/var/log/audit'
+            - item.mount == '/var/tmp'
             - rhel8stig_040132_var_tmp_status.stdout | length > 0
   when:
       - rhel_08_040132 or
