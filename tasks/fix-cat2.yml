@@ -4359,7 +4359,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00228
-      -  SV-230383r1017192_ruleSV-230383r1017192_rule
+      - SV-230383r1017192_ruleSV-230383r1017192_rule
       - V-230383
       - login
       - umask
