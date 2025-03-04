@@ -301,7 +301,7 @@
       dest: /etc/grub.d/01_users
       owner: root
       group: root
-      mode: 'u+x,g0-w'
+      mode: 'u+x,go-w'
   notify: confirm grub2 user cfg
   when:
       - rhel_08_010141 or
@@ -2071,7 +2071,7 @@
       - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: 'u+x,g0-w'
+            mode: 'u+x,go-w'
             state: file
         with_items:
             - "{{ rhel_08_010660_change_perms }}"
@@ -4692,7 +4692,7 @@
       - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
         ansible.builtin.file:
             path: "{{ rhel_08_030120_audit_log_dir.stdout }}"
-            mode: 'u+x,go-rwx'
+            mode: 'go-rwx'
             state: directory
         when: rhel_08_030120_audit_log_dir.stdout | length > 0
   when:
@@ -5921,7 +5921,7 @@
       - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive. | Set permissions to 755 on tools"
         ansible.builtin.file:
             path: "{{ item }}"
-            mode: 'u+x,go-w'
+            mode: 'go-w'
         with_items:
             - "{{ rhel_08_030620_tools.stdout_lines }}"
   when:
