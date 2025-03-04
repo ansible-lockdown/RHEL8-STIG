@@ -84,8 +84,8 @@
         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
   block:
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path"
         ansible.builtin.lineinfile:
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
@@ -95,8 +95,8 @@
             - rhel8stig_ssh_required
 
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message"
         ansible.builtin.copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
@@ -4359,7 +4359,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00228
-      - SV-230383r1017192_ruleSV-230383r1017192_rule
+      - SV-230383r1017192_rule
       - V-230383
       - login
       - umask
