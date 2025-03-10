@@ -107,21 +107,20 @@
         with_items:
             - /etc/issue
             - /etc/issue.net
-        when:
-            # - not system_is_ec2
-            - rhel_08_010040 or
-              rhel_08_010060
-        tags:
-            - CAT2
-            - RHEL-08-010040
-            - RHEL-08-010060
-            - CCI-000048
-            - NIST800-53R4_AC-8
-            - SRG-OS-000023-GPOS-00006
-            - SV-230225r1017044_rule
-            - SV-230227r1017046_rule
-            - V-230225
-            - V-230227
+  when:
+        - rhel_08_010040 or
+          rhel_08_010060
+  tags:
+        - CAT2
+        - RHEL-08-010040
+        - RHEL-08-010060
+        - CCI-000048
+        - NIST800-53R4_AC-8
+        - SRG-OS-000023-GPOS-00006
+        - SV-230225r1017044_rule
+        - SV-230227r1017046_rule
+        - V-230225
+        - V-230227
 
 - name: "MEDIUM | RHEL-08-010049 | PATCH | RHEL 8 must display a banner before granting local or remote access to the system via a graphical user logon"
   ansible.builtin.lineinfile:
