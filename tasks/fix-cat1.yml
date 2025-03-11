@@ -108,7 +108,7 @@
             replace: "{{ rhel8stig_replace_quoted_params }}"
         vars:
             query: "{{ prelim_rhel8stig_boot_part.stdout }}"
-            key: GRUB_CMDLINE_LINUX
+            key: GRUB_CMDLINE_LINUX  # noqa var-naming[no-reserved]
             param: boot
             value: UUID={{ prelim_rhel8stig_boot_uuid.stdout }}
             insert: true
@@ -117,7 +117,6 @@
             - rhel_08_010020_boot_kernel_set.stdout | length == 0
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
-
         notify: confirm grub2 user cfg
         register: result
 
