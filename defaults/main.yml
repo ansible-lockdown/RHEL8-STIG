@@ -55,6 +55,10 @@ rhel8stig_skip_reboot: true
 # Defined will change if control requires
 change_requires_reboot: false
 
+# Create managed not custom local_facts files
+create_benchmark_facts: true
+ansible_facts_path: /etc/ansible/facts.d
+
 ###########################################
 ### Goss is required on the remote host ###
 ### vars/auditd.yml for other settings  ###
@@ -69,11 +73,7 @@ audit_run_heavy_tests: true
 
 ## Only run Audit do not remediate
 audit_only: false
-### As part of audit_only ###
-# This will enable files to be copied back to control node in audit_only mode
-fetch_audit_files: false
-# Path to copy the files to will create dir structure in audit_only mode
-audit_capture_files_dir: /some/location to copy to on control node
+
 #############################
 
 # How to retrieve audit binary
@@ -102,6 +102,20 @@ audit_conf_dest: "/opt"
 
 # Where the audit logs are stored
 audit_log_dir: '/opt'
+
+## Ability to collect and take audit files moving to a centralised location
+# This enables the collection of the files from the host
+fetch_audit_output: false
+
+# Method of getting,uploading the summary files
+## Ensure access and permissions are avaiable for these to occur.
+## options are
+# fetch - fetches from server and moves to location on the ansible controller (could be a mount point available to controller)
+# copy - copies file to a location available to the managed node
+audit_output_collection_method: fetch
+
+# Location to put the audit files
+audit_output_destination: /opt/audit_summaries/
 
 ### Goss Settings ##
 ####### END ########
