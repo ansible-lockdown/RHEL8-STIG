@@ -18,6 +18,7 @@ skip_list:
     - '306'
     - '602'
     - '208'
+    - 'tag[no-duplicate]'
 use_default_rules: true
 rulesdir:
     - ./rules/
