@@ -224,10 +224,3 @@
       - run_audit
   tags:
       - run_audit
-
-
-- name: If Warnings found Output count and control IDs affected
-  when: warn_count != 0
-  tags: always
-  ansible.builtin.debug:
-    msg: You have {{ warn_count }} Warning(s) that require investigating that are related to the following benchmark ID(s) {{ warn_control_list }}

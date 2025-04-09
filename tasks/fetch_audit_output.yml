@@ -39,8 +39,3 @@
       ansible.builtin.debug:
         msg: "Warning!! Unable to write to localhost {{ audit_output_destination }} for audit file copy"
 
-    - name: "FETCH_AUDIT_FILES | Fetch files and copy to controller | Warning if issues with fetch_audit_files"
-      vars:
-        warn_control_id: "FETCH_AUDIT_FILES"
-      ansible.builtin.import_tasks:
-        file: warning_facts.yml
