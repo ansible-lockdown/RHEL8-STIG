@@ -11,7 +11,7 @@ RuleIDs updated for listed controls after changes in control
 - RHEL-08-010292 - RuleID
 - RHEL-08-010680 - RuleID
 
-## 3.4 STIG v2r1
+## 4.0.0 STIG v2r1
 
 RuleIDs updated for all controls
 Nist Control ID associations added

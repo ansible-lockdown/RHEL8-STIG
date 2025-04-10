@@ -27,8 +27,8 @@
   failed_when: false
   register: discovered_audit_copy_state
   loop:
-      - pre_audit_outfile
-      - post_audit_outfile
+      - "{{ pre_audit_outfile }}"
+      - "{{ post_audit_outfile }}"
 
 - name: "FETCH_AUDIT_FILES | Fetch files and copy to controller | Warning if issues with fetch_audit_files"
   when:
