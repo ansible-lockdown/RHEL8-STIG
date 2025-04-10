@@ -1,6 +1,6 @@
 # Changes to RHEL8STIG
 
-## 3.4 STIG v2r1
+## 4.0.0 STIG v2r1
 
 RuleIDs updated for all controls
 Nist Control ID associations added
@@ -16,7 +16,9 @@ Nist Control ID associations added
 - RHEL-08-040370
 - RHEL-08-010001 - removed as not a NIST value
 
-Min OS version updated to 8.10
+Min OS version updated to 2.10
+
+workflow updates
 
 ## 3.3 STIG V1R14
 
