@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v1r14'
+benchmark_version: 'v2r1'
 
 ## Benchmark name used by audting control role
 # The audit variable found at the base
@@ -134,7 +134,6 @@ rhel_08_040200: true
 rhel_08_040360: true
 
 # CAT 2 rules
-rhel_08_010001: true
 rhel_08_010010: true
 rhel_08_010019: true
 rhel_08_010030: true
@@ -275,12 +274,8 @@ rhel_08_020030: true
 rhel_08_020031: true
 rhel_08_020032: true
 rhel_08_020035: true
-rhel_08_020039: true
-rhel_08_020040: true
-rhel_08_020041: true
 rhel_08_020050: true
 rhel_08_020060: true
-rhel_08_020070: true
 rhel_08_020080: true
 rhel_08_020081: true
 rhel_08_020082: true
@@ -301,8 +296,6 @@ rhel_08_020180: true
 rhel_08_020190: true
 rhel_08_020200: true
 rhel_08_020210: true
-rhel_08_020220: true
-rhel_08_020221: true
 rhel_08_020230: true
 rhel_08_020235: true
 rhel_08_020231: true
@@ -479,7 +472,6 @@ rhel_08_010540: true
 rhel_08_010541: true
 rhel_08_010542: true
 rhel_08_020024: true
-rhel_08_020042: true
 rhel_08_020340: true
 rhel_08_030063: true
 rhel_08_030601: true
@@ -619,11 +611,11 @@ rhel8stig_blacklist_conf_file_perms: 0640
 # These are the minimum supported releases.
 # (Red Hat has support for older versions if you pay extra for it.)
 rhel8stig_min_supported_os_ver:
-    RedHat: "8.7"
-    CentOS: "8.7"
-    Rocky: "8.7"
-    AlmaLinux: "8.7"
-    OracleLinux: "8.7"
+    RedHat: "8.10"
+    CentOS: "8.10"
+    Rocky: "8.10"
+    AlmaLinux: "8.10"
+    OracleLinux: "8.10"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -760,7 +752,6 @@ rhel8stig_remove_unnecessary_user_files: false
 # RHEL-08-020221
 # pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
 rhel8stig_pam_pwhistory:
-    remember: 5
     retries: 3
 
 # RHEL-08-020010

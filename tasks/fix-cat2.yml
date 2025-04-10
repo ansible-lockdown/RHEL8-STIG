@@ -1,32 +1,5 @@
 ---
 # TODO: ansible-lint: schema
-- name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool."
-  block:
-      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert no McAfee"
-        ansible.builtin.debug:
-            msg:
-                - "WARNING!! You have no McAfee installed. To comply with STIG ID RHEL-08-010001 you need an AV tool"
-                - "McAfee is the suggested by STIG"
-        when:
-            - "'mcafeetp' not in ansible_facts.packages or
-               'mfetpd' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-010001 | PATCH | The RHEL 8 operating system must implement the Endpoint Security for Linux Threat Prevention tool. | Alert on McAfee present"
-        ansible.builtin.debug:
-            msg: "Congratulations! You have McAfee installed"
-        when:
-            - "'mcafeetp' in ansible_facts.packages or
-               'mfetpd' in ansible_facts.packages"
-  when:
-      - rhel_08_040286
-      - rhel8stig_av_sftw == 'mcafee'
-  tags:
-      - RHEL-08-010001
-      - CAT2
-      - CCI-001233
-      - SRG-OS-000191-GPOS-00080
-      - SV-245540r942951_rule
-      - V-245540
 
 - name: "MEDIUM | RHEL-08-010010 | PATCH | RHEL 8 vendor packaged system security patches and updates must be installed and up to date."
   ansible.builtin.package:
@@ -39,8 +12,9 @@
       - RHEL-08-010010
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230222r627750_rule
+      - SV-230222r1017041_rule
       - V-230222
 
 - name: "MEDIUM | RHEL-08-010019 | PATCH | RHEL 8 must ensure cryptographic verification of vendor software packages."
@@ -73,8 +47,9 @@
       - RHEL-08-010019
       - CAT2
       - CCI-001749
+      - NIST800-53R4_CM-5
       - SRG-OS-000366-GPOS-00153
-      - SV-256973r902752_rule
+      - SV-256973r1017373_rule
       - V-256973
 
 - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection."
@@ -97,8 +72,11 @@
       - RHEL-08-010030
       - CAT2
       - CCI-001199
+      - NIST800-53R4_SC-28
       - SRG-OS-000185-GPOS-00079
-      - SV-230224r917864_rule
+      - SRG-OS-000404-GPOS-00183
+      - SRG-OS-000405-GPOS-00184
+      - SV-230224r1017043_rule
       - V-230224
 
 - name: |
@@ -106,8 +84,8 @@
         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
   block:
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path"
         ansible.builtin.lineinfile:
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
@@ -117,8 +95,8 @@
             - rhel8stig_ssh_required
 
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message"
         ansible.builtin.copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
@@ -129,20 +107,20 @@
         with_items:
             - /etc/issue
             - /etc/issue.net
-        when:
-            # - not system_is_ec2
-            - rhel_08_010040 or
-              rhel_08_010060
-        tags:
-            - CAT2
-            - RHEL-08-010040
-            - RHEL-08-010060
-            - CCI-000048
-            - SRG-OS-000023-GPOS-00006
-            - SV-230225r951590_rule
-            - SV-230227r627750_rule
-            - V-230225
-            - V-230227
+  when:
+      - rhel_08_010040 or
+        rhel_08_010060
+  tags:
+      - CAT2
+      - RHEL-08-010040
+      - RHEL-08-010060
+      - CCI-000048
+      - NIST800-53R4_AC-8
+      - SRG-OS-000023-GPOS-00006
+      - SV-230225r1017044_rule
+      - SV-230227r1017046_rule
+      - V-230225
+      - V-230227
 
 - name: "MEDIUM | RHEL-08-010049 | PATCH | RHEL 8 must display a banner before granting local or remote access to the system via a graphical user logon"
   ansible.builtin.lineinfile:
@@ -161,8 +139,9 @@
       - RHEL-08-010049
       - CAT2
       - CCI-000048
+      - NIST800-53R4_AC-8
       - SRG-OS-000023-GPOS-00006
-      - SV-244519r743806_rule
+      - SV-244519r1017326_rule
       - V-244519
       - banner
 
@@ -187,8 +166,10 @@
       - RHEL-08-010050
       - CAT2
       - CCI-000048
+      - NIST800-53R4_AC-8
       - SRG-OS-000023-GPOS-00006
-      - SV-230226r743916_rule
+      - SRG-OS-000228-GPOS-00088
+      - SV-230226r1017045_rule
       - V-230226
 
 - name: "MEDIUM | RHEL-08-010070 | PATCH | All RHEL 8 remote access methods must be monitored."
@@ -205,8 +186,9 @@
       - RHEL-08-010070
       - CAT2
       - CCI-000067
+      - NIST800-53R4_AC-17
       - SRG-OS-000032-GPOS-00013
-      - SV-230228r951592_rule
+      - SV-230228r1017047_rule
       - V-230228
       - rsyslog
 
@@ -231,8 +213,10 @@
       - RHEL-08-010090
       - CAT2
       - CCI-000185
+      - NIST800-53R4_IA-5
       - SRG-OS-000066-GPOS-00034
-      - SV-230229r858739_rule
+      - SRG-OS-000384-GPOS-00167
+      - SV-230229r1017048_rule
       - V-230229
       - certificates
 
@@ -254,8 +238,9 @@
       - RHEL-08-010100
       - CAT2
       - CCI-000186
+      - NIST800-53R4_IA-5
       - SRG-OS-000067-GPOS-00035
-      - SV-230230r627750_rule
+      - SV-230230r1017049_rule
       - V-230230
 
 - name: "MEDIUM | RHEL-08-010110 | PATCH | RHEL 8 must encrypt all stored passwords with a FIPS 140-2 approved cryptographic hashing algorithm."
@@ -272,8 +257,9 @@
       - RHEL-08-010110
       - CAT2
       - CCI-000196
+      - NIST800-53R4_IA-5
       - SRG-OS-000073-GPOS-00041
-      - SV-230231r627750_rule
+      - SV-230231r1017050_rule
       - V-230231
       - login
 
@@ -307,8 +293,9 @@
       - RHEL-08-010120
       - CAT2
       - CCI-000196
+      - NIST800-53R4_IA-5
       - SRG-OS-000073-GPOS-00041
-      - SV-230232r627750_rule
+      - SV-230232r1017051_rule
       - V-230232
       - disruption_high
 
@@ -326,8 +313,9 @@
       - RHEL-08-010130
       - CAT2
       - CCI-000196
+      - NIST800-53R4_IA-5
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r880705_rule
+      - SV-230233r1017052_rule
       - V-230233
       - pamd
 
@@ -349,9 +337,10 @@
       - RHEL-08-010149
       - CAT2
       - CCI-000213
+      - NIST800-53R4_AC-3
       - SRG-OS-000080-GPOS-00048
-      - SV-244521r792982_rule
-      - SV-244522r792984_rule
+      - SV-244521r1017327_rule
+      - SV-244522r1017328_rule
       - V-244521
       - V-244522
       - grub
@@ -371,8 +360,9 @@
       - RHEL-08-010151
       - CAT2
       - CCI-000213
+      - NIST800-53R4_AC-3
       - SRG-OS-000080-GPOS-00048
-      - SV-230236r743928_rule
+      - SV-230236r1017055_rule
       - V-230236
       - systemd
 
@@ -391,8 +381,9 @@
       - RHEL-08-010152
       - CAT2
       - CCI-000213
+      - NIST800-53R4_AC-3
       - SRG-OS-000080-GPOS-00048
-      - SV-244523r743818_rule
+      - SV-244523r1017329_rule
       - V-244523
       - systemd
 
@@ -410,8 +401,9 @@
       - RHEL-08-010159
       - CAT2
       - CCI-000803
+      - NIST800-53R4_IA-7
       - SRG-OS-000120-GPOS-00061
-      - SV-244524r809331_rule
+      - SV-244524r1017330_rule
       - V-244524
       - pamd
 
@@ -429,8 +421,9 @@
       - RHEL-08-010160
       - CAT2
       - CCI-000803
+      - NIST800-53R4_IA-7
       - SRG-OS-000120-GPOS-00061
-      - SV-230237r809276_rule
+      - SV-230237r1017056_rule
       - V-230237
       - pamd
 
@@ -455,8 +448,9 @@
       - RHEL-08-010161
       - CAT2
       - CCI-000803
+      - NIST800-53R4_IA-7
       - SRG-OS-000120-GPOS-00061
-      - SV-230238r646862_rule
+      - SV-230238r1017057_rule
       - V-230238
       - kerberos
 
@@ -470,10 +464,28 @@
       - RHEL-08-010162
       - CAT2
       - CCI-000803
+      - NIST800-53R4_IA-7
       - SRG-OS-000120-GPOS-00061
-      - SV-230239r646864_rule
+      - SV-230239r1017058_rule
       - V-230239
       - kerberos
+
+- name: "MEDIUM | RHEL-08-010163 | PATCH | The krb5-server package must not be installed on RHEL 8."
+  ansible.builtin.package:
+      name: krb5-server
+      state: absent
+  when:
+      - rhel_08_010163
+      - "'krb5-server' in ansible_facts.packages"
+  tags:
+      - RHEL-08-010163
+      - CAT2
+      - CCI-000803
+      - NIST800-53R4_IA-7
+      - SRG-OS-000120-GPOS-00061
+      - SV-237640r1017323_rule
+      - V-237640
+      - krb5
 
 - name: "|
         MEDIUM | RHEL-08-010170 | PATCH | RHEL8 must use a Linux Security Module configured to enforce limits on system services.
@@ -492,10 +504,12 @@
       - RHEL-08-010450
       - CCI-001084
       - CCI-002696
+      - NIST800-53R4_SC-3
+      - NIST800-53R4_SI-6
       - SRG-OS-000134-GPOS-00068
       - SRG-OS-000445-GPOS-00199
-      - SV-230240r627750_rule
-      - SV-230282r627750_rule
+      - SV-230240r1017059_rule
+      - SV-230282r958944_rule
       - V-230240
       - V-230282
       - selinux
@@ -521,8 +535,9 @@
       - RHEL-08-010190
       - CAT2
       - CCI-001090
+      - NIST800-53R4_SC-4
       - SRG-OS-000138-GPOS-00069
-      - SV-230243r792857_rule
+      - SV-230243r1017061_rule
       - V-230243
       - permissions
 
@@ -540,8 +555,11 @@
       - RHEL-08-010200
       - CAT2
       - CCI-001133
+      - NIST800-53R4_SC-10
       - SRG-OS-000163-GPOS-00072
-      - SV-230244r951594_rule
+      - SRG-OS-000126-GPOS-00066
+      - SRG-OS-000279-GPOS-00109
+      - SV-230244r1017062_rule
       - V-230244
       - ssh
 
@@ -559,8 +577,11 @@
       - RHEL-08-010201
       - CAT2
       - CCI-001133
+      - NIST800-53R4_SC-10
       - SRG-OS-000163-GPOS-00072
-      - SV-244525r951596_rule
+      - SRG-OS-000126-GPOS-00066
+      - SRG-OS-000279-GPOS-00109
+      - SV-244525r1017331_rule
       - V-244525
       - ssh
 
@@ -583,145 +604,15 @@
       - RHEL-08-010220
       - RHEL-08-010230
       - CCI-001314
+      - NIST800-53R4_SI-11
       - SRG-OS-000206-GPOS-00084
-      - SV-230245r627750_rule
-      - SV-230246r627750_rule
-      - SV-230247r627750_rule
+      - SV-230245r1017063_rule
+      - SV-230246r1017064_rule
+      - SV-230247r1017065_rule
       - V-230245
       - V-230246
       - V-230247
       - permissions
-
-- name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
-  block:
-      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/system-auth
-            regexp: '^auth\s+required\s+pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth\s+required\s+pam_env.so'
-        notify: restart sssd
-
-      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set authfail"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/system-auth
-            regexp: '^auth\s+required\s+pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-
-      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set account faillock"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/system-auth
-            regexp: '^account\s+required\s+pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertbefore: '^account'
-        notify: restart sssd
-  when:
-      - rhel_08_020025
-      - ansible_distribution_version is version('8.2', '>=')
-  tags:
-      - RHEL-08-020025
-      - CAT2
-      - CCI-000044
-      - SRG-OS-000021-GPOS-00005
-      - SV-244533r743848_rule
-      - V-244533
-      - pamd
-
-- name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
-  block:
-      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/password-auth
-            regexp: '^auth\s+required\s+pam_faillock.so preauth'
-            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
-            insertafter: '^auth\s+required\s+pam_env.so'
-        notify: restart sssd
-
-      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set authfail"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/password-auth
-            regexp: '^auth\s+required\s+pam_faillock.so authfail'
-            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
-            insertafter: '^auth'
-        notify: restart sssd
-
-      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set account faillock"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/password-auth
-            regexp: '^account\s+required\s+pam_faillock.so'
-            line: 'account    required pam_faillock.so'
-            insertbefore: '^account'
-        notify: restart sssd
-  when:
-      - rhel_08_020026
-      - ansible_distribution_version is version('8.2', '>=')
-  tags:
-      - RHEL-08-020026
-      - CAT2
-      - CCI-000044
-      - SRG-OS-000021-GPOS-00005
-      - SV-244534r743851_rule
-      - V-244534
-      - pamd
-
-- name: "MEDIUM | RHEL-08-020031 | PATCH | RHEL 8 must initiate a session lock for graphical user interfaces when the screensaver is activated."
-  ansible.builtin.copy:
-      dest: /etc/dconf/db/local.d/00-screensaver_rhel_08_020031
-      content: |
-          [org/gnome/desktop/screensaver]
-          lock-delay=uint32 5
-      mode: 'u-x,go-wx'
-  notify: dconf update
-  when:
-      - rhel_08_020031
-      - rhel8stig_always_configure_dconf
-      - rhel8stig_gui
-  tags:
-      - RHEL-08-020031
-      - CAT2
-      - CCI-000057
-      - SRG-OS-000029-GPOS-00010
-      - SV-244535r743854_rule
-      - V-244535
-      - dconf
-
-- name: "MEDIUM | RHEL-08-020032 | PATCH | RHEL 8 must disable the user list at logon for graphical user interfaces."
-  ansible.builtin.copy:
-      dest: /etc/dconf/db/local.d/02-login-screen_rhel_08_020032
-      content: |
-          [org/gnome/login-screen]
-          disable-user-list=true
-      mode: 'u-x,go-wx'
-  when:
-      - rhel_08_020032
-      - rhel8stig_always_configure_dconf
-      - rhel8stig_gui
-  tags:
-      - RHEL-08-020032
-      - CAT2
-      - CCI-000366
-      - SRG-OS-000480-GPOS-00227
-      - SV-244536r743857_rule
-      - V-244536
-      - dconf
-
-- name: "MEDIUM | RHEL-08-020039 | PATCH | RHEL 8 must have the tmux package installed."
-  ansible.builtin.package:
-      name: tmux
-      state: present
-  when:
-      - rhel_08_020039
-      - "'tmux' not in ansible_facts.packages"
-  tags:
-      - RHEL-08-020039
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-244537r743860_rule
-      - V-244537
-      - tmux
 
 - name: |
         "MEDIUM | RHEL-08-010240 | PATCH | The RHEL 8 /var/log directory must have mode 0755 or less permissive."
@@ -742,53 +633,15 @@
       - RHEL-08-010250
       - RHEL-08-010260
       - CCI-001314
+      - NIST800-53R4_SI-11
       - SRG-OS-000206-GPOS-00084
-      - SV-230248r627750_rule
-      - SV-230249r627750_rule
-      - SV-230250r627750_rule
+      - SV-230248r1017066_rule
+      - SV-230249r1017067_rule
+      - SV-230250r1017068_rule
       - V-230248
       - V-230249
       - V-230250
       - permissions
-
-- name: "MEDIUM | RHEL-08-020081 | PATCH | RHEL 8 must prevent a user from overriding the session idle-delay setting for the graphical user interface."
-  ansible.builtin.copy:
-      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020081
-      content: |
-          /org/gnome/desktop/session/idle-delay
-      mode: 'u-x,go-wx'
-  notify: dconf update
-  when:
-      - rhel_08_020081
-      - rhel8stig_always_configure_dconf
-      - rhel8stig_gui
-  tags:
-      - RHEL-08-020081
-      - CAT2
-      - CCI-000057
-      - SRG-OS-000029-GPOS-00010
-      - SV-244538r743863_rule
-      - V-244538
-
-- name: "MEDIUM | RHEL-08-020082 | PATCH | RHEL 8 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
-  ansible.builtin.copy:
-      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020082
-      content: |
-          /org/gnome/desktop/screensaver/lock-enabled
-      mode: 'u-x,go-wx'
-  notify: dconf update
-  when:
-      - rhel_08_020082
-      - rhel8stig_always_configure_dconf
-      - rhel8stig_gui
-  tags:
-      - RHEL-08-020082
-      - CAT2
-      - CCI-000057
-      - SRG-OS-000029-GPOS-00010
-      - SV-244539r743866_rule
-      - V-244539
-      - dconf
 
 - name: "MEDIUM | RHEL-08-010287 | PATCH | The RHEL 8 SSH daemon must be configured to use system-wide crypto policies."
   ansible.builtin.lineinfile:
@@ -803,10 +656,16 @@
       - RHEL-08-010287
       - CAT2
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-244526r809334_rule
+      - SRG-OS-000393-GPOS-00173
+      - SRG-OS-000394-GPOS-00174
+      - SRG-OS-000125-GPOS-00065
+      - SV-244526r1017332_rule
       - V-244526
       - ssh
+
+## Added prior to ssh cipher, macs etc
 
 - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
   block:
@@ -826,8 +685,12 @@
       - RHEL-08-010293
       - CAT2
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-230254r627750_rule
+      - SRG-OS-000393-GPOS-00173
+      - SRG-OS-000394-GPOS-00174
+      - SRG-OS-000125-GPOS-00065
+      - SV-230254r1017072_rule
       - V-230254
       - fips
 
@@ -851,8 +714,12 @@
       - CAT2
       - RHEL-08-010290
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-230251r917870_rule
+      - SRG-OS-000393-GPOS-00173
+      - SRG-OS-000394-GPOS-00174
+      - SRG-OS-000125-GPOS-00065
+      - SV-230251r1017069_rule
       - V-230251
       - fips
 
@@ -876,8 +743,12 @@
       - CAT2
       - RHEL-08-010291
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-230252r917873_rule
+      - SRG-OS-000393-GPOS-00173
+      - SRG-OS-000394-GPOS-00174
+      - SRG-OS-000125-GPOS-00065
+      - SV-230252r1017070_rule
       - V-230252
       - fips
 
@@ -907,8 +778,12 @@
       - RHEL-08-010294
       - CAT2
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-230255r809382_rule
+      - SRG-OS-000393-GPOS-00173
+      - SRG-OS-000394-GPOS-00174
+      - SRG-OS-000125-GPOS-00065
+      - SV-230255r1017075_rule
       - V-230255
       - openssl
 
@@ -925,8 +800,10 @@
       - RHEL-08-010295
       - CAT2
       - CCI-001453
+      - NIST800-53R4_AC-17
       - SRG-OS-000250-GPOS-00093
-      - SV-230256r792859_rule
+      - SRG-OS-000423-GPOS-00187
+      - SV-230256r1017076_rule
       - V-230256
       - gnutls
 
@@ -966,10 +843,11 @@
       - RHEL-08-010310
       - RHEL-08-010320
       - CCI-001499
+      - NIST800-53R4_CM-5
       - SRG-OS-000259-GPOS-00100
-      - SV-230257r792862_rule
-      - SV-230258r627750_rule
-      - SV-230259r792864_rule
+      - SV-230257r1017077_rule
+      - SV-230258r1017078_rule
+      - SV-230259r1017079_rule
       - V-230257
       - V-230258
       - V-230259
@@ -984,7 +862,7 @@
               "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 0755 or less permissive. | Get library files with mode 0755 or less"
               "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root. | Get library files not owned by root"
               "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account. | Get library files not group-owned by root"
-        ansible.builtin.shell: "find -L /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
+        ansible.builtin.shell: "find /lib /lib64 /usr/lib /usr/lib64 -perm /0022 -type f -o ! -user root -o ! -group root"
         changed_when: false
         failed_when: false
         register: rhel_08_010330_library_files
@@ -1010,10 +888,11 @@
       - RHEL-08-010340
       - RHEL-08-010350
       - CCI-001499
+      - NIST800-53R4_CM-5
       - SRG-OS-000259-GPOS-00100
-      - SV-230260r792867_rule
-      - SV-230261r627750_rule
-      - SV-230262r627750_rule
+      - SV-230260r1017080_rule
+      - SV-230261r1017081_rule
+      - SV-230262r1017082_rule
       - V-230260
       - V-230261
       - V-230262
@@ -1054,7 +933,8 @@
       - RHEL-08-010331
       - CAT2
       - CCI-001499
-      - SV-251707r809345_rule
+      - NIST800-53R4_CM-5
+      - SV-251707r1017360_rule
       - V-251707
       - permissions
 
@@ -1093,8 +973,9 @@
       - RHEL-08-010341
       - CAT2
       - CCI-001499
+      - NIST800-53R4_CM-5
       - SRG-OS-000259-GPOS-00100
-      - SV-251708r810012_rule
+      - SV-251708r1017362_rule
       - V-251708
       - permissions
 
@@ -1133,8 +1014,9 @@
       - RHEL-08-010351
       - CAT2
       - CCI-001499
+      - NIST800-53R4_CM-5
       - SRG-OS-000259-GPOS-00100
-      - SV-251709r810014_rule
+      - SV-251709r1017364_rule
       - V-251709
       - permissions
 
@@ -1149,8 +1031,9 @@
       - RHEL-08-010358
       - CAT2
       - CCI-001744
+      - NIST800-53R4_CM-3
       - SRG-OS-000363-GPOS-00150
-      - SV-251710r880730_rule
+      - SV-256974r1017374_rule
       - V-256974
       - mailx
 
@@ -1165,8 +1048,9 @@
       - RHEL-08-010359
       - CAT2
       - CCI-002696
+      - NIST800-53R4_SI-6
       - SRG-OS-000445-GPOS-00199
-      - SV-251710r880730_rule
+      - SV-251710r958944_rule
       - V-251710
       - aide
 
@@ -1199,10 +1083,11 @@
       - RHEL-08-010360
       - CAT2
       - CCI-001744
+      - NIST800-53R4_CM-3
       - SRG-OS-000363-GPOS-00150
       - SRG-OS-000446-GPOS-00200
       - SRG-OS-000447-GPOS-00201
-      - SV-230263r902716_rule
+      - SV-230263r1017083_rule
       - V-230263
       - aide
       - cron
@@ -1239,8 +1124,9 @@
       - RHEL-08-010372
       - CAT2
       - CCI-001749
+      - NIST800-53R4_CM-5
       - SRG-OS-000366-GPOS-00153
-      - SV-230266r833290_rule
+      - SV-230266r1017084_rule
       - V-230266
       - sysctl
 
@@ -1276,8 +1162,9 @@
       - RHEL-08-010373
       - CAT2
       - CCI-002165
+      - NIST800-53R4_AC-3
       - SRG-OS-000312-GPOS-00122
-      - SV-230267r833292_rule
+      - SV-230267r1017085_rule
       - V-230267
       - sysctl
 
@@ -1313,8 +1200,9 @@
       - RHEL-08-010374
       - CAT2
       - CCI-002165
+      - NIST800-53R4_AC-3
       - SRG-OS-000312-GPOS-00122
-      - SV-230268r833294_rule
+      - SV-230268r1017086_rule
       - V-230268
       - sysctl
 
@@ -1330,8 +1218,9 @@
       - RHEL-08-010379
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251711r833385_rule
+      - SV-251711r1017365_rule
       - V-251711
       - sudoers
 
@@ -1349,8 +1238,9 @@
       - RHEL-08-010380
       - CAT2
       - CCI-002038
+      - NIST800-53R4_IA-11
       - SRG-OS-000373-GPOS-00156
-      - SV-230271r833301_rule
+      - SV-230271r1017379_rule
       - V-230271
       - sudo
 
@@ -1368,8 +1258,11 @@
       - RHEL-08-010381
       - CAT2
       - CCI-002038
+      - NIST800-53R4_IA-11
       - SRG-OS-000373-GPOS-00156
-      - SV-230272r627750_rule
+      - SRG-OS-000373-GPOS-00157
+      - SRG-OS-000373-GPOS-00158
+      - SV-230272r1017380_rule
       - V-230272
       - sudo
 
@@ -1384,8 +1277,9 @@
       - RHEL-08-010390
       - CAT2
       - CCI-001948
+      - NIST800-53R4_CM-6
       - SRG-OS-000375-GPOS-00160
-      - SV-230273r743943_rule
+      - SV-230273r1017381_rule
       - V-230273
       - multifactor
 
@@ -1409,8 +1303,10 @@
       - RHEL-08-010400
       - CAT2
       - CCI-001948
+      - NIST800-53R4_IA-2
       - SRG-OS-000375-GPOS-00160
-      - SV-230274r858741_rule
+      - SRG-OS-000377-GPOS-00162
+      - SV-230274r1017089_rule
       - V-230274
       - multifactor
 
@@ -1424,8 +1320,9 @@
       - RHEL-08-010410
       - CAT2
       - CCI-001953
+      - NIST800-53R4_IA-2
       - SRG-OS-000376-GPOS-00161
-      - SV-230275r627750_rule
+      - SV-230275r958816_rule
       - V-230275
       - opensc
       - piv
@@ -1455,8 +1352,9 @@
       - RHEL-08-010420
       - CAT2
       - CCI-002824
+      - NIST800-53R4_SI-16
       - SRG-OS-000433-GPOS-00192
-      - SV-230276r627750_rule
+      - SV-230276r958928_rule
       - V-230276
 
 - name: "MEDIUM | RHEL-08-010421 | PATCH | RHEL 8 must clear the page allocator to prevent use-after-free attacks."
@@ -1492,8 +1390,10 @@
       - RHEL-08-010421
       - CAT2
       - CCI-001084
+      - NIST800-53R4_SC-3
       - SRG-OS-000134-GPOS-00068
-      - SV-230277r792884_rule
+      - SRG-OS-000433-GPOS-00192
+      - SV-230277r1017090_rule
       - V-230277
       - grub
 
@@ -1530,8 +1430,10 @@
       - RHEL-08-010422
       - CAT2
       - CCI-001084
+      - NIST800-53R4_SC-3
       - SRG-OS-000134-GPOS-00068
-      - SV-230278r792886_rule
+      - SRG-OS-000433-GPOS-00192
+      - SV-230278r1017091_rule
       - V-230278
       - grub
 
@@ -1568,8 +1470,10 @@
       - RHEL-08-010423
       - CAT2
       - CCI-001084
+      - NIST800-53R4_SC-3
       - SRG-OS-000134-GPOS-00068
-      - SV-230279r951598_rule
+      - SRG-OS-000433-GPOS-00192
+      - SV-230279r1017092_rule
       - V-230279
       - grub
 
@@ -1605,8 +1509,9 @@
       - RHEL-08-010430
       - CAT2
       - CCI-002824
+      - NIST800-53R4_SI-16
       - SRG-OS-000433-GPOS-00193
-      - SV-230280r858767_rule
+      - SV-230280r1017093_rule
       - V-230280
       - sysctl
 
@@ -1633,8 +1538,9 @@
       - RHEL-08-010480
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230286r627750_rule
+      - SV-230286r1017097_rule
       - V-230286
       - ssh
 
@@ -1661,8 +1567,9 @@
       - RHEL-08-010490
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230287r880714_rule
+      - SV-230287r1017098_rule
       - V-230287
       - ssh
 
@@ -1680,8 +1587,9 @@
       - RHEL-08-010500
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230288r858701_rule
+      - SV-230288r1017099_rule
       - V-230288
       - ssh
 
@@ -1699,8 +1607,9 @@
       - RHEL-08-010520
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230290r951602_rule
+      - SV-230290r1017100_rule
       - V-230290
       - ssh
 
@@ -1718,8 +1627,9 @@
       - RHEL-08-010521
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230291r952105_rule
+      - SV-230291r1017102_rule
       - V-230291
       - ssh
 
@@ -1736,8 +1646,9 @@
       - RHEL-08-010522
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244528r952106_rule
+      - SV-244528r1017335_rule
       - V-244528
       - ssh
 
@@ -1754,8 +1665,9 @@
       - RHEL-08-010543
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230295r627750_rule
+      - SV-230295r1017106_rule
       - V-230295
       - complexity-high
       - mounts
@@ -1775,8 +1687,9 @@
       - RHEL-08-010544
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244529r902737_rule
+      - SV-244529r1017336_rule
       - V-244529
       - mounts
 
@@ -1794,8 +1707,9 @@
       - RHEL-08-010550
       - CAT2
       - CCI-000770
+      - NIST800-53R4_IA-2
       - SRG-OS-000109-GPOS-00056
-      - SV-230296r951608_rule
+      - SV-230296r1017107_rule
       - V-230296
       - ssh
 
@@ -1810,8 +1724,9 @@
       - RHEL-08-010561
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230298r627750_rule
+      - SV-230298r1017108_rule
       - V-230298
       - rsyslog
 
@@ -1830,8 +1745,9 @@
       - RHEL-08-010570
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230299r627750_rule
+      - SV-230299r1017109_rule
       - V-230299
       - mounts
       - home
@@ -1851,8 +1767,9 @@
       - RHEL-08-010571
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230300r743959_rule
+      - SV-230300r1017110_rule
       - V-230300
       - mounts
       - boot
@@ -1872,8 +1789,9 @@
       - RHEL-08-010572
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244530r809336_rule
+      - SV-244530r1017337_rule
       - V-244530
       - mounts
       - efi
@@ -1926,8 +1844,9 @@
       - RHEL-08-010580
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230301r627750_rule
+      - SV-230301r1017111_rule
       - V-230301
       - mounts
 
@@ -1947,8 +1866,9 @@
       - RHEL-08-010590
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230302r627750_rule
+      - SV-230302r1017112_rule
       - V-230302
       - mounts
       - home
@@ -1990,8 +1910,9 @@
       - RHEL-08-010600
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230303r627750_rule
+      - SV-230303r1017113_rule
       - V-230303
       - mounts
       - media
@@ -2030,8 +1951,9 @@
       - RHEL-08-010610
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230304r627750_rule
+      - SV-230304r1017114_rule
       - V-230304
       - mounts
       - media
@@ -2071,8 +1993,9 @@
       - RHEL-08-010620
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230305r627750_rule
+      - SV-230305r1017115_rule
       - V-230305
       - mounts
       - media
@@ -2093,8 +2016,9 @@
       - RHEL-08-010630
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230306r627750_rule
+      - SV-230306r1017116_rule
       - V-230306
       - mounts
       - nfs
@@ -2115,8 +2039,9 @@
       - RHEL-08-010640
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230307r627750_rule
+      - SV-230307r1017117_rule
       - V-230307
       - mounts
       - nfs
@@ -2137,8 +2062,9 @@
       - RHEL-08-010650
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230308r627750_rule
+      - SV-230308r1017118_rule
       - V-230308
       - mounts
       - nfs
@@ -2184,8 +2110,9 @@
       - RHEL-08-010660
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230309r627750_rule
+      - SV-230309r1017119_rule
       - V-230309
       - permissions
 
@@ -2202,8 +2129,9 @@
       - RHEL-08-010670
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230310r627750_rule
+      - SV-230310r1017120_rule
       - V-230310
       - kdump
 
@@ -2239,8 +2167,9 @@
       - RHEL-08-010671
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230311r858769_rule
+      - SV-230311r1017121_rule
       - V-230311
       - sysctl
 
@@ -2257,8 +2186,9 @@
       - RHEL-08-010672
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230312r833308_rule
+      - SV-230312r1017122_rule
       - V-230312
       - systemd
 
@@ -2274,8 +2204,9 @@
       - RHEL-08-010673
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230313r627750_rule
+      - SV-230313r1017124_rule
       - V-230313
       - security
       - limits
@@ -2292,8 +2223,9 @@
       - RHEL-08-010674
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230314r627750_rule
+      - SV-230314r1017125_rule
       - V-230314
       - systemd
 
@@ -2309,8 +2241,9 @@
       - RHEL-08-010675
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230315r627750_rule
+      - SV-230315r1017126_rule
       - V-230315
       - systemd
 
@@ -2383,8 +2316,9 @@
       - RHEL-08-010680
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230316r627750_rule
+      - SV-230316r1017127_rule
       - V-230316
       - dns
 
@@ -2418,7 +2352,8 @@
       - RHEL-08-010690
       - CAT2
       - CCI-000366
-      - SV-230317r792896_rule
+      - NIST800-53R4_CM-6
+      - SV-230317r1017128_rule
       - V-230317
       - complexity-high
 
@@ -2445,8 +2380,9 @@
       - RHEL-08-010700
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230318r743960_rule
+      - SV-230318r1017129_rule
       - V-230318
       - permissions
 
@@ -2473,8 +2409,9 @@
       - RHEL-08-010710
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230319r743961_rule
+      - SV-230319r1017130_rule
       - V-230319
       - permissions
 
@@ -2506,7 +2443,9 @@
       - RHEL-08-010720
       - CAT2
       - CCI-000366
-      - SV-230320r627750_rule
+      - NIST800-53R4_CM-6
+      - SRG-OS-000480-GPOS-00227
+      - SV-230320r1017131_rule
       - V-230320
 
 # Required for RHEL-08-010730
@@ -2521,8 +2460,9 @@
       - RHEL-08-010750
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230323r627750_rule
+      - SV-230323r1017134_rule
       - V-230323
       - permissions
 
@@ -2538,8 +2478,9 @@
       - RHEL-08-010730
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230321r627750_rule
+      - SV-230321r1017132_rule
       - V-230321
       - permissions
 
@@ -2566,8 +2507,9 @@
       - RHEL-08-010731
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244531r743842_rule
+      - SV-244531r1017338_rule
       - V-244531
       - permissions
 
@@ -2586,8 +2528,9 @@
       - RHEL-08-010740
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230322r880717_rule
+      - SV-230322r1017133_rule
       - V-230322
       - permissions
 
@@ -2607,8 +2550,9 @@
       - RHEL-08-010741
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244532r743845_rule
+      - SV-244532r1017339_rule
       - V-244532
       - permissions
 
@@ -2626,8 +2570,9 @@
       - RHEL-08-010760
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230324r627750_rule
+      - SV-230324r1017135_rule
       - V-230324
       - login
       - home
@@ -2645,8 +2590,9 @@
       - RHEL-08-010770
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230325r917879_rule
+      - SV-230325r1017136_rule
       - V-230325
       - complexity-high
 
@@ -2670,8 +2616,9 @@
       - RHEL-08-010780
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230326r627750_rule
+      - SV-230326r1017137_rule
       - V-230326
       - permissions
 
@@ -2695,8 +2642,9 @@
       - RHEL-08-010790
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230327r627750_rule
+      - SV-230327r1017138_rule
       - V-230327
       - permissions
 
@@ -2713,8 +2661,9 @@
       - RHEL-08-010800
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SSV-230328r902723_rule
+      - SV-230328r1017139_rule
       - V-23032
       - complexity-high
       - mounts
@@ -2723,7 +2672,7 @@
 - name: "MEDIUM | RHEL-08-010830 | PATCH | RHEL 8 must not allow users to override SSH environment variables."
   ansible.builtin.lineinfile:
       path: /etc/ssh/sshd_config
-      regexp: (?i)^\s*PermitUserEnvironment
+      regexp: '(?i)^PermitUserEnvironment'
       line: 'PermitUserEnvironment no'
       validate: '/usr/sbin/sshd -T -f %s'
   notify: restart sshd
@@ -2735,8 +2684,9 @@
       - RHEL-08-010830
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00229
-      - SV-230330r951610_rule
+      - SV-230330r1017141_rule
       - V-230330
       - ssh
       - disruption_high
@@ -2754,8 +2704,9 @@
       - RHEL-08-020000
       - CAT2
       - CCI-000016
+      - NIST800-53R4_AC-2
       - SRG-OS-000002-GPOS-00002
-      - SV-230331r627750_rule
+      - SV-230331r1017143_rule
       - V-230331
       - accounts
 
@@ -2800,8 +2751,10 @@
       - RHEL-08-020010
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230332r627750_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230332r1017144_rule
       - V-230332
       - pamd
 
@@ -2817,8 +2770,10 @@
       - RHEL-08-020011
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230333r743966_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230333r1017145_rule
       - V-230333
       - pamd
 
@@ -2863,8 +2818,10 @@
       - RHEL-08-020012
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230334r627750_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230334r1017146_rule
       - V-230334
       - pamd
 
@@ -2880,8 +2837,10 @@
       - RHEL-08-020013
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230335r743969_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230335r1017147_rule
       - V-230335
       - pamd
 
@@ -2926,8 +2885,10 @@
       - RHEL-08-020014
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230336r627750_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230336r1017148_rule
       - V-230336
       - pamd
 
@@ -2943,8 +2904,10 @@
       - RHEL-08-020015
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230337r743972_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230337r1017149_rule
       - V-230337
       - pamd
 
@@ -2989,8 +2952,10 @@
       - RHEL-08-020016
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230338r627750_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230338r1017150_rule
       - V-230338
       - pamd
 
@@ -3006,8 +2971,10 @@
       - RHEL-08-020017
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230339r743975_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230339r1017151_rule
       - V-230339
       - pamd
 
@@ -3052,8 +3019,10 @@
       - RHEL-08-020018
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230340r627750_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230340r1017152_rule
       - V-230340
       - pamd
 
@@ -3069,8 +3038,10 @@
       - RHEL-08-020019
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230341r743978_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230341r1017153_rule
       - V-230341
       - pamd
 
@@ -3115,8 +3086,10 @@
       - RHEL-08-020020
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230342r646872_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230342r1017154_rule
       - V-230342
       - pamd
 
@@ -3132,8 +3105,10 @@
       - RHEL-08-020021
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230343r743981_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230343r1017155_rule
       - V-230343
       - pamd
 
@@ -3178,8 +3153,10 @@
       - RHEL-08-020022
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230344r646874_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230344r1017156_rule
       - V-230344
       - pamd
 
@@ -3195,9 +3172,89 @@
       - RHEL-08-020023
       - CAT2
       - CCI-000044
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-230345r743984_rule
+      - SRG-OS-000329-GPOS-00128
+      - SV-230345r1017157_rule
       - V-230345
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
+  block:
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth\s+required\s+pam_env.so'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set authfail"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set account faillock"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/system-auth
+            regexp: '^account\s+required\s+pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertbefore: '^account'
+        notify: restart sssd
+  when:
+      - rhel_08_020025
+      - ansible_distribution_version is version('8.2', '>=')
+  tags:
+      - RHEL-08-020025
+      - CAT2
+      - CCI-000044
+      - NIST800-53R4_AC-7
+      - SRG-OS-000021-GPOS-00005
+      - SRG-OS-000329-GPOS-00128
+      - SV-244533r1017340_rule
+      - V-244533
+      - pamd
+
+- name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
+  block:
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^auth\s+required\s+pam_faillock.so preauth'
+            line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock.dir }} silent audit deny={{ rhel8stig_pam_faillock.attempts }}{{ (rhel8stig_pam_faillock.fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock.interval }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}"
+            insertafter: '^auth\s+required\s+pam_env.so'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set authfail"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^auth\s+required\s+pam_faillock.so authfail'
+            line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock.dir }} unlock_time={{ rhel8stig_pam_faillock.unlock_time }}'
+            insertafter: '^auth'
+        notify: restart sssd
+
+      - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set account faillock"
+        ansible.builtin.lineinfile:
+            path: /etc/pam.d/password-auth
+            regexp: '^account\s+required\s+pam_faillock.so'
+            line: 'account    required pam_faillock.so'
+            insertbefore: '^account'
+        notify: restart sssd
+  when:
+      - rhel_08_020026
+      - ansible_distribution_version is version('8.2', '>=')
+  tags:
+      - RHEL-08-020026
+      - CAT2
+      - CCI-000044
+      - NIST800-53R4_AC-7
+      - SRG-OS-000021-GPOS-00005
+      - SRG-OS-000329-GPOS-00128
+      - SV-244534r1017341_rule
+      - V-244534
       - pamd
 
 - name: |
@@ -3228,9 +3285,11 @@
       - RHEL-08-020028
       - CAT2
       - CCI-000044
+      - CCI-002238
+      - NIST800-53R4_AC-7
       - SRG-OS-000021-GPOS-00005
-      - SV-250315r793009_rule
-      - SV-250316r793010_rule
+      - SV-250315r1017356_rule
+      - SV-250316r1017357_rule
       - V-250315
       - V-250316
       - selinux
@@ -3274,12 +3333,59 @@
       - RHEL-08-020030
       - CAT2
       - CCI-000056
+      - NIST800-53R4_AC-11
       - SRG-OS-000028-GPOS-00009
-      - SV-230347r627750_rule
+      - SRG-OS-000030-GPOS-00011
+      - SV-230347r1017160_rule
       - V-230347
       - gui
 
-- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8 must terminate idle user sessions."
+- name: "MEDIUM | RHEL-08-020031 | PATCH | RHEL 8 must initiate a session lock for graphical user interfaces when the screensaver is activated."
+  ansible.builtin.copy:
+      dest: /etc/dconf/db/local.d/00-screensaver_rhel_08_020031
+      content: |
+          [org/gnome/desktop/screensaver]
+          lock-delay=uint32 5
+      mode: 'u-x,go-wx'
+  notify: dconf update
+  when:
+      - rhel_08_020031
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020031
+      - CAT2
+      - CCI-000057
+      - NIST800-53R4_AC-11
+      - SRG-OS-000029-GPOS-00010
+      - SRG-OS-000031-GPOS-00012
+      - SRG-OS-000480-GPOS-00227
+      - SV-244535r1017342_rule
+      - V-244535
+      - dconf
+
+- name: "MEDIUM | RHEL-08-020032 | PATCH | RHEL 8 must disable the user list at logon for graphical user interfaces."
+  ansible.builtin.copy:
+      dest: /etc/dconf/db/local.d/02-login-screen_rhel_08_020032
+      content: |
+          [org/gnome/login-screen]
+          disable-user-list=true
+      mode: 'u-x,go-wx'
+  when:
+      - rhel_08_020032
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020032
+      - CAT2
+      - CCI-000366
+      - NIST800-53R4_CM-6
+      - SRG-OS-000480-GPOS-00227
+      - SV-244536r1017343_rule
+      - V-244536
+      - dconf
+
+- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8.7 and higher must terminate idle user sessions."
   ansible.builtin.lineinfile:
       path: "/etc/systemd/logind.conf"
       regexp: "{{ item.regexp }}"
@@ -3290,65 +3396,16 @@
   notify: Restart_systemdlogin
   when:
       - rhel_08_020035
+      - ansible_facts.distribution_version is version_compare('8.7', '>=')
   tags:
       - RHEL-08-020035
       - CAT2
       - CCI-001133
+      - NIST800-53R4_SC-10
       - SRG-OS-000163-GPOS-00072
-      - SV-257258r942953_rule
+      - SV-257258r1017375_rule
       - V-257258
       - session
-
-- name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions."
-  block:
-      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Install tmux"
-        ansible.builtin.package:
-            name: tmux
-            state: present
-        when: "'tmux' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-020040 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for command line sessions. | Configure tmux"
-        ansible.builtin.lineinfile:
-            path: /etc/tmux.conf
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-            create: true
-            owner: root
-            group: root
-            mode: 'u-x,go-wx'
-        loop:
-            - { regexp: '^set -g lock-command', line: 'set -g lock-command vlock' }
-            - { regexp: '^bind X lock-session', line: 'bind X lock-session' }
-  when:
-      - rhel_08_020040
-  tags:
-      - RHEL-08-020040
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-230348r902725_rule
-      - V-230348
-      - tmux
-
-- name: "MEDIUM | RHEL-08-020041 | PATCH | RHEL 8 must ensure session control is automatically started at shell initialization. | Set tmux.sh if file exists"
-  ansible.builtin.blockinfile:
-      path: /etc/profile.d/tmux.sh
-      marker: "# <!-- {mark} ANSIBLE LOCKDOWN RHEL-08-020041 MANAGED BLOCK -->"
-      block: |
-          ### Updated to recognize other session control per Red Hat Case 03115293
-          [ $( /bin/id -u ) -eq 0 ] && [ x$TMUX = x ] && exec tmux
-          [[ $( /bin/tty ) =~ '/dev/tty' ]] && [ -n "$PS1" -a -z "$TMUX" ] && exec tmux
-      create: true
-  when:
-      - rhel_08_020041
-  tags:
-      - RHEL-08-020041
-      - CAT2
-      - CCI-000056
-      - SRG-OS-000028-GPOS-00009
-      - SV-230349r917920_rule
-      - V-230349
-      - tmux
 
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   block:
@@ -3411,8 +3468,10 @@
       - RHEL-08-020050
       - CAT2
       - CCI-000056
+      - NIST800-53R4_AC-11
       - SRG-OS-000028-GPOS-00009
-      - SV-230351r792899_rule
+      - SRG-OS-000030-GPOS-00011
+      - SV-230351r1017164_rule
       - V-230351
       - smartcard
 
@@ -3458,37 +3517,12 @@
       - RHEL-08-020060
       - CAT2
       - CCI-000057
+      - NIST800-53R4_AC-11
       - SRG-OS-000029-GPOS-00010
-      - SV-230352r646876_rule
+      - SRG-OS-000031-GPOS-00012
+      - SV-230352r1017165_rule
       - V-230352
       - gui
-
-- name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity."
-  block:
-      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Install tmux if needed"
-        ansible.builtin.package:
-            name: tmux
-            state: present
-        when: "'tmux' not in ansible_facts.packages"
-
-      - name: "MEDIUM | RHEL-08-020070 | PATCH | RHEL 8 must automatically log out command line user sessions after 15 minutes of inactivity. | Set tmux settings"
-        ansible.builtin.lineinfile:
-            path: /etc/tmux.conf
-            regexp: '^set -g lock-after-time'
-            line: "set -g lock-after-time {{ rhel8stig_tmux_lock_after_time }}"
-            owner: root
-            group: root
-            mode: 'u-x,go-wx'
-  when:
-      - rhel_08_020070
-  tags:
-      - RHEL-08-020070
-      - CAT2
-      - CCI-000057
-      - SRG-OS-000029-GPOS-00010
-      - SV-230353r627750_rule
-      - V-230353
-      - tmux
 
 - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
   ansible.builtin.lineinfile:
@@ -3506,10 +3540,58 @@
       - RHEL-08-020080
       - CAT2
       - CCI-000057
+      - NIST800-53R4_AC-11
       - SRG-OS-000029-GPOS-00010
-      - SV-230354r743990_rule
+      - SRG-OS-000031-GPOS-00012
+      - SRG-OS-000480-GPOS-00227
+      - SV-230354r1017167_rule
       - V-230354
       - gui
+
+- name: "MEDIUM | RHEL-08-020081 | PATCH | RHEL 8 must prevent a user from overriding the session idle-delay setting for the graphical user interface."
+  ansible.builtin.copy:
+      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020081
+      content: |
+          /org/gnome/desktop/session/idle-delay
+      mode: 'u-x,go-wx'
+  notify: dconf update
+  when:
+      - rhel_08_020081
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020081
+      - CAT2
+      - CCI-000057
+      - NIST800-53R4_AC-11
+      - SRG-OS-000029-GPOS-00010
+      - SRG-OS-000031-GPOS-00012
+      - SRG-OS-000480-GPOS-00227
+      - SV-244538r1017345_rule
+      - V-244538
+
+- name: "MEDIUM | RHEL-08-020082 | PATCH | RHEL 8 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
+  ansible.builtin.copy:
+      dest: /etc/dconf/db/local.d/locks/session_rhel_08_020082
+      content: |
+          /org/gnome/desktop/screensaver/lock-enabled
+      mode: 'u-x,go-wx'
+  notify: dconf update
+  when:
+      - rhel_08_020082
+      - rhel8stig_always_configure_dconf
+      - rhel8stig_gui
+  tags:
+      - RHEL-08-020082
+      - CAT2
+      - CCI-000057
+      - NIST800-53R4_AC-11
+      - SRG-OS-000029-GPOS-00010
+      - SRG-OS-000031-GPOS-00012
+      - SRG-OS-000480-GPOS-00227
+      - SV-244539r1017346_rule
+      - V-244539
+      - dconf
 
 - name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
   ansible.builtin.lineinfile:
@@ -3532,8 +3614,9 @@
       - RHEL-08-020090
       - CAT2
       - CCI-000187
+      - NIST800-53R4_IA-5
       - SRG-OS-000068-GPOS-00036
-      - SV-230355r858743_rule
+      - SV-230355r1017168_rule
       - V-230355
       - authentication
 
@@ -3552,8 +3635,9 @@
       - RHEL-08-020100
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000069-GPOS-00037
-      - SV-230356r902728_rule
+      - SV-230356r982195_rule
       - V-230356
       - pamd
 
@@ -3572,8 +3656,9 @@
       - RHEL-08-020101
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251713r902740_rule
+      - SV-251713r1017366_rule
       - V-251713
       - pamd
 
@@ -3612,8 +3697,9 @@
       - RHEL-08-020102
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251714r902743_rule
+      - SV-251714r1017367_rule
       - V-251714
       - pamd
 
@@ -3652,8 +3738,9 @@
       - RHEL-08-020103
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251715r902746_rule
+      - SV-251715r1017368_rule
       - V-251715
       - pamd
 
@@ -3670,8 +3757,9 @@
       - RHEL-08-020104
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251716r858737_rule
+      - SV-251716r1017369_rule
       - V-251716
       - pamd
 
@@ -3690,8 +3778,9 @@
       - RHEL-08-020110
       - CAT2
       - CCI-000192
+      - NIST800-53R4_IA-5
       - SRG-OS-000069-GPOS-00037
-      - SV-230357r858771_rule
+      - SV-230357r1017169_rule
       - V-230357
       - pwquality
 
@@ -3710,8 +3799,9 @@
       - RHEL-08-020120
       - CAT2
       - CCI-00019
+      - NIST800-53R4_IA-5
       - SRG-OS-000070-GPOS-00038
-      - SV-230358r858773_rule
+      - SV-230358r1017170_rule
       - V-230358
       - pwquality
 
@@ -3730,8 +3820,9 @@
       - RHEL-08-020130
       - CAT2
       - CCI-000194
+      - NIST800-53R4_IA-5
       - SRG-OS-000071-GPOS-00039
-      - SV-230359r858775_rule
+      - SV-230359r1017171_rule
       - V-230359
       - pwquality
 
@@ -3750,8 +3841,9 @@
       - RHEL-08-020140
       - CAT2
       - CCI-000195
+      - NIST800-53R4_IA-5
       - SRG-OS-000072-GPOS-00040
-      - SV-230360r858777_rule
+      - SV-230360r1017172_rule
       - V-230360
       - pwquality
 
@@ -3770,8 +3862,9 @@
       - RHEL-08-020150
       - CAT2
       - CCI-000195
+      - NIST800-53R4_IA-5
       - SRG-OS-000072-GPOS-00040
-      - SV-230361r858779_rule
+      - SV-230361r1017173_rule
       - V-230361
       - pwquality
 
@@ -3790,8 +3883,9 @@
       - RHEL-08-020160
       - CAT2
       - CCI-000195
+      - NIST800-53R4_IA-5
       - SRG-OS-000072-GPOS-00040
-      - SV-230362r858781_rule
+      - SV-230362r1017174_rule
       - V-230362
       - pwquality
 
@@ -3810,8 +3904,9 @@
       - RHEL-08-020170
       - CAT2
       - CCI-000195
+      - NIST800-53R4_IA-5
       - SRG-OS-000072-GPOS-00040
-      - SV-230363r858783_rule
+      - SV-230363r1017175_rule
       - V-230363
       - pwquality
 
@@ -3832,8 +3927,9 @@
       - RHEL8-08-020180
       - CAT2
       - CCI-000198
+      - NIST800-53R4_IA-5
       - SRG-OS-000075-GPOS-00043
-      - SV-230364r627750_rule
+      - SV-230364r1017176_rule
       - V-230364
       - password
 
@@ -3852,8 +3948,9 @@
       - RHEL-08-020190
       - CAT2
       - CCI-000198
+      - NIST800-53R4_IA-5
       - SRG-OS-000075-GPOS-00043
-      - SV-230365r858727_rule
+      - SV-230365r1017177_rule
       - V-230365
       - login
 
@@ -3872,8 +3969,9 @@
       - RHEL-08-020200
       - CAT2
       - CCI-000199
+      - NIST800-53R4_IA-5
       - SRG-OS-000076-GPOS-00044
-      - SV-230366r646878_rule
+      - SV-230366r1017178_rule
       - V-230366
       - login
 
@@ -3901,89 +3999,12 @@
       - RHEL-08-020210
       - CAT2
       - CCI-000199
+      - NIST800-53R4_IA-5
       - SRG-OS-000076-GPOS-00044
-      - SV-230367r627750_rule
+      - SV-230367r1017179_rule
       - V-230367
       - disruption-high
       - password
-
-- name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations."
-  block:
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Get pam_pwhistory status"
-        ansible.builtin.shell: cat /etc/pam.d/password-auth | grep "password.*requisite.*pam_pwhistory.so"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020220_pwhistory_status
-
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pw_history"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/password-auth
-            regexp: 'password\s+(required|requisite)\s+pam_pwhistory.so use_authtok remember='
-            line: "password    requisite pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
-            insertafter: '^password'
-            owner: root
-            group: root
-            mode: "{{ rhel8stig_pamd_file_perms }}"
-        when: rhel_08_020220_pwhistory_status.stdout | length == 0
-
-      - name: "MEDIUM | RHEL-08-020220 | RHEL 8 must be configured in the password-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
-        community.general.pamd:
-            name: password-auth
-            type: password
-            control: requisite
-            module_path: pam_pwhistory.so
-            module_arguments: 'remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}'
-            state: args_present
-        when: rhel_08_020220_pwhistory_status.stdout | length > 0
-  when:
-      - rhel_08_020220
-  tags:
-      - RHEL-08-020220
-      - CAT2
-      - CCI-000200
-      - SRG-OS-000077-GPOS-00045
-      - SV-230368r902759_rule
-      - V-230368
-      - pamd
-
-- name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations."
-  block:
-      - name: "MEDIUM | RHEL-08-020221 | AUDIT | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Get pam_pwhistory state "
-        ansible.builtin.shell: cat /etc/pam.d/system-auth | grep "password.*requisite.*pam_pwhistory.so"
-        changed_when: false
-        failed_when: false
-        register: rhel_08_020221_pwhistory_status
-
-      - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if no pw required pwhistory"
-        ansible.builtin.lineinfile:
-            path: /etc/pam.d/system-auth
-            regexp: 'password\s+(required|requisite)\s+pam_pwhistory.so use_authtok remember='
-            line: "password    requisite pam_pwhistory.so use_authtok remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}"
-            insertafter: '^password'
-            owner: root
-            group: root
-            mode: "{{ rhel8stig_pamd_file_perms }}"
-        when: rhel_08_020221_pwhistory_status.stdout | length == 0
-
-      - name: "MEDIUM | RHEL-08-020221 | PATCH | RHEL 8 must be configured in the system-auth file to prohibit password reuse for a minimum of five generations. | Set if pw required pwhistory exists"
-        community.general.pamd:
-            name: system-auth
-            type: password
-            control: requisite
-            module_path: pam_pwhistory.so
-            module_arguments: 'remember={{ rhel8stig_pam_pwhistory.remember | default(5) }}'
-            state: args_present
-        when: rhel_08_020221_pwhistory_status.stdout | length > 0
-  when:
-      - rhel_08_020221
-  tags:
-      - RHEL-08-020221
-      - CAT2
-      - CCI-000200
-      - SRG-OS-000077-GPOS-00045
-      - SV-251717r902749_rule
-      - V-251717
-      - pamd
 
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
   ansible.builtin.lineinfile:
@@ -4000,8 +4021,9 @@
       - RHEL-08-020230
       - CAT2
       - CCI-000205
+      - NIST800-53R4_IA-5
       - SRG-OS-000078-GPOS-00046
-      - SV-230369r858785_rule
+      - SV-230369r1017181_rule
       - V-230369
       - pwquality
 
@@ -4019,8 +4041,9 @@
       - RHEL-08-020231
       - CAT2
       - CCI-000205
+      - NIST800-53R4_IA-5
       - SRG-OS-000078-GPOS-00046
-      - SV-230370r627750_rule
+      - SV-230370r1017182_rule
       - V-230370
       - passwords
 
@@ -4043,8 +4066,9 @@
       - RHEL-08-020240
       - CAT2
       - CCI-000764
+      - NIST800-53R4_IA-2
       - SRG-OS-000104-GPOS-00051
-      - SV-230371r627750_rule
+      - SV-230371r1017183_rule
       - V-230371
       - user
 
@@ -4128,8 +4152,12 @@
       - RHEL-08-020250
       - CAT2
       - CCI-000765
+      - NIST800-53R4_IA-2
       - SRG-OS-000105-GPOS-00052
-      - SV-230372r942945_rule
+      - SRG-OS-000106-GPOS-00053
+      - SRG-OS-000107-GPOS-00054
+      - SRG-OS-000108-GPOS-00055
+      - SV-230372r1017184_rule
       - V-230372
       - pamd
 
@@ -4141,8 +4169,9 @@
       - RHEL-08-020260
       - CAT2
       - CCI-000795
+      - NIST800-53R4_IA-4
       - SRG-OS-000118-GPOS-00060
-      - SV-230373r627750_rule
+      - SV-230373r1017185_rule
       - V-230373
       - useradd
 
@@ -4165,8 +4194,9 @@
       - RHEL-08-020270
       - CAT2
       - CCI-001682
+      - NIST800-53R4_AC-2
       - SRG-OS-000123-GPOS-00064
-      - SV-230374r903129_rule
+      - SV-230374r1017186_rule
       - V-230374
       - user
 
@@ -4185,8 +4215,9 @@
       - RHEL-08-020280
       - CAT2
       - CCI-001619
+      - NIST800-53R4_IA-5
       - SRG-OS-000266-GPOS-00101
-      - SV-230375r858787_rule
+      - SV-230375r1017187_rule
       - V-230375
       - pwquality
 
@@ -4209,8 +4240,9 @@
       - RHEL-08-020290
       - CAT2
       - CCI-002007
+      - NIST800-53R4_IA-5
       - SRG-OS-000383-GPOS-00166
-      - SV-230376r942948_rule
+      - SV-230376r958828_rule
       - V-230376
       - sssd
 
@@ -4229,8 +4261,9 @@
       - RHEL-08-020300
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00225
-      - SV-230377r858789_rule
+      - SV-230377r1017188_rule
       - V-230377
       - pwquality
 
@@ -4248,8 +4281,9 @@
       - RHEL-08-020310
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00226
-      - SV-230378r627750_rule
+      - SV-230378r1017189_rule
       - V-230378
       - login
 
@@ -4282,8 +4316,9 @@
       - RHEL-08-020320
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230379r627750_rule
+      - SV-230379r1017190_rule
       - V-230379
       - accounts
 
@@ -4301,8 +4336,9 @@
       - RHEL-08-020350
       - CAT2
       - CCI-000052
+      - NIST800-53R4_AC-9
       - SRG-OS-000480-GPOS-00227
-      - SV-230382r951614_rule
+      - SV-230382r991589_rule
       - V-230382
       - ssh
 
@@ -4320,8 +4356,9 @@
       - RHEL-08-020351
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00228
-      - SV-230383r627750_rule
+      - SV-230383r1017192_rule
       - V-230383
       - login
       - umask
@@ -4353,8 +4390,9 @@
       - RHEL-08-020352
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00228
-      - SV-230384r858732_rule
+      - SV-230384r1017193_rule
       - V-230384
       - umask
 
@@ -4373,8 +4411,9 @@
       - RHEL-08-020353
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230385r792902_rule
+      - SV-230385r1017194_rule
       - V-230385
       - umask
 
@@ -4389,8 +4428,10 @@
       - RHEL-08-030000
       - CAT2
       - CCI-002233
+      - NIST800-53R4_AC-6
       - SRG-OS-000326-GPOS-00126
-      - SV-230386r627750_rule
+      - SRG-OS-000327-GPOS-00127
+      - SV-230386r958730_rule
       - V-230386
       - auditd
 
@@ -4405,8 +4446,9 @@
       - RHEL-08-030010
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230387r743996_rule
+      - SV-230387r1017195_rule
       - V-230387
       - cron
       - rsyslog
@@ -4426,8 +4468,9 @@
       - RHEL-08-030020
       - CAT2
       - CCI-000139
+      - NIST800-53R4_AU-5
       - SRG-OS-000046-GPOS-00022
-      - SV-230388r627750_rule
+      - SV-230388r1017196_rule
       - V-230388
       - auditd
 
@@ -4442,8 +4485,9 @@
       - RHEL-08-030030
       - CAT2
       - CCI-000139
+      - NIST800-53R4_AU-5
       - SRG-OS-000046-GPOS-00022
-      - SV-230389r627750_rule
+      - SV-230389r1017197_rule
       - V-230389
       - aliases
 
@@ -4458,8 +4502,9 @@
       - RHEL-08-030040
       - CAT2
       - CCI-000140
+      - NIST800-53R4_AU-5
       - SRG-OS-000047-GPOS-00023
-      - SV-230390r627750_rule
+      - SV-230390r1017198_rule
       - V-230390
       - auditd
 
@@ -4474,8 +4519,9 @@
       - RHEL-08-030060
       - CAT2
       - CCI-000140
+      - NIST800-53R4_AU-5
       - SRG-OS-000047-GPOS-00023
-      - SV-230392r627750_rule
+      - SV-230392r1017199_rule
       - V-230392
       - auditd
 
@@ -4490,8 +4536,9 @@
       - RHEL-08-030061
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230393r627750_rule
+      - SV-230393r1017200_rule
       - V-230393
       - auditd
 
@@ -4507,8 +4554,9 @@
       - RHEL-08-030062
       - CAT2
       - CCI-001851
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
-      - SV-230394r627750_rule
+      - SV-230394r958754_rule
       - V-230394
       - auditd
 
@@ -4535,8 +4583,9 @@
       - RHEL-08-030070
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230396r902733_rule
+      - SV-230396r1017202_rule
       - V-230396
       - permissions
       - log
@@ -4561,8 +4610,12 @@
       - RHEL-08-030080
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230397r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SRG-OS-000206-GPOS-00084
+      - SV-230397r1017203_rule
       - V-230397
       - permissions
       - log
@@ -4579,8 +4632,11 @@
       - RHEL-08-030090
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230398r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230398r1017204_rule
       - V-230398
       - permissions
       - log
@@ -4608,8 +4664,11 @@
       - RHEL-08-030100
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230399r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230399r1017205_rule
       - V-230399
       - permissions
       - log
@@ -4638,8 +4697,11 @@
       - RHEL-08-030110
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230400r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230400r1017206_rule
       - V-230400
       - permissions
       - log
@@ -4665,8 +4727,11 @@
       - RHEL-08-030120
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230401r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230401r1017207_rule
       - V-230401
       - permissions
       - log
@@ -4683,8 +4748,11 @@
       - RHEL-08-030121
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230402r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230402r1017208_rule
       - V-230402
       - auditd
 
@@ -4699,8 +4767,11 @@
       - RHEL-08-030122
       - CAT2
       - CCI-000162
+      - NIST800-53R4_AU-9
       - SRG-OS-000057-GPOS-00027
-      - SV-230403r627750_rule
+      - SRG-OS-000058-GPOS-00028
+      - SRG-OS-000059-GPOS-00029
+      - SV-230403r1017209_rule
       - V-230403
       - auditd
 
@@ -4716,8 +4787,23 @@
       - RHEL-08-030130
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230404r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000466-GPOS-00210
+      - SRG-OS-000476-GPOS-00221
+      - SV-230404r1017210_rule
       - V-230404
       - auditd
 
@@ -4733,8 +4819,22 @@
       - RHEL-08-030140
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230405r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230405r1017211_rule
       - V-230405
       - auditd
 
@@ -4750,8 +4850,22 @@
       - RHEL-08-030150
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230406r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230406r1017212_rule
       - V-230406
       - auditd
 
@@ -4767,8 +4881,22 @@
       - RHEL-08-030160
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230407r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230407r1017213_rule
       - V-230407
       - auditd
 
@@ -4784,8 +4912,22 @@
       - RHEL-08-030170
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230408r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230408r1017214_rule
       - V-230408
       - auditd
 
@@ -4801,8 +4943,22 @@
       - RHEL-08-030171
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230409r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230409r1017215_rule
       - V-230409
       - auditd
 
@@ -4818,8 +4974,22 @@
       - RHEL-08-030172
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230410r627750_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230410r1017216_rule
       - V-230410
       - auditd
 
@@ -4833,8 +5003,22 @@
       - rhel_08_030180
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230411r744000_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-230411r1017217_rule
       - V-230411
       - dnf
       - auditd
@@ -4850,8 +5034,22 @@
       - RHEL-08-030181
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-244542r818838_rule
+      - SRG-OS-000004-GPOS-00004
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000304-GPOS-00121
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000470-GPOS-00214
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000239-GPOS-00089
+      - SRG-OS-000240-GPOS-00090
+      - SRG-OS-000241-GPOS-00091
+      - SRG-OS-000303-GPOS-00120
+      - SRG-OS-000476-GPOS-00221
+      - SV-244542r1017348_rule
       - V-244542
       - auditd
 
@@ -4866,8 +5064,16 @@
       - RHEL-08-030190
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230412r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000064-GPOS-00032
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000466-GPOS-00210
+      - SV-230412r1017218_rule
       - V-230412
       - auditd
 
@@ -4882,8 +5088,19 @@
       - RHEL-08-030200
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230413r810463_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000458-GPOS-00203
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000463-GPOS-00207
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000474-GPOS-00219
+      - SRG-OS-000466-GPOS-00210
+      - SV-230413r1017219_rule
       - V-230413
       - auditd
 
@@ -4898,8 +5115,15 @@
       - RHEL-08-030250
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230418r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SV-230418r1017220_rule
       - V-230418
       - auditd
 
@@ -4914,8 +5138,15 @@
       - RHEL-08-030260
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230419r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000468-GPOS-00212
+      - SRG-OS-000471-GPOS-00215
+      - SV-230419r1017221_rule
       - V-230419
       - auditd
 
@@ -4930,8 +5161,14 @@
       - RHEL-08-030280
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230421r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230421r1017222_rule
       - V-230421
       - auditd
 
@@ -4946,8 +5183,14 @@
       - RHEL-08-030290
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230422r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230422r1017223_rule
       - V-230422
       - auditd
 
@@ -4962,8 +5205,14 @@
       - RHEL-08-030300
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230423r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230423r1017224_rule
       - V-230423
       - auditd
 
@@ -4978,8 +5227,14 @@
       - RHEL-08-030301
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230424r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230424r1017225_rule
       - V-230424
       - auditd
 
@@ -4994,8 +5249,14 @@
       - RHEL-08-030302
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230425r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230425r1017226_rule
       - V-230425
       - auditd
 
@@ -5010,8 +5271,14 @@
       - RHEL-08-030310
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230426r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230426r1017227_rule
       - V-230426
       - auditd
 
@@ -5026,8 +5293,14 @@
       - RHEL-08-030311
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230427r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230427r1017228_rule
       - V-230427
       - auditd
 
@@ -5042,8 +5315,14 @@
       - RHEL-08-030312
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230428r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230428r1017229_rule
       - V-230428
       - auditd
 
@@ -5058,8 +5337,14 @@
       - RHEL-08-030313
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230429r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230429r1017230_rule
       - V-230429
       - auditd
 
@@ -5074,8 +5359,14 @@
       - RHEL-08-030314
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230430r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230430r1017231_rule
       - V-230430
       - auditd
 
@@ -5090,8 +5381,14 @@
       - RHEL-08-030315
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230431r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230431r1017232_rule
       - V-230431
       - auditd
 
@@ -5106,8 +5403,14 @@
       - RHEL-08-030316
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230432r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230432r1017233_rule
       - V-230432
       - auditd
 
@@ -5122,8 +5425,14 @@
       - RHEL-08-030317
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230433r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230433r1017234_rule
       - V-230433
       - auditd
 
@@ -5138,8 +5447,14 @@
       - RHEL-08-030320
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230434r744002_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230434r1017235_rule
       - V-230434
       - auditd
 
@@ -5154,8 +5469,14 @@
       - RHEL-08-030330
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230435r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230435r1017236_rule
       - V-230435
       - auditd
 
@@ -5170,8 +5491,14 @@
       - RHEL-08-030340
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230436r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230436r1017237_rule
       - V-230436
       - auditd
 
@@ -5186,8 +5513,14 @@
       - RHEL-08-030350
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230437r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230437r1017238_rule
       - V-230437
       - auditd
 
@@ -5202,8 +5535,14 @@
       - RHEL-08-030360
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230438r810464_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230438r1017241_rule
       - V-230438
       - auditd
 
@@ -5218,8 +5557,14 @@
       - RHEL-08-030361
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230439r810465_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230439r1017243_rule
       - V-230439
       - auditd
 
@@ -5234,8 +5579,14 @@
       - RHEL-08-030370
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230444r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230444r1017244_rule
       - V-230444
       - auditd
 
@@ -5250,8 +5601,14 @@
       - RHEL-08-030390
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230446r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230446r1017245_rule
       - V-230446
       - auditd
 
@@ -5266,8 +5623,14 @@
       - RHEL-08-030400
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230447r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230447r1017246_rule
       - V-230447
       - auditd
 
@@ -5282,8 +5645,14 @@
       - RHEL-08-030410
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230448r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SV-230448r1017247_rule
       - V-230448
       - auditd
 
@@ -5298,8 +5667,15 @@
       - RHEL-08-030420
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230449r810455_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SV-230449r1017249_rule
       - V-230449
       - auditd
 
@@ -5314,8 +5690,16 @@
       - RHEL-08-030480
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230455r810459_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230455r1017251_rule
       - V-230455
       - auditd
 
@@ -5330,8 +5714,16 @@
       - RHEL-08-030490
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230456r810462_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230456r1017253_rule
       - V-230456
       - auditd
 
@@ -5346,8 +5738,16 @@
       - RHEL-08-030550
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230462r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230462r1017254_rule
       - V-230462
       - auditd
 
@@ -5362,8 +5762,16 @@
       - RHEL-08-030560
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230463r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230463r1017255_rule
       - V-230463
       - auditd
 
@@ -5378,8 +5786,16 @@
       - RHEL-08-030570
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230464r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000064-GPOS-00033
+      - SRG-OS-000466-GPOS-00210
+      - SV-230464r1017256_rule
       - V-230464
       - auditd
 
@@ -5394,8 +5810,16 @@
       - RHEL-08-030580
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230465r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000471-GPOS-00216
+      - SRG-OS-000477-GPOS-00222
+      - SV-230465r1017257_rule
       - V-230465
       - auditd
 
@@ -5410,8 +5834,15 @@
       - RHEL-08-030590
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230466r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000473-GPOS-00218
+      - SV-230466r1017258_rule
       - V-230466
       - auditd
 
@@ -5426,8 +5857,15 @@
       - RHEL-08-030600
       - CAT2
       - CCI-000169
+      - NIST800-53R4_AU-12
       - SRG-OS-000062-GPOS-00031
-      - SV-230467r627750_rule
+      - SRG-OS-000037-GPOS-00015
+      - SRG-OS-000042-GPOS-00020
+      - SRG-OS-000392-GPOS-00172
+      - SRG-OS-000462-GPOS-00206
+      - SRG-OS-000471-GPOS-00215
+      - SRG-OS-000473-GPOS-00218
+      - SV-230467r1017259_rule
       - V-230467
       - auditd
 
@@ -5444,8 +5882,9 @@
       - RHEL-08-030610
       - CAT2
       - CCI-000171
+      - NIST800-53R4_AU-12
       - SRG-OS-000063-GPOS-00032
-      - SV-230471r627750_rule
+      - SV-230471r1017262_rule
       - V-230471
       - permissions
       - auditd
@@ -5470,8 +5909,9 @@
       - RHEL-08-030620
       - CAT2
       - CCI-001493
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230472r627750_rule
+      - SV-230472r1017263_rule
       - V-230472
       - permissions
       - auditd
@@ -5495,8 +5935,11 @@
       - RHEL-08-030630
       - CAT2
       - CCI-001493
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230473r744008_rule
+      - SRG-OS-000257-GPOS-00098
+      - SRG-OS-000258-GPOS-00099
+      - SV-230473r1017264_rule
       - V-230473
       - permissions
       - auditd
@@ -5519,9 +5962,12 @@
   tags:
       - RHEL-08-030640
       - CAT2
-      - CCI-00149
+      - CCI-001493
+      - NIST800-53R4_AU-9
       - SRG-OS-000256-GPOS-00097
-      - SV-230474r627750_rule
+      - SRG-OS-000257-GPOS-00098
+      - SRG-OS-000258-GPOS-00099
+      - SV-230474r1017265_rule
       - V-230474
       - permissions
       - auditd
@@ -5548,8 +5994,9 @@
       - RHEL-08-030650
       - CAT2
       - CCI-001496
+      - NIST800-53R4_AU-9
       - SRG-OS-000278-GPOS-00108
-      - SV-230475r880722_rule
+      - SV-230475r1017266_rule
       - V-230475
       - aide
 
@@ -5579,8 +6026,9 @@
       - RHEL-08-030660
       - CAT2
       - CCI-001849
+      - NIST800-53R4_AU-4
       - SRG-OS-000341-GPOS-00132
-      - SV-230476r809313_rule
+      - SV-230476r958752_rule
       - V-230476
       - auditd
 
@@ -5595,8 +6043,9 @@
       - RHEL-08-030670
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230477r627750_rule
+      - SV-230477r1017267_rule
       - V-230477
       - rsyslog
 
@@ -5611,8 +6060,9 @@
       - RHEL-08-030680
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230478r744011_rule
+      - SV-230478r1017268_rule
       - V-230478
       - gnutls
       - rsyslog
@@ -5628,7 +6078,9 @@
       - RHEL-08-030690
       - CAT2
       - CCI-001851
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
+      - SRG-OS-000479-GPOS-00224
       - SV-230479r917883_rule
       - V-230479
       - auditd
@@ -5646,8 +6098,10 @@
       - RHEL-08-030700
       - CAT2
       - CCI-001851
+      - NIST800-53R4_CM-6
       - SRG-OS-000342-GPOS-00133
-      - SV-230480r627750_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230480r958754_rule
       - V-230480
       - auditd
 
@@ -5669,8 +6123,10 @@
       - RHEL-08-030710
       - CAT2
       - CCI-001851
+      - NIST800-53R4_CM-6
       - SRG-OS-000342-GPOS-00133
-      - SV-230481r818840_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230481r958754_rule
       - V-230481
       - auditd
       - rsyslog
@@ -5687,8 +6143,10 @@
       - rhel_08_030720
       - CAT2
       - CCI-001851
+      - NIST800-53R4_AU-4
       - SRG-OS-000342-GPOS-00133
-      - SV-230482r627750_rule
+      - SRG-OS-000479-GPOS-00224
+      - SV-230482r958754_rule
       - V-230482
       - auditd
       - rsyslog
@@ -5704,8 +6162,9 @@
       - RHEL-08-030730
       - CAT2
       - CCI-001855
+      - NIST800-53R4_AU-5
       - SRG-OS-000343-GPOS-00134
-      - SV-230483r744014_rule
+      - SV-230483r971542_rule
       - V-230483
       - auditd
 
@@ -5720,8 +6179,9 @@
       - RHEL-08-030731
       - CAT2
       - CCI-001855
+      - NIST800-53R4_AU-5
       - SRG-OS-000343-GPOS-00134
-      - SV-244543r743878_rule
+      - SV-244543r971542_rule
       - V-244543
       - auditd
 
@@ -5738,8 +6198,11 @@
       - RHEL-08-030740
       - CAT2
       - CCI-001891
+      - NIST800-53R4_AU-8
       - SRG-OS-000355-GPOS-00143
-      - SV-230484r627750_rule
+      - SRG-OS-000356-GPOS-00144
+      - SRG-OS-000359-GPOS-00146
+      - SV-230484r1017382_rule
       - V-230484
       - chrony
 
@@ -5753,8 +6216,9 @@
       - RHEL-08-040001
       - CAT2
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230488r627750_rule
+      - SV-230488r1017272_rule
       - V-230488
       - dnf
       - abrt
@@ -5770,8 +6234,9 @@
       - RHEL-08-040002
       - CAT2
       - CCI-00038
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230489r627750_rule
+      - SV-230489r1017273_rule
       - V-230489
       - dnf
       - sendmail
@@ -5797,8 +6262,9 @@
       - RHEL-08-040020
       - CAT2
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000095-GPOS-00049
-      - SV-230493r942915_rule
+      - SV-230493r1017276_rule
       - V-230493
       - camera
 
@@ -5812,11 +6278,6 @@
               changed_when: false
               failed_when: false
               check_mode: false
-              when:
-                  - rhel_08_040030
-              tags:
-                  - RHEL-08-040030
-                  - firewall
 
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
               ansible.builtin.debug:
@@ -5825,19 +6286,10 @@
                       - "{{ rhel8stig_ppsm_clsa_check_firewalld.stdout_lines }}"
               changed_when: true
               when:
-                  - rhel_08_040030
                   - rhel8stig_ppsm_clsa_check_firewalld.stdout_lines is defined
-              tags:
-                  - RHEL-08-040030
-                  - firewall
         when:
-            - rhel_08_040030
-            - not rhel8stig_system_is_chroot
             - rhel8stig_firewall_service == "firewalld"
             - rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
 
       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | IPTables block"
         block:
@@ -5847,10 +6299,6 @@
               changed_when: false
               failed_when: false
               check_mode: false
-              when: rhel_08_040030
-              tags:
-                  - RHEL-08-040030
-                  - firewall
 
             - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
               ansible.builtin.debug:
@@ -5859,42 +6307,29 @@
                       - "{{ rhel8stig_ppsm_clsa_check_iptables.stdout_lines }}"
               changed_when: true
               when:
-                  - rhel_08_040030
-                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is defined
-              tags:
-                  - RHEL-08-040030
-                  - firewall
+                  - rhel8stig_ppsm_clsa_check_iptables.stdout_lines is definedl
         when:
-            - rhel_08_040030
-            - not rhel8stig_system_is_chroot
             - rhel8stig_firewall_service == "iptables"
             - rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
 
       - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Warn no firewall is in use"
         ansible.builtin.debug:
             msg: "Your configured firewall service is {{ rhel8stig_firewall_service }}, but you have set the variable rhel8stig_start_firewall_service to false. We cannot audit control RHEL-08-040030 - RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
         changed_when: true
         when:
-            - rhel_08_040030
             - not rhel8stig_start_firewall_service
-        tags:
-            - RHEL-08-040030
-            - firewall
   when:
       - rhel_08_040030
       - not rhel8stig_system_is_chroot
       - rhel8stig_firewall_service != "not_required"
-
       - rhel8stig_disruptive
   tags:
       - RHEL-08-040030
       - CAT2
       - CCI-000382
+      - NIST800-53R4_CM-7
       - SRG-OS-000096-GPOS-00050
-      - SV-230500r627750_rule
+      - SV-230500r1017283_rule
       - V-230500
       - firewall
 
@@ -5918,8 +6353,9 @@
       - RHEL-08-040070
       - CAT2
       - CCI-000778
+      - NIST800-53R4_IA-3
       - SRG-OS-000114-GPOS-00059
-      - SV-230502r627750_rule
+      - SV-230502r1017284_rule
       - V-230502
       - autofs
 
@@ -5942,8 +6378,10 @@
       - RHEL-08-040080
       - CAT2
       - CCI-000778
+      - NIST800-53R4_IA-3
       - SRG-OS-000114-GPOS-00059
-      - SV-230503r942936_rule
+      - SRG-OS-000378-GPOS-00163
+      - SV-230503r1017285_rule
       - V-230503
       - usb_devices
 
@@ -5967,8 +6405,9 @@
       - RHEL-08-040100
       - CAT2
       - CCI-002314
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-230505r744020_rule
+      - SV-230505r958672_rule
       - V-230505
       - firewall
       - iptables
@@ -5994,12 +6433,14 @@
       - RHEL-08-040101
       - CAT2
       - CCI-002314
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-244544r743881_rule
+      - SV-244544r958672_rule
       - V-244544
       - firewalld
       - firewall
 
+# After previous controls as they are dependancies
 - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
   block:
       - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone"
@@ -6085,8 +6526,9 @@
       - RHEL-08-040090
       - CAT2
       - CCI-002314
+      - NIST800-53R4_AC-17
       - SRG-OS-000297-GPOS-00115
-      - SV-230504r942942_rule
+      - SV-230504r958672_rule
       - V-230504
       - firewall
 
@@ -6115,8 +6557,9 @@
       - RHEL-08-040110
       - CAT2
       - CCI-001444
+      - NIST800-53R4_AC-18
       - SRG-OS-000299-GPOS-00117
-      - SV-230506r627750_rule
+      - SV-230506r1017286_rule
       - V-230506
       - wifi
 
@@ -6152,8 +6595,9 @@
       - RHEL-08-040111
       - CAT2
       - CCI-001443
+      - NIST800-53R4_AC-18
       - SRG-OS-000300-GPOS-00118
-      - SV-230507r942939_rule
+      - SV-230507r1017287_rule
       - V-230507
       - bluetooth
 
@@ -6167,6 +6611,7 @@
       src: tmpfs
       fstype: tmpfs
       opts: "defaults{{ rhel_08_040120 | ternary (',nodev', '') }}{{ rhel_08_040121 | ternary (',nosuid', '') }}{{ rhel_08_040122 | ternary (',noexec', '') }}"
+  notify: systemctl daemon-reload
   when:
       - rhel_08_040120 or
         rhel_08_040121 or
@@ -6177,10 +6622,11 @@
       - RHEL-08-040121
       - RHEL-08-040122
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230508r627750_rule
-      - SV-230509r627750_rule
-      - SV-230510r627750_rule
+      - SV-230508r958804_rule
+      - SV-230509r958804_rule
+      - SV-230510r958804_rule
       - V-230508
       - V-230509
       - V-230510
@@ -6223,12 +6669,13 @@
       - CAT2
       - RHEL-08-040123
       - RHEL-08-040124
-      - RHEL-08-04125
+      - RHEL-08-040125
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230511r627750_rule
-      - SV-230512r627750_rule
-      - SV-230513r627750_rule
+      - SV-230511r958804_rule
+      - SV-230512r958804_rule
+      - SV-230513r958804_rule
       - V-230511
       - V-230512
       - V-230513
@@ -6272,10 +6719,11 @@
       - RHEL-08-040127
       - RHEL-08-040128
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230514r627750_rule
-      - SV-230515r627750_rule
-      - SV-230516r627750_rule
+      - SV-230514r958804_rule
+      - SV-230515r958804_rule
+      - SV-230516r958804_rule
       - V-230514
       - V-230515
       - V-230516
@@ -6319,10 +6767,11 @@
       - RHEL-08-040130
       - RHEL-08-040131
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230517r627750_rule
-      - SV-230518r627750_rule
-      - SV-230519r627750_rule
+      - SV-230517r958804_rule
+      - SV-230518r958804_rule
+      - SV-230519r958804_rule
       - V-230517
       - V-230518
       - V-230519
@@ -6366,10 +6815,11 @@
       - RHEL-08-040133
       - RHEL-08-040134
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230520r792927_rule
-      - SV-230521r792930_rule
-      - SV-230522r792933_rule
+      - SV-230520r958804_rule
+      - SV-230521r958804_rule
+      - SV-230522r958804_rule
       - V-230520
       - V-230521
       - V-230522
@@ -6386,8 +6836,11 @@
       - RHEL-08-040135
       - CAT2
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-230523r744023_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-230523r958804_rule
       - V-230523
       - fapolicy
 
@@ -6401,8 +6854,11 @@
       - RHEL-08-040136
       - CAT2
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-244545r743884_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-244545r958804_rule
       - V-244545
       - fapolicy
 
@@ -6453,8 +6909,11 @@
       - RHEL-08-040137
       - CAT2
       - CCI-001764
+      - NIST800-53R4_CM-7
       - SRG-OS-000368-GPOS-00154
-      - SV-244546r858730_rule
+      - SRG-OS-000370-GPOS-00155
+      - SRG-OS-000480-GPOS-00232
+      - SV-244546r1017349_rule
       - V-244546
       - fapolicy
 
@@ -6497,10 +6956,11 @@
       - RHEL-08-040141
       - CAT2
       - CCI-001958
+      - NIST800-53R4_IA-3
       - SRG-OS-000378-GPOS-00163
-      - SV-244547r743890_rule
-      - SV-230524r744026_rule
-      - SV-244548r743893_rule
+      - SV-244547r1014811_rule
+      - SV-230524r1014813_rule
+      - SV-244548r1014815_rule
       - V-244547
       - V-230524
       - V-244548
@@ -6518,8 +6978,9 @@
       - RHEL-08-040150
       - CAT2
       - CCI-002385
+      - NIST800-53R4_SC-5
       - SRG-OS-000420-GPOS-00186
-      - SV-230525r902735_rule
+      - SV-230525r958902_rule
       - V-230525
       - firewall
       - nftables
@@ -6553,9 +7014,13 @@
       - RHEL-08-040160
       - CAT2
       - CCI-002418
+      - NIST800-53R4_SC-8
       - SRG-OS-000423-GPOS-00187
-      - SV-244549r916422_rule
-      - SV-230526r916422_rule
+      - SRG-OS-000424-GPOS-00188
+      - SRG-OS-000425-GPOS-00189
+      - SRG-OS-000426-GPOS-00190
+      - SV-244549r958908_rule
+      - SV-230526r958908_rule
       - V-244549
       - V-230526
       - ssh
@@ -6574,8 +7039,11 @@
       - RHEL-08-040161
       - CAT2
       - CCI-000068
+      - NIST800-53R4_AC-17
       - SRG-OS-000033-GPOS-00014
-      - SV-230527r951616_rule
+      - SRG-OS-000420-GPOS-00186
+      - SRG-OS-000424-GPOS-00188
+      - SV-230527r1017288_rule
       - V-230527
       - ssh
 
@@ -6593,8 +7061,9 @@
       - RHEL-08-040180
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230532r627750_rule
+      - SV-230532r1017294_rule
       - V-230532
       - debug-shell
 
@@ -6631,7 +7100,7 @@
       - CAT2
       - CI-000366
       - SRG-OS-000480-GPOS-00227
-      - SV-244550r858791_rule
+      - SV-244550r1017350_rule
       - V-244550
       - ipv4
 
@@ -6669,8 +7138,9 @@
       - RHEL-08-040210
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230535r858793_rule
+      - SV-230535r1017297_rule
       - V-230535
       - icmp
 
@@ -6706,8 +7176,9 @@
       - RHEL-08-040220
       - CAT2
       - CCI-00036
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230536r858795_rule
+      - SV-230536r1017298_rule
       - V-230536
       - icmp
 
@@ -6744,8 +7215,9 @@
       - RHEL-08-040230
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230537r858797_rule
+      - SV-230537r1017299_rule
       - V-230537
       - icmp
 
@@ -6781,8 +7253,9 @@
       - RHEL-08-040239
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244551r858799_rule
+      - SV-244551r1017351_rule
       - V-244551
       - ip4
 
@@ -6817,8 +7290,9 @@
       - RHEL-08-040240
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230538r858801_rule
+      - SV-230538r1017300_rule
       - V-230538
       - icmp
 
@@ -6854,8 +7328,9 @@
       - RHEL-08-040249
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244552r858803_rule
+      - SV-244552r1017352_rule
       - V-244552
       - ipv4
 
@@ -6890,8 +7365,9 @@
       - RHEL-08-040250
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230539r861085_rule
+      - SV-230539r1017301_rule
       - V-230539
       - icmp
 
@@ -6928,8 +7404,9 @@
       - RHEL-08-040259
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-250317r858808_rule
+      - SV-250317r1017358_rule
       - V-250317
       - icmp
 
@@ -6967,8 +7444,9 @@
       - RHEL-08-040260
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230540r858810_rule
+      - SV-230540r1017302_rule
       - V-230540
       - icmp
 
@@ -7006,8 +7484,9 @@
       - RHEL-08-040261
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230541r858812_rule
+      - SV-230541r1017303_rule
       - V-230541
       - icmp
 
@@ -7045,8 +7524,9 @@
       - RHEL-08-040262
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230542r858814_rule
+      - SV-230542r1017304_rule
       - V-230542
       - icmp
 
@@ -7082,8 +7562,9 @@
       - RHEL-08-040270
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230543r858816_rule
+      - SV-230543r1017305_rule
       - V-230543
       - icmp
 
@@ -7119,8 +7600,9 @@
       - RHEL-08-040279
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244553r858818_rule
+      - SV-244553r1017353_rule
       - V-244553
       - ipv4
 
@@ -7157,8 +7639,9 @@
       - RHEL-08-040280
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230544r858820_rule
+      - SV-230544r1017306_rule
       - V-230544
       - icmp
 
@@ -7194,8 +7677,9 @@
       - RHEL-08-040281
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230545r858822_rule
+      - SV-230545r1017307_rule
       - V-230545
       - sysctl
 
@@ -7231,8 +7715,9 @@
       - RHEL-08-040282
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230546r858824_rule
+      - SV-230546r1017308_rule
       - V-230546
       - sysctl
 
@@ -7268,8 +7753,9 @@
       - RHEL-08-040283
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230547r858826_rule
+      - SV-230547r1017309_rule
       - V-230547
       - sysctl
 
@@ -7305,8 +7791,9 @@
       - RHEL-08-040284
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230548r858828_rule
+      - SV-230548r1017310_rule
       - V-230548
       - sysctl
 
@@ -7342,8 +7829,9 @@
       - RHEL-08-040285
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230549r858830_rule
+      - SV-230549r1017311_rule
       - V-230549
       - sysctl
 
@@ -7379,8 +7867,9 @@
       - RHEL-08-040286
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-244554r858832_rule
+      - SV-244554r1017354_rule
       - V-244554
 
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
@@ -7392,8 +7881,9 @@
       - RHEL-08-040290
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230550r627750_rule
+      - SV-230550r1017312_rule
       - V-230550
       - mail
 
@@ -7414,8 +7904,9 @@
       - RHEL-08-040320
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230553r809324_rule
+      - SV-230553r1017315_rule
       - V-230553
       - gui
 
@@ -7431,8 +7922,9 @@
       - RHEL-08-040321
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-251718r809378_rule
+      - SV-251718r1017371_rule
       - V-251718
       - systemctl
 
@@ -7456,8 +7948,9 @@
       - RHEL-08-040330
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230554r627750_rule
+      - SV-230554r1017316_rule
       - V-230554
       - network
 
@@ -7475,8 +7968,9 @@
       - RHEL-08-040340
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - V-230555r951618_rule
+      - SV-230555r1017317_rule
       - V-230555
       - ssh
 
@@ -7493,8 +7987,9 @@
       - RHEL-08-040341
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230556r951620_rule
+      - SV-230556r1017318_rule
       - V-230556
       - ssh
 
@@ -7523,8 +8018,9 @@
       - RHEL-08-040342
       - CAT2
       - CCI-001453
+      - NIST800-53R4_CM-6
       - SRG-OS-000250-GPOS-00093
-      - SV-255924r917888_rule
+      - SV-255924r1017372_rule
       - V-255924
       - fips
 
@@ -7547,8 +8043,9 @@
       - RHEL-08-040350
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230557r627750_rule
+      - SV-230557r1017319_rule
       - V-230557
       - tftp
 
@@ -7563,8 +8060,9 @@
       - RHEL-08-040370
       - CAT2
       - CCI-000381
+      - NIST800-53R4_CM-7
       - SRG-OS-000480-GPOS-00227
-      - SV-230559r646887_rule
+      - SV-230559r1014820_rule
       - V-230559
       - dnf
       - gssproxy
@@ -7580,8 +8078,9 @@
       - RHEL-08-040380
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230560r627750_rule
+      - SV-230560r1017321_rule
       - V-230560
       - iprutils
 
@@ -7596,8 +8095,9 @@
       - RHEL-08-040390
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230561r627750_rule
+      - SV-230561r1017322_rule
       - V-230561
       - tuned
 
@@ -7614,26 +8114,11 @@
       - RHEL-08-040400
       - CAT2
       - CCI-002265
+      - NIST800-53R4_AC-16
       - SRG-OS-000324-GPOS-00125
-      - SV-254520r928805_rule
+      - SV-254520r958726_rule
       - V-254520
       - selinux
-
-- name: "MEDIUM | RHEL-08-010163 | PATCH | The krb5-server package must not be installed on RHEL 8."
-  ansible.builtin.package:
-      name: krb5-server
-      state: absent
-  when:
-      - rhel_08_010163
-      - "'krb5-server' in ansible_facts.packages"
-  tags:
-      - RHEL-08-010163
-      - CAT2
-      - CCI-000803
-      - SRG-OS-000120-GPOS-00061
-      - SV-237640r646890_rule
-      - V-237640
-      - krb5
 
 - name: "MEDIUM | RHEL-08-010382 | PATCH | RHEL 8 must restrict privilege elevation to authorized personnel."
   block:
@@ -7669,8 +8154,9 @@
       - RHEL-08-010382
       - CAT2
       - CCI-000366
+      - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-237641r646893_rule
+      - SV-237641r1017324_rule
       - V-237641
       - sudo
 
@@ -7732,8 +8218,9 @@
       - RHEL-08-010383
       - CAT2
       - CCI-002227
+      - NIST800-53R4_AC-6
       - SRG-OS-000480-GPOS-00227
-      - SV-237642r861086_rule
+      - SV-237642r991589_rule
       - V-237642
       - sudo
 
@@ -7769,8 +8256,9 @@
       - RHEL-08-010384
       - CAT2
       - CCI-002038
+      - NIST800-53R4_IA-11
       - SRG-OS-000373-GPOS-00156
-      - SV-237643r861088_rule
+      - SV-237643r1017325_rule
       - V-237643
       - sudo
 
@@ -7785,6 +8273,9 @@
       - RHEL-08-010385
       - CAT2
       - CCI-002038
+      - NIST800-53R4_IA-11
       - SRG-OS-000373-GPOS-00156
-      - SV-251712r810017_rule
+      - SRG-OS-000373-GPOS-00157
+      - SRG-OS-000373-GPOS-00158
+      - SV-251712r1017383_rule
       - V-251712
