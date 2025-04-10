@@ -27,7 +27,9 @@ Nist Control ID associations added
 - RHEL-08-040370
 - RHEL-08-010001 - removed as not a NIST value
 
-Min OS version updated to 8.10
+Min OS version updated to 2.10
+
+workflow updates
 
 ## 3.3 STIG V1R14
 
