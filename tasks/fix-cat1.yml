@@ -117,7 +117,6 @@
             - rhel_08_010020_boot_kernel_set.stdout | length == 0
             - not ansible_check_mode or
               rhel_08_010020_default_grub_missing_audit is not changed
-
         notify: confirm grub2 user cfg
         register: result
 

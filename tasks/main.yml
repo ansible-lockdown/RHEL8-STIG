@@ -141,7 +141,7 @@
       file: fix-cat1.yml
   when: rhel8stig_cat1_patch
   tags:
-      - CAT1
+      - rhel8stig_cat1
       - high
 
 - name: Include CAT II patches
@@ -149,7 +149,7 @@
       file: fix-cat2.yml
   when: rhel8stig_cat2_patch
   tags:
-      - CAT2
+      - rhel8stig_cat2
       - medium
 
 - name: Include CAT III patches
@@ -157,7 +157,7 @@
       file: fix-cat3.yml
   when: rhel8stig_cat3_patch
   tags:
-      - CAT3
+      - rhel8stig_cat3
       - low
 
 - name: Flush handlers
@@ -186,6 +186,36 @@
       - run_audit
   tags:
       - run_audit
+
+- name: Add ansible file showing Benchmark and levels applied
+  block:
+      - name: Create ansible facts directory
+        ansible.builtin.file:
+            path: "{{ ansible_facts_path }}"
+            state: directory
+            owner: root
+            group: root
+            mode: 'u=rwx,go=rx'
+
+      - name: Create ansible facts file
+        ansible.builtin.template:
+            src: etc/ansible/compliance_facts.j2
+            dest: "{{ ansible_facts_path }}/compliance_facts.fact"
+            owner: root
+            group: root
+            mode: "u-x,go-wx"
+  when: create_benchmark_facts
+  tags:
+      - always
+      - benchmark
+
+- name: Fetch audit files
+  ansible.builtin.import_tasks:
+      file: fetch_audit_output.yml
+  when:
+      - fetch_audit_output
+      - run_audit
+  tags: always
 
 - name: Show Audit Summary
   ansible.builtin.debug:

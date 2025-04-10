@@ -57,8 +57,8 @@
         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
   block:
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Uncomment banner keyword and set banner path"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Uncomment banner keyword and set banner path"
         ansible.builtin.lineinfile:
             path: /etc/ssh/sshd_config
             regexp: '(?i)^#?Banner'
@@ -68,8 +68,8 @@
             - rhel8stig_ssh_required
 
       - name: |
-              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message""
-              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message""
+              "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon. | Set banner message"
+              "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon. | Set banner message"
         ansible.builtin.copy:  # noqa: template-instead-of-copy
             dest: "{{ item }}"
             content: "{{ rhel8stig_logon_banner }}"
@@ -80,21 +80,20 @@
         with_items:
             - /etc/issue
             - /etc/issue.net
-        when:
-            # - not system_is_ec2
-            - rhel_08_010040 or
-              rhel_08_010060
-        tags:
-            - CAT2
-            - RHEL-08-010040
-            - RHEL-08-010060
-            - CCI-000048
-            - NIST800-53R4_AC-8
-            - SRG-OS-000023-GPOS-00006
-            - SV-230225r1017044_rule
-            - SV-230227r1017046_rule
-            - V-230225
-            - V-230227
+  when:
+      - rhel_08_010040 or
+        rhel_08_010060
+  tags:
+      - CAT2
+      - RHEL-08-010040
+      - RHEL-08-010060
+      - CCI-000048
+      - NIST800-53R4_AC-8
+      - SRG-OS-000023-GPOS-00006
+      - SV-230225r1017044_rule
+      - SV-230227r1017046_rule
+      - V-230225
+      - V-230227
 
 - name: "MEDIUM | RHEL-08-010049 | PATCH | RHEL 8 must display a banner before granting local or remote access to the system via a graphical user logon"
   ansible.builtin.lineinfile:
@@ -4332,7 +4331,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00228
-      - SV-230383r1017192_ruleSV-230383r1017192_rule
+      - SV-230383r1017192_rule
       - V-230383
       - login
       - umask
@@ -4766,7 +4765,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4776,7 +4774,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000466-GPOS-00210
       - SRG-OS-000476-GPOS-00221
       - SV-230404r1017210_rule
@@ -4800,7 +4797,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4810,7 +4806,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230405r1017211_rule
       - V-230405
@@ -4833,7 +4828,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4843,7 +4837,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230406r1017212_rule
       - V-230406
@@ -4866,7 +4859,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4876,7 +4868,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230407r1017213_rule
       - V-230407
@@ -4899,7 +4890,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4909,7 +4899,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230408r1017214_rule
       - V-230408
@@ -4932,7 +4921,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4942,7 +4930,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230409r1017215_rule
       - V-230409
@@ -4965,7 +4952,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -4975,7 +4961,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230410r1017216_rule
       - V-230410
@@ -4996,7 +4981,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -5006,7 +4990,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-230411r1017217_rule
       - V-230411
@@ -5029,7 +5012,6 @@
       - SRG-OS-000004-GPOS-00004
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000304-GPOS-00121
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -5039,7 +5021,6 @@
       - SRG-OS-000240-GPOS-00090
       - SRG-OS-000241-GPOS-00091
       - SRG-OS-000303-GPOS-00120
-      - SRG-OS-000304-GPOS-00121
       - SRG-OS-000476-GPOS-00221
       - SV-244542r1017348_rule
       - V-244542
@@ -5060,7 +5041,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000064-GPOS-00032
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
@@ -5112,7 +5092,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000468-GPOS-00212
@@ -5136,7 +5115,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000468-GPOS-00212
@@ -5160,7 +5138,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5183,7 +5160,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5206,7 +5182,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5229,7 +5204,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5252,7 +5226,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5275,7 +5248,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5298,7 +5270,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5321,7 +5292,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5344,7 +5314,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5367,7 +5336,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5390,7 +5358,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5413,7 +5380,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5436,7 +5402,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5459,7 +5424,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5482,7 +5446,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5505,7 +5468,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5528,7 +5490,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5551,7 +5512,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5574,7 +5534,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5597,7 +5556,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5620,7 +5578,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5643,7 +5600,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5666,7 +5622,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5832,7 +5787,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5857,7 +5811,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
@@ -5881,7 +5834,6 @@
       - SRG-OS-000062-GPOS-00031
       - SRG-OS-000037-GPOS-00015
       - SRG-OS-000042-GPOS-00020
-      - SRG-OS-000062-GPOS-00031
       - SRG-OS-000392-GPOS-00172
       - SRG-OS-000462-GPOS-00206
       - SRG-OS-000471-GPOS-00215
