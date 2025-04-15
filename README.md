@@ -56,7 +56,7 @@ This contains rewrites and ID reference changes as per STIG documentation.
 
 ## Auditing
 
-This can be turned on or off within the defaults/main.yml file with the variable rhel7cis_run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
+This can be turned on or off within the defaults/main.yml file with the variable run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
 
 This is a quick, very lightweight, check (where possible) of config compliance and live/running settings.
 
