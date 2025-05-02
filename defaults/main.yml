@@ -9,9 +9,9 @@ benchmark: RHEL8-STIG
 # Whether to skip the OS check for supported OS's
 skip_os_check: false
 
-rhel8stig_cat1_patch: true
-rhel8stig_cat2_patch: true
-rhel8stig_cat3_patch: true
+rhel8stig_cat1: true
+rhel8stig_cat2: true
+rhel8stig_cat3: true
 
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
