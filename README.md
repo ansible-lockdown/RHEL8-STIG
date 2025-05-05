@@ -2,7 +2,7 @@
 
 ## Configure a RHEL8 based system to be complaint with Disa STIG
 
-This role is based on RHEL 8 DISA STIG: [Version 2, Rel 1 released on  24, Oct 2024](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R1_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 2, Rel 2 released on 30, Jan 2025](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R2_STIG.zip).
 
 ---
 
@@ -66,10 +66,6 @@ This audit will not only check the config has the correct setting but aims to ca
 ## Documentation
 
 - [Read The Docs](https://ansible-lockdown.readthedocs.io/en/latest/)
-- [Getting Started](https://www.lockdownenterprise.com/docs/getting-started-with-lockdown#GH_AL_RH8_stig)
-- [Customizing Roles](https://www.lockdownenterprise.com/docs/customizing-lockdown-enterprise#GH_AL_RH8_stig)
-- [Per-Host Configuration](https://www.lockdownenterprise.com/docs/per-host-lockdown-enterprise-configuration#GH_AL_RH8_stig)
-- [Getting the Most Out of the Role](https://www.lockdownenterprise.com/docs/get-the-most-out-of-lockdown-enterprise#GH_AL_RH8_stig)
 
 ## Requirements
 
@@ -155,7 +151,7 @@ We encourage you (the community) to contribute to this role. Please read the rul
 
 uses:
 
-- ansible-core 2.12
+- ansible-core 2.16
 - ansible collections - pulls in the latest version based on requirements file
 - runs the audit using the devel branch
 - This is an automated test that occurs on pull requests into devel
@@ -193,4 +189,4 @@ pre-commit run
 Massive thanks to the fantastic community and all its members.
 This includes a huge thanks and credit to the original authors and maintainers.
 
-Josh Springer, Daniel Shepherd, Bas Meijeri, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell
+Josh Springer, Daniel Shepherd, Bas Meijer, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell

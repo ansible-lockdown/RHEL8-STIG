@@ -139,7 +139,7 @@
 - name: Include CAT I patches
   ansible.builtin.import_tasks:
       file: fix-cat1.yml
-  when: rhel8stig_cat1_patch
+  when: rhel8stig_cat1
   tags:
       - rhel8stig_cat1
       - high
@@ -147,7 +147,7 @@
 - name: Include CAT II patches
   ansible.builtin.import_tasks:
       file: fix-cat2.yml
-  when: rhel8stig_cat2_patch
+  when: rhel8stig_cat2
   tags:
       - rhel8stig_cat2
       - medium
@@ -155,7 +155,7 @@
 - name: Include CAT III patches
   ansible.builtin.import_tasks:
       file: fix-cat3.yml
-  when: rhel8stig_cat3_patch
+  when: rhel8stig_cat3
   tags:
       - rhel8stig_cat3
       - low

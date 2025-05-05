@@ -1,7 +1,6 @@
 .env
 *.log
 *.retry
-.cache
 .vagrant
 tests/*redhat-subscription
 tests/Dockerfile
@@ -12,6 +11,7 @@ delete*
 ignore*
 # VSCode
 .vscode
+vagrant
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

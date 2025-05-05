@@ -4,12 +4,13 @@
 
 [lockdown_details]
 # Benchmark release
-Benchmark_release = STIG-{{ benchmark_version }}
+Benchmark_release = {{ benchmark }}
+Benchmark_version = {{ benchmark_version }}
 Benchmark_run_date = {{ '%Y-%m-%d - %H:%M:%S' | ansible.builtin.strftime }}
 # If options set (doesn't mean it ran all controls)
-cat_1_hardening_enabled = {{ rhel8stig_cat1_patch }}
-cat_2_hardening_enabled = {{ rhel8stig_cat2_patch }}
-cat_3_hardening_enabled = {{ rhel8stig_cat3_patch }}
+cat_1_hardening_enabled = {{ rhel8stig_cat1 }}
+cat_2_hardening_enabled = {{ rhel8stig_cat2 }}
+cat_3_hardening_enabled = {{ rhel8stig_cat3 }}
 
 {% if ansible_run_tags | length > 0 %}
 # If tags used to stipulate run level
@@ -27,6 +28,7 @@ Cat_3_Server_tag_run = true
 [lockdown_audit_details]
 {% if run_audit %}
 # Audit run
+audit_run_date = {{ '%Y-%m-%d - %H:%M:%S' | ansible.builtin.strftime }}
 audit_file_local_location = {{ audit_log_dir }}
 {% if not audit_only %}
 audit_summary = {{ post_audit_results }}

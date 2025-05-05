@@ -52,33 +52,6 @@
       - SV-256973r1017373_rule
       - V-256973
 
-- name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection."
-  block:
-      - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Get partition layout"
-        ansible.builtin.shell: lsblk
-        changed_when: false
-        failed_when: false
-        register: rhel_08_010030_partition_layout
-
-      - name: "MEDIUM | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Message out warning"
-        ansible.builtin.debug:
-            msg:
-                - 'WARNING!! Below is the partition layout. Please run the "sudo more /etc/crypttab" command to confirm every persistent disk partition has an entry.'
-                - "If partitions other than pseudo file systems (such as /var or /sys) this is a finding"
-                - "{{ rhel_08_010030_partition_layout.stdout_lines }}"
-  when:
-      - rhel_08_010030
-  tags:
-      - RHEL-08-010030
-      - CAT2
-      - CCI-001199
-      - NIST800-53R4_SC-28
-      - SRG-OS-000185-GPOS-00079
-      - SRG-OS-000404-GPOS-00183
-      - SRG-OS-000405-GPOS-00184
-      - SV-230224r1017043_rule
-      - V-230224
-
 - name: |
         "MEDIUM | RHEL-08-010040 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a ssh logon."
         "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
@@ -315,7 +288,7 @@
       - CCI-000196
       - NIST800-53R4_IA-5
       - SRG-OS-000073-GPOS-00041
-      - SV-230233r1017052_rule
+      - SV-230233r1044790_rule
       - V-230233
       - pamd
 
@@ -719,7 +692,7 @@
       - SRG-OS-000393-GPOS-00173
       - SRG-OS-000394-GPOS-00174
       - SRG-OS-000125-GPOS-00065
-      - SV-230251r1017069_rule
+      - SV-230251r1044814_rule
       - V-230251
       - fips
 
@@ -748,7 +721,7 @@
       - SRG-OS-000393-GPOS-00173
       - SRG-OS-000394-GPOS-00174
       - SRG-OS-000125-GPOS-00065
-      - SV-230252r1017070_rule
+      - SV-230252r1044817_rule
       - V-230252
       - fips
 
@@ -2318,7 +2291,7 @@
       - CCI-000366
       - NIST800-53R4_CM-6
       - SRG-OS-000480-GPOS-00227
-      - SV-230316r1017127_rule
+      - SV-230316r1044801_rule
       - V-230316
       - dns
 

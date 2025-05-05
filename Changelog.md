@@ -1,5 +1,16 @@
 # Changes to RHEL8STIG
 
+## STIG v2r2
+
+RuleIDs updated for listed controls after changes in control
+
+- RHEL-08-010030 - moved from CAT2 to CAT1 control
+- RHEL-08-010130 - hashing round increase min from 5000 to 100000
+- RHEL-08-010290 - MAC reordered
+- RHEL-08-010291 - Ciphers reordered
+- RHEL-08-010292 - RuleID
+- RHEL-08-010680 - RuleID
+
 ## 4.0.0 STIG v2r1
 
 RuleIDs updated for all controls
