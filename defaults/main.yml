@@ -1,17 +1,17 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v1r12'
+benchmark_version: 'v2r2'
 
-## Benchmark name used by audting control role
+## Benchmark name used by auditing control role
 # The audit variable found at the base
 benchmark: RHEL8-STIG
 
 # Whether to skip the OS check for supported OS's
 skip_os_check: false
 
-rhel8stig_cat1_patch: true
-rhel8stig_cat2_patch: true
-rhel8stig_cat3_patch: true
+rhel8stig_cat1: true
+rhel8stig_cat2: true
+rhel8stig_cat3: true
 
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
@@ -35,7 +35,6 @@ rhel8stig_audit_disruptive: false
 rhel8stig_skip_for_travis: false
 
 rhel8stig_workaround_for_disa_benchmark: true
-rhel8stig_workaround_for_ssg_benchmark: true
 
 # tweak role to run in a chroot, such as in kickstart %post script
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
@@ -56,27 +55,30 @@ rhel8stig_skip_reboot: true
 # Defined will change if control requires
 change_requires_reboot: false
 
-##########################################
+# Create managed not custom local_facts files
+create_benchmark_facts: true
+ansible_facts_path: /etc/ansible/facts.d
+
+###########################################
 ### Goss is required on the remote host ###
-## Refer to vars/auditd.yml for any other settings ##
+### vars/auditd.yml for other settings  ###
 
 # Allow audit to setup the requirements including installing git (if option chosen and downloading and adding goss binary to system)
 setup_audit: false
 
 # enable audits to run - this runs the audit and get the latest content
 run_audit: false
+# Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
+audit_run_heavy_tests: true
 
-# Only run Audit do not remediate
+## Only run Audit do not remediate
 audit_only: false
-# As part of audit_only
-# This will enable files to be copied back to control node
-fetch_audit_files: false
-# Path to copy the files to will create dir structure
-audit_capture_files_dir: /some/location to copy to on control node
+
+#############################
 
 # How to retrieve audit binary
 # Options are copy or download - detailed settings at the bottom of this file
-# you will need to access to either github or the file already dowmloaded
+# you will need to access to either github or the file already downloaded
 get_audit_binary_method: download
 
 ## if get_audit_binary_method - copy the following needs to be updated for your environment
@@ -85,20 +87,38 @@ get_audit_binary_method: download
 audit_bin_copy_location: /some/accessible/path
 
 # how to get audit files onto host options
-# options are git/copy/get_url other e.g. if you wish to run from already downloaded conf
+# options are git/copy/archive/get_url other e.g. if you wish to run from already downloaded conf
 audit_content: git
 
-# archive or copy:
-audit_conf_copy: "some path to copy from"
+# If using either archive, copy, get_url:
+## Note will work with .tar files - zip will require extra configuration
+### If using get_url this is expecting github url in tar.gz format e.g.
+### https://github.com/ansible-lockdown/RHEL8-STIG-Audit/archive/refs/tags/1.0.0.tar.gz
+audit_conf_source: "some path or url to copy from"
 
-# get_url:
-audit_files_url: "some url maybe s3?"
+# Destination for the audit content to be placed on managed node
+# note may not need full path e.g. /opt with the directory being the {{ benchmark }}-Audit directory
+audit_conf_dest: "/opt"
 
-# Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
-audit_run_heavy_tests: true
+# Where the audit logs are stored
+audit_log_dir: '/opt'
 
-### End Goss enablements ####
-#### Detailed settings found at the end of this document ####
+## Ability to collect and take audit files moving to a centralized location
+# This enables the collection of the files from the host
+fetch_audit_output: false
+
+# Method of getting,uploading the summary files
+## Ensure access and permissions are available for these to occur.
+## options are
+# fetch - fetches from server and moves to location on the ansible controller (could be a mount point available to controller)
+# copy - copies file to a location available to the managed node
+audit_output_collection_method: fetch
+
+# Location to put the audit files
+audit_output_destination: /opt/audit_summaries/
+
+### Goss Settings ##
+####### END ########
 
 # These variables correspond with the STIG IDs defined in the STIG and allows you to enable/disable specific rules.
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
@@ -106,6 +126,7 @@ audit_run_heavy_tests: true
 # CAT 1 rules
 rhel_08_010000: true
 rhel_08_010020: true
+rhel_08_010030: true
 rhel_08_010121: true
 rhel_08_010140: true
 rhel_08_010150: true
@@ -128,10 +149,8 @@ rhel_08_040200: true
 rhel_08_040360: true
 
 # CAT 2 rules
-rhel_08_010001: true
 rhel_08_010010: true
 rhel_08_010019: true
-rhel_08_010030: true
 rhel_08_010040: true
 rhel_08_010049: true
 rhel_08_010050: true
@@ -269,12 +288,8 @@ rhel_08_020030: true
 rhel_08_020031: true
 rhel_08_020032: true
 rhel_08_020035: true
-rhel_08_020039: true
-rhel_08_020040: true
-rhel_08_020041: true
 rhel_08_020050: true
 rhel_08_020060: true
-rhel_08_020070: true
 rhel_08_020080: true
 rhel_08_020081: true
 rhel_08_020082: true
@@ -295,8 +310,6 @@ rhel_08_020180: true
 rhel_08_020190: true
 rhel_08_020200: true
 rhel_08_020210: true
-rhel_08_020220: true
-rhel_08_020221: true
 rhel_08_020230: true
 rhel_08_020235: true
 rhel_08_020231: true
@@ -473,7 +486,6 @@ rhel_08_010540: true
 rhel_08_010541: true
 rhel_08_010542: true
 rhel_08_020024: true
-rhel_08_020042: true
 rhel_08_020340: true
 rhel_08_030063: true
 rhel_08_030601: true
@@ -492,7 +504,7 @@ rhel_08_040300: true
 rhel_08_040310: true
 
 # Whether or not to run tasks related to auditing/patching the desktop environment
-rhel8stig_gui: false
+rhel8stig_gui: "{{ prelim_gnome_present.stat.exists | default(false) }}"
 
 # Whether or not you need kdump. False will disable service and true will leave service
 rhel8stig_kdump_needed: false
@@ -500,11 +512,6 @@ rhel8stig_kdump_needed: false
 # Whether to configure dconf rules unconditionally (ignoring presence of dconf
 # or rhel8stig_gui)
 rhel8stig_always_configure_dconf: false
-
-# Whether or not to run tasks related to smart card authentication enforcement
-rhel8stig_smartcard: false
-# Configure your smartcard driver
-rhel8stig_smartcarddriver: cackey
 
 # Set the file that sysctl should write to
 rhel8stig_sysctl_file: /etc/sysctl.d/99_stig_sysctl.conf
@@ -528,6 +535,11 @@ rhel8stig_ipv6_required: true
 # When set to anything other than mcafee it will skip this control assuming localized threat prevention management
 rhel8stig_av_sftw: mcafee
 
+# RHEL-08-010110 & 010130 & 010760 & 020190 & 020200 & 020231 & 020310 & 020351
+# rhel8stig_login_defs_file_perms
+# Permissions set on /etc/login.defs
+rhel8stig_login_defs_file_perms: 0644
+
 # RHEL-08-010210
 # rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
 # To conform to STIG standards this needs to be 0640 or more restrictive
@@ -544,9 +556,17 @@ rhel8stig_var_log_perm: 0755
 rhel8stig_sys_commands_perm: 0755
 
 # RHEL-08-010330
-# rhel8stig_lib_file_perm is the permissions teh library files will be set to
+# rhel8stig_lib_file_perm is the permissions the library files will be set to
 # To conform to STIG standards this needs to be set to 755 or more restrictive
 rhel8stig_lib_file_perm: 755
+
+# RHEL-08-010380
+# rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
+#
+rhel8stig_sudoers_exclude_nopasswd_list:
+    - rocky
+    - ec2-user
+#    - vagrant
 
 # RHEL-08-010480
 # rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
@@ -554,15 +574,11 @@ rhel8stig_lib_file_perm: 755
 rhel8stig_ssh_pub_key_perm: 0644
 
 # RHEL-08-010490
-# rhel8stig_ssh_priv_key_perm are the permssions set to the SSH private host keys
+# rhel8stig_ssh_priv_key_perm are the permissions set to the SSH private host keys
 # To conform to STIG standards this needs to be set to 0600 or less permissive
 rhel8stig_ssh_priv_key_perm: 0600
 
 # RHEL-08-010690
-# Set standard user paths here
-# Also set whether we should automatically remediate paths in user ini files.
-# rhel_08_020720_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
-rhel8stig_standard_user_path: "PATH=$PATH:$HOME/.local/bin:$HOME/bin"
 rhel8stig_change_user_path: false
 
 # RHEL-08-010700
@@ -588,19 +604,32 @@ rhel8stig_local_int_home_file_perms: 0750
 
 # RHEL-08-010770
 # rhel8stig_local_int_perm is the permissions set to the local initialization files
-# To connform to STIG standards this needs to be set to 0740 or less permissive
+# To conform to STIG standards this needs to be set to 0740 or less permissive
 rhel8stig_local_int_perm: 0740
+
+# RHEL-08-020100 pamd file permissions - /etc/pam.d/(password-auth|system-auth) files
+# rhel8stig_pamd_file_perms
+# This needs a minimum of 0644 ( more restrictive may cause issues testing will be required)
+rhel8stig_pamd_file_perms: 0644
+
+# RHEL-08-020110 - pwquality file permissions
+# mode: "{{ rhel8stig_pamd_file_perms }}"
+rhel8stig_pwquality_file_perms: 0644
+
+# RHEL-08-0400xx
+# blacklist.conf - /etc/modprobe.d/blacklist.conf file permissions
+rhel8stig_blacklist_conf_file_perms: 0640
 
 # RHEL-08-020250
 # This is a check for a "supported release"
 # These are the minimum supported releases.
 # (Red Hat has support for older versions if you pay extra for it.)
 rhel8stig_min_supported_os_ver:
-    RedHat: "8.7"
-    CentOS: "8.7"
-    Rocky: "8.7"
-    AlmaLinux: "8.7"
-    OracleLinux: "8.7"
+    RedHat: "8.10"
+    CentOS: "8.10"
+    Rocky: "8.10"
+    AlmaLinux: "8.10"
+    OracleLinux: "8.10"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -707,13 +736,6 @@ rhel8stig_sssd:
     maprule: (userCertificate;binary={cert!bin})
     domains: "{{ rhel8stig_sssd_domain }}"
 
-# RHEL-08-020070
-# Session timeout setting file (TMOUT setting can be set in multiple files)
-# Timeout value is in seconds. (60 seconds * 10 = 600)
-rhel8stig_shell_session_timeout:
-    file: /etc/profile.d/tmout.sh
-    timeout: 600
-
 # RHEL-08-010200 | All network connections associated with SSH traffic must
 # terminate at the end of the session or after 10 minutes of inactivity, except
 # to fulfill documented and validated mission requirements.
@@ -744,7 +766,6 @@ rhel8stig_remove_unnecessary_user_files: false
 # RHEL-08-020221
 # pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
 rhel8stig_pam_pwhistory:
-    remember: 5
     retries: 3
 
 # RHEL-08-020010
@@ -762,14 +783,6 @@ rhel8stig_pam_faillock:
 
 # RHEL-08-020035
 rhel_08_020035_idlesessiontimeout: 900
-
-# RHEL-08-030670
-# rhel8stig_audisp_disk_full_action options are syslog, halt, and single to fit STIG standards
-rhel8stig_audisp_disk_full_action: single
-
-# RHEL-08-030680
-# rhel8stig_audisp_network_failure_action optoins are syslog, halt, and single
-rhel8stig_audisp_network_failure_action: single
 
 # RHEL-08-030060
 # rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
@@ -828,15 +841,11 @@ rhel8stig_availability_override: false
 #      Use this for any other setup to avoid loss of data or data corruption.
 rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
 
-# REHL-08-010020
+# RHEL-08-010020
 rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
 
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
-
-# RHEL-08-010630/RHEL-08-010640/RHEL-08-010650
-rhel8stig_nfs_mounts: "{{ ansible_mounts | to_json | from_json | json_query(rhel8stig_nfs_mounts_query) }}"
-rhel8stig_nfs_mounts_query: "[?starts_with(fstype, 'nfs')].mount"
 
 # RHEL-08-010680
 # This can be managed using a template ensure settings are correct
@@ -856,8 +865,8 @@ rhel8stig_dns_servers:  # The order needs to be set as expected. If you have 3 y
 rhel8stig_int_gid: 1000
 
 # RHEL-08-010130
-# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 5000
-rhel8stig_hashing_rounds: 5000
+# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 100000
+rhel8stig_hashing_rounds: 100000
 
 # RHEL-08-010100
 rhel8stig_path_to_sshkey: "/root/.ssh/"
@@ -878,36 +887,36 @@ rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
 rhel8stig_fapolicy_white_list:
     - 'deny_audit perm=any pattern=ld_so : all'
-    - deny all all
+    - 'deny perm=any all : all'
 
 # RHEL-08-040090
 # rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
 rhel8stig_custom_firewall_zone: "new_fw_zone"
 
+# rhel8stig_copy_existing_zone - if you wish to copy an existing zones rules to the new zone
+rhel8stig_copy_existing_zone: true
+# rhel8stig_existing_zone_to_copy - name of the zone that you wish to copy from
+rhel8stig_existing_zone_to_copy: public
+
 # RHEL-08-040090
-# rhel8stig_white_list_services is the services that you want to allow through initially for teh new firewall zone
-# http and ssh need to be enabled for the role to run.
+# This designed not work with rhel8stig_existing_zone_to_copy and when deploy new rules
+# rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
+    - ssh
     - http
     - https
-    - ssh
 
 # RHEL-08-010290
 # RHEL-08-010290
 # This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
 # to conform to STIG standard control RHEL-08-010290 this variable must include hmac-sha2-512,hmac-sha2-256
 # to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_macs: 'MACS=hmac-sha2-512,hmac-sha2-256,hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com'
-rhel8stig_ssh_ciphers: "Ciphers=aes256-ctr,aes192-ctr,aes128-ctr,aes256-gcm@openssh.com,aes128-gcm@openssh.com"
+rhel8stig_ssh_macs: 'MACS=hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
+rhel8stig_ssh_ciphers: "Ciphers=aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr"
 # RHEL-08-040342
-# Expected Values for FIPS KEX algorithims
+# Expected Values for FIPS KEX algorithms
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
-
-# This will be the CRYPTO_POLICY settings in the opensshserver.conf file. It will be a string for the entirety of the setting
-# to conform to STIG standard control RHEL-08-010290 this variable must contain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256 settings
-# to conform to STIG standard control RHEL-08-010291 this variable must cotnain oCiphers=aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_server_crypto_settings: "-oCiphers=aes256-ctr,aes192-ctr,aes128-ctr -oMACS=hmac-sha2-512,hmac-sha2-256"
 
 # RHEL-08-010295
 # This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions

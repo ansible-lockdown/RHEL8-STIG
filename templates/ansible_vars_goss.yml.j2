@@ -2,7 +2,7 @@
 ## metadata for Audit benchmark
 benchmark_version: {{ benchmark_version }}
 
-rhel8stig_os_distribution: {{ ansible_distribution | lower }}
+rhel8stig_os_distribution: {{ ansible_facts['distribution'] | lower }}
 
 gpg_keys:
 {% for info in gpg_keys %}
@@ -11,8 +11,9 @@ gpg_keys:
 {% endfor %}
 rpm_gpg_key: {{ rpm_gpg_key }}
 
-rhel8stig_os_version_pre_8_2: {% if ansible_distribution_version >= '8.2' %}false{% else %}true{% endif %}
+rhel8stig_os_version_pre_8_2: {% if ansible_facts['distribution_version'] is version('8.1', '<=') %}true{% else %}false{% endif %}
 
+OS_ver: {{ ansible_facts['distribution_version'] }}
 
 # Some tests may need to scan every filesystem or have an impact on a system
 # these may need be scheduled to minimise impact also ability to set a timeout if taking too long
@@ -22,9 +23,9 @@ timeout_ms: {{ audit_cmd_timeout }}
 ### Remediation Settings
 
 # turn the categories on/off
-rhel8stig_cat1: {{ rhel8stig_cat1_patch }}
-rhel8stig_cat2: {{ rhel8stig_cat2_patch }}
-rhel8stig_cat3: {{ rhel8stig_cat3_patch }}
+rhel8stig_cat1: {{ rhel8stig_cat1 }}
+rhel8stig_cat2: {{ rhel8stig_cat2 }}
+rhel8stig_cat3: {{ rhel8stig_cat3 }}
 
 
 # If using the supplied graphical interface
@@ -72,7 +73,6 @@ RHEL_08_040360: {{ rhel_08_040360 }}
 
 
 # Cat 2 rules
-RHEL_08_010001: {{ rhel_08_010001 }}
 RHEL_08_010010: {{ rhel_08_010010 }}
 RHEL_08_010019: {{ rhel_08_010019 }}
 RHEL_08_010030: {{ rhel_08_010030 }}
@@ -211,12 +211,8 @@ RHEL_08_020030: {{ rhel_08_020030 }}
 RHEL_08_020031: {{ rhel_08_020031 }}
 RHEL_08_020032: {{ rhel_08_020032 }}
 RHEL_08_020035: {{ rhel_08_020035 }}
-RHEL_08_020039: {{ rhel_08_020039 }}
-RHEL_08_020040: {{ rhel_08_020040 }}
-RHEL_08_020041: {{ rhel_08_020041 }}
 RHEL_08_020050: {{ rhel_08_020050 }}
 RHEL_08_020060: {{ rhel_08_020060 }}
-RHEL_08_020070: {{ rhel_08_020070 }}
 RHEL_08_020080: {{ rhel_08_020080 }}
 RHEL_08_020081: {{ rhel_08_020081 }}
 RHEL_08_020082: {{ rhel_08_020082 }}
@@ -225,7 +221,7 @@ RHEL_08_020100: {{ rhel_08_020100 }}
 RHEL_08_020101: {{ rhel_08_020101 }}
 RHEL_08_020102: {{ rhel_08_020102 }}
 RHEL_08_020103: {{ rhel_08_020103 }}
-RHEL_08_020104: {{ rhel_08_020104 }}
+RHEL_08_020104: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or greater
 RHEL_08_020110: {{ rhel_08_020110 }}
 RHEL_08_020120: {{ rhel_08_020120 }}
 RHEL_08_020130: {{ rhel_08_020130 }}
@@ -237,8 +233,6 @@ RHEL_08_020180: {{ rhel_08_020180 }}
 RHEL_08_020190: {{ rhel_08_020190 }}
 RHEL_08_020200: {{ rhel_08_020200 }}
 RHEL_08_020210: {{ rhel_08_020210 }}
-RHEL_08_020220: {{ rhel_08_020220 }}
-RHEL_08_020221: {{ rhel_08_020221 }}
 RHEL_08_020230: {{ rhel_08_020230 }}
 RHEL_08_020231: {{ rhel_08_020231 }}
 RHEL_08_020240: {{ rhel_08_020240 }}
@@ -407,12 +401,11 @@ RHEL_08_010292: {{ rhel_08_010292 }}
 RHEL_08_010375: {{ rhel_08_010375 }}
 RHEL_08_010376: {{ rhel_08_010376 }}
 RHEL_08_010440: {{ rhel_08_010440 }}
-RHEL_08_010471: {{ rhel_08_010471 }}
+RHEL_08_010471: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}false{% else %}true{% endif %}  # Only runs if 8.3 or less
 RHEL_08_010540: {{ rhel_08_010540 }}
 RHEL_08_010541: {{ rhel_08_010541 }}
 RHEL_08_010542: {{ rhel_08_010542 }}
 RHEL_08_020024: {{ rhel_08_020024 }}
-RHEL_08_020042: {{ rhel_08_020042 }}
 RHEL_08_020340: {{ rhel_08_020340 }}
 RHEL_08_030063: {{ rhel_08_030063 }}
 RHEL_08_030601: {{ rhel_08_030601 }}

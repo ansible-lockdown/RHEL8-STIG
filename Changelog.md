@@ -1,5 +1,106 @@
 # Changes to RHEL8STIG
 
+## STIG v2r2
+
+RuleIDs updated for listed controls after changes in control
+
+- RHEL-08-010030 - moved from CAT2 to CAT1 control
+- RHEL-08-010130 - hashing round increase min from 5000 to 100000
+- RHEL-08-010290 - MAC reordered
+- RHEL-08-010291 - Ciphers reordered
+- RHEL-08-010292 - RuleID
+- RHEL-08-010680 - RuleID
+
+## 4.0.0 STIG v2r1
+
+RuleIDs updated for all controls
+Nist Control ID associations added
+
+- RHEL-08-010350 - command updated
+- RHEL-08-010472 - Not Applicable if fips
+- RHEL-08-020035 - version 8.7+
+- RHEL-08-020039 RHEL-08-020040 RHEL-08-020041 RHEL-08-020042, RHEL-08-020070 - TMUX removed
+- RHEL-08-020220, RHEL-08-020221 - remember not required for PAM
+- RHEL-08-020320 - Updated Check and Fix
+- RHEL-08-030603, RHEL-08-040139, RHEL-08-040140, RHEL-08-040141 - Rules updated Ok if no USB peripherals
+- RHEL-08-040284
+- RHEL-08-040370
+- RHEL-08-010001 - removed as not a NIST value
+
+Min OS version updated to 2.10
+
+workflow updates
+
+## 3.3 STIG V1R14
+
+- #232 - thanks to  @eday87 @BJSmithIEEE
+- #298 thanks to @mikefrompsu
+- #299 thanks to @cpu010100
+- thanks to @dglinder
+  - #301
+  - #302
+- ansible config update
+
+- Added gui discovery option
+updated ruleids
+
+- CAT I
+  - RHEL-08-020330 - cat1
+- CAT II
+  - RHEL-08-010040
+  - RHEL-08-010070
+  - RHEL-08-010200
+  - RHEL-08-010201
+  - RHEL-08-010423
+  - RHEL-08-010520
+  - RHEL-08-010521
+  - RHEL-08-010522
+  - RHEL-08-010550
+  - RHEL-08-010830
+  - RHEL-08-020350
+  - RHEL-08-040161
+  - RHEL-08-040340
+  - RHEL-08-040341
+
+## 3.3 - STIG V1R13 - 24th Jan 2024
+
+- updated audit variables
+- workflow updates
+- #277 thanks to @BJSmithIEEE
+- #278 thanks to @prestonSeaman2
+- #299 thanks to @derekbentson
+- removed dependency on jmespath
+- updated 010120 prelim and idempotency
+
+## 3.2 - STIG V1R13 - 24th Jan 2024
+
+- Audit updated
+  - moved audit into prelim
+  - updates to audit logic for copy and archive options
+
+ruleid updated
+
+- 010001
+- 020250
+- 020290
+- 040090
+
+CAT II
+
+- 020035 - updated rule and added handler for logind restart
+- 040020 - /bin/false update and ruleid update
+- 040080 - /bin/false and ruleid
+- 040111 - /bin/false and ruleid
+
+CAT III
+
+- 040021 - /bin/false and ruleid
+- 040022 - /bin/false and ruleid
+- 040023 - /bin/false and ruleid
+- 040024 - /bin/false and ruleid
+- 040025 - /bin/false and ruleid
+- 040026 - /bin/false and ruleid
+
 ## 3.1 - STIG V1R12 - 25th Oct 2023
 
 ruleid updated

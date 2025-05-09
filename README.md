@@ -2,7 +2,7 @@
 
 ## Configure a RHEL8 based system to be complaint with Disa STIG
 
-This role is based on RHEL 8 DISA STIG: [Version 1, Rel 12 released on Oct 25, 2023](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V1R12_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 2, Rel 2 released on 30, Jan 2025](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R2_STIG.zip).
 
 ---
 
@@ -28,7 +28,6 @@ This role is based on RHEL 8 DISA STIG: [Version 1, Rel 12 released on Oct 25, 2
 ![Pull Requests](https://img.shields.io/github/issues-pr/ansible-lockdown/RHEL8-STIG?label=Pull%20Requests)
 
 ![License](https://img.shields.io/github/license/ansible-lockdown/RHEL8-STIG?label=License)
-
 
 ---
 
@@ -57,20 +56,16 @@ This contains rewrites and ID reference changes as per STIG documentation.
 
 ## Auditing
 
-This can be turned on or off within the defaults/main.yml file with the variable rhel7cis_run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
+This can be turned on or off within the defaults/main.yml file with the variable run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
 
-This is a much quicker, very lightweight, checking (where possible) config compliance and live/running settings.
+This is a quick, very lightweight, check (where possible) of config compliance and live/running settings.
 
-A new form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/goss-org/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
+A form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/goss-org/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
 This audit will not only check the config has the correct setting but aims to capture if it is running with that configuration also trying to remove [false positives](https://www.mindpointgroup.com/blog/is-compliance-scanning-still-relevant/) in the process.
 
 ## Documentation
 
 - [Read The Docs](https://ansible-lockdown.readthedocs.io/en/latest/)
-- [Getting Started](https://www.lockdownenterprise.com/docs/getting-started-with-lockdown#GH_AL_RH8_stig)
-- [Customizing Roles](https://www.lockdownenterprise.com/docs/customizing-lockdown-enterprise#GH_AL_RH8_stig)
-- [Per-Host Configuration](https://www.lockdownenterprise.com/docs/per-host-lockdown-enterprise-configuration#GH_AL_RH8_stig)
-- [Getting the Most Out of the Role](https://www.lockdownenterprise.com/docs/get-the-most-out-of-lockdown-enterprise#GH_AL_RH8_stig)
 
 ## Requirements
 
@@ -84,10 +79,8 @@ The following packages must be installed on the controlling host/host where ansi
 
 - python2-passlib (or just passlib, if using python3)
 - python-lxml
-- python-xmltodict
-- python-jmespath
 
-Package 'python-xmltodict' is required if you enable the OpenSCAP tool installation and run a report. Packages python(2)-passlib and python-jmespath are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
+Packages python(2)-passlib are required for tasks with custom filters or modules. These are all required on the controller host that executes Ansible.
 
 ## Role Variables
 
@@ -158,7 +151,7 @@ We encourage you (the community) to contribute to this role. Please read the rul
 
 uses:
 
-- ansible-core 2.12
+- ansible-core 2.16
 - ansible collections - pulls in the latest version based on requirements file
 - runs the audit using the devel branch
 - This is an automated test that occurs on pull requests into devel
@@ -195,4 +188,5 @@ pre-commit run
 
 Massive thanks to the fantastic community and all its members.
 This includes a huge thanks and credit to the original authors and maintainers.
-Josh Springer, Daniel Shepherd, Bas Meijeri, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell
+
+Josh Springer, Daniel Shepherd, Bas Meijer, James Cassell, Mike Renfro, DFed, George Nalen, Mark Bolwell

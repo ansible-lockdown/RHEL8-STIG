@@ -36,7 +36,7 @@
         ansible.builtin.include_vars:
             file: "{{ container_vars_file }}"
 
-      - name: output if discovered is a container
+      - name: Output if discovered is a container
         ansible.builtin.debug:
             msg: system has been discovered as a container
         when:
@@ -92,7 +92,8 @@
       - RHEL-08-010149
 
 - name: Include OS specific variables
-  ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
+  ansible.builtin.include_vars:
+      file: "{{ ansible_facts.distribution }}.yml"
   tags:
       - always
 
@@ -129,55 +130,42 @@
       - always
 
 - name: Include prelim tasks
-  ansible.builtin.import_tasks: prelim.yml
+  ansible.builtin.import_tasks:
+      file: prelim.yml
   tags:
       - prelim_tasks
       - run_audit
 
-- name: Include audit specific variables
-  ansible.builtin.include_vars: audit.yml
-  when:
-      - run_audit or audit_only
-      - setup_audit
-  tags:
-      - setup_audit
-      - run_audit
-
-- name: Include pre-remediation audit tasks
-  ansible.builtin.import_tasks: pre_remediation_audit.yml
-  when:
-      - run_audit or audit_only
-      - setup_audit
-  tags:
-      - run_audit
-
 - name: Include CAT I patches
-  ansible.builtin.import_tasks: fix-cat1.yml
-  when: rhel8stig_cat1_patch
+  ansible.builtin.import_tasks:
+      file: fix-cat1.yml
+  when: rhel8stig_cat1
   tags:
-      - CAT1
+      - rhel8stig_cat1
       - high
 
 - name: Include CAT II patches
-  ansible.builtin.import_tasks: fix-cat2.yml
-  when: rhel8stig_cat2_patch
+  ansible.builtin.import_tasks:
+      file: fix-cat2.yml
+  when: rhel8stig_cat2
   tags:
-      - CAT2
+      - rhel8stig_cat2
       - medium
 
 - name: Include CAT III patches
-  ansible.builtin.import_tasks: fix-cat3.yml
-  when: rhel8stig_cat3_patch | bool
+  ansible.builtin.import_tasks:
+      file: fix-cat3.yml
+  when: rhel8stig_cat3
   tags:
-      - CAT3
+      - rhel8stig_cat3
       - low
 
-- name: flush handlers
+- name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: reboot system
+- name: Reboot system
   block:
-      - name: reboot system if not skipped
+      - name: Reboot system if not skipped
         ansible.builtin.reboot:
         when:
             - change_requires_reboot
@@ -191,12 +179,43 @@
             - change_requires_reboot
             - rhel8stig_skip_reboot
 
-- name: run post remediation audit
-  ansible.builtin.import_tasks: post_remediation_audit.yml
+- name: Run post remediation audit
+  ansible.builtin.import_tasks:
+      file: post_remediation_audit.yml
   when:
       - run_audit
   tags:
       - run_audit
+
+- name: Add ansible file showing Benchmark and levels applied
+  block:
+      - name: Create ansible facts directory
+        ansible.builtin.file:
+            path: "{{ ansible_facts_path }}"
+            state: directory
+            owner: root
+            group: root
+            mode: 'u=rwx,go=rx'
+
+      - name: Create ansible facts file
+        ansible.builtin.template:
+            src: etc/ansible/compliance_facts.j2
+            dest: "{{ ansible_facts_path }}/compliance_facts.fact"
+            owner: root
+            group: root
+            mode: "u-x,go-wx"
+  when: create_benchmark_facts
+  tags:
+      - always
+      - benchmark
+
+- name: Fetch audit files
+  ansible.builtin.import_tasks:
+      file: fetch_audit_output.yml
+  when:
+      - fetch_audit_output
+      - run_audit
+  tags: always
 
 - name: Show Audit Summary
   ansible.builtin.debug:

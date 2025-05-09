@@ -11,6 +11,7 @@ skip_list:
     - 'name[casing]'
     - 'name[template]'
     - 'key-order[task]'
+    - 'tag[no-duplicate]'
     - '204'
     - '305'
     - '303'
@@ -18,5 +19,8 @@ skip_list:
     - '306'
     - '602'
     - '208'
+    - 'tag[no-duplicate]'
 use_default_rules: true
+rulesdir:
+    - ./rules/
 verbosity: 0
