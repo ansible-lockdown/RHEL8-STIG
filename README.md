@@ -2,7 +2,7 @@
 
 ## Configure a RHEL8 based system to be complaint with Disa STIG
 
-This role is based on RHEL 8 DISA STIG: [Version 2, Rel 2 released on 30, Jan 2025](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R2_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 2, Rel 3 released on 4, April2025](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R3_STIG.zip).
 
 ---
 

@@ -1,5 +1,19 @@
 # Changes to RHEL8STIG
 
+## STIG v2t3
+
+Complete lint update
+Updated handlers to start with upper case
+separated controls to group numbers
+removed conditionals if pkg - to give OK instead of skipped
+separated many control to their own task
+Added warning list to end of play
+- RHEL-08-010296 - Added Client ssh MACs control.
+- RHEL-08-010297 - Added Client ssh Cipher control.
+- RHEL-08-010455 - Added requirement.
+- RHEL-08-020103 - removed
+- RHEL-08-020104 - removed
+
 ## STIG v2r2
 
 RuleIDs updated for listed controls after changes in control

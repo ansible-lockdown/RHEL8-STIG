@@ -1,176 +1,227 @@
 ---
 
-- name: change_requires_reboot
+- name: Change_requires_reboot
   ansible.builtin.set_fact:
-      change_requires_reboot: true
+    change_requires_reboot: true
 
-- name: systemctl daemon-reload
+- name: Systemctl daemon-reload
+  when: not system_is_container
   ansible.builtin.systemd:
-      daemon_reload: true
-  when:
-      - not system_is_container
+    daemon_reload: true
 
-- name: Restart_systemdlogin
+- name: Restart_systemd_login
   ansible.builtin.systemd:
-      name: systemd-logind
-      state: restarted
+    name: systemd-logind
+    state: restarted
 
-- name: sysctl system
-  ansible.builtin.shell: sysctl --system
+- name: Sysctl system
   when: "'procps-ng' in ansible_facts.packages"
+  ansible.builtin.command: sysctl --system
+  changed_when: true
 
-- name: restart sshd
-  ansible.builtin.service:
-      name: sshd
-      state: restarted
+- name: Restart sshd
   when:
-      - rhel_08_040159
-      - not rhel8stig_system_is_chroot
-      - "'openssh-server' in ansible_facts.packages"
-      - not change_requires_reboot
-
-- name: restart sssd
+    - not rhel8stig_system_is_chroot
+    - "'openssh-server' in ansible_facts.packages"
+    - not change_requires_reboot
   ansible.builtin.service:
-      name: sssd
-      state: restarted
-  when:
-      - "'sssd' in ansible_facts.packages"
+    name: sshd
+    state: restarted
 
-- name: restart snmpd
-  ansible.builtin.service:
-      name: snmpd
-      state: restarted
-  when:
-      - not rhel8stig_system_is_chroot
-      - not change_requires_reboot
-
-- name: restart rngd
-  ansible.builtin.service:
-      name: rngd.service
-      state: restarted
-  when:
-      - rhel_08_010471
-
-- name: restart rsyslog
-  ansible.builtin.service:
-      name: rsyslog
-      state: restarted
-  when:
-      - rhel_08_010561
-
-- name: restart firewalld
-  ansible.builtin.service:
-      name: firewalld
-      state: restarted
-  when: rhel_08_040101
-
-- name: restart fapolicyd
-  ansible.builtin.service:
-      name: fapolicyd
-      state: restarted
-  when: rhel_08_040136
-
-- name: generate fapolicyd rules
-  ansible.builtin.shell: fagenrules --load
-  when: rhel_08_040137_rules_dir.stat.exists
-
-- name: restart usbguard
-  ansible.builtin.service:
-      name: usbguard
-      state: restarted
-  when: rhel_08_040141
-
-- name: confirm grub2 user cfg
+- name: AIDE - Check for DB file
   ansible.builtin.stat:
-      path: "/etc/grub.d/01_users"
+    path: "{{ rhel8stig_aide_db_file }}"
+  register: discovered_aide_db_file
+  listen: Build_aide_db
+
+- name: AIDE - Discover age of DB
+  when: discovered_aide_db_file.stat.exists
+  ansible.builtin.find:
+    path: "{{ rhel8stig_aide_db_file | dirname }}"
+    pattern: "{{ rhel8stig_aide_db_file | basename }}"
+    age: "{{ rhel8stig_aide_db_file_age }}"
+  register: discovered_aide_db_age
+  listen: Build_aide_db
+
+- name: "AIDE - Create DB if absent, forced or older than {{ rhel8stig_aide_db_file_age }}"
+  when: not discovered_aide_db_file.stat.exists or
+        (discovered_aide_db_age.files | length > 0) or
+        rhel8stig_aide_db_recreate
+  ansible.builtin.command: /usr/sbin/aide --init
+  changed_when: true
+  register: discovered_new_aide_db_created
+  listen: Build_aide_db
+
+- name: "AIDE - Rename DB file if DB created"
+  when:
+    - not discovered_aide_db_file.stat.exists or
+      (discovered_aide_db_age.files | length > 0) or
+      rhel8stig_aide_db_recreate
+    - discovered_new_aide_db_created.changed  # noqa: no-changed-when
+  ansible.builtin.command: "mv -f {{ rhel8stig_aide_db_new_file }} {{ rhel8stig_aide_db_file }}"
+  changed_when: true
+  listen: Build_aide_db
+
+- name: AIDE - If DB exists run check comparison
+  when:
+    - discovered_aide_db_file.stat.exists
+    - not discovered_new_aide_db_created.changed  # noqa: no-changed-when
+  ansible.builtin.command: /usr/sbin/aide --check
+  changed_when: true
+  failed_when: discovered_aidedb_check.rc not in [ 0, 1, 4, 7 ]
+  register: discovered_aidedb_check
+  listen: Build_aide_db
+
+- name: AIDE - Warning if checks fail
+  when: discovered_aidedb_check.rc != 0
+  vars:
+    warn_control_id: "MEDIUM | RHEL-09-651010-Aide-Check"
+  ansible.builtin.import_tasks:
+    file: warning_facts.yml
+  listen: Build_aide_db
+
+- name: Restart sssd
+  when: "'sssd' in ansible_facts.packages"
+  ansible.builtin.service:
+    name: sssd
+    state: restarted
+
+- name: Restart snmpd
+  when:
+    - not rhel8stig_system_is_chroot
+    - not change_requires_reboot
+  ansible.builtin.service:
+    name: snmpd
+    state: restarted
+
+- name: Restart rngd
+  when: rhel_08_010471
+  ansible.builtin.service:
+    name: rngd.service
+    state: restarted
+
+- name: Restart rsyslog
+  ansible.builtin.service:
+    name: rsyslog
+    state: restarted
+
+- name: Restart firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: restarted
+
+- name: Restart fapolicyd
+  ansible.builtin.service:
+    name: fapolicyd
+    state: restarted
+
+- name: Generate fapolicyd rules
+  ansible.builtin.command: fagenrules --load
+  changed_when: true
+
+- name: Restart usbguard
+  ansible.builtin.service:
+    name: usbguard
+    state: restarted
+
+- name: Confirm grub2 user cfg
+  ansible.builtin.stat:
+    path: "/etc/grub.d/01_users"
   changed_when: rhel8stig_grub2_user_cfg.stat.exists
   register: rhel8stig_grub2_user_cfg
-  notify: make grub2 config
+  listen: Make grub2 config
 
-- name: make grub2 config
-  ansible.builtin.shell: /usr/sbin/grub2-mkconfig --output={{ rhel8stig_bootloader_path }}/grub.cfg
+- name: Rebuild grub
   when:
-      - rhel8stig_grub2_user_cfg.stat.exists
-      - not rhel8stig_skip_for_travis
-      - not system_is_container
+    - rhel8stig_grub2_user_cfg.stat.exists
+    - not rhel8stig_skip_for_travis
+    - not system_is_container
+  ansible.builtin.command: /usr/sbin/grub2-mkconfig --output={{ prelim_bootloader_path }}/grub.cfg
+  changed_when: true
+  listen: Make grub2 config
 
-- name: copy grub2 config to BIOS/UEFI to satisfy benchmark
-  listen: make grub2 config
+- name: Copy grub2 config to BIOS/UEFI to satisfy benchmark
+  when:
+    - rhel8stig_grub2_user_cfg.stat.exists
+    - rhel8stig_workaround_for_disa_benchmark
+    - not rhel8stig_skip_for_travis
+    - not system_is_container
   ansible.builtin.copy:
-      src: "{{ rhel8stig_bootloader_path }}/grub.cfg"
-      dest: "{{ rhel8stig_bootloader_path }}/grub.cfg"
-      remote_src: true
-      owner: root
-      group: root
-      mode: 'u+x,go-w'
-  when:
-      - rhel8stig_grub2_user_cfg.stat.exists
-      - rhel8stig_workaround_for_disa_benchmark
-      - not rhel8stig_skip_for_travis
-      - not system_is_container
+    src: "{{ prelim_bootloader_path }}/grub.cfg"
+    dest: "{{ prelim_bootloader_path }}/grub.cfg"
+    remote_src: true
+    owner: root
+    group: root
+    mode: 'u+x,go-w'
+  listen: Make grub2 config
 
-- name: "restart {{ rhel8stig_time_service }}"
+- name: "Restart {{ rhel8stig_time_service }}"
+  when:
+    - not rhel8stig_skip_for_travis
+    - not rhel8stig_system_is_chroot
+    - not system_is_container
+    - not change_requires_reboot
   ansible.builtin.service:
-      name: "{{ rhel8stig_time_service }}"
-      state: restarted
-  when:
-      - not rhel8stig_skip_for_travis
-      - not rhel8stig_system_is_chroot
-      - not system_is_container
-      - not change_requires_reboot
+    name: "{{ rhel8stig_time_service }}"
+    state: restarted
 
-- name: update auditd
+- name: Update auditd
   ansible.builtin.template:
-      src: audit/99_auditd.rules.j2
-      dest: /etc/audit/rules.d/99_auditd.rules
-      owner: root
-      group: root
-      mode: 'u-x,go-rwx'
-  notify: restart auditd
+    src: audit/99_auditd.rules.j2
+    dest: /etc/audit/rules.d/99_auditd.rules
+    owner: root
+    group: root
+    mode: 'u-x,go-rwx'
+  notify: Restart auditd
 
-- name: restart auditd
-  ansible.builtin.shell: /usr/sbin/service auditd restart
+- name: Restart auditd  # noqa: command-instead-of-module
   when:
-      - not rhel8stig_skip_for_travis
-      - not rhel8stig_system_is_chroot
-      - not system_is_container
-      - not change_requires_reboot
-      - rhel_08_030181
+    - not rhel8stig_system_is_chroot
+    - not system_is_container
+    - not change_requires_reboot
+  ansible.builtin.command: /usr/sbin/service auditd restart
+  changed_when: true
 
-- name: rebuild initramfs
-  ansible.builtin.shell: dracut -f
-  when:
-      - not system_is_container
+- name: Rebuild initramfs
+  when: not system_is_container
+  ansible.builtin.command: dracut -f
+  changed_when: true
 
-- name: undo existing prelinking
-  ansible.builtin.shell: prelink -ua
+- name: Undo existing prelinking
+  ansible.builtin.command: prelink -ua
+  changed_when: true
 
-- name: update running audit failure mode
-  ansible.builtin.shell: auditctl -f {{ rhel8stig_auditd_failure_flag }}
+- name: Update running audit failure mode
+  ansible.builtin.command: auditctl -f {{ rhel8stig_auditd_failure_flag }}
   failed_when: false
+  changed_when: true
 
-- name: clean up ssh host key
-  ansible.builtin.file:
-      path: "{{ item }}"
-      state: absent
+- name: Clean up ssh host key
   with_items:
-      - /etc/ssh/ssh_host_rsa_key
-      - /etc/ssh/ssh_host_rsa_key.pub
+    - /etc/ssh/ssh_host_rsa_key
+    - /etc/ssh/ssh_host_rsa_key.pub
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
 
-- name: init aide and wait
-  ansible.builtin.shell: /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}'
-  notify: move aide db
+- name: Init aide and wait
+  ansible.builtin.command: /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}'
+  changed_when: true
+  notify: Move aide db
 
-- name: init aide
-  ansible.builtin.shell: nohup /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}' > /dev/null &
-  notify: move aide db
+- name: Init aide
+  ansible.builtin.command: nohup /usr/sbin/aide --init -B 'database_out=file:{{ rhel8stig_aide_temp_db_file }}' > /dev/null &
+  changed_when: true
+  notify: Move aide db
 
-- name: move aide db
-  ansible.builtin.shell: "mv {{ rhel8stig_aide_temp_db_file }} {{ rhel8stig_aide_db_file }}"
+- name: Move aide db
   when: not rhel8stig_aide_db_status.stat.exists or rhel8stig_overwrite_aide_db
+  ansible.builtin.command: "mv {{ rhel8stig_aide_temp_db_file }} {{ rhel8stig_aide_db_file }}"
+  changed_when: true
 
-- name: dconf update
-  ansible.builtin.shell: dconf update
+- name: Dconf update
   when:
-      - "'dconf' in ansible_facts.packages"
-      - rhel8stig_always_configure_dconf
+    - "'dconf' in ansible_facts.packages"
+    - rhel8stig_always_configure_dconf
+  ansible.builtin.command: dconf update
+  changed_when: true
