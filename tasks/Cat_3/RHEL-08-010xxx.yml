@@ -1,0 +1,245 @@
+---
+
+- name: "LOW | RHEL-08-010171 | PATCH | RHEL 8 must have policycoreutils package installed."
+  when: rhel_08_010171
+  tags:
+    - RHEL-08-010171
+    - CAT3
+    - CCI-001084
+    - NIST800-53R4_SC-3
+    - SRG-OS-000134-GPOS-00068
+    - SV-230241r1017060_rule
+    - V-230241
+    - policycoreutils
+  ansible.builtin.package:
+    name: policycoreutils
+
+- name: "LOW | RHEL-08-010292 | PATCH | RHEL 8 must ensure the SSH server uses strong entropy."
+  when:
+    - rhel_08_010292
+    - rhel8stig_ssh_required
+  tags:
+    - RHEL-08-010292
+    - CAT3
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230253r1044799_rule
+    - V-230253
+    - ssh
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/sshd
+    regexp: (?i)^#?\s*SSH_USE_STRONG_RNG='
+    line: SSH_USE_STRONG_RNG=32
+  notify: Restart sshd
+
+- name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
+  when: rhel_08_010375
+  tags:
+    - RHEL-08-010375
+    - CAT3
+    - CCI-001090
+    - NIST800-53R4_SC-4
+    - SRG-OS-000138-GPOS-00069
+    - SV-230269r1017087_rule
+    - V-230269
+    - sysctl
+  block:
+    - name: "LOW | RHEL-08-010375 | AUIDT | RHEL 8 must restrict access to the kernel message buffer. | Find conflicting instances"
+      ansible.builtin.shell: grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      changed_when: false
+      failed_when: false
+      register: discovered_kernel_dmesg_settings
+
+    - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer. | Remove conflicting instances"
+      when: discovered_kernel_dmesg_settings.stdout | length > 0
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: ^kernel.dmesg_restrict\s*=\s*0
+        state: absent
+      loop: "{{ discovered_kernel_dmesg_settings.stdout_lines }}"
+
+    - name: "LOW | RHEL-08-010375 | PATCH | RHEL 8 must restrict access to the kernel message buffer."
+      ansible.posix.sysctl:
+        name: kernel.dmesg_restrict
+        value: 1
+        state: present
+        reload: "{{ rhel8stig_sysctl_reload }}"
+        sysctl_set: true
+        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+
+- name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
+  when: rhel_08_010376
+  tags:
+    - RHEL-08-010376
+    - CAT3
+    - CCI-001090
+    - NIST800-53R4_SC-4
+    - SRG-OS-000138-GPOS-00069
+    - SV-230270r1017088_rule
+    - V-230270
+    - sysctl
+  block:
+    - name: "LOW | RHEL-08-010376 | AUDIT | RHEL 8 must prevent kernel profiling by unprivileged users. | Find conflicting instances"
+      ansible.builtin.shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      changed_when: false
+      failed_when: false
+      register: rhel_08_010376_conflicting_settings
+
+    - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Remove conflicting instances"
+      when: rhel_08_010376_conflicting_settings.stdout | length > 0
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: '^kernel.perf_event_paranoid = [^2]'
+        state: absent
+      loop: "{{ rhel_08_010376_conflicting_settings.stdout_lines }}"
+
+    - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
+      ansible.posix.sysctl:
+        name: kernel.perf_event_paranoid
+        value: 2
+        state: present
+        reload: "{{ rhel8stig_sysctl_reload }}"
+        sysctl_set: true
+        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+
+- name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8."
+  when: rhel_08_010440
+  tags:
+    - RHEL-08-010440
+    - CAT3
+    - CCI-002617
+    - NIST800-53R4_SI-2
+    - SRG-OS-000437-GPOS-00194
+    - SV-230281r958936_rule
+    - V-230281
+  block:
+    - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Find .conf files"
+      ansible.builtin.find:
+        paths: /etc
+        recurse: true
+        file_type: any
+        depth: 2
+        patterns:
+          - yum.conf
+          - dnf.conf
+      register: discovered_pkg_mgr_settings
+
+    - name: "LOW | RHEL-08-010440 | PATCH | YUM must remove all software components after updated versions have been installed on RHEL 8. | Set settings"
+      ansible.builtin.lineinfile:
+        path: "{{ item.path }}"
+        regexp: '^.*clean_requirements_on_remove'
+        line: 'clean_requirements_on_remove=True'
+      loop: "{{ discovered_pkg_mgr_settings.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+
+- name: |
+    "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service.
+     LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+  when:
+    - rhel_08_010471 or
+      rhel_08_010472
+    - not rhel_08_010020 or ansible_fips  # Can't enable if FIPS
+  tags:
+    - RHEL-08-010471
+    - RHEL-08-010472
+    - CAT3
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230285r1017096_rule
+    - SV-244527r1017333_rule
+    - V-230285
+    - V-244527
+  block:
+    - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+      ansible.builtin.package:
+        name: rng-tools
+        state: present
+
+    - name: "LOW | RHEL-08-010471 | PATCH | RHEL 8 must enable the hardware random number generator entropy gatherer service."
+      ansible.builtin.systemd:
+        name: rngd.service
+        enabled: true
+      notify: Restart rngd
+
+- name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+  when:
+    - rhel_08_010540
+    - rhel8stig_complex
+    - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
+  tags:
+    - RHEL-08-010540
+    - CAT3
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230292r1017103_rule
+    - V-230292
+    - complexity-high
+    - mounts
+    - var
+  vars:
+    warn_control_id: "LOW | RHEL-08-010540"
+  block:
+    - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+      ansible.builtin.debug:
+        msg: "Warning!! /var is not mounted on a separate partition"
+
+    - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
+  when:
+    - rhel_08_010541
+    - rhel8stig_complex
+    - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
+  tags:
+    - RHEL-08-010541
+    - CAT3
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230293r1017104_rule
+    - V-230293
+    - complexity_high
+    - mounts
+  vars:
+    warn_control_id: "LOW | RHEL-08-010541"
+  block:
+    - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
+      ansible.builtin.debug:
+        msg: "Warning!! /var/log is not mounted on a separate partition"
+
+    - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+  when:
+    - rhel_08_010542
+    - rhel8stig_complex
+    - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
+  tags:
+    - RHEL-08-010542
+    - CAT3
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230294r1017105_rule
+    - V-230294
+    - complexity_high
+    - mounts
+    - auditd
+  vars:
+    warn_control_id: "LOW | RHEL-08-010542"
+  block:
+    - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+      ansible.builtin.debug:
+        msg: "Warning!! /var/log/audit is not mounted on a seperate partition"
+
+    - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml

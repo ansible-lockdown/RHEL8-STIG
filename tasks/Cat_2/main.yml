@@ -1,0 +1,17 @@
+---
+
+- name: Import RHEL-08-010xxx
+  ansible.builtin.import_tasks:
+    file: RHEL-08-010xxx.yml
+
+- name: Import RHEL-08-020xxx
+  ansible.builtin.import_tasks:
+    file: RHEL-08-020xxx.yml
+
+- name: Import RHEL-08-030xxx
+  ansible.builtin.import_tasks:
+    file: RHEL-08-030xxx.yml
+
+- name: Import RHEL-08-040xxx
+  ansible.builtin.import_tasks:
+    file: RHEL-08-040xxx.yml
