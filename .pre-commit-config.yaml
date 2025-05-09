@@ -1,10 +1,9 @@
 ---
-
 ##### CI for use by github no need for action to be added
 ##### Inherited
 ci:
-    autofix_prs: false
-    skip: [detect-aws-credentials, ansible-lint ]
+  autofix_prs: false
+  skip: [detect-aws-credentials, ansible-lint ]
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -47,7 +46,7 @@ repos:
   - id: gitleaks
 
 - repo: https://github.com/ansible-community/ansible-lint
-  rev: v25.4.0
+  rev: v25.2.1
   hooks:
   - id: ansible-lint
     name: Ansible-lint
