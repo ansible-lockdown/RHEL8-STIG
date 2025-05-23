@@ -1,7 +1,7 @@
 ---
 
 - name: "MEDIUM | RHEL-08-040001 | PATCH | RHEL 8 must not have any automated bug reporting tools installed."
-  when: rhel_08_040001
+  when: rhel8stig_040001
   tags:
     - RHEL-08-040001
     - CAT2
@@ -17,7 +17,7 @@
     state: absent
 
 - name: "MEDIUM | RHEL-08-040002 | PATCH | RHEL 8 must not have the sendmail package installed."
-  when: rhel_08_040002
+  when: rhel8stig_040002
   tags:
     - RHEL-08-040002
     - CAT2
@@ -33,7 +33,7 @@
     state: absent
 
 - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
-  when: rhel_08_040020
+  when: rhel8stig_040020
   tags:
     - RHEL-08-040020
     - CAT2
@@ -61,7 +61,7 @@
 
 - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments."
   when:
-    - rhel_08_040030
+    - rhel8stig_040030
     - not rhel8stig_system_is_chroot
     - rhel8stig_firewall_service != "not_required"
     - rhel8stig_disruptive
@@ -131,7 +131,7 @@
         file: warning_facts.yml
 
 - name: "MEDIUM | RHEL-08-040070 | PATCH | The RHEL 8 file system automounter must be disabled unless required."
-  when: rhel_08_040070
+  when: rhel8stig_040070
   tags:
     - RHEL-08-040070
     - CAT2
@@ -156,7 +156,7 @@
         enabled: false
 
 - name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
-  when: rhel_08_040080
+  when: rhel8stig_040080
   tags:
     - RHEL-08-040080
     - CAT2
@@ -183,7 +183,7 @@
 
 - name: "MEDIUM | RHEL-08-040100 | PATCH | A firewall must be installed on RHEL 8."
   when:
-    - rhel_08_040100
+    - rhel8stig_040100
     - rhel8stig_firewall_service != "not_required"
   tags:
     - RHEL-08-040100
@@ -211,7 +211,7 @@
 
 - name: "MEDIUM | RHEL-08-040101 | PATCH | A firewall must be active on RHEL 8"
   when:
-    - rhel_08_040101
+    - rhel8stig_040101
     - rhel8stig_firewall_service == "firewalld"
   tags:
     - RHEL-08-040101
@@ -238,7 +238,7 @@
 # After previous controls as they are dependancies
 - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems."
   when:
-    - rhel_08_040090
+    - rhel8stig_040090
     - rhel8stig_firewall_service != "not_required"
   tags:
     - RHEL-08-040090
@@ -328,7 +328,7 @@
       register: discovered_default_zone_set
 
 - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled."
-  when: rhel_08_040110
+  when: rhel8stig_040110
   tags:
     - RHEL-08-040110
     - CAT2
@@ -349,17 +349,17 @@
     - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
       when: discovered_nmcli_available.rc == 0
       ansible.builtin.command: nmcli radio wifi
-      register: rhel_08_wifi_enabled
+      register: rhel8stig_wifi_enabled
       check_mode: false
-      changed_when: rhel_08_wifi_enabled.stdout != "disabled"
+      changed_when: rhel8stig_wifi_enabled.stdout != "disabled"
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
-      when: rhel_08_wifi_enabled is changed  # noqa no-handler
+      when: rhel8stig_wifi_enabled is changed  # noqa no-handler
       ansible.builtin.command: nmcli radio wifi off
       changed_when: true
 
 - name: "MEDIUM | RHEL-08-040111 | PATCH | RHEL 8 Bluetooth must be disabled."
-  when: rhel_08_040111
+  when: rhel8stig_040111
   tags:
     - RHEL-08-040111
     - CAT2
@@ -389,9 +389,9 @@
     "MEDIUM | RHEL-08-040121 | PATCH | RHEL 8 must mount /dev/shm with the nosuid option."
     "MEDIUM | RHEL-08-040122 | PATCH | RHEL 8 must mount /dev/shm with the noexec option."
   when:
-    - rhel_08_040120 or
-      rhel_08_040121 or
-      rhel_08_040122
+    - rhel8stig_040120 or
+      rhel8stig_040121 or
+      rhel8stig_040122
   tags:
     - CAT2
     - RHEL-08-040120
@@ -412,203 +412,343 @@
     state: mounted
     src: tmpfs
     fstype: tmpfs
-    opts: "defaults{{ rhel_08_040120 | ternary(',nodev', '') }}{{ rhel_08_040121 | ternary(',nosuid', '') }}{{ rhel_08_040122 | ternary(',noexec', '') }}"
+    opts: "defaults{{ rhel8stig_040120 | ternary(',nodev', '') }}{{ rhel8stig_040121 | ternary(',nosuid', '') }}{{ rhel8stig_040122 | ternary(',noexec', '') }}"
   notify: Systemctl daemon-reload
 
-- name: |
-    "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-    "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-    "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
-    when:
-    - rhel_08_040123 or
-      rhel_08_040124 or
-      rhel_08_040125
+- name: MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option
+  when:
+    - rhel8stig_040123
+    - item.mount == '/tmp'
+    - "'nodev' not in item.options"
   tags:
     - CAT2
     - RHEL-08-040123
-    - RHEL-08-040124
-    - RHEL-08-040125
     - CCI-001764
     - NIST800-53R4_CM-7
     - SRG-OS-000368-GPOS-00154
     - SV-230511r958804_rule
-    - SV-230512r958804_rule
-    - SV-230513r958804_rule
     - V-230511
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_tmp
+  ansible.posix.mount:
+    path: /tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }},nodev"
+    state: present
+  register: discovered_tmp_nodev
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
+  when:
+    - rhel8stig_040124
+    - item.mount == '/tmp'
+    - "'nosuid' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040124
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230512r958804_rule
     - V-230512
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_tmp
+  ansible.posix.mount:
+    path: /tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_tmp_nodev.changed %},nodev{% endif %},nosuid"
+    state: present
+  register: discovered_tmp_nosuid
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
+  when:
+    - rhel8stig_040125
+    - item.mount == '/tmp'
+    - "'noexec' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040125
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230513r958804_rule
     - V-230513
     - mounts
-  block:
-    - name: |
-        "MEDIUM | RHEL-08-040123 | AUDIT | RHEL 8 must mount /tmp with the nodev option."
-        "MEDIUM | RHEL-08-040124 | AUDIT | RHEL 8 must mount /tmp with the nosuid option."
-        "MEDIUM | RHEL-08-040125 | AUDIT | RHEL 8 must mount /tmp with the noexec option."
-      ansible.builtin.command: mount | grep /tmp  # noqa command-instead-of-module
-      changed_when: false
-      failed_when: false
-      register: discovered_tmp_mount_status
+  notify:
+    - Systemctl daemon-reload
+    - Remount_tmp
+  ansible.posix.mount:
+    path: /tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_tmp_nodev.changed %},nodev{% endif %}{% if discovered_tmp_nosuid.changed %},nosuid{% endif %},noexec"
+    state: present
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
 
-    - name: |
-        "MEDIUM | RHEL-08-040123 | PATCH | RHEL 8 must mount /tmp with the nodev option."
-        "MEDIUM | RHEL-08-040124 | PATCH | RHEL 8 must mount /tmp with the nosuid option."
-        "MEDIUM | RHEL-08-040125 | PATCH | RHEL 8 must mount /tmp with the noexec option."
-      when:
-        - discovered_tmp_mount_status.stdout | length > 0
-        - item.mount =='/tmp'
-      ansible.posix.mount:
-        path: "{{ item.mount }}"
-        state: mounted
-        src: "{{ item.device }}"
-        fstype: "{{ item.fstype }}"
-        opts: "defaults{{ rhel_08_040123 | ternary(',nodev', '') }}{{ rhel_08_040124 | ternary(',nosuid', '') }}{{ rhel_08_040125 | ternary(',noexec', '') }}"
-      loop: "{{ ansible_facts.mounts }}"
-
-- name: |
-    "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-    "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-    "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+- name: MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option
   when:
-    - rhel_08_040126 or
-      rhel_08_040127 or
-      rhel_08_040128
+    - rhel8stig_040126
+    - item.mount == '/var/log'
+    - "'nodev' not in item.options"
   tags:
     - CAT2
     - RHEL-08-040126
-    - RHEL-08-040127
-    - RHEL-08-040128
     - CCI-001764
     - NIST800-53R4_CM-7
     - SRG-OS-000368-GPOS-00154
     - SV-230514r958804_rule
-    - SV-230515r958804_rule
-    - SV-230516r958804_rule
     - V-230514
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log
+  ansible.posix.mount:
+    path: /var/log
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }},nodev"
+    state: present
+  register: discovered_var_log_nodev
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
+  when:
+    - rhel8stig_040127
+    - item.mount == '/var/log'
+    - "'nosuid' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040127
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230515r958804_rule
     - V-230515
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log
+  ansible.posix.mount:
+    path: /var/log
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_log_nodev.changed %},nodev{% endif %},nosuid"
+    state: present
+  register: discovered_var_log_nosuid
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
+  when:
+    - rhel8stig_040128
+    - item.mount == '/var/log'
+    - "'noexec' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040128
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230516r958804_rule
     - V-230516
     - mounts
-  block:
-    - name: |
-        "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-        "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-        "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-      ansible.builtin.command: mount | grep '\s\+/var/log\s\+'  # noqa command-instead-of-module
-      changed_when: false
-      failed_when: false
-      register: discovered_var_log_status
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log
+  ansible.posix.mount:
+    path: /var/log
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_log_nodev.changed %},nodev{% endif %}{% if discovered_var_log_nosuid.changed %},nosuid{% endif %},noexec"
+    state: present
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
 
-    - name: |
-        "MEDIUM | RHEL-08-040126 | PATCH | RHEL 8 must mount /var/log with the nodev option."
-        "MEDIUM | RHEL-08-040127 | PATCH | RHEL 8 must mount /var/log with the nosuid option."
-        "MEDIUM | RHEL-08-040128 | PATCH | RHEL 8 must mount /var/log with the noexec option."
-      when:
-        - discovered_var_log_status.stdout | length > 0
-        - item.mount == '/var/log'
-      ansible.posix.mount:
-        path: "{{ item.mount }}"
-        state: mounted
-        src: "{{ item.device }}"
-        fstype: "{{ item.fstype }}"
-        opts: "defaults{{ rhel_08_040126 | ternary(',nodev', '') }}{{ rhel_08_040127 | ternary(',nosuid', '') }}{{ rhel_08_040128 | ternary(',noexec', '') }}"
-      loop: "{{ ansible_facts.mounts }}"
-
-- name: |
-    "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-    "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-    "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
-    when:
-    - rhel_08_040129 or
-      rhel_08_040130 or
-      rhel_08_040131
+- name: MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option
+  when:
+    - rhel8stig_040129
+    - item.mount == '/var/log/audit'
+    - "'nodev' not in item.options"
   tags:
     - CAT2
     - RHEL-08-040129
-    - RHEL-08-040130
-    - RHEL-08-040131
     - CCI-001764
     - NIST800-53R4_CM-7
     - SRG-OS-000368-GPOS-00154
     - SV-230517r958804_rule
-    - SV-230518r958804_rule
-    - SV-230519r958804_rule
     - V-230517
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log_audit
+  ansible.posix.mount:
+    path: /var/log/audit
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }},nodev"
+    state: present
+  register: discovered_var_log_audit_nodev
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
+  when:
+    - rhel8stig_040130
+    - item.mount == '/var/log/audit'
+    - "'nosuid' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040130
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230518r958804_rule
     - V-230518
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log_audit
+  ansible.posix.mount:
+    path: /var/log/audit
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_log_audit_nodev.changed %},nodev{% endif %},nosuid"
+    state: present
+  register: discovered_var_log_audit_nosuid
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
+  when:
+    - rhel8stig_040131
+    - item.mount == '/var/log/audit'
+    - "'noexec' not in item.options"
+  tags:
+    - CAT2
+    - RHEL-08-040131
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230519r958804_rule
     - V-230519
     - mounts
-  block:
-    - name: |
-        "MEDIUM | RHEL-08-040129 | AUDIT | RHEL 8 must mount /var/log/audit with the nodev option."
-        "MEDIUM | RHEL-08-040130 | AUDIT | RHEL 8 must mount /var/log/audit with the nosuid option."
-        "MEDIUM | RHEL-08-040131 | AUDIT | RHEL 8 must mount /var/log/audit with the noexec option."
-      ansible.builtin.command: mount | grep /var/log/audit  # noqa command-instead-of-module
-      changed_when: false
-      failed_when: false
-      register: discovered_var_log_audit_status
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_log_audit
+  ansible.posix.mount:
+    path: /var/log/audit
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_log_audit_nodev.changed %},nodev{% endif %}{% if discovered_var_log_audit_nosuid.changed %},nosuid{% endif %},noexec"
+    state: present
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
 
-    - name: |
-        "MEDIUM | RHEL-08-040129 | PATCH | RHEL 8 must mount /var/log/audit with the nodev option."
-        "MEDIUM | RHEL-08-040130 | PATCH | RHEL 8 must mount /var/log/audit with the nosuid option."
-        "MEDIUM | RHEL-08-040131 | PATCH | RHEL 8 must mount /var/log/audit with the noexec option."
-      when:
-        - item.mount == '/var/log/audit'
-        - discovered_var_log_audit_status.stdout | length > 0
-      ansible.posix.mount:
-        path: "{{ item.mount }}"
-        state: mounted
-        src: "{{ item.device }}"
-        fstype: "{{ item.fstype }}"
-        opts: "defaults{{ rhel_08_040129 | ternary(',nodev', '') }}{{ rhel_08_040130 | ternary(',nosuid', '') }}{{ rhel_08_040131 | ternary(',noexec', '') }}"
-      loop: "{{ ansible_facts.mounts }}"
-
-- name: |
-    "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-    "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-    "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+- name: MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option
   when:
-    - rhel_08_040132 or
-      rhel_08_040133 or
-      rhel_08_040134
+    - rhel8stig_040132
+    - item.mount == '/var/tmp'
+    - "'nodev' not in item.options"
   tags:
     - CAT2
     - RHEL-08-040132
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230520r958804_ruleule
+    - V-230520
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_tmp
+  ansible.posix.mount:
+    path: /var/tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }},nodev"
+    state: present
+  register: discovered_var_tmp_nodev
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
+  when:
+    - rhel8stig_040133
+    - item.mount == '/var/tmp'
+    - "'nosuid' not in item.options"
+  tags:
+    - CAT2
     - RHEL-08-040133
+    - CCI-001764
+    - NIST800-53R4_CM-7
+    - SRG-OS-000368-GPOS-00154
+    - SV-230521r958804_rule
+    - V-230521
+    - mounts
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_tmp
+  ansible.posix.mount:
+    path: /var/tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_tmp_nodev.changed %},nodev{% endif %},nosuid"
+    state: present
+  register: discovered_var_tmp_nosuid
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
+
+- name: "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
+  when:
+    - rhel8stig_040134
+    - item.mount == '/var/tmp'
+    - "'noexec' not in item.options"
+  tags:
+    - CAT2
     - RHEL-08-040134
     - CCI-001764
     - NIST800-53R4_CM-7
     - SRG-OS-000368-GPOS-00154
-    - SV-230520r958804_rule
-    - SV-230521r958804_rule
     - SV-230522r958804_rule
-    - V-230520
-    - V-230521
     - V-230522
     - mounts
-  block:
-    - name: |
-        "MEDIUM | RHEL-08-040132 | AUDIT | RHEL 8 must mount /var/tmp with the nodev option"
-        "MEDIUM | RHEL-08-040133 | AUDIT | RHEL 8 must mount /var/tmp with the nosuid option."
-        "MEDIUM | RHEL-08-040134 | AUDIT | RHEL 8 must mount /var/tmp with the noexec option."
-      ansible.builtin.command: mount | grep /var/tmp  # noqa command-instead-of-module
-      changed_when: false
-      failed_when: false
-      register: discovered_var_tmp_status
-
-    - name: |
-        "MEDIUM | RHEL-08-040132 | PATCH | RHEL 8 must mount /var/tmp with the nodev option"
-        "MEDIUM | RHEL-08-040133 | PATCH | RHEL 8 must mount /var/tmp with the nosuid option."
-        "MEDIUM | RHEL-08-040134 | PATCH | RHEL 8 must mount /var/tmp with the noexec option."
-      when:
-        - item.mount == '/var/tmp'
-        - discovered_var_tmp_status.stdout | length > 0
-      ansible.posix.mount:
-        path: "{{ item.mount }}"
-        state: mounted
-        src: "{{ item.device }}"
-        fstype: "{{ item.fstype }}"
-        opts: "defaults{{ rhel_08_040132 | ternary(',nodev', '') }}{{ rhel_08_040133 | ternary(',nosuid', '') }}{{ rhel_08_040134 | ternary(',noexec', '') }}"
-      loop: "{{ ansible_facts.mounts }}"
+  notify:
+    - Systemctl daemon-reload
+    - Remount_var_tmp
+  ansible.posix.mount:
+    path: /var/tmp
+    src: "{{ item.device }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}{% if discovered_var_tmp_nodev.changed %},nodev{% endif %}{% if discovered_var_tmp_nosuid.changed %},nosuid{% endif %},noexec"
+    state: present
+  loop: "{{ ansible_facts.mounts }}"
+  loop_control:
+    label: "{{ item.device }}"
 
 - name: "MEDIUM | RHEL-08-040135 | PATCH | The RHEL 8 fapolicy module must be installed."
-  when: rhel_08_040135
+  when: rhel8stig_040135
   tags:
     - RHEL-08-040135
     - CAT2
@@ -625,7 +765,7 @@
     state: present
 
 - name: "MEDIUM | RHEL-08-040136 | PATCH | The RHEL 8 fapolicy module must be enabled."
-  when: rhel_08_040136
+  when: rhel8stig_040136
   tags:
     - RHEL-08-040136
     - CAT2
@@ -643,7 +783,7 @@
     state: started
 
 - name: "MEDIUM | RHEL-08-040137 | PATCH | The RHEL 8 fapolicy module must be configured to employ a deny-all, permit-by-exception policy to allow the execution of authorized software programs."
-  when: rhel_08_040137
+  when: rhel8stig_040137
   tags:
     - RHEL-08-040137
     - CAT2
@@ -704,9 +844,9 @@
     "MEDIUM | RHEL-08-040140 | PATCH | RHEL 8 must block unauthorized peripherals before establishing a connection."
     "MEDIUM | RHEL-08-040141 | PATCH | RHEL 8 must enable the USBGuard."
   when:
-    - rhel_08_040139 or
-      rhel_08_040140 or
-      rhel_08_040141
+    - rhel8stig_040139 or
+      rhel8stig_040140 or
+      rhel8stig_040141
   tags:
     - RHEL-08-040139
     - RHEL-08-040140
@@ -724,22 +864,22 @@
     - usbguard
   block:
     - name: "MEDIUM | RHEL-08-040139 | PATCH | RHEL 8 must have the USBGuard installed. | Install usbguard"
-      when: rhel_08_040139
+      when: rhel8stig_040139
       ansible.builtin.package:
         name: usbguard
         state: present
 
     - name: "MEDIUM | RHEL-08-040140 | PATCH | RHEL 8 must block unauthorized peripherals before establishing a connection. | generate policy"
       when:
-        - rhel_08_040140
-        - rhel_08_040139
+        - rhel8stig_040140
+        - rhel8stig_040139
       ansible.builtin.command: usbguard generate-policy > /etc/usbguard/rules.conf
       changed_when: true
 
     - name: "MEDIUM | RHEL-08-040141 | PATCH | RHEL 8 must enable the USBGuard. | Start/Enable service"
       when:
-        - rhel_08_040141
-        - rhel_08_040139
+        - rhel8stig_040141
+        - rhel8stig_040139
       ansible.builtin.service:
         name: usbguard
         enabled: true
@@ -747,7 +887,7 @@
 
 - name: "MEDIUM | RHEL-08-040150 | PATCH | A firewall must be able to protect against or limit the effects of Denial of Service (DoS) attacks by ensuring RHEL 8 can implement rate-limiting measures on impacted network interfaces."
   when:
-    - rhel_08_040150
+    - rhel8stig_040150
     - rhel8stig_firewall_service != "not_required"
   tags:
     - RHEL-08-040150
@@ -768,8 +908,8 @@
     "MEDIUM | RHEL-08-040159 | PATCH | All RHEL 8 networked systems must have SSH installed."
     "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission."
   when:
-    - rhel_08_040159 or
-      rhel_08_040160
+    - rhel8stig_040159 or
+      rhel8stig_040160
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-040159
@@ -788,13 +928,13 @@
     - ssh
   block:
     - name: "MEDIUM | RHEL-08-040159 | PATCH | All RHEL 8 networked systems must have SSH installed. | Install openssh-server"
-      when: rhel_08_040159
+      when: rhel8stig_040159
       ansible.builtin.package:
         name: openssh-server
         state: present
 
     - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
-      when: rhel_08_040159
+      when: rhel8stig_040159
       ansible.builtin.service:
         name: sshd
         enabled: true
@@ -802,7 +942,7 @@
 
 - name: "MEDIUM | RHEL-08-040161 | PATCH | RHEL 8 must force a frequent session key renegotiation for SSH connections to the server."
   when:
-    - rhel_08_040161
+    - rhel8stig_040161
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-040161
@@ -825,7 +965,7 @@
 - name: "MEDIUM | RHEL-08-040180 | PATCH | The debug-shell systemd service must be disabled on RHEL 8."
   when:
     - ansible_service_mgr == 'systemd'
-    - rhel_08_040180
+    - rhel8stig_040180
   tags:
     - RHEL-08-040180
     - CAT2
@@ -841,7 +981,7 @@
     daemon_reload: true
 
 - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
-  when: rhel_08_040209
+  when: rhel8stig_040209
   tags:
     - RHEL-08-040209
     - CAT2
@@ -878,7 +1018,7 @@
 
 - name: "MEDIUM | RHEL-08-040210 | PATCH | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted."
   when:
-    - rhel_08_040210
+    - rhel8stig_040210
     - rhel8stig_ipv6_required
   tags:
     - RHEL-08-040210
@@ -916,7 +1056,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040220 | PATCH | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects."
-  when: rhel_08_040220
+  when: rhel8stig_040220
   tags:
     - RHEL-08-040220
     - CAT2
@@ -953,7 +1093,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040230 | PATCH | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
-  when: rhel_08_040230
+  when: rhel8stig_040230
   tags:
     - RHEL-08-040230
     - CAT2
@@ -990,7 +1130,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040239 | PATCH | RHEL 8 must not forward IPv4 source-routed packets."
-  when: rhel_08_040239
+  when: rhel8stig_040239
   tags:
     - RHEL-08-040239
     - CAT2
@@ -1028,7 +1168,7 @@
 
 - name: "MEDIUM | RHEL-08-040240 | PATCH | RHEL 8 must not forward IPv6 source-routed packets."
   when:
-    - rhel_08_040240
+    - rhel8stig_040240
     - rhel8stig_ipv6_required
   tags:
     - RHEL-08-040240
@@ -1064,7 +1204,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040249 | PATCH | RHEL 8 must not forward IPv4 source-routed packets by default."
-  when: rhel_08_040249
+  when: rhel8stig_040249
   tags:
     - RHEL-08-040249
     - CAT2
@@ -1102,7 +1242,7 @@
 
 - name: "MEDIUM | RHEL-08-040250 | PATCH | RHEL 8 must not forward IPv6 source-routed packets by default."
   when:
-    - rhel_08_040250
+    - rhel8stig_040250
     - rhel8stig_ipv6_required
   tags:
     - RHEL-08-040250
@@ -1139,7 +1279,7 @@
 
 - name: "MEDIUM | RHEL-08-040259 | PATCH | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router."
   when:
-    - rhel_08_040259
+    - rhel8stig_040259
     - not rhel8stig_system_is_router
   tags:
     - RHEL-08-040259
@@ -1178,7 +1318,7 @@
 
 - name: "MEDIUM | RHEL-08-040260 | PATCH | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router."
   when:
-    - rhel_08_040260
+    - rhel8stig_040260
     - rhel8stig_ipv6_required
     - not rhel8stig_system_is_router
   tags:
@@ -1218,7 +1358,7 @@
 
 - name: "MEDIUM | RHEL-08-040261 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces."
   when:
-    - rhel_08_040261
+    - rhel8stig_040261
     - rhel8stig_ipv6_required
     - not rhel8stig_system_is_router
   tags:
@@ -1258,7 +1398,7 @@
 
 - name: "MEDIUM | RHEL-08-040262 | PATCH | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default."
   when:
-    - rhel_08_040262
+    - rhel8stig_040262
     - rhel8stig_ipv6_required
     - not rhel8stig_system_is_router
   tags:
@@ -1297,7 +1437,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040270 | PATCH | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default."
-  when: rhel_08_040270
+  when: rhel8stig_040270
   tags:
     - RHEL-08-040270
     - CAT2
@@ -1334,7 +1474,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040279 | PATCH | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages."
-  when: rhel_08_040279
+  when: rhel8stig_040279
   tags:
     - RHEL-08-040279
     - CAT2
@@ -1372,7 +1512,7 @@
 
 - name: "MEDIUM | RHEL-08-040280 | PATCH | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages."
   when:
-    - rhel_08_040280
+    - rhel8stig_040280
     - rhel8stig_ipv6_required
   tags:
     - RHEL-08-040280
@@ -1410,7 +1550,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040281 | PATCH | RHEL 8 must disable access to network bpf syscall from unprivileged processes."
-  when: rhel_08_040281
+  when: rhel8stig_040281
   tags:
     - RHEL-08-040281
     - CAT2
@@ -1447,7 +1587,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes."
-  when: rhel_08_040282
+  when: rhel8stig_040282
   tags:
     - RHEL-08-040282
     - CAT2
@@ -1484,7 +1624,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
-  when: rhel_08_040283
+  when: rhel8stig_040283
   tags:
     - RHEL-08-040283
     - CAT2
@@ -1521,7 +1661,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040284 | PATCH | RHEL 8 must disable the use of user namespaces."
-  when: rhel_08_040284
+  when: rhel8stig_040284
   tags:
     - RHEL-08-040284
     - CAT2
@@ -1558,7 +1698,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces."
-  when: rhel_08_040285
+  when: rhel8stig_040285
   tags:
     - RHEL-08-040285
     - CAT2
@@ -1595,7 +1735,7 @@
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
-  when: rhel_08_040286
+  when: rhel8stig_040286
   tags:
     - RHEL-08-040286
     - CAT2
@@ -1633,7 +1773,7 @@
 - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
   when:
     - "'postfix' in ansible_facts.packages"
-    - rhel_08_040290
+    - rhel8stig_040290
   tags:
     - RHEL-08-040290
     - CAT2
@@ -1648,7 +1788,7 @@
 
 - name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
   when:
-    - rhel_08_040320
+    - rhel8stig_040320
     - not rhel8stig_gui
     - "'xorg-x11-server-Xorg' in ansible_facts.packages or
       'xorg-x11-server-common' in ansible_facts.packages or
@@ -1674,7 +1814,7 @@
 
 - name: "MEDIUM | RHEL-08-040321 | PATCH | The graphical display manager must not be the default target on RHEL 8 unless approved."
   when:
-    - rhel_08_040321
+    - rhel8stig_040321
     - not rhel8stig_gui
   tags:
     - RHEL-08-040321
@@ -1692,7 +1832,7 @@
 
 - name: "MEDIUM | RHEL-08-040330 | PATCH | RHEL 8 network interfaces must not be in promiscuous mode."
   when:
-    - rhel_08_040330
+    - rhel8stig_040330
     - not rhel8stig_net_promisc_mode_required
   tags:
     - RHEL-08-040330
@@ -1720,7 +1860,7 @@
 
 - name: "MEDIUM | RHEL-08-040340 | PATCH | RHEL 8 remote X connections for interactive users must be disabled unless to fulfill documented and validated mission requirements."
   when:
-    - rhel_08_040340
+    - rhel8stig_040340
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-040340
@@ -1731,16 +1871,16 @@
     - SV-230555r1017317_rule
     - V-230555
     - ssh
-  ansible.builtin.lineinfile:
+  ansible.builtin.replace:
     path: /etc/ssh/sshd_config
-    regexp: '(?i)^#?\s*X11Forwarding'
-    line: 'X11Forwarding no'
+    regexp: '(?i)^#?\s*X11Forwarding yes'
+    replace: X11Forwarding no
     validate: '/usr/sbin/sshd -T -f %s'
   notify: Restart sshd
 
 - name: "MEDIUM | RHEL-08-040341 | PATCH | The RHEL 8 SSH daemon must prevent remote hosts from connecting to the proxy display."
   when:
-    - rhel_08_040341
+    - rhel8stig_040341
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-040341
@@ -1759,7 +1899,7 @@
 
 - name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
   when:
-    - rhel_08_040342
+    - rhel8stig_040342
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-040342
@@ -1790,7 +1930,7 @@
 
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   when:
-    - rhel_08_040350
+    - rhel8stig_040350
     - rhel8stig_tftp_required
   tags:
     - RHEL-08-040350
@@ -1813,7 +1953,7 @@
     - discovered_tftp_server_args_settings.rc != 257
 
 - name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
-  when: rhel_08_040370
+  when: rhel8stig_040370
   tags:
     - RHEL-08-040370
     - CAT2
@@ -1829,7 +1969,7 @@
     state: absent
 
 - name: "MEDIUM | RHEL-08-040380 | PATCH | The iprutils package must not be installed unless mission essential on RHEL 8."
-  when: rhel_08_040380
+  when: rhel8stig_040380
   tags:
     - RHEL-08-040380
     - CAT2
@@ -1844,7 +1984,7 @@
     state: absent
 
 - name: "MEDIUM | RHEL-08-040390 | PATCH | The tuned package must not be installed unless mission essential on RHEL 8."
-  when: rhel_08_040390
+  when: rhel8stig_040390
   tags:
     - RHEL-08-040390
     - CAT2
@@ -1859,7 +1999,7 @@
     state: absent
 
 - name: "MEDIUM | RHEL-08-040400 | AUDIT | RHEL 8 must prevent non-privileged users from executing privileged functions, including disabling, circumventing, or altering implemented security safeguards/countermeasures."
-  when: rhel_08_040400
+  when: rhel8stig_040400
   tags:
     - RHEL-08-040400
     - CAT2

@@ -9,6 +9,21 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
+- name: Remount_tmp
+  ansible.posix.mount:
+    name: /tmp
+    state: remounted
+
+- name: Remount_var_log
+  ansible.posix.mount:
+    name: /var/log
+    state: remounted
+
+- name: Remount_var_log_audit
+  ansible.posix.mount:
+    name: /var/log/audit
+    state: remounted
+
 - name: Remount_var_tmp
   ansible.posix.mount:
     name: /var/tmp
