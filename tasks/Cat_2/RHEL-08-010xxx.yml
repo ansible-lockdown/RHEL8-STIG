@@ -2874,7 +2874,7 @@
   when:
     - rhel8stig_010800
     - rhel8stig_complex
-    - "'/home' not in ansible_facts.mounts"
+    - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
   tags:
     - RHEL-08-010800
     - CAT2
@@ -2891,7 +2891,7 @@
   block:
     - name: "MEDIUM | RHEL-08-010800 | AUDIT | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
       ansible.builtin.debug:
-        msg: "WARNING!!  /home is not mounted on a separate partition"
+        msg: "WARNING!! /home is not mounted on a separate partition"
 
     - name: "MEDIUM | RHEL-08-010800 | AUDIT | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
       ansible.builtin.import_tasks:
