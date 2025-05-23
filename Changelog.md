@@ -1,6 +1,6 @@
 # Changes to RHEL8STIG
 
-## STIG v2t3
+## STIG v2r3
 
 Complete lint update
 Updated handlers to start with upper case
@@ -8,6 +8,13 @@ separated controls to group numbers
 removed conditionals if pkg - to give OK instead of skipped
 separated many control to their own task
 Added warning list to end of play
+Renamed control variables to correct format
+auditd logic updated
+sssd prelim warning now added to warning summary
+bootloader - 010020 UUID logic updated
+010423 fixed and 010660 updated
+mount logic rewrite
+- RHEL-08-101030 - Moved to CAT1
 - RHEL-08-010296 - Added Client ssh MACs control.
 - RHEL-08-010297 - Added Client ssh Cipher control.
 - RHEL-08-010455 - Added requirement.
@@ -172,7 +179,7 @@ Controls updated
   - 010290 - ruleid and SSH MACS updated
   - 010291 - ruleid and SSH Ciphers updated
   - 010770 - ruleid
-  - 020035 - new control idlesession timeout new var rhel_08_020035_idlesessiontimeout
+  - 020035 - new control idlesession timeout new var idlesessiontimeout
   - 020041 - ruleid and tmux script update
   - 030690 - ruleid and protocol options added
   - 040159 - ruleid
