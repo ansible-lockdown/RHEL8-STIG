@@ -1,127 +1,155 @@
 # This template will set all of the auditd configurations via a handler in the role in one task instead of individually
-{% if rhel_08_030000 %}
+{% if rhel8stig_030000 %}
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv
 -a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k execpriv
 -a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k execpriv
 -a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k execpriv
 {% endif %}
-{% if rhel_08_030190 %}
+{% if rhel8stig_030130 %}
+-w /etc/shadow -p wa -k identity
+{% endif %}
+{% if rhel8stig_030140 %}
+-w /etc/security/opasswd -p wa -k identity
+{% endif %}
+{% if rhel8stig_030150 %}
+-w /etc/passwd -p wa -k identity
+{% endif %}
+{% if rhel8stig_030160 %}
+-w /etc/gshadow -p wa -k identity
+{% endif %}
+{% if rhel8stig_030170 %}
+-w /etc/group -p wa -k identity
+{% endif %}
+{% if rhel8stig_030171 %}
+-w /etc/sudoers -p wa -k identity
+{% endif %}
+{% if rhel8stig_030172 %}
+-w /etc/sudoers.d/ -p wa -k identity
+{% endif %}
+{% if rhel8stig_030190 %}
 -a always,exit -F path=/usr/bin/su -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-priv_change
 {% endif %}
-{% if rhel_08_030200 %}
+{% if rhel8stig_030200 %}
 -a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 -a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 -a always,exit -F arch=b32 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
 -a always,exit -F arch=b64 -S setxattr,fsetxattr,lsetxattr,removexattr,fremovexattr,lremovexattr -F auid=0 -k perm_mod
 {% endif %}
-{% if rhel_08_030250 %}
+{% if rhel8stig_030250 %}
 -a always,exit -F path=/usr/bin/chage -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-chage
 {% endif %}
-{% if rhel_08_030260 %}
+{% if rhel8stig_030260 %}
 -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 {% endif %}
-{% if rhel_08_030280 %}
+{% if rhel8stig_030280 %}
 -a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-ssh
 {% endif %}
-{% if rhel_08_030290 %}
+{% if rhel8stig_030290 %}
 -a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-passwd
 {% endif %}
-{% if rhel_08_030300 %}
+{% if rhel8stig_030300 %}
 -a always,exit -F path=/usr/bin/mount -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-mount
 {% endif %}
-{% if rhel_08_030301 %}
+{% if rhel8stig_030301 %}
 -a always,exit -F path=/usr/bin/umount -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-mount
 {% endif %}
-{% if rhel_08_030302 %}
+{% if rhel8stig_030302 %}
 -a always,exit -F arch=b32 -S mount -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-mount
 -a always,exit -F arch=b64 -S mount -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-mount
 {% endif %}
-{% if rhel_08_030310 %}
+{% if rhel8stig_030310 %}
 -a always,exit -F path=/usr/sbin/unix_update -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030311 %}
+{% if rhel8stig_030311 %}
 -a always,exit -F path=/usr/sbin/postdrop -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030312 %}
+{% if rhel8stig_030312 %}
 -a always,exit -F path=/usr/sbin/postqueue -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030313 %}
+{% if rhel8stig_030313 %}
 -a always,exit -F path=/usr/sbin/semanage -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030314 %}
+{% if rhel8stig_030314 %}
 -a always,exit -F path=/usr/sbin/setfiles -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030315 %}
+{% if rhel8stig_030315 %}
 -a always,exit -F path=/usr/sbin/userhelper -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030316 %}
+{% if rhel8stig_030316 %}
 -a always,exit -F path=/usr/sbin/setsebool -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030317 %}
+{% if rhel8stig_030317 %}
 -a always,exit -F path=/usr/sbin/unix_chkpwd -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-unix-update
 {% endif %}
-{% if rhel_08_030320 %}
+{% if rhel8stig_030320 %}
 -a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-ssh
 {% endif %}
-{% if rhel_08_030330 %}
+{% if rhel8stig_030330 %}
 -a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 {% endif %}
-{% if rhel_08_030340 %}
+{% if rhel8stig_030340 %}
 -a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-pam_timestamp_check
 {% endif %}
-{% if rhel_08_030350 %}
+{% if rhel8stig_030350 %}
 -a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k priv_cmd
 {% endif %}
-{% if rhel_08_030360 %}
+{% if rhel8stig_030360 %}
 -a always,exit -F arch=b32 -S init_module,finit_module -F auid>={{ min_int_uid }} -F auid!=unset -k module_chng
 -a always,exit -F arch=b64 -S init_module,finit_module -F auid>={{ min_int_uid }} -F auid!=unset -k module_chng
 {% endif %}
-{% if rhel_08_030361 %}
+{% if rhel8stig_030361 %}
 -a always,exit -F arch=b32 -S rename,unlink,rmdir,renameat,unlinkat -F auid>={{ min_int_uid }} -F auid!=unset -k delete
 -a always,exit -F arch=b64 -S rename,unlink,rmdir,renameat,unlinkat -F auid>={{ min_int_uid }} -F auid!=unset -k delete
 {% endif %}
-{% if rhel_08_030370 %}
+{% if rhel8stig_030370 %}
 -a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-gpasswd
 {% endif %}
-{% if rhel_08_030390 %}
+{% if rhel8stig_030390 %}
 -a always,exit -F arch=b32 -S delete_module -F auid>={{ min_int_uid }} -F auid!=unset -k module_chng
 -a always,exit -F arch=b64 -S delete_module -F auid>={{ min_int_uid }} -F auid!=unset -k module_chng
 {% endif %}
-{% if rhel_08_030400 %}
+{% if rhel8stig_030400 %}
 -a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-crontab
 {% endif %}
-{% if rhel_08_030410 %}
+{% if rhel8stig_030410 %}
 -a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k priv_cmd
 {% endif %}
-{% if rhel_08_030420 %}
+{% if rhel8stig_030420 %}
 -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>={{ min_int_uid }} -F auid!=unset -k perm_access
 -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EPERM -F auid>={{ min_int_uid }} -F auid!=unset -k perm_access
 -a always,exit -F arch=b32 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>={{ min_int_uid }} -F auid!=unset -k perm_access
 -a always,exit -F arch=b64 -S truncate,ftruncate,creat,open,openat,open_by_handle_at -F exit=-EACCES -F auid>={{ min_int_uid }} -F auid!=unset -k perm_access
 {% endif %}
-{% if rhel_08_030480 %}
+{% if rhel8stig_030480 %}
 -a always,exit -F arch=b32 -S chown,fchown,fchownat,lchown -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 -a always,exit -F arch=b64 -S chown,fchown,fchownat,lchown -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 {% endif %}
-{% if rhel_08_030490 %}
+{% if rhel8stig_030490 %}
 -a always,exit -F arch=b32 -S chmod,fchmod,fchmodat -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 {% endif %}
-{% if rhel_08_030550 %}
+{% if rhel8stig_030550 %}
 -a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k priv_cmd
 {% endif %}
-{% if rhel_08_030560 %}
+{% if rhel8stig_030560 %}
 -a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k privileged-usermod
 {% endif %}
-{% if rhel_08_030570 %}
+{% if rhel8stig_030570 %}
 -a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>={{ min_int_uid }} -F auid!=unset -k perm_mod
 {% endif %}
-{% if rhel_08_030580 %}
+{% if rhel8stig_030580 %}
 -a always,exit -F path=/usr/bin/kmod -F perm=x -F auid>=1000 -F auid!=unset -k modules
 {% endif %}
-{% if rhel_08_030590 %}
+{% if rhel8stig_030590 %}
 -w {{ rhel8stig_pam_faillock_dir }} -p wa -k logins
 {% endif %}
-{% if rhel_08_030600 %}
+{% if rhel8stig_030600 %}
 -w /var/log/lastlog -p wa -k logins
+{% endif %}
+{% if rhel8stig_030122 %}
+--loginuid-immutable
+{% endif %}
+{% if rhel8stig_030121 %}
+# Must the last rule
+-e2
 {% endif %}

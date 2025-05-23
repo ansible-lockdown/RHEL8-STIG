@@ -1,7 +1,7 @@
 ---
 
 - name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
-  when: rhel_08_030000
+  when: rhel8stig_030000
   tags:
     - RHEL-08-030000
     - CAT2
@@ -14,11 +14,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030010 | PATCH | Cron logging must be implemented in RHEL 8."
-  when: rhel_08_030010
+  when: rhel8stig_030010
   tags:
     - RHEL-08-030010
     - CAT2
@@ -35,7 +35,7 @@
     line: 'cron.*                                                  /var/log/cron'
 
 - name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
-  when: rhel_08_030020
+  when: rhel8stig_030020
   tags:
     - RHEL-08-030020
     - CAT2
@@ -55,7 +55,7 @@
     - discovered_action_mail_acct_result.rc != 257
 
 - name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
-  when: rhel_08_030030
+  when: rhel8stig_030030
   tags:
     - RHEL-08-030030
     - CAT2
@@ -71,7 +71,7 @@
     line: 'postmaster:     root'
 
 - name: "MEDIUM | RHEL-08-030040 | PATCH | The RHEL 8 System must take appropriate action when an audit processing failure occurs."
-  when: rhel_08_030040
+  when: rhel8stig_030040
   tags:
     - RHEL-08-030040
     - CAT2
@@ -87,7 +87,7 @@
     line: "disk_error_action = {{ rhel8stig_auditd_disk_error_action }}"
 
 - name: "MEDIUM | RHEL-08-030060 | PATCH | The RHEL 8 audit system must take appropriate action when the audit storage volume is full."
-  when: rhel_08_030060
+  when: rhel8stig_030060
   tags:
     - RHEL-08-030060
     - CAT2
@@ -103,7 +103,7 @@
     line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
 
 - name: "MEDIUM | RHEL-08-030061 | PATCH | The RHEL 8 audit system must audit local events."
-  when: rhel_08_030061
+  when: rhel8stig_030061
   tags:
     - RHEL-08-030061
     - CAT2
@@ -119,7 +119,7 @@
     line: "local_events = yes"
 
 - name: "MEDIUM | RHEL-08-030062 | PATCH | RHEL 8 must label all off-loaded audit logs before sending them to the central log server."
-  when: rhel_08_030062
+  when: rhel8stig_030062
   tags:
     - RHEL-08-030062
     - CAT2
@@ -136,7 +136,7 @@
   notify: Restart auditd
 
 - name: "MEDIUM | RHEL-08-030070 | PATCH | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access."
-  when: rhel_08_030070
+  when: rhel8stig_030070
   tags:
     - RHEL-08-030070
     - CAT2
@@ -169,7 +169,7 @@
         mode: 'o-x,go-rwx'
 
 - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access."
-  when: rhel_08_030080
+  when: rhel8stig_030080
   tags:
     - RHEL-08-030080
     - CAT2
@@ -198,7 +198,7 @@
         owner: root
 
 - name: "MEDIUM | RHEL-08-030090 | PATCH | RHEL 8 audit logs must be group-owned by root to prevent unauthorized read access."
-  when: rhel_08_030090
+  when: rhel8stig_030090
   tags:
     - RHEL-08-030090
     - CAT2
@@ -218,7 +218,7 @@
     line: "log_group = root"
 
 - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access."
-  when: rhel_08_030100
+  when: rhel8stig_030100
   tags:
     - RHEL-08-030100
     - CAT2
@@ -248,7 +248,7 @@
         mode: 'go-rwx'
 
 - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access."
-  when: rhel_08_030110
+  when: rhel8stig_030110
   tags:
     - skip_ansible_lint
     - RHEL-08-030110
@@ -279,7 +279,7 @@
         mode: 'go-rwx'
 
 - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
-  when: rhel_08_030120
+  when: rhel8stig_030120
   tags:
     - RHEL-08-030120
     - CAT2
@@ -308,7 +308,7 @@
         state: directory
 
 - name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
-  when: rhel_08_030121
+  when: rhel8stig_030121
   tags:
     - RHEL-08-030121
     - CAT2
@@ -320,13 +320,13 @@
     - SV-230402r1017208_rule
     - V-230402
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-e '
-    line: "-e 2"
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030122 | PATCH | RHEL 8 audit system must protect logon UIDs from unauthorized change."
-  when: rhel_08_030122
+  when: rhel8stig_030122
   tags:
     - RHEL-08-030122
     - CAT2
@@ -338,13 +338,13 @@
     - SV-230403r1017209_rule
     - V-230403
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^--loginuid-'
-    line: "--loginuid-immutable"
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030130 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
-  when: rhel_08_030130
+  when: rhel8stig_030130
   tags:
     - RHEL-08-030130
     - CAT2
@@ -368,14 +368,13 @@
     - SV-230404r1017210_rule
     - V-230404
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/shadow'
-    line: '-w /etc/shadow -p wa -k identity'
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030140 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/security/opasswd."
-  when: rhel_08_030140
+  when: rhel8stig_030140
   tags:
     - RHEL-08-030140
     - CAT2
@@ -398,14 +397,13 @@
     - SV-230405r1017211_rule
     - V-230405
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/security/opasswd'
-    line: -w /etc/security/opasswd -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030150 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd."
-  when: rhel_08_030150
+  when: rhel8stig_030150
   tags:
     - RHEL-08-030150
     - CAT2
@@ -428,14 +426,13 @@
     - SV-230406r1017212_rule
     - V-230406
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/passwd'
-    line: -w /etc/passwd -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030160 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow."
-  when: rhel_08_030160
+  when: rhel8stig_030160
   tags:
     - RHEL-08-030160
     - CAT2
@@ -458,14 +455,13 @@
     - SV-230407r1017213_rule
     - V-230407
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/gshadow'
-    line: -w /etc/gshadow -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030170 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
-  when: rhel_08_030170
+  when: rhel8stig_030170
   tags:
     - RHEL-08-030170
     - CAT2
@@ -488,14 +484,13 @@
     - SV-230408r1017214_rule
     - V-230408
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/group'
-    line: -w /etc/group -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030171 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
-  when: rhel_08_030171
+  when: rhel8stig_030171
   tags:
     - RHEL-08-030171
     - CAT2
@@ -518,14 +513,13 @@
     - SV-230409r1017215_rule
     - V-230409
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/sudoers '
-    line: -w /etc/sudoers -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030172 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers.d/."
-  when: rhel_08_030172
+  when: rhel8stig_030172
   tags:
     - RHEL-08-030172
     - CAT2
@@ -548,16 +542,15 @@
     - SV-230410r1017216_rule
     - V-230410
     - auditd
-  ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/audit.rules
-    regexp: '^-w /etc/sudoers.d/'
-    line: -w /etc/sudoers.d/ -p wa -k identity
-  notify: Restart auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed."
-  when: rhel_08_030180
+  when: rhel8stig_030180
   tags:
-    - rhel_08_030180
+    - rhel8stig_030180
     - CAT2
     - CCI-000169
     - NIST800-53R4_AU-12
@@ -584,7 +577,7 @@
     state: present
 
 - name: "MEDIUM | RHEL-08-030181 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
-  when: rhel_08_030181
+  when: rhel8stig_030181
   tags:
     - RHEL-08-030181
     - CAT2
@@ -613,7 +606,7 @@
   notify: Restart auditd
 
 - name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
-  when: rhel_08_030190
+  when: rhel8stig_030190
   tags:
     - RHEL-08-030190
     - CAT2
@@ -632,11 +625,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
-  when: rhel_08_030200
+  when: rhel8stig_030200
   tags:
     - RHEL-08-030200
     - CAT2
@@ -658,11 +651,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
-  when: rhel_08_030250
+  when: rhel8stig_030250
   tags:
     - RHEL-08-030250
     - CAT2
@@ -680,11 +673,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
-  when: rhel_08_030260
+  when: rhel8stig_030260
   tags:
     - RHEL-08-030260
     - CAT2
@@ -702,11 +695,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
-  when: rhel_08_030280
+  when: rhel8stig_030280
   tags:
     - RHEL-08-030280
     - CAT2
@@ -723,11 +716,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
-  when: rhel_08_030290
+  when: rhel8stig_030290
   tags:
     - RHEL-08-030290
     - CAT2
@@ -744,11 +737,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
-  when: rhel_08_030300
+  when: rhel8stig_030300
   tags:
     - RHEL-08-030300
     - CAT2
@@ -765,11 +758,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
-  when: rhel_08_030301
+  when: rhel8stig_030301
   tags:
     - RHEL-08-030301
     - CAT2
@@ -786,11 +779,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
-  when: rhel_08_030302
+  when: rhel8stig_030302
   tags:
     - RHEL-08-030302
     - CAT2
@@ -807,11 +800,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
-  when: rhel_08_030310
+  when: rhel8stig_030310
   tags:
     - RHEL-08-030310
     - CAT2
@@ -828,11 +821,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
-  when: rhel_08_030311
+  when: rhel8stig_030311
   tags:
     - RHEL-08-030311
     - CAT2
@@ -849,11 +842,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
-  when: rhel_08_030312
+  when: rhel8stig_030312
   tags:
     - RHEL-08-030312
     - CAT2
@@ -870,11 +863,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
-  when: rhel_08_030313
+  when: rhel8stig_030313
   tags:
     - RHEL-08-030313
     - CAT2
@@ -891,11 +884,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
-  when: rhel_08_030314
+  when: rhel8stig_030314
   tags:
     - RHEL-08-030314
     - CAT2
@@ -912,11 +905,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030315 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
-  when: rhel_08_030315
+  when: rhel8stig_030315
   tags:
     - RHEL-08-030315
     - CAT2
@@ -933,11 +926,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
-  when: rhel_08_030316
+  when: rhel8stig_030316
   tags:
     - RHEL-08-030316
     - CAT2
@@ -954,11 +947,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
-  when: rhel_08_030317
+  when: rhel8stig_030317
   tags:
     - RHEL-08-030317
     - CAT2
@@ -975,11 +968,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
-  when: rhel_08_030320
+  when: rhel8stig_030320
   tags:
     - RHEL-08-030320
     - CAT2
@@ -996,11 +989,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
-  when: rhel_08_030330
+  when: rhel8stig_030330
   tags:
     - RHEL-08-030330
     - CAT2
@@ -1017,11 +1010,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030340 | PATCH | Successful/unsuccessful uses of the pam_timestamp_check command in RHEL 8 must generate an audit record."
-  when: rhel_08_030340
+  when: rhel8stig_030340
   tags:
     - RHEL-08-030340
     - CAT2
@@ -1038,11 +1031,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030350 | PATCH | Successful/unsuccessful uses of the newgrp command in RHEL 8 must generate an audit record."
-  when: rhel_08_030350
+  when: rhel8stig_030350
   tags:
     - RHEL-08-030350
     - CAT2
@@ -1059,11 +1052,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030360 | PATCH | Successful/unsuccessful uses of the init_module command in RHEL 8 must generate an audit record."
-  when: rhel_08_030360
+  when: rhel8stig_030360
   tags:
     - RHEL-08-030360
     - CAT2
@@ -1083,7 +1076,7 @@
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
-  when: rhel_08_030361
+  when: rhel8stig_030361
   tags:
     - RHEL-08-030361
     - CAT2
@@ -1100,11 +1093,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
-  when: rhel_08_030370
+  when: rhel8stig_030370
   tags:
     - RHEL-08-030370
     - CAT2
@@ -1121,11 +1114,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
-  when: rhel_08_030390
+  when: rhel8stig_030390
   tags:
     - RHEL-08-030390
     - CAT2
@@ -1142,11 +1135,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
-  when: rhel_08_030400
+  when: rhel8stig_030400
   tags:
     - RHEL-08-030400
     - CAT2
@@ -1163,11 +1156,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
-  when: rhel_08_030410
+  when: rhel8stig_030410
   tags:
     - RHEL-08-030410
     - CAT2
@@ -1184,11 +1177,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
-  when: rhel_08_030420
+  when: rhel8stig_030420
   tags:
     - RHEL-08-030420
     - CAT2
@@ -1206,11 +1199,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
-  when: rhel_08_030480
+  when: rhel8stig_030480
   tags:
     - RHEL-08-030480
     - CAT2
@@ -1229,11 +1222,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
-  when: rhel_08_030490
+  when: rhel8stig_030490
   tags:
     - RHEL-08-030490
     - CAT2
@@ -1252,11 +1245,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030550 | PATCH | Successful/unsuccessful uses of the sudo command in RHEL 8 must generate an audit record."
-  when: rhel_08_030550
+  when: rhel8stig_030550
   tags:
     - RHEL-08-030550
     - CAT2
@@ -1275,11 +1268,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030560 | PATCH | Successful/unsuccessful uses of the usermod command in RHEL 8 must generate an audit record."
-  when: rhel_08_030560
+  when: rhel8stig_030560
   tags:
     - RHEL-08-030560
     - CAT2
@@ -1298,11 +1291,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
-  when: rhel_08_030570
+  when: rhel8stig_030570
   tags:
     - RHEL-08-030570
     - CAT2
@@ -1321,11 +1314,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
-  when: rhel_08_030580
+  when: rhel8stig_030580
   tags:
     - RHEL-08-030580
     - CAT2
@@ -1344,11 +1337,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
-  when: rhel_08_030590
+  when: rhel8stig_030590
   tags:
     - RHEL-08-030590
     - CAT2
@@ -1366,11 +1359,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
-  when: rhel_08_030600
+  when: rhel8stig_030600
   tags:
     - RHEL-08-030600
     - CAT2
@@ -1388,11 +1381,11 @@
     - auditd
   ansible.builtin.debug:
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
-  changed_when: false
+  changed_when: true
   notify: Update auditd
 
 - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
-  when: rhel_08_030610
+  when: rhel8stig_030610
   tags:
     - RHEL-08-030610
     - CAT2
@@ -1411,7 +1404,7 @@
     - /etc/audit/auditd.conf
 
 - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
-  when: rhel_08_030620
+  when: rhel8stig_030620
   tags:
     - RHEL-08-030620
     - CAT2
@@ -1428,7 +1421,7 @@
   loop: "{{ rhel8stig_audit_bins }}"
 
 - name: "MEDIUM | RHEL-08-030630 | PATCH | RHEL 8 audit tools must be owned by root."
-  when: rhel_08_030630
+  when: rhel8stig_030630
   tags:
     - RHEL-08-030630
     - CAT2
@@ -1447,7 +1440,7 @@
   loop: "{{ rhel8stig_audit_bins }}"
 
 - name: "MEDIUM | RHEL-08-030640 | PATCH | RHEL 8 audit tools must be group-owned by root."
-  when: rhel_08_030640
+  when: rhel8stig_030640
   tags:
     - RHEL-08-030640
     - CAT2
@@ -1466,7 +1459,7 @@
   loop: "{{ rhel8stig_audit_bins }}"
 
 - name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
-  when: rhel_08_030650
+  when: rhel8stig_030650
   tags:
     - RHEL-08-030650
     - CAT2
@@ -1490,7 +1483,7 @@
     - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
 
 - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
-  when: rhel_08_030660
+  when: rhel8stig_030660
   tags:
     - RHEL-08-030660
     - CAT2
@@ -1527,7 +1520,7 @@
         file: warning_facts.yml
 
 - name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
-  when: rhel_08_030670
+  when: rhel8stig_030670
   tags:
     - RHEL-08-030670
     - CAT2
@@ -1542,7 +1535,7 @@
     state: present
 
 - name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
-  when: rhel_08_030680
+  when: rhel8stig_030680
   tags:
     - RHEL-08-030680
     - CAT2
@@ -1558,7 +1551,7 @@
     state: present
 
 - name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
-  when: rhel_08_030690
+  when: rhel8stig_030690
   tags:
     - RHEL-08-030690
     - CAT2
@@ -1576,7 +1569,7 @@
     line: "*.* {{ rhel8stig_remotelog_server.protocol }}{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
 
 - name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
-  when: rhel_08_030700
+  when: rhel8stig_030700
   tags:
     - RHEL-08-030700
     - CAT2
@@ -1594,7 +1587,7 @@
   notify: Restart auditd
 
 - name: "MEDIUM | RHEL-08-030710 | PATCH | RHEL 8 must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
-  when: rhel_08_030710
+  when: rhel8stig_030710
   tags:
     - RHEL-08-030710
     - CAT2
@@ -1615,9 +1608,9 @@
     - { regexp: '^\$ActionSendStreamDriverMode', line: '$ActionSendStreamDriverMode 1' }
 
 - name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
-  when: rhel_08_030720
+  when: rhel8stig_030720
   tags:
-    - rhel_08_030720
+    - rhel8stig_030720
     - CAT2
     - CCI-001851
     - NIST800-53R4_AU-4
@@ -1634,7 +1627,7 @@
   notify: Restart auditd
 
 - name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
-  when: rhel_08_030730
+  when: rhel8stig_030730
   tags:
     - RHEL-08-030730
     - CAT2
@@ -1650,7 +1643,7 @@
     line: 'space_left = 25%'
 
 - name: "MEDIUM | RHEL-08-030731 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume 75 percent utilization."
-  when: rhel_08_030731
+  when: rhel8stig_030731
   tags:
     - RHEL-08-030731
     - CAT2
@@ -1667,7 +1660,7 @@
 
 - name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
   when:
-    - rhel_08_030740
+    - rhel8stig_030740
     - "'chrony' in ansible_facts.packages"
   tags:
     - RHEL-08-030740
