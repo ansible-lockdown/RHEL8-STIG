@@ -36,7 +36,7 @@
 
 - name: "Check password set for connecting user"
   when:
-    - rhel_08_010380
+    - rhel8stig_010380
     - ansible_env.SUDO_USER is defined
     - not system_is_ec2
   tags: always
@@ -58,8 +58,8 @@
 
 - name: "Ensure superuser for grub does not match existing user"
   when:
-    - rhel_08_010141 or
-      rhel_08_010149
+    - rhel8stig_010141 or
+      rhel8stig_010149
   tags: always
   block:
     - name: "Ensure superuser for grub does not match existing user | capture users"
@@ -83,8 +83,8 @@
   when:
     - not system_is_ec2
     - not system_is_container
-    - rhel_08_010140 or
-      rhel_08_010150
+    - rhel8stig_010140 or
+      rhel8stig_010150
   tags: always
   ansible.builtin.assert:
     that: rhel8stig_bootloader_password_hash != 'grub.pbkdf2.sha512.changethispassword'  # pragma: allowlist secret
@@ -93,7 +93,7 @@
 - name: Check if using resolv.conf template settings are changed
   when:
     - rhel8_stig_use_resolv_template
-    - rhel_08_010680
+    - rhel8stig_010680
   tags: always
   ansible.builtin.assert:
     that:

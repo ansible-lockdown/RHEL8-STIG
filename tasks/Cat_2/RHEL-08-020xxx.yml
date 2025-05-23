@@ -1,7 +1,7 @@
 ---
 
 - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-  when: rhel_08_020000
+  when: rhel8stig_020000
   tags:
     - RHEL-08-020000
     - CAT2
@@ -28,7 +28,7 @@
 
 - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
   when:
-    - rhel_08_020010
+    - rhel8stig_020010
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020010
@@ -76,7 +76,7 @@
 
 - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
   when:
-    - rhel_08_020011
+    - rhel8stig_020011
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020011
@@ -95,7 +95,7 @@
 
 - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020012
+    - rhel8stig_020012
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020012
@@ -143,7 +143,7 @@
 
 - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020013
+    - rhel8stig_020013
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020013
@@ -162,7 +162,7 @@
 
 - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020014
+    - rhel8stig_020014
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020014
@@ -210,7 +210,7 @@
 
 - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020015
+    - rhel8stig_020015
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020015
@@ -229,7 +229,7 @@
 
 - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
   when:
-    - rhel_08_020016
+    - rhel8stig_020016
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020016
@@ -277,7 +277,7 @@
 
 - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
   when:
-    - rhel_08_020017
+    - rhel8stig_020017
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020017
@@ -296,7 +296,7 @@
 
 - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
   when:
-    - rhel_08_020018
+    - rhel8stig_020018
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020018
@@ -342,9 +342,9 @@
         - system-auth
         - password-auth
 
-- name: "MEDIUM | RHEL-08-020019| PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
+- name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
   when:
-    - rhel_08_020019
+    - rhel8stig_020019
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020019
@@ -363,7 +363,7 @@
 
 - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   when:
-    - rhel_08_020020
+    - rhel8stig_020020
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020020
@@ -411,7 +411,7 @@
 
 - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   when:
-    - rhel_08_020021
+    - rhel8stig_020021
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020021
@@ -430,7 +430,7 @@
 
 - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020022
+    - rhel8stig_020022
     - ansible_distribution_version is version('8.1', '<=')
   tags:
     - RHEL-08-020022
@@ -478,7 +478,7 @@
 
 - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
-    - rhel_08_020023
+    - rhel8stig_020023
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020023
@@ -497,7 +497,7 @@
 
 - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
   when:
-    - rhel_08_020025
+    - rhel8stig_020025
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020025
@@ -536,7 +536,7 @@
 
 - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
   when:
-    - rhel_08_020026
+    - rhel8stig_020026
     - ansible_distribution_version is version('8.2', '>=')
   tags:
     - RHEL-08-020026
@@ -577,8 +577,8 @@
     "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
      MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
   when:
-    - rhel_08_020027 or
-      rhel_08_020028
+    - rhel8stig_020027 or
+      rhel8stig_020028
   tags:
     - RHEL-08-020027
     - RHEL-08-020028
@@ -613,7 +613,7 @@
 
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   when:
-    - rhel_08_020030
+    - rhel8stig_020030
     - "'dconf' in ansible_facts.packages"
     - rhel8stig_always_configure_dconf
   tags:
@@ -643,7 +643,7 @@
       notify: Dconf update
 
     - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
-      when: rhel_08_020030_lock_enabled.stdout | length == 0
+      when: rhel8stig_020030_lock_enabled.stdout | length == 0
       ansible.builtin.lineinfile:
         path: /etc/dconf/db/local.d/00-screensaver
         create: true
@@ -659,7 +659,7 @@
 
 - name: "MEDIUM | RHEL-08-020031 | PATCH | RHEL 8 must initiate a session lock for graphical user interfaces when the screensaver is activated."
   when:
-    - rhel_08_020031
+    - rhel8stig_020031
     - rhel8stig_always_configure_dconf
     - rhel8stig_gui
   tags:
@@ -683,7 +683,7 @@
 
 - name: "MEDIUM | RHEL-08-020032 | PATCH | RHEL 8 must disable the user list at logon for graphical user interfaces."
   when:
-    - rhel_08_020032
+    - rhel8stig_020032
     - rhel8stig_always_configure_dconf
     - rhel8stig_gui
   tags:
@@ -696,7 +696,7 @@
     - V-244536
     - dconf
   ansible.builtin.copy:
-    dest: /etc/dconf/db/local.d/02-login-screen_rhel_08_020032
+    dest: /etc/dconf/db/local.d/02-login-screen_rhel8stig_020032
     content: |
       [org/gnome/login-screen]
       disable-user-list=true
@@ -704,7 +704,7 @@
 
 - name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8.7 and higher must terminate idle user sessions."
   when:
-    - rhel_08_020035
+    - rhel8stig_020035
     - ansible_facts.distribution_version is version_compare('8.7', '>=')
   tags:
     - RHEL-08-020035
@@ -726,7 +726,7 @@
 
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   when:
-    - rhel_08_020050
+    - rhel8stig_020050
     - "'dconf' in ansible_facts.packages"
   tags:
     - RHEL-08-020050
@@ -794,7 +794,7 @@
 
 - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
   when:
-    - rhel_08_020060
+    - rhel8stig_020060
     - "'dconf' in ansible_facts.packages"
     - rhel8stig_always_configure_dconf
   tags:
@@ -843,7 +843,7 @@
 
 - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
   when:
-    - rhel_08_020080
+    - rhel8stig_020080
     - "'dconf' in ansible_facts.packages"
     - rhel8stig_always_configure_dconf
   tags:
@@ -867,7 +867,7 @@
 
 - name: "MEDIUM | RHEL-08-020081 | PATCH | RHEL 8 must prevent a user from overriding the session idle-delay setting for the graphical user interface."
   when:
-    - rhel_08_020081
+    - rhel8stig_020081
     - rhel8stig_always_configure_dconf
     - rhel8stig_gui
   tags:
@@ -890,7 +890,7 @@
 
 - name: "MEDIUM | RHEL-08-020082 | PATCH | RHEL 8 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
   when:
-    - rhel_08_020082
+    - rhel8stig_020082
     - rhel8stig_always_configure_dconf
     - rhel8stig_gui
   tags:
@@ -914,7 +914,7 @@
 
 - name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
   when:
-    - rhel_08_020090
+    - rhel8stig_020090
     - prelim_sssd_conf_present.stat.exists
   tags:
     - RHEL-08-020090
@@ -940,7 +940,7 @@
   notify: Restart sssd
 
 - name: "MEDIUM | RHEL-08-020100 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the password-auth file."
-  when: rhel_08_020100
+  when: rhel8stig_020100
   tags:
     - RHEL-08-020100
     - CAT2
@@ -957,7 +957,7 @@
     insertafter: '^password'
 
 - name: "MEDIUM | RHEL-08-020101 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the system-auth file."
-  when: rhel_08_020101
+  when: rhel8stig_020101
   tags:
     - RHEL-08-020101
     - CAT2
@@ -975,7 +975,7 @@
 
 - name: "MEDIUM | RHEL-08-020104 | PATCH | RHEL 8 systems, version 8.4 and above, must ensure the password complexity module is configured for three retries or less."
   when:
-    - rhel_08_020104
+    - rhel8stig_020104
     - ansible_distribution_version is version('8.4', '>=')
   tags:
     - RHEL-08-020104
@@ -993,7 +993,7 @@
     mode: 'u-x,go-wx'
 
 - name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
-  when: rhel_08_020110
+  when: rhel8stig_020110
   tags:
     - RHEL-08-020110
     - CAT2
@@ -1013,7 +1013,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
-  when: rhel_08_020120
+  when: rhel8stig_020120
   tags:
     - RHEL-08-020120
     - CAT2
@@ -1040,7 +1040,7 @@
     owner: root
     group: root
     mode: 'u-x,g-wx,o-rwx'
-  when: rhel_08_020130
+  when: rhel8stig_020130
   tags:
     - RHEL-08-020130
     - CAT2
@@ -1052,7 +1052,7 @@
     - pwquality
 
 - name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
-  when: rhel_08_020140
+  when: rhel8stig_020140
   tags:
     - RHEL-08-020140
     - CAT2
@@ -1072,7 +1072,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL-08-20150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
-  when: rhel_08_020150
+  when: rhel8stig_020150
   tags:
     - RHEL-08-020150
     - CAT2
@@ -1092,7 +1092,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
-  when: rhel_08_020160
+  when: rhel8stig_020160
   tags:
     - RHEL-08-020160
     - CAT2
@@ -1112,7 +1112,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
-  when: rhel_08_020170
+  when: rhel8stig_020170
   tags:
     - RHEL-08-020170
     - CAT2
@@ -1132,7 +1132,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
-  when: rhel_08_020180
+  when: rhel8stig_020180
   tags:
     - RHEL8-08-020180
     - CAT2
@@ -1155,7 +1155,7 @@
       loop: "{{ discovered_min_password_users.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
-  when: rhel_08_020190
+  when: rhel8stig_020190
   tags:
     - RHEL-08-020190
     - CAT2
@@ -1171,7 +1171,7 @@
     line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults_pass_min_days }}"
 
 - name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
-  when: rhel_08_020200
+  when: rhel8stig_020200
   tags:
     - RHEL-08-020200
     - CAT2
@@ -1188,7 +1188,7 @@
 
 - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
   when:
-    - rhel_08_020210
+    - rhel8stig_020210
     - rhel8stig_disruption_high
   tags:
     - RHEL-08-020210
@@ -1220,7 +1220,7 @@
       loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
-  when: rhel_08_020230
+  when: rhel8stig_020230
   tags:
     - RHEL-08-020230
     - CAT2
@@ -1240,7 +1240,7 @@
     mode: 'u-x,g-wx,o-rwx'
 
 - name: "MEDIUM | RHEL-08-020231 | PATCH | RHEL 8 passwords for new users must have a minimum of 15 characters."
-  when: rhel_08_020231
+  when: rhel8stig_020231
   tags:
     - RHEL-08-020231
     - CAT2
@@ -1258,7 +1258,7 @@
     group: root
 
 - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
-  when: rhel_08_020240
+  when: rhel8stig_020240
   tags:
     - RHEL-08-020240
     - CAT2
@@ -1289,7 +1289,7 @@
 
 - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
   when:
-    - rhel_08_020250
+    - rhel8stig_020250
     - prelim_sssd_conf_present.stat.exists
   tags:
     - RHEL-08-020250
@@ -1377,7 +1377,7 @@
       notify: Restart sssd
 
 - name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
-  when: rhel_08_020260
+  when: rhel8stig_020260
   tags:
     - RHEL-08-020260
     - CAT2
@@ -1400,7 +1400,7 @@
       changed_when: true
 
 - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
-  when: rhel_08_020270
+  when: rhel8stig_020270
   tags:
     - RHEL-08-020270
     - CAT2
@@ -1430,7 +1430,7 @@
         file: warning_facts.yml
 
 - name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
-  when: rhel_08_020280
+  when: rhel8stig_020280
   tags:
     - RHEL-08-020280
     - CAT2
@@ -1447,7 +1447,7 @@
 
 - name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
   when:
-    - rhel_08_020290
+    - rhel8stig_020290
     - prelim_sssd_conf_present.stat.exists
   tags:
     - RHEL-08-020290
@@ -1471,7 +1471,7 @@
     - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
 
 - name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
-  when: rhel_08_020300
+  when: rhel8stig_020300
   tags:
     - RHEL-08-020300
     - CAT2
@@ -1487,7 +1487,7 @@
     line: "dictcheck = {{ rhel8stig_password_complexity_dictcheck }}"
 
 - name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
-  when: rhel_08_020310
+  when: rhel8stig_020310
   tags:
     - RHEL-08-020310
     - CAT2
@@ -1503,7 +1503,7 @@
     line: "FAIL_DELAY {{ rhel8stig_login_defaults_fail_delay_secs }}"
 
 - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
-  when: rhel_08_020320
+  when: rhel8stig_020320
   tags:
     - RHEL-08-020320
     - CAT2
@@ -1538,7 +1538,7 @@
 
 - name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
   when:
-    - rhel_08_020350
+    - rhel8stig_020350
     - rhel8stig_ssh_required
   tags:
     - RHEL-08-020350
@@ -1557,7 +1557,7 @@
   notify: Restart sshd
 
 - name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
-  when: rhel_08_020351
+  when: rhel8stig_020351
   tags:
     - RHEL-08-020351
     - CAT2
@@ -1574,7 +1574,7 @@
     line: "UMASK           {{ rhel8stig_login_defaults_umask }}"
 
 - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts."
-  when: rhel_08_020352
+  when: rhel8stig_020352
   tags:
     - RHEL-08-020352
     - CAT2
@@ -1605,7 +1605,7 @@
       loop: "{{ discovered_interactive_user_files_umask.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-020353 | PATCH | RHEL 8 must define default permissions for logon and non-logon shells."
-  when: rhel_08_020353
+  when: rhel8stig_020353
   tags:
     - RHEL-08-020353
     - CAT2

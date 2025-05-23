@@ -1,7 +1,7 @@
 ---
 
 - name: "HIGH | RHEL-08-040000 | PATCH | RHEL 8 must not have the telnet-server package installed."
-  when: rhel_08_040000
+  when: rhel8stig_040000
   tags:
     - RHEL-08-040000
     - CAT1
@@ -18,7 +18,7 @@
   ansible.builtin.package:
     name: rsh-server
     state: absent
-  when: rhel_08_040010
+  when: rhel8stig_040010
   tags:
     - RHEL-08-040010
     - CAT1
@@ -29,7 +29,7 @@
     - V-230492
 
 - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
-  when: rhel_08_040170
+  when: rhel8stig_040170
   tags:
     - RHEL-08-040170
     - CAT1
@@ -54,7 +54,7 @@
 
 - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   when:
-    - rhel_08_040171
+    - rhel8stig_040171
     - "'gnome-desktop' in ansible_facts.packages or 'gnome-desktop3' in ansible_facts.packages"
   tags:
     - RHEL-08-040171
@@ -91,12 +91,12 @@
     - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
       when: discovered_gui_logout_settings_status.stdout | length > 0
       ansible.builtin.replace:
-        path: "{{ rhel_08_040171_logout_settings_status.stdout }}"
+        path: "{{ discovered_gui_logout_settings_status.stdout }}"
         regexp: '^[L|l]ogout=.*'
         replace: "logout=''"
 
 - name: "HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
-  when: rhel_08_040172
+  when: rhel8stig_040172
   tags:
     - RHEL-08-040172
     - CAT1
@@ -113,7 +113,7 @@
 
 - name: "HIGH | RHEL-08-040190 | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
   when:
-    - rhel_08_040190
+    - rhel8stig_040190
     - not rhel8stig_tftp_required
   tags:
     - RHEL-08-040190
@@ -129,7 +129,7 @@
     state: absent
 
 - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
-  when: rhel_08_040200
+  when: rhel8stig_040200
   tags:
     - RHEL-08-040200
     - CAT1
@@ -169,7 +169,7 @@
         file: warning_facts.yml
 
 - name: "HIGH | RHEL-08-040360 | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
-  when: rhel_08_040360
+  when: rhel8stig_040360
   tags:
     - RHEL-08-040360
     - CAT1

@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
-  when: rhel_08_040004
+  when: rhel8stig_040004
   tags:
     - RHEL-08-040004
     - CAT3
@@ -25,7 +25,7 @@
       notify: Rebuild grub
 
 - name: "LOW | RHEL-08-040021 | PATCH | RHEL 8 must disable the asynchronous transfer mode (ATM) protocol."
-  when: rhel_08_040021
+  when: rhel8stig_040021
   tags:
     - RHEL-08-040021
     - CAT3
@@ -51,7 +51,7 @@
   notify: Change_requires_reboot
 
 - name: "LOW | RHEL-08-040022 | PATCH | RHEL 8 must disable the controller area network (CAN) protocol."
-  when: rhel_08_040022
+  when: rhel8stig_040022
   tags:
     - RHEL-08-040022
     - CAT3
@@ -77,7 +77,7 @@
   notify: Change_requires_reboot
 
 - name: "LOW | RHEL-08-040023 | PATCH | RHEL 8 must disable the stream control transmission (SCTP) protocol."
-  when: rhel_08_040023
+  when: rhel8stig_040023
   tags:
     - RHEL-08-040023
     - CAT3
@@ -103,7 +103,7 @@
   notify: Change_requires_reboot
 
 - name: "LOW | RHEL-08-040024 | PATCH | RHEL 8 must disable the transparent inter-process communication (TIPC) protocol."
-  when: rhel_08_040024
+  when: rhel8stig_040024
   tags:
     - RHEL-08-040024
     - CAT3
@@ -129,7 +129,7 @@
   notify: Change_requires_reboot
 
 - name: "LOW | RHEL-08-040025 | PATCH | RHEL 8 must disable mounting of cramfs."
-  when: rhel_08_040025
+  when: rhel8stig_040025
   tags:
     - RHEL-08-040025
     - CAT3
@@ -155,7 +155,7 @@
   notify: Change_requires_reboot
 
 - name: "LOW | RHEL-08-040026 | PATCH | RHEL 8 must disable IEEE 1394 (FireWire) Support."
-  when: rhel_08_040026
+  when: rhel8stig_040026
   tags:
     - RHEL-08-040026
     - CAT3
@@ -184,8 +184,8 @@
     "LOW | RHEL-08-040300 | PATCH | The RHEL 8 file integrity tool must be configured to verify extended attributes."
     "LOW | RHEL-08-040310 | PATCH | The RHEL 8 file integrity tool must be configured to verify Access Control Lists (ACLs)."
   when:
-    - rhel_08_040300
-    - rhel_08_040310
+    - rhel8stig_040300
+    - rhel8stig_040310
   tags:
     - CAT3
     - RHEL-08-040300

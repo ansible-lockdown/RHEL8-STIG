@@ -1,7 +1,7 @@
 ---
 
 - name: "HIGH | RHEL-08-010000 | AUDIT | The RHEL 8 must be a vendor-supported release."
-  when: rhel_08_010000
+  when: rhel8stig_010000
   tags:
     - RHEL-08-010000
     - CAT1
@@ -15,7 +15,7 @@
   changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
 
 - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
-  when: rhel_08_010020
+  when: rhel8stig_010020
   tags:
     - RHEL-08-010020
     - CAT1
@@ -51,7 +51,7 @@
       notify: Change_requires_reboot
 
 - name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection."
-  when: rhel_08_010030
+  when: rhel8stig_010030
   tags:
     - RHEL-08-010030
     - CAT1
@@ -85,7 +85,7 @@
         file: warning_facts.yml
 
 - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords."
-  when: rhel_08_010121
+  when: rhel8stig_010121
   tags:
     - RHEL-08-010121
     - CAT1
@@ -134,8 +134,8 @@
         "HIGH | RHEL-08-010150 | PATCH | RHEL 8 operating systems booted with a BIOS must require authentication upon booting into single-user and maintenance modes."
   when:
     - not system_is_ec2
-    - rhel_08_010140 or
-      rhel_08_010150
+    - rhel8stig_010140 or
+      rhel8stig_010150
   tags:
     - RHEL-08-010140
     - RHEL-08-010150
@@ -160,7 +160,7 @@
   notify: Make grub2 config
 
 - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
-  when: rhel_08_010370
+  when: rhel8stig_010370
   tags:
     - RHEL-08-010370
     - CAT1
@@ -191,7 +191,7 @@
       loop: "{{ discovered_repos_list.files | map(attribute='path') | flatten }}"
 
 - name: "HIGH | RHEL-08-010371 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
-  when: rhel_08_010371
+  when: rhel8stig_010371
   tags:
     - RHEL-08-010371
     - CAT1
@@ -207,7 +207,7 @@
     line: localpkg_gpgcheck=True
 
 - name: "HIGH | RHEL-08-010460 | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
-  when: rhel_08_010460
+  when: rhel8stig_010460
   tags:
     - RHEL-08-010460
     - CAT1
@@ -222,7 +222,7 @@
     state: absent
 
 - name: "HIGH | RHEL-08-010470 | PATCH | There must be no .shosts files on the RHEL 8 operating system."
-  when: rhel_08_010470
+  when: rhel8stig_010470
   tags:
     - RHEL-08-010470
     - CAT1
@@ -249,7 +249,7 @@
 - name: "HIGH | RHEL-08-010820 | PATCH | Unattended or automatic logon via the RHEL 8 graphical user interface must not be allowed."
   when:
     - rhel8stig_gui
-    - rhel_08_010820
+    - rhel8stig_010820
   tags:
     - RHEL-08-010820
     - CAT1

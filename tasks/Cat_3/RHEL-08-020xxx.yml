@@ -1,7 +1,7 @@
 ---
 
 - name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
-  when: rhel_08_020024
+  when: rhel8stig_020024
   tags:
     - RHEL-08-020024
     - CAT3
@@ -21,7 +21,7 @@
     mode: 'u-x,go-wx'
 
 - name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
-  when: rhel_08_020340
+  when: rhel8stig_020340
   tags:
     - RHEL-08-020340
     - CAT3

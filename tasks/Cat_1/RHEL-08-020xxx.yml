@@ -2,7 +2,7 @@
 
 - name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
   when:
-    - rhel_08_020330
+    - rhel8stig_020330
     - rhel8stig_disruption_high
     - rhel8stig_ssh_required
   tags:
@@ -34,10 +34,10 @@
     path: /etc/pam.d/system-auth
     regexp: ' nullok'
     replace: ''
-  when: rhel_08_020331
+  when: rhel8stig_020331
 
 - name: "HIGH | RHEL-08-020332 | PATCH | RHEL 8 must not allow blank or null passwords in the password-auth file."
-  when: rhel_08_020332
+  when: rhel8stig_020332
   tags:
     - RHEL-08-020332
     - CAT1

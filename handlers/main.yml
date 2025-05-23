@@ -9,6 +9,11 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
+- name: Remount_var_tmp
+  ansible.posix.mount:
+    name: /var/tmp
+    state: remounted
+
 - name: Restart_systemd_login
   ansible.builtin.systemd:
     name: systemd-logind
@@ -95,7 +100,7 @@
     state: restarted
 
 - name: Restart rngd
-  when: rhel_08_010471
+  when: rhel8stig_010471
   ansible.builtin.service:
     name: rngd.service
     state: restarted
@@ -136,7 +141,7 @@
     - rhel8stig_grub2_user_cfg.stat.exists
     - not rhel8stig_skip_for_travis
     - not system_is_container
-  ansible.builtin.command: /usr/sbin/grub2-mkconfig --output={{ prelim_bootloader_path }}/grub.cfg
+  ansible.builtin.command: "/usr/sbin/grub2-mkconfig -o {{ prelim_bootloader_path }}/grub.cfg"
   changed_when: true
   listen: Make grub2 config
 
