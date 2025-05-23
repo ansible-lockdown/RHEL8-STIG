@@ -1624,13 +1624,13 @@
     - grub
   block:
     - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear memory when it is freed to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
-      ansible.builtin.shell: grep -iE "grub_cmdline_linux.*init_in_free=1" /etc/default/grub
+      ansible.builtin.shell: grep -i "grub_cmdline_linux" /etc/default/grub | grep init_in_free=1
       changed_when: false
       failed_when: false
       register: discovered_init_grub_cmdline_linux
 
     - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear memory when it is freed to prevent use-after-free attacks. | Set slub_debug to P as active"
-      when: discovered_init_grub_cmdline_linux | length == 0
+      when: discovered_init_grub_cmdline_linux.stdout | length == 0
       ansible.builtin.command: grubby --update-kernel=ALL --args="init_on_free=1"
       changed_when: true
       notify:
@@ -2288,33 +2288,19 @@
     - V-230309
     - permissions
   block:
-    - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Find world-writable files on all partitions"
-      ansible.builtin.command: find {{ item.mount }} -xdev -type f -perm -002
+    - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs."
+      ansible.builtin.shell: find /home -perm -002 -type f -name ".[^.]*" -exec ls -ld {} \;
       changed_when: false
-      failed_when: false
-      register: discovered_world_writable_files
-      with_items: "{{ ansible_mounts }}"
-      loop_control:
-        label: "{{ item.mount }}"
+      failed_when: discovered_user_exec_ww_files.rc not in [ 0, 1 ]
+      register: discovered_user_exec_ww_files
 
-    - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set fact for flattening"
-      ansible.builtin.set_fact:
-        discovered_world_writable_files_change_perms: "{{ discovered_world_writable_files.results | map(attribute='stdout_lines') | flatten }}"
-
-    - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs. | Compare to home directories"
-      when: discovered_world_writable_files_change_perms != []
-      ansible.builtin.include_tasks: audit_homedirinifiles.yml
-      loop: "{{ prelim_interactive_homedir_ini_files }}"
-      loop_control:
-        loop_var: ini_item
-
-    - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs. | Set permissions"
+    - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
+      when: discovered_user_exec_ww_files is defined
       ansible.builtin.file:
         path: "{{ item }}"
-        mode: 'u+x,go-w'
-        state: file
-      loop: "{{ discovered_world_writable_files_change_perms }}"
-      when: discovered_world_writable_files_change_perms != []
+        mode: 'go-wx'
+      loop: "{{ discovered_user_exec_ww_files.stdout_lines }}"
+
 
 - name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
   when:
