@@ -13,6 +13,7 @@ auditd logic updated
 sssd prelim warning now added to warning summary
 bootloader - 010020 UUID logic updated
 010423 fixed and 010660 updated
+audit alignment
 mount logic rewrite
 - RHEL-08-101030 - Moved to CAT1
 - RHEL-08-010296 - Added Client ssh MACs control.
