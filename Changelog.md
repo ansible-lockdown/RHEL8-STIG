@@ -1,5 +1,9 @@
 # Changes to RHEL8STIG
 
+## 5.0.0 STIG v2r4
+
+RuleIDs updated for listed controls after changes
+
 ## STIG v2r3
 
 Complete lint update
