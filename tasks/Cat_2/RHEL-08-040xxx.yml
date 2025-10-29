@@ -71,7 +71,7 @@
     - CCI-000382
     - NIST800-53R4_CM-7
     - SRG-OS-000096-GPOS-00050
-    - SV-230500r1017283_rule
+    - SV-230500r1101900_rule
     - V-230500
     - firewall
   vars:
@@ -83,7 +83,7 @@
         - rhel8stig_start_firewall_service
       block:
         - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using firewalld"
-          ansible.builtin.shell: firewall-cmd --list-all | grep services | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
+          ansible.builtin.shell: firewall-cmd --list-all | grep -e "active" -e "services" | cut -d ':' -f 2 | tr " " "\n" | sed '/^$/d' | sort -u
           changed_when: false
           failed_when: false
           check_mode: false
