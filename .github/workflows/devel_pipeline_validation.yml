@@ -17,12 +17,6 @@
     # Allow manual running of workflow
     workflow_dispatch:
 
-  # Allow permissions for AWS auth
-  permissions:
-    id-token: write
-    contents: read
-    pull-requests: read
-
   # A workflow run is made up of one or more jobs
   # that can run sequentially or in parallel
   jobs:
@@ -30,11 +24,18 @@
     welcome:
       runs-on: ubuntu-latest
 
+      permissions:
+        issues: write
+        pull-requests: write
+
       steps:
         - uses: actions/first-interaction@main
           with:
-            repo-token: ${{ secrets.GITHUB_TOKEN }}
-            pr-message: |-
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            issue_message: |-
+                Congrats on opening your first issue and thank you for taking the time to help improve Ansible-Lockdown!
+                Please join in the conversation happening on the [Discord Server](https://www.lockdownenterprise.com/discord) as well.
+            pr_message: |-
                 Congrats on opening your first pull request and thank you for taking the time to help improve Ansible-Lockdown!
                 Please join in the conversation happening on the [Discord Server](https://www.lockdownenterprise.com/discord) as well.
 
@@ -42,6 +43,13 @@
     playbook-test:
       # The type of runner that the job will run on
       runs-on: self-hosted
+
+      # Allow permissions for AWS auth
+      permissions:
+        id-token: write
+        contents: read
+        pull-requests: read
+
       env:
         ENABLE_DEBUG: ${{ vars.ENABLE_DEBUG }}
         # Imported as a variable by terraform
