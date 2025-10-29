@@ -49,6 +49,9 @@
 
 - name: Pre Audit Setup | Check Goss is available
   when: run_audit
+  tags:
+    - goss_template
+    - run_audit
   block:
     - name: Pre Audit Setup | Check for goss file
       ansible.builtin.stat:

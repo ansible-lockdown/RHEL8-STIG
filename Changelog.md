@@ -4,6 +4,16 @@
 
 RuleIDs updated for listed controls after changes
 
+- RHEL-08-010330, RHEL-08-010340, RHEL-08-010350
+- Added “/usr/lib64” to Check and Fix Text paths.
+- RHEL-08-010380 - Updated sudoers “NOPASSWD” Check Text command.
+- RHEL-08-010381 - Updated Check Text command to split the search for “NOPASSWD” and “!authenticate”
+- RHEL-08-010382 - Updated sudoers “ALL” Check Text command.
+- RHEL-08-010741 - Updated finding text.
+- RHEL-08-030655 - Added requirement to audit any script or executable called by cron as root or by any privileged user.
+- RHEL-08-040030 - Updated Check command.
+- RHEL-08-040310 - Updated the Discussion to include “aide.conf” monitoring explanation and updated the Check to require the SA to review the “aide.conf” manually.
+
 ## STIG v2r3
 
 Complete lint update
