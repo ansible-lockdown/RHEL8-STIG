@@ -1285,7 +1285,7 @@
     - CCI-002038
     - NIST800-53R4_IA-11
     - SRG-OS-000373-GPOS-00156
-    - SV-230271r1017379_rule
+    - SV-230271r1101896_rule
     - V-230271
     - sudo
   ansible.builtin.replace:
