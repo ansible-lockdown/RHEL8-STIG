@@ -125,9 +125,7 @@
   notify: Dconf update
 
 - name: "MEDIUM | RHEL-08-010060 | PATCH | RHEL 8 must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon"
-  when:
-    - rhel8stig_010040 or
-      rhel8stig_010060
+  when: rhel8stig_010040 or rhel8stig_010060
   tags:
     - CAT2
     - RHEL-08-010060
@@ -309,9 +307,7 @@
 - name: |
     "MEDIUM | RHEL-08-010141 | PATCH | RHEL 8 operating systems booted with United Extensible Firmware Interface (UEFI) must require a unique superusers name upon booting into single-user mode and maintenance."
     "MEDIUM | RHEL-08-010149 | PATCH | RHEL 8 operating systems booted with a BIOS must require a unique superusers name upon booting into single-user and maintenance modes."
-  when:
-    - rhel8stig_010141 or
-      rhel8stig_010149
+  when: rhel8stig_010141 or rhel8stig_010149
   tags:
     - RHEL-08-010141
     - RHEL-08-010149
@@ -1572,6 +1568,7 @@
   block:
     - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
       ansible.builtin.shell: grep -iE grub_cmdline_linux /etc/default/grub | grep page_poison=1
+      changed_when: false
       failed_when: false
       register: discovered_page_poison_grub_cmdline_linux
 
@@ -2005,8 +2002,7 @@
   loop: "{{ ansible_facts.mounts }}"
 
 - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions."
-  when:
-    - rhel8stig_010580
+  when: rhel8stig_010580
   tags:
     - RHEL-08-010580
     - CAT2
@@ -2300,7 +2296,6 @@
         path: "{{ item }}"
         mode: 'go-wx'
       loop: "{{ discovered_user_exec_ww_files.stdout_lines }}"
-
 
 - name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
   when:

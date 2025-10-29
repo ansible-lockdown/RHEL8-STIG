@@ -15,9 +15,6 @@
     state: absent
 
 - name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not have the rsh-server package installed."
-  ansible.builtin.package:
-    name: rsh-server
-    state: absent
   when: rhel8stig_040010
   tags:
     - RHEL-08-040010
@@ -27,6 +24,9 @@
     - SRG-OS-000095-GPOS-00049
     - SV-230492r1017275_rule
     - V-230492
+  ansible.builtin.package:
+    name: rsh-server
+    state: absent
 
 - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
   when: rhel8stig_040170

@@ -22,6 +22,7 @@
   notify: Restart sshd
 
 - name: "HIGH | RHEL-08-020331 | PATCH | RHEL 8 must not allow blank or null passwords in the system-auth file."
+  when: rhel8stig_020331
   tags:
     - RHEL-08-020331
     - CAT1
@@ -34,7 +35,6 @@
     path: /etc/pam.d/system-auth
     regexp: ' nullok'
     replace: ''
-  when: rhel8stig_020331
 
 - name: "HIGH | RHEL-08-020332 | PATCH | RHEL 8 must not allow blank or null passwords in the password-auth file."
   when: rhel8stig_020332

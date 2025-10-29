@@ -57,9 +57,7 @@
         sudo_password_rule: RHEL-08-010380  # pragma: allowlist secret
 
 - name: "Ensure superuser for grub does not match existing user"
-  when:
-    - rhel8stig_010141 or
-      rhel8stig_010149
+  when: rhel8stig_010141 or rhel8stig_010149
   tags: always
   block:
     - name: "Ensure superuser for grub does not match existing user | capture users"
@@ -114,8 +112,8 @@
 - name: Include CAT I patches
   when: rhel8stig_cat1
   tags:
-   - rhel8stig_cat1
-   - high
+    - rhel8stig_cat1
+    - high
   ansible.builtin.import_tasks:
     file: Cat_1/main.yml
 
