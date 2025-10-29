@@ -165,9 +165,7 @@
         mode: 'u+x,go-w'
 
 - name: "PRELIM | Find all sudoers files."
-  when:
-    - rhel8stig_010380 or
-      rhel8stig_010381
+  when: rhel8stig_010380 or rhel8stig_010381
   tags: always
   ansible.builtin.shell: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
   check_mode: false
