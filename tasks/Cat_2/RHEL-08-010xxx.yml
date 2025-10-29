@@ -1306,7 +1306,7 @@
     - SRG-OS-000373-GPOS-00156
     - SRG-OS-000373-GPOS-00157
     - SRG-OS-000373-GPOS-00158
-    - SV-230272r1017380_rule
+    - SV-230272r1101898_rule
     - V-230272
     - sudo
   ansible.builtin.replace:
@@ -1325,7 +1325,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-237641r1017324_rule
+    - SV-237641r1101904_rule
     - V-237641
     - sudo
   block:
