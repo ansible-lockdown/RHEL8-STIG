@@ -2739,7 +2739,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-244532r1017339_rule
+    - SV-244532r1101906_rule
     - V-244532
     - permissions
   ansible.builtin.file:
