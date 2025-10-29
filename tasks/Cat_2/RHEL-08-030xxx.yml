@@ -1482,6 +1482,31 @@
     - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
     - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
 
+- name: "MEDIUM | RHEL-08-030655 | PATCH | RHEL 8 must audit any script or executable called by cron as root or by any privileged user."
+  when: rhel8stig_030655
+  tags:
+    - RHEL-08-030655
+    - CAT2
+    - CCI-000172
+    - NIST800-53R4_AU-12
+    - SRG-OS-000471-GPOS-00215
+    - SV-274877r1106148_rule
+    - V-274877
+    - cron
+  notify: Update auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030655 | PATCH | RHEL 8 must audit any script or executable called by cron as root or by any privileged user. | /etc/cron.d/"
+      ansible.builtin.lineinfile:
+        path: /etc/audit/rules.d/audit.rules
+        regexp: '^-w\s+/etc/cron\.d/?\s+-p\s+wa\s+-k\s+cronjobs'
+        line: "-w /etc/cron.d/ -p wa -k cronjobs"
+
+    - name: "MEDIUM | RHEL-08-030655 | PATCH | RHEL 8 must audit any script or executable called by cron as root or by any privileged user. | /var/spool/cron/"
+      ansible.builtin.lineinfile:
+        path: /etc/audit/rules.d/audit.rules
+        regexp: '^-w\s+/var/spool/cron/?\s+-p\s+wa\s+-k\s+cronjobs'
+        line: "-w /var/spool/cron/ -p wa -k cronjobs"
+
 - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
   when: rhel8stig_030660
   tags:
