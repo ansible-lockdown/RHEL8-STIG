@@ -296,12 +296,12 @@
 
 - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
   when:
+    - '"python3-libselinux" not in ansible_facts.packages'
     - not system_is_container
-    - rhel8stig_010170 or
-      rhel8stig_010450
+    - rhel8stig_010170 or rhel8stig_010450
   tags: always
   ansible.builtin.package:
-    name: libselinux-utils
+    name: python3-libselinux
     state: present
 
 - name: "PRELIM | Bare bones SSH Server"

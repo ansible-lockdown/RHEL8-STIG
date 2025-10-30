@@ -476,10 +476,10 @@
     - V-230240
     - selinux
     - disruption_high
-  ansible.posix.selinux:
-    state: enforcing
-    policy: "{{ ansible_selinux.type }}"
-  notify: Change_requires_reboot
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: (?i)^selinux=
+    line: SELINUX=enforcing
 
 - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources."
   when: rhel8stig_010190

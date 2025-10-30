@@ -14,6 +14,7 @@ RuleIDs updated for listed controls after changes
 - RHEL-08-040030 - Updated Check command.
 - RHEL-08-040310 - Updated the Discussion to include “aide.conf” monitoring explanation and updated the Check to require the SA to review the “aide.conf” manually.
 - QA Linting Fixes
+- Revamp 08-01010
 
 ## STIG v2r3
 
