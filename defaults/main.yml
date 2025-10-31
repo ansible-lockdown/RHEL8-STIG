@@ -789,9 +789,6 @@ rhel8stig_availability_override: false
 #      Use this for any other setup to avoid loss of data or data corruption.
 rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
 
-# RHEL-08-010020
-rhel8stig_boot_part: "{{ rhel8stig_boot_part.stdout }}"
-
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
 

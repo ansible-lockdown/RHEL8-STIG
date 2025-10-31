@@ -97,21 +97,6 @@
   ansible.builtin.import_tasks:
     file: pre_remediation_audit.yml
 
-- name: "PRELIM | Find boot partition"
-  tags: always
-  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then echo "/boot/efi" ; else echo "/boot"; fi
-  changed_when: false
-  check_mode: false
-  register: prelim_rhel8stig_boot_part
-
-- name: "PRELIM | Find boot partition UUID"
-  when: rhel8stig_010020
-  tags: always
-  ansible.builtin.shell: if [ -d /sys/firmware/efi ]; then lsblk -l -o +UUID | grep -i efi | awk '{print $NF}'; else lsblk -l -o +UUID | grep -w '/boot' | grep -v efi | awk '{print $NF}'; fi
-  changed_when: false
-  check_mode: false
-  register: prelim_rhel8stig_boot_uuid
-
 - name: "PRELIM | RHEL-08-010020 | Crypto-policies-scripts package for FIPS"
   when: rhel8stig_010020
   tags:

@@ -15,6 +15,7 @@ RuleIDs updated for listed controls after changes
 - RHEL-08-040310 - Updated the Discussion to include “aide.conf” monitoring explanation and updated the Check to require the SA to review the “aide.conf” manually.
 - QA Linting Fixes
 - Revamp 08-01010
+- Removed boot_partition premlim var
 
 ## STIG v2r3
 

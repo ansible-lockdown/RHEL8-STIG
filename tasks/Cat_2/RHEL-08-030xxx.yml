@@ -1495,9 +1495,14 @@
     - cron
   notify: Update auditd
   ansible.builtin.lineinfile:
-    path: /etc/audit/rules.d/50-cron.rules
+    path: /etc/audit/rules.d/50_cron.rules
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
+    state: present
+    create: true
+    mode: 'u-x,go-rwx'
+    owner: root
+    group: root
   loop:
     - { regexp: '^-w\s+/etc/cron\.d/?\s+-p\s+wa\s+-k\s+cronjobs', line: "-w /etc/cron.d/ -p wa -k cronjobs" }
     - { regexp: '^-w\s+/var/spool/cron/?\s+-p\s+wa\s+-k\s+cronjobs', line: "-w /var/spool/cron/ -p wa -k cronjobs" }
