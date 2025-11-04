@@ -27,8 +27,8 @@ This role is based on RHEL 8 DISA STIG: [Version 2, Rel 4 released on 4, August 
 ![Release Branch](https://img.shields.io/badge/Release%20Branch-Main-brightgreen)
 ![Release Tag](https://img.shields.io/github/v/tag/ansible-lockdown/RHEL8-STIG?label=Release%20Tag&&color=success)
 ![Main Release Date](https://img.shields.io/github/release-date/ansible-lockdown/RHEL8-STIG?label=Release%20Date)
-![Benchmark Version Main](https://img.shields.io/endpoint?url=https://github.com/ansible-lockdown/github_linux_IaC/badges/RHEL8-STIG/benchmark-version-main.json)
-![Benchmark Version Devel](https://img.shields.io/endpoint?url=https://github.com/ansible-lockdown/github_linux_IaC/badges/RHEL8-STIG/benchmark-version-devel.json)
+![Benchmark Version Main](https://img.shields.io/endpoint?url=https://ansible-lockdown.github.io/github_linux_IaC/badges/RHEL8-STIG/benchmark-version-main.json)
+![Benchmark Version Devel](https://img.shields.io/endpoint?url=https://ansible-lockdown.github.io/github_linux_IaC/badges/RHEL8-STIG/benchmark-version-devel.json)
 
 [![Main Pipeline Status](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/main_pipeline_validation.yml/badge.svg?)](https://github.com/ansible-lockdown/RHEL8-STIG/actions/workflows/main_pipeline_validation.yml)
 
