@@ -1396,12 +1396,23 @@
     - V-230471
     - permissions
     - auditd
-  ansible.builtin.file:
-    path: "{{ item }}"
-    mode: 'u-x,g-wx,o-rwx'
-  loop:
-    - /etc/audit/rules.d/audit.rules
-    - /etc/audit/auditd.conf
+  block:
+    - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Find all custom audit/rules.d files"
+      ansible.builtin.find:
+        paths: /etc/audit/rules.d/
+        file_type: file
+        patterns: "*.rules"
+        recurse: false
+      register: custom_audit_rules
+
+    - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: 'u-x,g-wx,o-rwx'
+      loop:
+        - /etc/audit/rules.d/audit.rules
+        - /etc/audit/auditd.conf
+        - "{{ custom_audit_rules.files | map(attribute='path') | list }}"
 
 - name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
   when: rhel8stig_030620
