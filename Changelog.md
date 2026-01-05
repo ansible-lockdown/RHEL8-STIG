@@ -21,6 +21,7 @@ mount logic rewrite
 - RHEL-08-010455 - Added requirement.
 - RHEL-08-020103 - removed
 - RHEL-08-020104 - removed
+- RHEL-08-030610 - Adjusted to change rules.d file thanks to @platymatt
 
 ## STIG v2r2
 
