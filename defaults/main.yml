@@ -782,7 +782,7 @@ rhel8stig_pam_faillock:
     dir: /var/log/faillock
 
 # RHEL-08-020035
-rhel_08_020035_idlesessiontimeout: 900
+rhel_08_020035_idlesessiontimeout: 600
 
 # RHEL-08-030060
 # rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
