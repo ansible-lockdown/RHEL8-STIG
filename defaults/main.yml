@@ -563,6 +563,8 @@ rhel8stig_aide_db_new_file: /var/lib/aide/aide.db.new.gz
 # Active db file
 rhel8stig_aide_db_file: /var/lib/aide/aide.db.gz
 
+rhel8stig_workaround_for_disa_benchmark: true
+
 rhel8stig_cron_special_disable: "{{ rhel8stig_workaround_for_disa_benchmark or rhel8stig_workaround_for_ssg_benchmark or false }}"
 
 # Set maximum number of simultaneous system logins (RHEL-08-040000)
