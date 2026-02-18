@@ -1,5 +1,50 @@
 # Changes to RHEL8STIG
 
+## 5.0.0 STIG v2r6 Jan 2026
+
+updated benchmark version
+lint
+standards
+test improvments
+
+## CAT1
+- 010015 - new control - crypto-policies
+- 010020 - new requirements - rewrite - Crypto FIPS
+- 010270 - new - Crypto FIPS
+- 040010 - rsh-server changed to EPEL
+- 040172 - updated to drop in file
+
+## CAT2
+- 010275 - new - bind - crypto
+- 010280 - new - ipsec - crypto
+- 010287 - removed
+- 010293 - removed
+- 010294 - removed
+- 010295 - removed
+- 010296 - updated
+- 010297 - updated
+- 010350 - changed to root owner
+- 010455
+- 010572 - ignore vfat
+- 010580 - ignore vfat
+- 010630
+- 010640
+- 010660 - removed
+- 010670
+- 010671 - dropin file
+- 010672 - not required if kdump disabled
+- 010673 - not required if kdump disabled
+- 010674 - not required if kdump disabled
+- 010675 - not required if kdump disabled
+- 020000 - removed as duplicate of 020270
+- 020060 - 10 min timeout
+- 040282 - dropin file
+- 040285 - dropin file
+
+## CAT 3
+
+- 020340 - removed
+
 ## 5.0.0 STIG v2r4
 
 RuleIDs updated for listed controls after changes
