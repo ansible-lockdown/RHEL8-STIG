@@ -92,14 +92,20 @@
         warn_control_id: "SSSD_checks_skipped"
 
 - name: "PRELIM | Include audit specific variables"
-  when: run_audit or audit_only or setup_audit
-  tags: always
+  when:
+    - run_audit or audit_only
+    - setup_audit
+  tags:
+    - setup_audit
+    - run_audit
   ansible.builtin.include_vars:
     file: audit.yml
 
 - name: "PRELIM | Include pre-remediation audit tasks"
-  when: run_audit or audit_only or setup_audit
-  tags: always
+  when:
+    - run_audit or audit_only
+    - setup_audit
+  tags: run_audit
   ansible.builtin.import_tasks:
     file: pre_remediation_audit.yml
 
