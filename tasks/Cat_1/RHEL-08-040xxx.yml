@@ -122,7 +122,7 @@
     - SRG-OS-000480-GPOS-00227
     - SV-230531r1155396_rule
     - V-230531
-  notify: Systemd_daemon_reload
+  notify: Systemctl daemon-reload
   block:
     - name: HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled | ansible.builtin.systemd
       ansible.builtin.file:
