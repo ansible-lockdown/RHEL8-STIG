@@ -421,11 +421,11 @@
     - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
       ansible.builtin.command: find / -name *.keytab
       changed_when: false
-      failed_when: rhel8stig_010161_keytab_files.rc not in [ 0, 1 ]
-      register: rhel8stig_010161_keytab_files
+      failed_when: discovered_keytab_files.rc not in [ 0, 1 ]
+      register: discovered_keytab_files
 
     - name: "MEDIUM | RHEL-08-010161 | PATCH | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Remove .keytab files"
-      when: rhel8stig_010161_keytab_files.stdout | length > 0
+      when: discovered_keytab_files.stdout | length > 0
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
@@ -497,13 +497,13 @@
       ansible.builtin.shell: "find / -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
       changed_when: false
       failed_when: false
-      register: rhel8stig_010190_world_writable_files
+      register: discovered_world_writable_files
 
     - name: "MEDIUM | RHEL-08-010190 | PATCH | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Set sticky bit to world-writable files"
       ansible.builtin.file:
         path: "{{ item }}"
         mode: '+t'
-      loop: "{{ rhel8stig_010190_world_writable_files.stdout_lines }}"
+      loop: "{{ discovered_world_writable_files.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-010200 | PATCH | RHEL 8 must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
   when:
@@ -639,56 +639,51 @@
     path: /var/log
     group: root
 
-- name: "MEDIUM | RHEL-08-010287 | PATCH | The RHEL 8 SSH daemon must be configured to use system-wide crypto policies."
+- name: "MEDIUM | RHEL-08-010275 | PATCH | RHEL 8 must implement DOD-approved encryption in the bind package."
   when:
-    - rhel8stig_010287
-    - rhel8stig_ssh_required
+    - rhel8stig_010275
+    - rhel8stig_disruption_high
+    - "'bind' in ansible_facts.packages"
   tags:
-    - RHEL-08-010287
+    - RHEL-08-010275
     - CAT2
-    - CCI-001453
-    - NIST800-53R4_AC-17
-    - SRG-OS-000250-GPOS-00093
-    - SRG-OS-000393-GPOS-00173
-    - SRG-OS-000394-GPOS-00174
-    - SRG-OS-000125-GPOS-00065
-    - SV-244526r1017332_rule
-    - V-244526
-    - ssh
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/sshd
-    regexp: '^CRYPTO_POLICY\s*=\s*'
-    line: '# CRYPTO_POLICY='
-  notify: Change_requires_reboot
+    - CCI-002418
+    - NIST800-53R4_SC-8
+    - SRG-OS-000423-GPOS-00187
+    - SRG-OS-000426-GPOS-00190
+    - SV-279931r1156346_rule
+    - V-279931
+    - bind
+    - encryption
+  community.general.ini_file:
+    path: /etc/named.conf
+    section: options
+    option: include
+    value: "/etc/crypto-policies/back-ends/bind.config"
+    state: present
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
 
-# Enabled prior to Ciphers and Macs as related
-
-- name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package."
-  when: rhel8stig_010293
+- name: "MEDIUM | RHEL-08-010280 | PATCH | RHEL 8 IP tunnels must use FIPS 140-3-approved cryptographic algorithms."
+  when:
+    - rhel8stig_010280
+    - rhel8stig_disruption_high
+    - "'libreswan' in ansible_facts.packages"
   tags:
-    - RHEL-08-010293
+    - RHEL-08-010280
     - CAT2
-    - CCI-001453
+    - CCI-000068
     - NIST800-53R4_AC-17
-    - SRG-OS-000250-GPOS-00093
-    - SRG-OS-000393-GPOS-00173
-    - SRG-OS-000394-GPOS-00174
-    - SRG-OS-000125-GPOS-00065
-    - SV-230254r1017072_rule
-    - V-230254
+    - SRG-OS-000033-GPOS-00014
+    - SV-279930r1156343_rule
+    - V-279930
     - fips
-  block:
-    - name: "MEDIUM | RHEL-08-010293 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Get current FIPS mode state"
-      ansible.builtin.command: fips-mode-setup --check
-      changed_when: false
-      failed_when: discovered_ssh_fips_check.stdout is not defined
-      register: discovered_ssh_fips_check
-
-    - name: "MEDIUM | RHEL-08-010293 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption in the OpenSSL package. | Enable FIPS"
-      when: '"disabled" in discovered_ssh_fips_check.stdout'
-      ansible.builtin.command: fips-mode-setup --enable
-      changed_when: true
-      notify: Change_requires_reboot
+    - tunnel
+  ansible.builtin.lineinfile:
+    path: /etc/ipsec.conf
+    regexp: ^(#|)\s*include /etc/crypto-policies/back-ends
+    line: include /etc/crypto-policies/back-ends/libreswan.config
 
 - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | Add MACs"
   when: rhel8stig_010290
@@ -701,7 +696,7 @@
     - SRG-OS-000393-GPOS-00173
     - SRG-OS-000394-GPOS-00174
     - SRG-OS-000125-GPOS-00065
-    - SV-230251r1044814_rule
+    - SV-230251r1155370_rule
     - V-230251
     - fips
     - sshd
@@ -709,6 +704,7 @@
     - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
       ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
       changed_when: false
+      failed_when: discovered_current_macs.rc not in [ 0, 1 ]
       register: discovered_current_macs
 
     - name: "MEDIUM | RHEL-08-010290 | PATCH | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
@@ -717,7 +713,7 @@
         regexp: '(^CRYPTO_POLICY=.*)-oMACS={{ discovered_current_macs.stdout }}(.*$)'
         line: '\g<1>-oMACS={{ rhel8stig_ssh_macs }}\g<2>'
         backrefs: true
-      notify: Change_requires_reboot
+      notify: Reinstall_crypto_policies
 
 - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Add Ciphers"
   when: rhel8stig_010291
@@ -730,7 +726,7 @@
     - SRG-OS-000393-GPOS-00173
     - SRG-OS-000394-GPOS-00174
     - SRG-OS-000125-GPOS-00065
-    - SV-230252r1044817_rule
+    - SV-230252r1155364_rule
     - V-230252
     - fips
     - sshd
@@ -748,59 +744,6 @@
         backrefs: true
       notify: Change_requires_reboot
 
-- name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
-  when: rhel8stig_010294
-  tags:
-    - RHEL-08-010294
-    - CAT2
-    - CCI-001453
-    - NIST800-53R4_AC-17
-    - SRG-OS-000250-GPOS-00093
-    - SRG-OS-000393-GPOS-00173
-    - SRG-OS-000394-GPOS-00174
-    - SRG-OS-000125-GPOS-00065
-    - SV-230255r1017075_rule
-    - V-230255
-    - openssl
-  block:
-    - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
-      when: ansible_facts.packages['crypto-policies'][0].version | int < 20210617
-      ansible.builtin.lineinfile:
-        path: /etc/crypto-policies/back-ends/opensslcnf.config
-        regexp: '^MinProtocol ='
-        line: "MinProtocol = TLSv1.2"
-      notify: Change_requires_reboot
-
-    - name: "MEDIUM | RHEL-08-010294 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the OpenSSL package."
-      when: ansible_facts.packages['crypto-policies'][0].version | int >= 20210617
-      ansible.builtin.lineinfile:
-        path: /etc/crypto-policies/back-ends/opensslcnf.config
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-      notify: change_requires_reboot
-      loop:
-        - { regexp: '^TLS.MinProtocol = ', line: "TLS.MinProtocol = TLSv1.2" }
-        - { regexp: '^DTLS.MinProtocol =', line: "DTLS.MinProtocol = DTLSv1.2" }
-
-- name: "MEDIUM | RHEL-08-010295 | PATCH | The RHEL 8 operating system must implement DoD-approved TLS encryption in the GnuTLS package"
-  when: rhel8stig_010295
-  tags:
-    - RHEL-08-010295
-    - CAT2
-    - CCI-001453
-    - NIST800-53R4_AC-17
-    - SRG-OS-000250-GPOS-00093
-    - SRG-OS-000423-GPOS-00187
-    - SV-230256r1017076_rule
-    - V-230256
-    - gnutls
-  ansible.builtin.lineinfile:
-    path: /etc/crypto-policies/back-ends/gnutls.config
-    regexp: '^(.*)\+VERS-ALL:'
-    line: '\1{{ rhel8stig_gnutls_encryption }}'
-    backrefs: true
-  notify: Change_requires_reboot
-
 - name: "MEDIUM | RHEL-08-010296 | PATCH | The RHEL 8 SSH client must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-3 validated cryptographic hash algorithms. | Add MACs"
   when: rhel8stig_010296
   tags:
@@ -809,7 +752,7 @@
     - CCI-001453
     - NIST800-53R4_AC-17
     - SRG-OS-000250-GPOS-00093
-    - SV-272482r1069414_rule
+    - SV-272482r1155367_rule
     - V-272482
     - fips
     - sshd
@@ -827,7 +770,7 @@
     - CCI-001453
     - NIST800-53R4_AC-17
     - SRG-OS-000250-GPOS-00093
-    - SV-272483r1069415_rule
+    - SV-272483r1155361_rule
     - V-272483
     - fips
     - sshd
@@ -983,7 +926,7 @@
     - NIST800-53R4_CM-5
   block:
     - name: "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
-      ansible.builtin.command: find -L /lib /lib64 /usr/lib /usr/lib64 ! -user root
+      ansible.builtin.command: find -L /lib /lib64 /usr/lib /usr/lib64 -type f -name "*.so*" ! -user root
       changed_when: false
       failed_when: discovered_lib_files_owner.rc not in [ 0, 1 ]
       register: discovered_lib_files_owner
@@ -1014,34 +957,47 @@
     - '/usr/lib'
     - '/usr/lib64'
 
-- name: "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root or a system account."
+- name: "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root."
   when: rhel8stig_010350
   tags:
     - RHEL-08-010350
     - CAT2
     - CCI-001499
     - SRG-OS-000259-GPOS-00100
-    - SV-230262r1101894_rule
+    - SV-230262r1155384_rule
     - V-230262
     - NIST800-53R4_CM-5
   vars:
     warn_control_id: "MEDIUM | RHEL-08-010350"
   block:
-    - name: "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root or a system account."
-      ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -uid +1000 -type f -exec ls {} \;
+    - name: "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
+      ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -type f -name "*.so*" ! -group root
       changed_when: false
       failed_when: discovered_lib_files_group.rc not in [ 0, 1 ]
       register: discovered_lib_files_group
 
-    - name: "MEDIUM | RHEL-08-010350 | WARN | RHEL 8 library files must be group-owned by root or a system account."
-      when: discovered_lib_files_group.stdout | length > 0
+    - name: "MEDIUM | RHEL-08-010350 | PATCH | RHEL 8 library files must be group-owned by root."
+      when:
+        - discovered_lib_files_group.stdout | length > 0
+        - rhel8stig_disruption_high
+      ansible.builtin.file:
+        path: "{{ item }}"
+        group: root
+      loop: "{{ discovered_lib_files_group.stdout_lines }}"
+
+    - name: "MEDIUM | RHEL-08-010350 | WARN | RHEL 8 library files must be group-owned by root."
+      when:
+        - discovered_lib_files_group.stdout | length > 0
+        - not rhel8stig_disruption_high
       ansible.builtin.debug:
         msg: |
             "Warning!! Please validate group ownership of the following library files or symlinks
              {{ discovered_lib_files_group.stdout_lines }}"
 
-    - name: "MEDIUM | RHEL-08-010350 | WARN | RHEL 8 library files must be group-owned by root or a system account."
-      when: discovered_lib_files_group.stdout | length > 0
+    - name: "MEDIUM | RHEL-08-010350 | WARN | RHEL 8 library files must be group-owned by root."
+      when:
+        - discovered_lib_files_group.stdout | length > 0
+        - not rhel8stig_disruption_high
       ansible.builtin.import_tasks:
         file: warning_facts.yml
 
@@ -1166,17 +1122,17 @@
       ansible.builtin.shell: grep -rs "kernel.kexec_load_disabled = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
       failed_when: false
-      register: discover_conflicting_kernel_settings
+      register: discovered_conflicting_kernel_settings
 
     - name: "MEDIUM | RHEL-08-010372 | PATCH | RHEL 8 must prevent the loading of a new kernel for later execution. | Remove conflicting instances"
       when:
-        - discover_conflicting_kernel_settings.stdout | length > 0
+        - discovered_conflicting_kernel_settings.stdout | length > 0
         - item != rhel8stig_sysctl_file
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: '^kernel.kexec_load_disabled = 0'
         state: absent
-      loop: "{{ discover_conflicting_kernel_settings.stdout_lines }}"
+      loop: "{{ discovered_conflicting_kernel_settings.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-010373 | PATCH | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks."
   when: rhel8stig_010373
@@ -1701,7 +1657,7 @@
     - CCI-002235
     - NIST800-53R4_AC-6
     - SRG-OS-000445-GPOS-00199
-    - SV-272484r1069340_rule
+    - SV-272484r1134875_rule
     - V-272484
     - selinux
     - disruption_high
@@ -1982,6 +1938,7 @@
 - name: "MEDIUM | RHEL-08-010572 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory."
   when:
     - item.mount == '/boot/efi'
+    - item.fstype != 'vfat'
     - rhel8stig_010572
   tags:
     - RHEL-08-010572
@@ -1989,7 +1946,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-244530r1017337_rule
+    - SV-244530r1155403_rule
     - V-244530
     - mounts
     - efi
@@ -2009,12 +1966,12 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230301r1017111_rule
+    - SV-230301r1155405_rule
     - V-230301
     - mounts
   block:
     - name: "MEDIUM | RHEL-08-010580 | AUDIT | RHEL 8 must prevent special devices on non-root local partitions. | Get mounts"
-      ansible.builtin.shell: mount | grep '^/dev\S* on /\S' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'  # noqa: command-instead-of-module
+      ansible.builtin.shell: mount | grep '^/dev\S* on /\S' | grep -v 'vfat' | grep --invert-match 'nodev' | awk '{print $1,$3,$5,$6}' | sed 's/[()]//g'  # noqa: command-instead-of-module
       changed_when: false
       check_mode: false
       register: discovered_nonroot_mounts_nodev_missing
@@ -2212,7 +2169,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230306r1017116_rule
+    - SV-230306r1155386_rule
     - V-230306
     - mounts
     - nfs
@@ -2235,7 +2192,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230307r1017117_rule
+    - SV-230307r1155388_rule
     - V-230307
     - mounts
     - nfs
@@ -2270,33 +2227,6 @@
     state: mounted
   loop: "{{ ansible_facts.mounts }}"
 
-- name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
-  when:
-    - rhel8stig_010660
-    - rhel8stig_disruption_high
-  tags:
-    - RHEL-08-010660
-    - CAT2
-    - CCI-000366
-    - NIST800-53R4_CM-6
-    - SRG-OS-000480-GPOS-00227
-    - SV-230309r1017119_rule
-    - V-230309
-    - permissions
-  block:
-    - name: "MEDIUM | RHEL-08-010660 | AUDIT | Local RHEL 8 initialization files must not execute world-writable programs."
-      ansible.builtin.shell: find /home -perm -002 -type f -name ".[^.]*" -exec ls -ld {} \;
-      changed_when: false
-      failed_when: discovered_user_exec_ww_files.rc not in [ 0, 1 ]
-      register: discovered_user_exec_ww_files
-
-    - name: "MEDIUM | RHEL-08-010660 | PATCH | Local RHEL 8 initialization files must not execute world-writable programs."
-      when: discovered_user_exec_ww_files is defined
-      ansible.builtin.file:
-        path: "{{ item }}"
-        mode: 'go-wx'
-      loop: "{{ discovered_user_exec_ww_files.stdout_lines }}"
-
 - name: "MEDIUM | RHEL-08-010670 | PATCH | RHEL 8 must disable kernel dumps unless needed."
   when:
     - rhel8stig_010670
@@ -2307,7 +2237,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230310r1017120_rule
+    - SV-230310r1155383_rule
     - V-230310
     - kdump
   ansible.builtin.service:
@@ -2323,7 +2253,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230311r1017121_rule
+    - SV-230311r1155408_rule
     - V-230311
     - sysctl
   block:
@@ -2336,7 +2266,7 @@
     - name: "MEDIUM | RHEL-08-010671 | PATCH | RHEL 8 must disable the kernel.core_pattern."
       when:
         - discovered_kernel_core_settings.stdout | length > 0
-        - item != rhel8stig_sysctl_file
+        - item != '/etc/sysctl.d/99-disable-coredump.conf'
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: kernel.core_pattern\s*=\s*.*(?<!\|\/bin\/false)$
@@ -2350,7 +2280,7 @@
         state: present
         reload: "{{ rhel8stig_sysctl_reload }}"
         sysctl_set: true
-        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+        sysctl_file: /etc/sysctl.d/99-disable-coredump.conf
 
 - name: "MEDIUM | RHEL-08-010672 | PATCH | RHEL 8 must disable acquiring, saving, and processing core dumps."
   when:
@@ -2362,7 +2292,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230312r1017122_rule
+    - SV-230312r1134877_rule
     - V-230312
     - systemd
   ansible.builtin.systemd:
@@ -2379,7 +2309,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230313r1069304_rule
+    - SV-230313r1155379_rule
     - V-230313
     - security
     - limits
@@ -2399,7 +2329,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230314r1017125_rule
+    - SV-230314r1134881_rule
     - V-230314
     - systemd
   ansible.builtin.lineinfile:
@@ -2417,7 +2347,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230315r1017126_rule
+    - SV-230315r1134883_rule
     - V-230315
     - systemd
   ansible.builtin.lineinfile:

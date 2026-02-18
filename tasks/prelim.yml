@@ -59,6 +59,12 @@
         max_int_uid: "{{ uid_max_id.stdout }}"
         min_int_gid: "{{ gid_min_id.stdout }}"
 
+- name: PRELIM | Set crypto policies and subpolicies fact
+  when: rhel8stig_additional_fips_crypto_subpolicies
+  tags: always
+  ansible.builtin.set_fact:
+    combined_crypto_policy_config: "{{ combined_crypto_policy_config }}:{{ rhel8stig_additional_fips_crypto_subpolicies_list | join(':') }}"
+
 - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Set sssd.conf location"
   when:
     - rhel8stig_010400 or
@@ -315,12 +321,11 @@
       changed_when: true
       notify: Clean up ssh host key
 
-- name: "PRELIM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
+- name: "PRELIM | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   when:
     - rhel8stig_stig_interactive_homedir_results is defined
     - rhel8stig_disruption_high
-    - rhel8stig_010660 or
-      rhel8stig_010770
+    - rhel8stig_010770
   tags: always
   ansible.builtin.shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   loop: "{{ rhel8stig_stig_interactive_homedir_results }}"
@@ -328,12 +333,11 @@
   failed_when: false
   register: prelim_interactive_user_ini_file_list
 
-- name: "PRELIM | RHEL-08-010660 | RHEL-08-010770 | Set fact for home directory paths for interactive users"
+- name: "PRELIM | RHEL-08-010770 | Set fact for home directory paths for interactive users"
   when:
     - rhel8stig_stig_interactive_homedir_results is defined
     - rhel8stig_disruption_high
-    - rhel8stig_010660 or
-      rhel8stig_010770
+    - rhel8stig_010770
   tags: always
   ansible.builtin.set_fact:
     prelim_interactive_homedir_ini_files: "{{ prelim_interactive_user_ini_file_list.results | map(attribute='stdout_lines') | list }}"

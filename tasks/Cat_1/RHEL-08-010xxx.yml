@@ -14,7 +14,23 @@
     msg: Minimum supported version of {{ ansible_distribution }} is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
   changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
 
-- name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards."
+- name: "HIGH | RHEL-08-010015 | RHEL 8 must have the crypto-policies package installed."
+  when: rhel8stig_010015
+  tags:
+    - RHEL-08-010015
+    - CAT1
+    - CCI-002450
+    - NIST800-53R4_SC-13
+    - SRG-OS-000396-GPOS-00176
+    - SRG-OS-000393-GPOS-00173
+    - SRG-OS-000394-GPOS-00174
+    - SV-279933r1156352_rule
+    - V-279933
+  ansible.builtin.package:
+    name: crypto-policies
+    state: present
+
+- name: "HIGH | RHEL-08-010020 | PATCH | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy."
   when: rhel8stig_010020
   tags:
     - RHEL-08-010020
@@ -26,26 +42,34 @@
     - SRG-OS-000396-GPOS-00176
     - SRG-OS-000423-GPOS-00187
     - SRG-OS-000478-GPOS-00223
-    - SV-230223r1069327_rule
+    - SRG-OS-000393-GPOS-00173
+    - SRG-OS-000394-GPOS-00174
+    - SV-230223r1155356_rule
     - V-230223
   block:
-    - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | install FIPS"
-      when: "'dracut-fips' not in ansible_facts.packages"
-      ansible.builtin.package:
-        name: dracut-fips
-        state: present
-      notify:
-        - Rebuild initramfs
-        - Change_requires_reboot
-
-    - name: "HIGH | RHEL-08-010020 | AUDIT | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Check FIPS mode on kernel"
-      ansible.builtin.command: fips-mode-setup --check
+    - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS"
+      ansible.builtin.command: update-crypto-policies --show
       changed_when: false
-      register: discovered_fips_status
+      failed_when: discovered_crypto_policies_status.rc not in [0, 1]
+      register: discovered_crypto_policies_status
 
-    - name: "HIGH | RHEL-08-010020 | PATCH | The Red Hat Enterprise Linux operating system must implement NIST FIPS-validated cryptography for the following: to provision digital signatures, to generate cryptographic hashes, and to protect data requiring data-at-rest protections in accordance with applicable federal laws, Executive Orders, directives, policies, regulations, and standards. | Enable FIPS mode on kernel"
-      when: "'FIPS mode is disabled' in discovered_fips_status.stdout"
-      ansible.builtin.command: fips-mode-setup --enable
+    - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS mode on kernel"
+      ansible.builtin.command: grep -Ew 'min_rsa_size|hash ' /etc/crypto-policies/state/CURRENT.pol
+      changed_when: false
+      failed_when: discovered_fips_current_policy_status.rc not in [0, 1]
+      register: discovered_fips_current_policy_status
+
+    - name: "HIGH | RHEL-08-010020 | PATCH | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Add STIG pmod files"
+      ansible.builtin.template:
+        src: "etc/crypto-policies/policies/modules/STIG.pmod.j2"
+        dest: "/{{ item }}"
+        owner: root
+        group: root
+        mode: 'u-x,go-rwx'
+
+    - name: "HIGH | RHEL-08-010020 | PATCH | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Enable FIPS mode on kernel"
+      when: "'FIPS' not in discovered_crypto_policies_status.stdout"
+      ansible.builtin.command: update-crypto-policies --set FIPS:STIG
       changed_when: false
       register: discovered_fips_status
       notify: Change_requires_reboot
@@ -158,6 +182,34 @@
     group: root
     mode: 'u-x,g-wx,o-rwx'
   notify: Make grub2 config
+
+- name: "HIGH | RHEL-08-010270 | PATCH | RHEL 8 cryptographic policy must not be overridden."
+  when:
+    - rhel8stig_010270
+    - rhel8stig_disruption_high
+  tags:
+    - RHEL-08-010270
+    - CAT1
+    - CCI-002450
+    - NIST800-53R4_SC-13
+    - SRG-OS-000396-GPOS-00176
+    - SRG-OS-000393-GPOS-00173
+    - SRG-OS-000394-GPOS-00174
+    - SV-279932r1156349_rule
+    - V-279932
+  block:
+    - name: "HIGH | RHEL-08-010270 | AUDIT | RHEL 8 cryptographic policy must not be overridden. | Check FIPS"
+      ansible.builtin.command: update-crypto-policies --is-applied
+      changed_when: false
+      failed_when: discovered_crypto_policies_status.rc not in [0, 1]
+      register: discovered_crypto_policies_status
+
+    - name: "HIGH | RHEL-08-010270 | AUDIT | RHEL 8 cryptographic policy must not be overridden. | Add to reinstall"
+      when: "'policy is applied' not in discovered_crypto_policies_status.stdout"
+      ansible.builtin.debug:
+        msg: 'WARNING!! FIPS policy is not applied - running as handler to reinstall crypto-policies'
+      changed_when: true
+      notify: Reinstall_crypto_policies
 
 - name: "HIGH | RHEL-08-010370 | PATCH | RHEL 8 must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   when: rhel8stig_010370

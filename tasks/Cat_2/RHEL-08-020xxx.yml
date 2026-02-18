@@ -1,31 +1,5 @@
 ---
 
-- name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-  when: rhel8stig_020000
-  tags:
-    - RHEL-08-020000
-    - CAT2
-    - CCI-000016
-    - NIST800-53R4_AC-2
-    - SRG-OS-000002-GPOS-00002
-    - SV-230331r1017143_rule
-    - V-230331
-    - accounts
-  vars:
-    warn_control_id: "MEDIUM | RHEL-08-020000"
-  block:
-    - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-      ansible.builtin.debug:
-        msg:
-          - "WARNING!!  Please check temporary accounts for expiration dates to be 72 hours or less."
-          - "To do this please run sudo chage -l account_name for the accounts you need to check"
-          - "The results will display the Account Expires information"
-          - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
-
-    - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
-      ansible.builtin.import_tasks:
-        file: warning_facts.yml
-
 - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
   when:
     - rhel8stig_020010
@@ -219,7 +193,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230337r1069292_rule
+    - SV-230337r1134885_rule
     - V-230337
     - pamd
   ansible.builtin.lineinfile:
@@ -600,12 +574,12 @@
         setype: faillog_t
         seuser: system_u
         state: present
-      register: discover_add_faillock_secontext
+      register: discovered_add_faillock_secontext
 
     - name: |
         "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
          MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-      when: discover_add_faillock_secontext.changed  # noqa no-handler
+      when: discovered_add_faillock_secontext.changed  # noqa no-handler
       ansible.builtin.command: "restorecon -irvF {{ rhel8stig_pam_faillock_dir }}"
       changed_when: true
 
@@ -629,15 +603,15 @@
       ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
       changed_when: false
       failed_when: false
-      register: discover_lock_enabled
+      register: discovered_lock_enabled
 
     - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
-      when: discover_lock_enabled.stdout | length > 0
+      when: discovered_lock_enabled.stdout | length > 0
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: ^lock-enabled
         line: lock-enabled=true
-      loop: "{{ discover_lock_enabled.stdout_lines }}"
+      loop: "{{ discovered_lock_enabled.stdout_lines }}"
       notify: Dconf update
 
     - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
@@ -790,7 +764,7 @@
         mode: 'u-x,g-wx,o-rwx'
       notify: Dconf update
 
-- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
+- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity."
   when:
     - rhel8stig_020060
     - "'dconf' in ansible_facts.packages"
@@ -806,13 +780,13 @@
     - V-230352
     - gui
   block:
-    - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
+    - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity. | Find idle-delay parameter"
       ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
       changed_when: false
       failed_when: false
       register: discovered_idle_delay_param
 
-    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
+    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity. | Set idle-delay if doesn't exist"
       when: discovered_idle_delay_param.stdout_lines | length == 0
       ansible.builtin.lineinfile:
         path: /etc/dconf/db/local.d/00-screensaver
@@ -823,16 +797,16 @@
         regexp: '^idle-delay'
         line: |
           [org/gnome/desktop/session]
-          # Set the lock time out to 900 seconds before the session is considered idle
-          idle-delay=uint32 900
+          # Set the lock time out to 600 seconds before the session is considered idle
+          idle-delay=uint32 600
       notify: Dconf update
 
-    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
+    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity. | Set idle-delay if exists"
       when: discovered_idle_delay_param.stdout_lines | length > 0
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: '^idle-delay='
-        line: idle-delay=uint32 900
+        line: idle-delay=uint32 600
         owner: root
         group: root
         mode: 'u-x,g-wx,o-rwx'
@@ -1621,3 +1595,22 @@
     - /etc/bashrc
     - /etc/csh.cshrc
     - /etc/profile
+
+- name: "MEDIUM | RHEL-08-020360 | PATCH | RHEL 8 must automatically exit interactive command shell user sessions after 10 minutes of inactivity."
+  when: rhel8stig_020360
+  tags:
+    - RHEL-08-020360
+    - CAT2
+    - CCI-001133
+    - NIST800-53R4_SC-10
+    - SRG-OS-000163-GPOS-00072
+    - SRG-OS-000029-GPOS-00010
+    - SV-279929r1156340_rule
+    - V-279929
+    - login
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/tmout.sh
+    regexp: ^(?#)declare -xr TMOUT=600
+    line: declare -xr TMOUT=600
+    mode: 'u+x,go-w,go+x'
+    create: true

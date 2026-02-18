@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: "v2r4"
+benchmark_version: "v2r6"
 
 ## Benchmark name used by auditing control role
 # The audit variable found at the base
@@ -13,24 +13,10 @@ rhel8stig_cat1: true
 rhel8stig_cat2: true
 rhel8stig_cat3: true
 
-# We've defined complexity-high to mean that we cannot automatically remediate
-# the rule in question.  In the future this might mean that the remediation
-# may fail in some cases.
-rhel8stig_complexity_high: false
-
-# Show "changed" for complex items not remediated per complexity-high setting
-# to make them stand out.  "changed" items on a second run of the role would
-# indicate items requiring manual review.
-rhel8stig_audit_complex: true
-
 # We've defined disruption-high to indicate items that are likely to cause
 # disruption in a normal workflow.  These items can be remediated automatically
 # but are disabled by default to avoid disruption.
 rhel8stig_disruption_high: false
-
-# Show "changed" for disruptive items not remediated per disruption-high
-# setting to make them stand out.
-rhel8stig_audit_disruptive: false
 
 rhel8stig_skip_for_travis: false
 
@@ -128,11 +114,13 @@ audit_output_destination: /opt/audit_summaries/
 # in order for the variables below to take effect.
 # CAT 1 rules
 rhel8stig_010000: true
+rhel8stig_010015: true
 rhel8stig_010020: true
 rhel8stig_010030: true
 rhel8stig_010121: true
 rhel8stig_010140: true
 rhel8stig_010150: true
+rhel8stig_010270: true
 rhel8stig_010370: true
 rhel8stig_010371: true
 rhel8stig_010460: true
@@ -184,12 +172,10 @@ rhel8stig_010230: true
 rhel8stig_010240: true
 rhel8stig_010250: true
 rhel8stig_010260: true
-rhel8stig_010287: true
+rhel8stig_010275: true
+rhel8stig_010280: true
 rhel8stig_010290: true
 rhel8stig_010291: true
-rhel8stig_010293: true
-rhel8stig_010294: true
-rhel8stig_010295: true
 rhel8stig_010296: true
 rhel8stig_010297: true
 rhel8stig_010300: true
@@ -248,7 +234,6 @@ rhel8stig_010620: true
 rhel8stig_010630: true
 rhel8stig_010640: true
 rhel8stig_010650: true
-rhel8stig_010660: true
 rhel8stig_010670: true
 rhel8stig_010671: true
 rhel8stig_010672: true
@@ -271,7 +256,7 @@ rhel8stig_010780: true
 rhel8stig_010790: true
 rhel8stig_010800: true
 rhel8stig_010830: true
-rhel8stig_020000: true
+
 rhel8stig_020010: true
 rhel8stig_020011: true
 rhel8stig_020012: true
@@ -315,7 +300,6 @@ rhel8stig_020190: true
 rhel8stig_020200: true
 rhel8stig_020210: true
 rhel8stig_020230: true
-rhel8stig_020235: true
 rhel8stig_020231: true
 rhel8stig_020240: true
 rhel8stig_020250: true
@@ -330,6 +314,7 @@ rhel8stig_020350: true
 rhel8stig_020351: true
 rhel8stig_020352: true
 rhel8stig_020353: true
+rhel8stig_020360: true
 rhel8stig_030000: true
 rhel8stig_030010: true
 rhel8stig_030020: true
@@ -409,7 +394,6 @@ rhel8stig_030731: true
 rhel8stig_030740: true
 rhel8stig_040001: true
 rhel8stig_040002: true
-rhel8stig_040003: true
 rhel8stig_040020: true
 rhel8stig_040030: true
 rhel8stig_040070: true
@@ -491,7 +475,7 @@ rhel8stig_010540: true
 rhel8stig_010541: true
 rhel8stig_010542: true
 rhel8stig_020024: true
-rhel8stig_020340: true
+
 rhel8stig_030063: true
 rhel8stig_030601: true
 rhel8stig_030602: true
@@ -535,11 +519,6 @@ local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65
 # IPv6 required
 rhel8stig_ipv6_required: true
 
-# RHEL-08-010001
-# rhel8stig_av_sftw is the AV software package. When set to mcafee it enables the check for these packages
-# When set to anything other than mcafee it will skip this control assuming localized threat prevention management
-rhel8stig_av_sftw: mcafee
-
 # RHEL-08-010380
 # rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
 #
@@ -547,19 +526,6 @@ rhel8stig_sudoers_exclude_nopasswd_list:
   - rocky
   - ec2-user
 #    - vagrant
-
-# RHEL-08-010690
-rhel8stig_change_user_path: false
-
-# RHEL-08-010700
-# rhel8stig_ww_dir_owner is the owner of all world-writable directories
-# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
-rhel8stig_ww_dir_owner: root
-
-# RHEL-08-010710
-# rhel8stig_ww_dir_grpowner is the owner of all world-writable directories
-# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
-rhel8stig_ww_dir_grpowner: root
 
 # RHEL-08-020250
 # This is a check for a "supported release"
@@ -581,20 +547,6 @@ rhel8stig_time_service: chronyd
 rhel8stig_firewall_service: firewalld
 rhel8stig_start_firewall_service: true
 
-# RHEL-08-040160
-# RHEL-08-040310
-# Install and enable ssh on networked systems
-rhel8stig_ssh_required: true
-
-# RHEL-08-040500
-# If not required, remove tftp
-rhel8stig_tftp_required: false
-
-# RHEL-08-010140 and RHEL-08-020280
-# Password protect the boot loader
-rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword # pragma: allowlist secret
-rhel8stig_boot_superuser: bootloader_admin
-
 ### Aide
 # AIDE is a file integrity checking tool, similar in nature to Tripwire.
 # While it cannot prevent intrusions, it can detect unauthorized changes
@@ -614,14 +566,6 @@ rhel8stig_aide_db_recreate: false
 rhel8stig_aide_db_new_file: /var/lib/aide/aide.db.new.gz
 # Active db file
 rhel8stig_aide_db_file: /var/lib/aide/aide.db.gz
-rhel8stig_aide_cron:
-  user: root
-  cron_file: aide
-  job: "/usr/sbin/aide --check"
-  special_time: daily
-  # Disable the notification check rule to disable mailing notifications
-  notify_by_mail: true
-  notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
 
 rhel8stig_cron_special_disable: "{{ rhel8stig_workaround_for_disa_benchmark or rhel8stig_workaround_for_ssg_benchmark or false }}"
 
@@ -658,18 +602,6 @@ rhel8stig_logon_banner_nice: |
   communications and work product are private and confidential. See User
   Agreement for details.
 
-# Password complexity settings
-rhel8stig_password_complexity_ucredit: -1
-rhel8stig_password_complexity_lcredit: -1
-rhel8stig_password_complexity_dcredit: -1
-rhel8stig_password_complexity_ocredit: -1
-rhel8stig_password_complexity_difok: 8
-rhel8stig_password_complexity_minclass: 4
-rhel8stig_password_complexity_maxrepeat: 3
-rhel8stig_password_complexity_maxclassrepeat: 4
-rhel8stig_password_complexity_minlen: 15
-rhel8stig_password_complexity_dictcheck: 1
-
 rhel8stig_sssd_conf: /etc/sssd/sssd.conf
 rhel8stig_sssd_domain: testing.test
 rhel8stig_sssd_certmap: "certmap/{{ rhel8stig_sssd_domain }}/rule_name"
@@ -682,12 +614,6 @@ rhel8stig_sssd_domains: "{{ rhel8stig_sssd_domain }}"
 # to fulfill documented and validated mission requirements.
 # Timeout value is in seconds. (60 seconds * 10 = 600)
 rhel8stig_ssh_session_timeout: 600
-
-# RHEL-08-020102
-# RHEL-08-020103
-# rhel8stig_pam_pwquality_retry is the number of retries set to the password required pam_pwquality.so in system and password auth files
-# To conform to STIG standards this value needs to be 3 or less
-rhel8stig_pam_pwquality_retry: 3
 
 # RHEL-08-020320
 # If vsftpd is required, remove 'ftp' from rhel8stig_unnecessary_accounts.
@@ -703,11 +629,121 @@ rhel8stig_unnecessary_accounts:
   - games
 rhel8stig_remove_unnecessary_user_files: false
 
-# RHEL-08-020220
-# RHEL-08-020221
-# pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
-rhel8stig_pam_pwhistory:
-  retries: 3
+# /etc/login.defs settings
+# RHEL-08-010110
+# RHEL-08-020190
+# RHEL-08-020200
+# RHEL-08-020310
+rhel8stig_login_defaults_encrypt_method: SHA512
+rhel8stig_login_defaults_pass_min_days: 1
+rhel8stig_login_defaults_pass_max_days: 60
+rhel8stig_login_defaults_fail_delay_secs: 4
+rhel8stig_login_defaults_umask: "077"
+rhel8stig_login_defaults_create_home: "yes"
+
+rhel8stig_availability_override: false
+# auditd_failure_flag
+# 2    Tells your system to perform an immediate shutdown without
+#      flushing any pending data to disk when the limits of your
+#      audit system are exceeded. Because this shutdown is not a clean shutdown.
+#      restrict the use of -f 2 to only the most security conscious environments
+# 1    System continues to run, issues a warning and audit stops.
+#      Use this for any other setup to avoid loss of data or data corruption.
+rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
+
+rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
+  - 8.8.8.8
+  - 8.8.4.4
+
+rhel8stig_int_gid: 1000
+
+# Add list of additional crypto subpolicies to be added to FIPS
+# 10020 - additional crypto subpolicies
+
+rhel8stig_additional_fips_crypto_subpolicies: false
+# !!!! add additional crypto subpolicies here
+# Examples can be seen below
+rhel8stig_additional_fips_crypto_subpolicies_list:
+# - AD-SUPPORT
+# - NO-ENFORCE-EMS
+
+# RHEL-08-010100
+rhel8stig_path_to_sshkey: "/root/.ssh/"
+
+# RHEL-08-010130
+# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 100000
+rhel8stig_hashing_rounds: 100000
+
+# RHEL-08-010140 and RHEL-08-020280
+# Password protect the boot loader
+rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword # pragma: allowlist secret
+rhel8stig_boot_superuser: bootloader_admin
+
+# now in prelim
+# Enable UID discovery:
+discover_int_uid: true
+# If discovery set to false use these values
+min_int_uid: 1000
+max_int_uid: 65534
+min_int_gid: 1000
+
+# RHEL-08-010290 and 010296
+# This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
+# to conform to STIG standard control RHEL-08-010290 and 010296 this variable must include hmac-sha2-512,hmac-sha2-256
+
+rhel8stig_ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256"
+
+# RHEL-08-010291 and 010297
+# to conform to STIG standard control RHEL-08-010291 and 010297 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
+rhel8stig_ssh_ciphers: "aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"
+
+# RHEL-08-010360 | AIDE Cron Job
+rhel8stig_aide_cron:
+  user: root
+  cron_file: aide
+  job: "/usr/sbin/aide --check"
+  special_time: daily
+  # Disable the notification check rule to disable mailing notifications
+  notify_by_mail: true
+  notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
+
+# RHEL-08-010380
+# Setting to enable or disable fixes that depend on password-based authentication
+# i.e. if users authenticate with a means other than passwords (pubkey)
+# and will not know or use passwords then this should be 'no'
+rhel8stig_using_password_auth: true
+
+# RHEL-08-010384
+# The value given to Defaults timestamp timeout= in the sudo file.
+# Value must be greater than 0 to conform to STIG standards
+rhel8stig_sudo_timestamp_timeout: 1
+
+# RHEL-08-010680
+# This can be managed using a template ensure settings are correct
+rhel8_stig_use_resolv_template: false
+rhel8_stig_resolv_domain: example.com
+rhel8_stig_resolv_search:
+#    - 'example.com'
+#    - 'blah'
+rhel8_stig_resolv_options:
+#    - 'rotate 2'
+#    - 'timeout:1'
+
+# RHEL-08-010690
+rhel8stig_change_user_path: false
+
+# RHEL-08-010700
+# rhel8stig_ww_dir_owner is the owner of all world-writable directories
+# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
+rhel8stig_ww_dir_owner: root
+
+# RHEL-08-010710
+# rhel8stig_ww_dir_grpowner is the owner of all world-writable directories
+# To conform to STIG standards this needs to be set to root, sys, bin, or an application group
+rhel8stig_ww_dir_grpowner: root
+
+# RHEL-08-010740/RHEL-08-010750
+rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
 
 # RHEL-08-020010
 # RHEL-08-020011
@@ -724,6 +760,48 @@ rhel8stig_pam_faillock_dir: /var/log/faillock
 # RHEL-08-020035
 rhel8stig_idlesessiontimeout: 600
 
+# RHEL-08-020070
+# This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
+rhel8stig_tmux_lock_after_time: 900
+
+# RHEL-08-020102
+# RHEL-08-020103
+# rhel8stig_pam_pwquality_retry is the number of retries set to the password required pam_pwquality.so in system and password auth files
+# To conform to STIG standards this value needs to be 3 or less
+rhel8stig_pam_pwquality_retry: 3
+
+# RHEL-08-020100 and RHEL-08-020101 Password complexity settings
+# Password complexity settings
+rhel8stig_password_complexity_ucredit: -1
+rhel8stig_password_complexity_lcredit: -1
+rhel8stig_password_complexity_dcredit: -1
+rhel8stig_password_complexity_ocredit: -1
+rhel8stig_password_complexity_difok: 8
+rhel8stig_password_complexity_minclass: 4
+rhel8stig_password_complexity_maxrepeat: 3
+rhel8stig_password_complexity_maxclassrepeat: 4
+rhel8stig_password_complexity_minlen: 15
+rhel8stig_password_complexity_dictcheck: 1
+
+# RHEL-08-020220
+# RHEL-08-020221
+# pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
+rhel8stig_pam_pwhistory:
+  retries: 3
+
+# RHEL-08-030020
+rhel8stig_auditd_mail_acct: root
+
+# RHEL-08-030040 - Options are SYSLOG, SINGLE, and HALT to fit STIG standards
+rhel8stig_auditd_disk_error_action: HALT
+
+# RHEL-08-030050 - Options are SYSLOG or KEEP_LOGS to fit STIG standards
+rhel8stig_auditd_max_log_file_action: SYSLOG
+
+# RHEL-08-030060
+# rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
+rhel8stig_auditd_disk_full_action: HALT
+
 rhel8stig_audit_bins:
   - "/usr/sbin/auditctl"
   - "/usr/sbin/aureport"
@@ -733,36 +811,6 @@ rhel8stig_audit_bins:
   - "/usr/sbin/rsyslogd"
   - "/usr/sbin/augenrules"
 
-# RHEL-08-030060
-# rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
-rhel8stig_auditd_disk_full_action: HALT
-
-# RHEL-08-030040 - Options are SYSLOG, SINGLE, and HALT to fit STIG standards
-rhel8stig_auditd_disk_error_action: HALT
-
-# RHEL-08-030050 - Options are SYSLOG or KEEP_LOGS to fit STIG standards
-rhel8stig_auditd_max_log_file_action: SYSLOG
-
-# RHEL-08-030700
-# rhel8stig_audisp_overflow_action - Options are syslog, single, or halt to fit STIG standards
-rhel8stig_audisp_overflow_action: syslog
-
-# RHEL-08-040330
-# Network interface promiscuous mode setting will be disabled unless set to true
-rhel8stig_net_promisc_mode_required: false
-
-# /etc/login.defs settings
-# RHEL-08-010110
-# RHEL-08-020190
-# RHEL-08-020200
-# RHEL-08-020310
-rhel8stig_login_defaults_encrypt_method: SHA512
-rhel8stig_login_defaults_pass_min_days: 1
-rhel8stig_login_defaults_pass_max_days: 60
-rhel8stig_login_defaults_fail_delay_secs: 4
-rhel8stig_login_defaults_umask: "077"
-rhel8stig_login_defaults_create_home: "yes"
-
 # RHEL-08-030690 uncomment and set the value to a remote IP address that can receive audit logs
 # NOTE different protocol configs '@''=UDP '@@''=TCP '':omrelp:'=RELP
 rhel8stig_remotelog_server:
@@ -770,69 +818,17 @@ rhel8stig_remotelog_server:
   port: 9999
   protocol: "@@"
 
-# RHEL-08-030020
-rhel8stig_auditd_mail_acct: root
-
-# RHEL-08-010380
-# Setting to enable or disable fixes that depend on password-based authentication
-# i.e. if users authenticate with a means other than passwords (pubkey)
-# and will not know or use passwords then this should be 'no'
-rhel8stig_using_password_auth: true
-
-rhel8stig_availability_override: false
-# auditd_failure_flag
-# 2    Tells your system to perform an immediate shutdown without
-#      flushing any pending data to disk when the limits of your
-#      audit system are exceeded. Because this shutdown is not a clean shutdown.
-#      restrict the use of -f 2 to only the most security conscious environments
-# 1    System continues to run, issues a warning and audit stops.
-#      Use this for any other setup to avoid loss of data or data corruption.
-rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
-
-# RHEL-08-010740/RHEL-08-010750
-rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
-
-# RHEL-08-010680
-# This can be managed using a template ensure settings are correct
-rhel8_stig_use_resolv_template: false
-rhel8_stig_resolv_domain: example.com
-rhel8_stig_resolv_search:
-#    - 'example.com'
-#    - 'blah'
-rhel8_stig_resolv_options:
-#    - 'rotate 2'
-#    - 'timeout:1'
-
-rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
-  - 8.8.8.8
-  - 8.8.4.4
-
-rhel8stig_int_gid: 1000
-
-# RHEL-08-010130
-# The rounds parameter goes into the SHA_CRYPT_MIN_ROUNDS element of the /etc/login.defs file. The value shoudl be set no lower than 100000
-rhel8stig_hashing_rounds: 100000
-
-# RHEL-08-010100
-rhel8stig_path_to_sshkey: "/root/.ssh/"
-
-# now in prelim
-# Enable UID discovery:
-discover_int_uid: true
-# If discovery set to false use these values
-min_int_uid: 1000
-max_int_uid: 65534
-min_int_gid: 1000
+# RHEL-08-030700
+# rhel8stig_audisp_overflow_action - Options are syslog, single, or halt to fit STIG standards
+rhel8stig_audisp_overflow_action: syslog
 
 # RHEL-08-030740
 # rhel8stig_ntp_server_name is the name of the NTP server
 rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 
-# RHEL-08-040137
-# rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
-rhel8stig_fapolicy_white_list:
-  - "deny_audit perm=any pattern=ld_so : all"
-  - "deny perm=any all : all"
+# RHEL-08-040060
+# rhel8stig_epel_required is the flag to enable or disable the installation of the EPEL repository
+rhel8stig_epel_required: false
 
 # RHEL-08-040090
 # rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
@@ -848,31 +844,30 @@ rhel8stig_existing_zone_to_copy: public
 # rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
+  - dns
   - ssh
   - http
   - https
 
-# RHEL-08-010290
-# RHEL-08-010290
-# This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
-# to conform to STIG standard control RHEL-08-010290 this variable must include hmac-sha2-512,hmac-sha2-256
-# to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256"
-rhel8stig_ssh_ciphers: "aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr"
+# RHEL-08-040137
+# rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
+rhel8stig_fapolicy_white_list:
+  - "deny_audit perm=any pattern=ld_so : all"
+  - "deny perm=any all : all"
+
+# RHEL-08-040160
+# RHEL-08-040310
+# Install and enable ssh on networked systems
+rhel8stig_ssh_required: true
+
+# RHEL-08-040330
+# Network interface promiscuous mode setting will be disabled unless set to true
+rhel8stig_net_promisc_mode_required: false
+
 # RHEL-08-040342
 # Expected Values for FIPS KEX algorithms
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
 
-# RHEL-08-010295
-# This will be teh GnuTLS ecryption packages. The task sets the +VERS-ALL: setting, the only items needed are the DoD approved encryptions
-# to conform to STIG standards this variable must contain +VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0
-rhel8stig_gnutls_encryption: "+VERS-ALL:-VERS-DTLS0.9:-VERS-SSL3.0:-VERS-TLS1.0:-VERS-TLS1.1:-VERS-DTLS1.0"
-
-# RHEL-08-020070
-# This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
-rhel8stig_tmux_lock_after_time: 900
-
-# RHEL-08-010384
-# The value given to Defaults timestamp timeout= in the sudo file.
-# Value must be greater than 0 to conform to STIG standards
-rhel8stig_sudo_timestamp_timeout: 1
+# RHEL-08-040500
+# If not required, remove tftp
+rhel8stig_tftp_required: false

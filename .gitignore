@@ -6,9 +6,17 @@ tests/*redhat-subscription
 tests/Dockerfile
 *.iso
 *.box
+
 packer_cache
 delete*
 ignore*
+
+#
+*xccdf.xml
+*.pdf
+*history.md
+*plan.md
+
 # VSCode
 .vscode
 vagrant
