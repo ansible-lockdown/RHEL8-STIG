@@ -1405,7 +1405,7 @@
     - name: "MEDIUM | RHEL-08-030610 | PATCH | Set audit file permissions"
       ansible.builtin.file:
         path: "{{ item }}"
-        mode: '0640'
+        mode: 'u-x,g-wx,o-rwx'
         owner: root
         group: root
       failed_when: discovered_custom_audit_rules_permissions.state not in '[ file, absent ]'

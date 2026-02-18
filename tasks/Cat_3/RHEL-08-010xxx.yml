@@ -84,15 +84,15 @@
       ansible.builtin.shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
       failed_when: false
-      register: rhel8stig_010376_conflicting_settings
+      register: discovered_kernel_paranoid_settings
 
     - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users. | Remove conflicting instances"
-      when: rhel8stig_010376_conflicting_settings.stdout | length > 0
+      when: discovered_kernel_paranoid_settings.stdout | length > 0
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: '^kernel.perf_event_paranoid = [^2]'
         state: absent
-      loop: "{{ rhel8stig_010376_conflicting_settings.stdout_lines }}"
+      loop: "{{ discovered_kernel_paranoid_settings.stdout_lines }}"
 
     - name: "LOW | RHEL-08-010376 | PATCH | RHEL 8 must prevent kernel profiling by unprivileged users."
       ansible.posix.sysctl:

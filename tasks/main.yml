@@ -46,11 +46,11 @@
       changed_when: false
       failed_when: false
       check_mode: false
-      register: ansible_user_password_set
+      register: discovered_user_password_set
 
     - name: "Assert that password set for {{ ansible_env.SUDO_USER }} and account not locked"  # noqa: name[template]
       ansible.builtin.assert:
-        that: ansible_user_password_set.stdout | length != 0 and ansible_user_password_set.stdout != "!!"
+        that: discovered_user_password_set.stdout | length != 0 and discovered_user_password_set.stdout != "!!"
         fail_msg: "You have {{ sudo_password_rule }} enabled but the user = {{ ansible_env.SUDO_USER }} has no password set - It can break access"
         success_msg: "You have a password set for the {{ ansible_env.SUDO_USER }}"
       vars:
@@ -65,11 +65,11 @@
       changed_when: false
       failed_when: false
       check_mode: false
-      register: rhel8stig_user_list
+      register: discovered_user_list
 
     - name: "Ensure superuser for grub does not match existing user"
       ansible.builtin.assert:
-        that: rhel8stig_boot_superuser not in rhel8stig_user_list.stdout_lines
+        that: rhel8stig_boot_superuser not in discovered_user_list.stdout_lines
         fail_msg: "A unique name must be used for bootloader access user='{{ rhel8stig_boot_superuser }}' already exists refer to variable rhel8stig_boot_superuser"
 
 - name: Include OS specific variables
@@ -173,7 +173,7 @@
         dest: "{{ ansible_facts_path }}/compliance_facts.fact"
         owner: root
         group: root
-        mode: "u-x,go-wx"
+        mode: 'u-x,go-wx'
 
 - name: Fetch audit files
   when:

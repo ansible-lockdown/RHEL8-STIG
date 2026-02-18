@@ -10,6 +10,9 @@ rhel8stig_service_started: "{{ rhel8stig_system_is_chroot | ternary(omit, 'start
 # !!!!!!!!possibly delete
 # rhel8stig_systemd_daemon_reload: "{{ not rhel8stig_system_is_chroot }}"
 
+# RHEL 8 STIG requirements
+combined_crypto_policy_config: FIPS
+
 rhel8stig_sysctl_reload: "{{ not system_is_container }}"
 
 # these variables are for enabling tasks to run that will be further controled
@@ -51,3 +54,10 @@ discover_int_uid: true
 # Used to control warning summary
 warn_control_list: ""
 warn_count: 0
+
+company_title: 'MindPoint Group - A Tyto Athene Company'
+
+file_managed_by_ansible: |-
+  # File managed by ansible as part of {{ benchmark }} benchmark
+  # As part of Ansible-lockdown
+  # Provided by {{ company_title }}

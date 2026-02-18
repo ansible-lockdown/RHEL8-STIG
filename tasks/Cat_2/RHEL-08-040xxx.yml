@@ -152,8 +152,8 @@
       when: discovered_autofs_status.stdout == "loaded"
       ansible.builtin.service:
         name: autofs
-        state: stopped
         enabled: false
+        masked: true
 
 - name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
   when: rhel8stig_040080
@@ -308,10 +308,10 @@
           ansible.builtin.shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
           changed_when: false
           failed_when: false
-          register: rhel8stig_target_drop_set
+          register: discovered_target_drop_set
 
         - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
-          when: rhel8stig_target_drop_set.rc != 0
+          when: discovered_target_drop_set.rc != 0
           ansible.builtin.command: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
           changed_when: true
 
@@ -349,9 +349,9 @@
     - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
       when: discovered_nmcli_available.rc == 0
       ansible.builtin.command: nmcli radio wifi
-      register: rhel8stig_wifi_enabled
+      register: discovered_wifi_enabled
       check_mode: false
-      changed_when: rhel8stig_wifi_enabled.stdout != "disabled"
+      changed_when: discovered_wifi_enabled.stdout != "disabled"
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
       when: rhel8stig_wifi_enabled is changed  # noqa no-handler
@@ -1594,7 +1594,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230546r1017308_rule
+    - SV-230546r1155413_rule
     - V-230546
     - sysctl
   block:
@@ -1607,7 +1607,7 @@
     - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes. | Replace conflicting instances"
       when:
         - discovered_ptrace_settings.stdout | length > 0
-        - item != rhel8stig_sysctl_file
+        - item != '/etc/sysctl.d/99-ptrace-restrict.conf'
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: kernel.yama.ptrace_scope.*
@@ -1621,7 +1621,7 @@
         state: present
         reload: "{{ rhel8stig_sysctl_reload }}"
         sysctl_set: true
-        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+        sysctl_file: /etc/sysctl.d/99-ptrace-restrict.conf
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
   when: rhel8stig_040283
@@ -1718,7 +1718,7 @@
     - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Replace conflicting instances"
       when:
         - discovered_reverse_path_settings.stdout | length > 0
-        - item != rhel8stig_sysctl_file
+        - item != '/etc/sysctl.d/ipv4_rp_filter.conf'
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: net.ipv4.conf.all.rp_filter = [^1]
@@ -1732,7 +1732,7 @@
         state: present
         reload: "{{ rhel8stig_sysctl_reload }}"
         sysctl_set: true
-        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+        sysctl_file: /etc/sysctl.d/ipv4_rp_filter.conf
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
   when: rhel8stig_040286
