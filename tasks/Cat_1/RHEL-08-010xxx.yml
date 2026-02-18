@@ -62,7 +62,7 @@
     - name: "HIGH | RHEL-08-010020 | PATCH | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Add STIG pmod files"
       ansible.builtin.template:
         src: "etc/crypto-policies/policies/modules/STIG.pmod.j2"
-        dest: "/{{ item }}"
+        dest: "/etc/crypto-policies/policies/modules/STIG.pmod"
         owner: root
         group: root
         mode: 'u-x,go-rwx'
