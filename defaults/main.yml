@@ -18,10 +18,6 @@ rhel8stig_cat3: true
 # but are disabled by default to avoid disruption.
 rhel8stig_disruption_high: false
 
-rhel8stig_skip_for_travis: false
-
-rhel8stig_workaround_for_disa_benchmark: true
-
 # tweak role to run in a chroot, such as in kickstart %post script
 rhel8stig_system_is_chroot: "{{ ansible_is_chroot | default(False) }}"
 

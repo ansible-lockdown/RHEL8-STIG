@@ -165,7 +165,6 @@
 - name: Rebuild grub
   when:
     - discovered_grub2_user_cfg.stat.exists
-    - not rhel8stig_skip_for_travis
     - not system_is_container
   ansible.builtin.command: "/usr/sbin/grub2-mkconfig -o {{ prelim_bootloader_path }}/grub.cfg"
   changed_when: true
@@ -173,9 +172,7 @@
 
 - name: Copy grub2 config to BIOS/UEFI to satisfy benchmark
   when:
-    - rhel8stig_grub2_user_cfg.stat.exists
-    - rhel8stig_workaround_for_disa_benchmark
-    - not rhel8stig_skip_for_travis
+    - discovered_grub2_user_cfg.stat.exists
     - not system_is_container
   ansible.builtin.copy:
     src: "{{ prelim_bootloader_path }}/grub.cfg"
@@ -188,8 +185,6 @@
 
 - name: "Restart {{ rhel8stig_time_service }}"
   when:
-    - not rhel8stig_skip_for_travis
-    - not rhel8stig_system_is_chroot
     - not system_is_container
     - not change_requires_reboot
   ansible.builtin.service:

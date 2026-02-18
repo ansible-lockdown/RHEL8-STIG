@@ -1807,7 +1807,6 @@
 - name: "MEDIUM | RHEL-08-010543 | AUDIT | A separate RHEL 8 filesystem must be used for the /tmp directory."
   when:
     - rhel8stig_010543
-    - rhel8stig_complex
     - ansible_mounts | selectattr('mount', 'match', '^/tmp$') | list | length == 0
   tags:
     - RHEL-08-010543
@@ -1834,7 +1833,6 @@
 - name: "MEDIUM | RHEL-08-010544 | AUDIT | RHEL 8 must use a separate file system for /var/tmp."
   when:
     - rhel8stig_010544
-    - rhel8stig_complex
     - ansible_mounts | selectattr('mount', 'match', '^/var/tmp$') | list | length == 0
   tags:
     - RHEL-08-010544
@@ -2582,7 +2580,7 @@
     group: "{{ item.gid }}"
     mode: 'o-rwx'
   register: discovered_home_dir
-  loop: "{{ rhel8stig_passwd | selectattr('uid', '>=', min_int_uid | int) | selectattr('uid', '<=', max_int_uid | int) | list }}"
+  loop: "{{ prelim_captured_passwd_data | selectattr('uid', '>=', min_int_uid | int) | selectattr('uid', '<=', max_int_uid | int) | list }}"
   loop_control:
     label: "{{ item.id }}"
 
@@ -2655,9 +2653,9 @@
     group: "{{ item.gid }}"
     state: directory
     mode: 'g-w,o-rwx'
-  loop: "{{ rhel8stig_passwd }}"
+  loop: "{{ prelim_captured_passwd_data }}"
   loop_control:
-    label: "{{ rhel8stig_passwd_label }}"
+    label: "{{ item.id }}"
 
 - name: "MEDIUM | RHEL-08-010741 | PATCH | RHEL 8 must be configured so that all files and directories contained in local interactive user home directories are group-owned by a group of which the home directory owner is a member."
   when:
@@ -2677,9 +2675,9 @@
     group: "{{ item.gid }}"
     state: directory
     recurse: true
-  loop: "{{ rhel8stig_passwd }}"
+  loop: "{{ prelim_captured_passwd_data }}"
   loop_control:
-    label: "{{ rhel8stig_passwd_label }}"
+    label: "{{ item.id }}"
 
 - name: "MEDIUM | RHEL-08-010760 | PATCH | All RHEL 8 local interactive user accounts must be assigned a home directory upon creation."
   when: rhel8stig_010760
@@ -2784,7 +2782,6 @@
 - name: "MEDIUM | RHEL-08-010800 | AUDIT | A separate RHEL 8 filesystem must be used for user home directories (such as /home or an equivalent)."
   when:
     - rhel8stig_010800
-    - rhel8stig_complex
     - ansible_mounts | selectattr('mount', 'match', '^/home$') | list | length == 0
   tags:
     - RHEL-08-010800

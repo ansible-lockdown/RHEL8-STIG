@@ -1182,13 +1182,13 @@
     - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
       ansible.builtin.command: chage -d '-1 day' {{ item }}
       changed_when: true
-      check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+      check_mode: false
       loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
 
     - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
       ansible.builtin.command: chage -M 60 {{ item }}
       changed_when: true
-      check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+      check_mode: false
       loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."

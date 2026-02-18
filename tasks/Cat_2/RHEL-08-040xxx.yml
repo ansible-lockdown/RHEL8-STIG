@@ -64,7 +64,7 @@
     - rhel8stig_040030
     - not rhel8stig_system_is_chroot
     - rhel8stig_firewall_service != "not_required"
-    - rhel8stig_disruptive
+    - rhel8stig_disruption_high
   tags:
     - RHEL-08-040030
     - CAT2
@@ -354,7 +354,7 @@
       changed_when: discovered_wifi_enabled.stdout != "disabled"
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
-      when: rhel8stig_wifi_enabled is changed  # noqa no-handler
+      when: discovered_wifi_enabled is changed  # noqa no-handler
       ansible.builtin.command: nmcli radio wifi off
       changed_when: true
 
