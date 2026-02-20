@@ -15,7 +15,7 @@
     - V-230332
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: ^auth\s+required\s+pam_faillock.so preauth
@@ -82,7 +82,7 @@
     - V-230334
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -149,7 +149,7 @@
     - V-230336
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -216,7 +216,7 @@
     - V-230338
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth       required pam_faillock.so preauth'
@@ -283,7 +283,7 @@
     - V-230340
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur.| Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur.| Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -350,7 +350,7 @@
     - V-230342
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -417,7 +417,7 @@
     - V-230344
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -484,7 +484,7 @@
     - V-244533
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: /etc/pam.d/system-auth
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -523,7 +523,7 @@
     - V-244534
     - pamd
   block:
-    - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"  # noqa: jinja[spacing]
+    - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth" # noqa: jinja[spacing]
       ansible.builtin.lineinfile:
         path: /etc/pam.d/password-auth
         regexp: '^auth\s+required\s+pam_faillock.so preauth'
@@ -579,7 +579,7 @@
     - name: |
         "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
          MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
-      when: discovered_add_faillock_secontext.changed  # noqa no-handler
+      when: discovered_add_faillock_secontext.changed # noqa no-handler
       ansible.builtin.command: "restorecon -irvF {{ rhel8stig_pam_faillock_dir }}"
       changed_when: true
 
@@ -1503,7 +1503,7 @@
       loop: "{{ rhel8stig_unnecessary_accounts }}"
 
     - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
-      when: discovered_unnecessary_accounts_removed is changed  # noqa no-handler
+      when: discovered_unnecessary_accounts_removed is changed # noqa no-handler
       ansible.builtin.include_tasks: parse_etc_passwd.yml
       vars:
         rhel8stig_passwd_tasks: "RHEL-08-020320"  # pragma: allowlist secret

@@ -142,7 +142,7 @@
     - V-230502
     - autofs
   block:
-    - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error"  # noqa: command-instead-of-module
+    - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error" # noqa: command-instead-of-module
       ansible.builtin.shell: "systemctl show autofs | grep LoadState | cut -d= -f2"
       changed_when: false
       failed_when: false
@@ -339,7 +339,7 @@
     - V-230506
     - wifi
   block:
-    - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"  # noqa: command-instead-of-module
+    - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available" # noqa: command-instead-of-module
       ansible.builtin.command: rpm -q NetworkManager
       check_mode: false
       changed_when: false
@@ -354,7 +354,7 @@
       changed_when: discovered_wifi_enabled.stdout != "disabled"
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
-      when: discovered_wifi_enabled is changed  # noqa no-handler
+      when: discovered_wifi_enabled is changed # noqa no-handler
       ansible.builtin.command: nmcli radio wifi off
       changed_when: true
 

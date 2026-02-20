@@ -40,7 +40,7 @@ skip_postfix_check: {% if 'postfix' not in ansible_facts.packages %}True{% else 
 skip_tftp_check: {% if rhel8stig_tftp_required %}False{% else %}True{% endif %}
 
 
-# Sets up the system dependant on bootloader
+# Sets up the system dependent on bootloader
 legacy_boot: {{ prelim_legacy_boot }}
 rhel8stig_bootloader_path: {{ prelim_bootloader_path }}
 
@@ -462,9 +462,9 @@ rhel8stig_auditd_max_log_file_action: {{ rhel8stig_auditd_max_log_file_action }}
 rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 
 # RHEL_08_030690 if using remote syslog server
-rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
-rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
-rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server.protocol }}'
+rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server }}
+rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server_port }}
+rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server_protocol }}'
 
 # RHEL_08_040137
 python_bin: {{ ansible_python.executable }}

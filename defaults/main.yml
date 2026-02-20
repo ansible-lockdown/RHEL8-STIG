@@ -14,7 +14,7 @@ rhel8stig_cat2: true
 rhel8stig_cat3: true
 
 # We've defined disruption-high to indicate items that are likely to cause
-# disruption in a normal workflow.  These items can be remediated automatically
+# disruption in a normal workflow. These items can be remediated automatically
 # but are disabled by default to avoid disruption.
 rhel8stig_disruption_high: false
 
@@ -504,13 +504,13 @@ rhel8stig_sysctl_file: /etc/sysctl.d/99_stig_sysctl.conf
 # Whether or not system uses remote automounted home directories via autofs
 rhel8stig_autofs_remote_home_dirs: false
 
-# The local mount point used by autofs to mount remote home directory to.  This location will be excluded during getent user enumeration, if rhel8stig_autofs_remote_home_dirs is true
+# The local mount point used by autofs to mount remote home directory to. This location will be excluded during getent user enumeration, if rhel8stig_autofs_remote_home_dirs is true
 rhel8stig_auto_mount_home_dirs_local_mount_point: "/home/"
 
 # The default shell command to gather local interactive user directories
 ## NOTE: You will need to adjust the UID range in parenthesis below.
 ## ALSO NOTE: We weed out any user with a home dir not in standard locations because interactive users shouldn't have those paths as a home dir. Add or removed directory paths as needed below.
-local_interactive_user_dir_command: "getent passwd { {{ rhel8stig_int_gid }}..65535} | grep -v '/sbin/nologin' | cut -d: -f6 | sort -u | grep -Ev '/var/|/nonexistent/|/run/*'"
+local_interactive_user_dir_command: "getent passwd { {{ min_int_uid }}..65535} | grep -v '/sbin/nologin' | cut -d: -f6 | sort -u | grep -Ev '/var/|/nonexistent/|/run/*'"
 
 # IPv6 required
 rhel8stig_ipv6_required: true
@@ -544,13 +544,6 @@ rhel8stig_firewall_service: firewalld
 rhel8stig_start_firewall_service: true
 
 ### Aide
-# AIDE is a file integrity checking tool, similar in nature to Tripwire.
-# While it cannot prevent intrusions, it can detect unauthorized changes
-# to configuration files by alerting when the files are changed. Review
-# the AIDE quick start guide and AIDE documentation before proceeding.
-# By setting this variable to `true`, all of the settings related to AIDE will be applied!
-rhel8stig_use_aide: true
-
 # If DB file older than below will automatically rebuild DB
 # e.g. options:1w = 1 week, 1d = 1day 1h = 1 hour
 rhel8stig_aide_db_file_age: 1w
@@ -637,23 +630,20 @@ rhel8stig_login_defaults_pass_min_days: 1
 rhel8stig_login_defaults_pass_max_days: 60
 rhel8stig_login_defaults_fail_delay_secs: 4
 rhel8stig_login_defaults_umask: "077"
-rhel8stig_login_defaults_create_home: "yes"
 
 rhel8stig_availability_override: false
 # auditd_failure_flag
-# 2    Tells your system to perform an immediate shutdown without
-#      flushing any pending data to disk when the limits of your
-#      audit system are exceeded. Because this shutdown is not a clean shutdown.
-#      restrict the use of -f 2 to only the most security conscious environments
-# 1    System continues to run, issues a warning and audit stops.
-#      Use this for any other setup to avoid loss of data or data corruption.
+# 2 Tells your system to perform an immediate shutdown without
+# flushing any pending data to disk when the limits of your
+# audit system are exceeded. Because this shutdown is not a clean shutdown.
+# restrict the use of -f 2 to only the most security conscious environments
+# 1 System continues to run, issues a warning and audit stops.
+# Use this for any other setup to avoid loss of data or data corruption.
 rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
 
 rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
   - 8.8.8.8
   - 8.8.4.4
-
-rhel8stig_int_gid: 1000
 
 # Add list of additional crypto subpolicies to be added to FIPS
 # 10020 - additional crypto subpolicies
@@ -683,7 +673,6 @@ discover_int_uid: true
 # If discovery set to false use these values
 min_int_uid: 1000
 max_int_uid: 65534
-min_int_gid: 1000
 
 # RHEL-08-010290 and 010296
 # This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
@@ -696,14 +685,12 @@ rhel8stig_ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
 rhel8stig_ssh_ciphers: "aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com,aes128-ctr"
 
 # RHEL-08-010360 | AIDE Cron Job
-rhel8stig_aide_cron:
-  user: root
-  cron_file: aide
-  job: "/usr/sbin/aide --check"
-  special_time: daily
-  # Disable the notification check rule to disable mailing notifications
-  notify_by_mail: true
-  notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
+rhel8stig_aide_cron_user: root
+rhel8stig_aide_cron_cron_file: aide
+rhel8stig_aide_cron_job: "/usr/sbin/aide --check"
+rhel8stig_aide_cron_special_time: daily
+rhel8stig_aide_cron_notify_by_mail: true
+rhel8stig_aide_cron_notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
 
 # RHEL-08-010380
 # Setting to enable or disable fixes that depend on password-based authentication
@@ -740,9 +727,6 @@ rhel8stig_ww_dir_owner: root
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_grpowner: root
 
-# RHEL-08-010740/RHEL-08-010750
-rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
-
 # RHEL-08-020010
 # RHEL-08-020011
 # RHEL-08-020012
@@ -757,10 +741,6 @@ rhel8stig_pam_faillock_dir: /var/log/faillock
 
 # RHEL-08-020035
 rhel8stig_idlesessiontimeout: 600
-
-# RHEL-08-020070
-# This is the value for the tmux lock after setting. To conform to STIG standards value needs to be set to 900 or less
-rhel8stig_tmux_lock_after_time: 900
 
 # RHEL-08-020102
 # RHEL-08-020103
@@ -780,12 +760,6 @@ rhel8stig_password_complexity_maxrepeat: 3
 rhel8stig_password_complexity_maxclassrepeat: 4
 rhel8stig_password_complexity_minlen: 15
 rhel8stig_password_complexity_dictcheck: 1
-
-# RHEL-08-020220
-# RHEL-08-020221
-# pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
-rhel8stig_pam_pwhistory:
-  retries: 3
 
 # RHEL-08-030020
 rhel8stig_auditd_mail_acct: root
@@ -811,10 +785,9 @@ rhel8stig_audit_bins:
 
 # RHEL-08-030690 uncomment and set the value to a remote IP address that can receive audit logs
 # NOTE different protocol configs '@''=UDP '@@''=TCP '':omrelp:'=RELP
-rhel8stig_remotelog_server:
-  server: 10.10.10.10
-  port: 9999
-  protocol: "@@"
+rhel8stig_remotelog_server: 10.10.10.10
+rhel8stig_remotelog_server_port: 9999
+rhel8stig_remotelog_server_protocol: "@"
 
 # RHEL-08-030700
 # rhel8stig_audisp_overflow_action - Options are syslog, single, or halt to fit STIG standards
@@ -848,7 +821,7 @@ rhel8stig_white_list_services:
   - https
 
 # RHEL-08-040137
-# rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
+# rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be deny all
 rhel8stig_fapolicy_white_list:
   - "deny_audit perm=any pattern=ld_so : all"
   - "deny perm=any all : all"

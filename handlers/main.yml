@@ -200,7 +200,7 @@
     mode: 'u-x,go-rwx'
   notify: Restart auditd
 
-- name: Restart auditd  # noqa: command-instead-of-module
+- name: Restart auditd # noqa: command-instead-of-module
   when:
     - not rhel8stig_system_is_chroot
     - not system_is_container

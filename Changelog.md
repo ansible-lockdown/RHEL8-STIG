@@ -421,10 +421,10 @@ Controls updated
       - RHEL-08-040280 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040281 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040282 - Updated to include find and remove for conflicting parameters
-      - RHEL-08-040283 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040284 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040285 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040286 - Updated to include find adn remove for conflicting parameters
+      - RHEL-08-040283 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040284 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040285 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040286 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040340
       - RHEL-08-040341
       - RHEL-08-040400 - New control

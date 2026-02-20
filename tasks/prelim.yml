@@ -48,16 +48,10 @@
       changed_when: false
       register: uid_max_id
 
-    - name: PRELIM | Capture GID_MIN information from logins.def
-      ansible.builtin.shell: grep -w "^GID_MIN" /etc/login.defs | awk '{print $NF}'
-      changed_when: false
-      register: gid_min_id
-
-    - name: PRELIM | Set_facts for interactive uid/gid
+    - name: PRELIM | Set_facts for interactive uid
       ansible.builtin.set_fact:
         min_int_uid: "{{ uid_min_id.stdout }}"
         max_int_uid: "{{ uid_max_id.stdout }}"
-        min_int_gid: "{{ gid_min_id.stdout }}"
 
 - name: PRELIM | Set crypto policies and subpolicies fact
   when: rhel8stig_additional_fips_crypto_subpolicies
@@ -197,7 +191,7 @@
   ansible.builtin.import_tasks:
     file: parse_etc_passwd.yml
     # vars:
-    #   rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"  # pragma: allowlist secret
+    # rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320" # pragma: allowlist secret
 
 - name: "PRELIM | AUDIT | Discover Interactive Users"
   tags: always
