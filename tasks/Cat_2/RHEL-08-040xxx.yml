@@ -1897,37 +1897,6 @@
     line: 'X11UseLocalhost yes'
     validate: '/usr/sbin/sshd -T -f %s'
 
-- name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
-  when:
-    - rhel8stig_040342
-    - rhel8stig_ssh_required
-  tags:
-    - RHEL-08-040342
-    - CAT2
-    - CCI-001453
-    - NIST800-53R4_CM-6
-    - SRG-OS-000250-GPOS-00093
-    - SV-255924r1017372_rule
-    - V-255924
-    - fips
-  block:
-    - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
-      ansible.builtin.shell: grep -E "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
-      changed_when: false
-      failed_when: false
-      register: discovered_current_kex_settings
-
-    - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | update KEXs"
-      when:
-        - discovered_current_kex_settings is defined
-        - discovered_current_kex_settings.stdout | length > 0
-      ansible.builtin.lineinfile:
-        path: /etc/crypto-policies/back-ends/opensshserver.config
-        regexp: '(^CRYPTO_POLICY=.*)-o{{ discovered_current_kex_settings.stdout }}(.*$)'
-        line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
-        backrefs: true
-      notify: Change_requires_reboot
-
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   when:
     - rhel8stig_040350

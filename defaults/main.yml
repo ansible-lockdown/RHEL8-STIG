@@ -128,7 +128,6 @@ rhel8stig_020331: true
 rhel8stig_020332: true
 rhel8stig_040000: true
 rhel8stig_040010: true
-rhel8stig_040060: true
 rhel8stig_040170: true
 rhel8stig_040171: true
 rhel8stig_040172: true
@@ -159,7 +158,6 @@ rhel8stig_010161: true
 rhel8stig_010162: true
 rhel8stig_010163: true
 rhel8stig_010170: true
-rhel8stig_010180: true
 rhel8stig_010190: true
 rhel8stig_010200: true
 rhel8stig_010201: true
@@ -453,7 +451,6 @@ rhel8stig_040321: true
 rhel8stig_040330: true
 rhel8stig_040340: true
 rhel8stig_040341: true
-rhel8stig_040342: true
 rhel8stig_040350: true
 rhel8stig_040370: true
 rhel8stig_040380: true
@@ -810,7 +807,7 @@ rhel8stig_audisp_overflow_action: syslog
 # rhel8stig_ntp_server_name is the name of the NTP server
 rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 
-# RHEL-08-040060
+# RHEL-08-040010
 # rhel8stig_epel_required is the flag to enable or disable the installation of the EPEL repository
 rhel8stig_epel_required: false
 
@@ -847,10 +844,6 @@ rhel8stig_ssh_required: true
 # RHEL-08-040330
 # Network interface promiscuous mode setting will be disabled unless set to true
 rhel8stig_net_promisc_mode_required: false
-
-# RHEL-08-040342
-# Expected Values for FIPS KEX algorithms
-rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"
 
 # RHEL-08-040500
 # If not required, remove tftp

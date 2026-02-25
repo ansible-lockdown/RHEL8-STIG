@@ -16,15 +16,20 @@
 - Fixed 8 double-space grammar issues in Cat_2 task names
 - Removed unused regex variables from `vars/main.yml` (rhel8stig_regexp_quoted_params, rhel8stig_replace_quoted_params, rhel8stig_service_started)
 - Renamed 5 non-standard register variables to `discovered_*` prefix convention in `prelim.yml`
+- Verified all 366 rules against V2R6
+- Aligned defaults/main.yml and goss template with RHEL8-STIG-Audit vars/STIG.yml
+- 010180 - removed from defaults and goss template (no remediation task existed; originally merged into 010700)
+- 040060 - removed rule toggle from defaults and goss template (no remediation task existed; rhel8stig_epel_required retained under 040010 where it is used)
+- 040342 - removed from defaults, goss template, and remediation task in Cat_2/RHEL-08-040xxx.yml (not in V2R6; KEX handled by crypto-policies); rhel8stig_ssh_kex variable removed
 
-## CAT1
+### CAT1
 - 010015 - new control - crypto-policies
 - 010020 - new requirements - rewrite - Crypto FIPS
 - 010270 - new - Crypto FIPS
 - 040010 - rsh-server changed to EPEL
 - 040172 - updated to drop in file
 
-## CAT2
+### CAT2
 - 010275 - new - bind - crypto
 - 010280 - new - ipsec - crypto
 - 010287 - removed
@@ -48,11 +53,14 @@
 - 010675 - not required if kdump disabled
 - 020000 - removed as duplicate of 020270
 - 020060 - 10 min timeout
+- 020360 - new - shell session TMOUT 10 min inactivity
+- 030655 - new - audit cron scripts/executables (added in v2r4, aligned for v2r6)
 - 040282 - dropin file
 - 040285 - dropin file
 
-## CAT 3
+### CAT 3
 
+- 010472 - new - rng-tools package installed
 - 020340 - removed
 
 ## 5.0.0 STIG v2r4
