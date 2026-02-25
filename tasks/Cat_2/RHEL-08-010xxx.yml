@@ -429,7 +429,7 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
-      loop: "{{ rhel8stig_010161_keytab_files.stdout_lines }}"
+      loop: "{{ discovered_keytab_files.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-010162 | PATCH | The krb5-workstation package must not be installed on RHEL 8."
   when: rhel8stig_010162
@@ -1048,7 +1048,9 @@
     state: present
 
 - name: "MEDIUM | RHEL-08-010359 | PATCH | The RHEL 8 operating system must use a file integrity tool to verify correct operation of all security functions. | pkg install"
-  when: rhel8stig_010359
+  when:
+    - rhel8stig_use_aide
+    - rhel8stig_010359
   tags:
     - RHEL-08-010359
     - CAT2
@@ -1072,6 +1074,7 @@
 - name: "MEDIUM | RHEL-08-010360 | PATCH | The RHEL 8 file integrity tool must notify the system administrator when changes to the baseline configuration or anomalies in the operation of any security functions are discovered within an organizationally defined frequency."
   when:
     - rhel8stig_010360
+    - rhel8stig_use_aide
     - rhel8stig_disruption_high
     - "'crontabs' in ansible_facts.packages"
   tags:
@@ -2485,16 +2488,16 @@
       ansible.builtin.command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -uid +999
       changed_when: false
       failed_when: false
-      register: discovered_world_writable_directories
+      register: discovered_worldwide_dir_owners
 
     - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Set permissions"
       when:
-        - discovered_world_writable_directories.stdout is defined
-        - discovered_world_writable_directories.stdout | length > 0
+        - discovered_worldwide_dir_owners.stdout is defined
+        - discovered_worldwide_dir_owners.stdout | length > 0
       ansible.builtin.file:
         path: "{{ item }}"
         owner: "{{ rhel8stig_ww_dir_owner }}"
-      loop: "{{ discovered_world_writable_directories.stdout_lines }}"
+      loop: "{{ discovered_worldwide_dir_owners.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group."
   when: rhel8stig_010710
@@ -2512,16 +2515,16 @@
       ansible.builtin.command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -gid +999
       changed_when: false
       failed_when: false
-      register: discovered_world_writable_directories
+      register: discovered_world_writable_dir_group_owners
 
     - name: "MEDIUM | RHEL-08-010710 | PATCH | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Set permissions"
       when:
-        - discovered_world_writable_directories.stdout is defined
-        - discovered_world_writable_directories.stdout | length > 0
+        - discovered_world_writable_dir_group_owners.stdout is defined
+        - discovered_world_writable_dir_group_owners.stdout | length > 0
       ansible.builtin.file:
         path: "{{ item }}"
         group: "{{ rhel8stig_ww_dir_grpowner }}"
-      loop: "{{ discovered_world_writable_directories.stdout_lines }}"
+      loop: "{{ discovered_world_writable_dir_group_owners.stdout_lines }}"
 
 - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file."
   when: rhel8stig_010720

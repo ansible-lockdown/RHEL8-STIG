@@ -10,8 +10,6 @@ os_gpg_key_pubkey_content: {{ os_gpg_key_pubkey_content }}
 rpm_gpg_key: {{ rpm_gpg_key }}
 gpg_package: {{ gpg_package }}
 
-rhel8stig_os_version_pre_8_2: {% if ansible_facts['distribution_version'] is version('8.1', '<=') %}true{% else %}false{% endif %}
-
 OS_ver: {{ ansible_facts['distribution_version'] }}
 
 # Some tests may need to scan every filesystem or have an impact on a system
@@ -43,7 +41,7 @@ skip_tftp_check: {% if rhel8stig_tftp_required %}False{% else %}True{% endif %}
 
 # Sets up the system dependent on bootloader
 legacy_boot: {{ prelim_legacy_boot }}
-rhel8stig_bootloader_path: {{ prelim_bootloader_path }}
+prelim_bootloader_path: {{ prelim_bootloader_path }}
 
 
 # Cat 1 rules
@@ -425,7 +423,7 @@ RHEL_08_040310: {{ rhel8stig_040310 }}
 
 # Variables
 
-rhel8stig_password_hash: {{ rhel8stig_bootloader_password_hash }}
+rhel8stig_bootloader_password_hash: {{ rhel8stig_bootloader_password_hash }}
 rhel8stig_boot_superuser: {{ rhel8stig_boot_superuser }}
 
 # RHEL_08_101120 & Auditd controls
@@ -434,7 +432,6 @@ MAX_UID: {{ max_int_uid }}
 
 
 # RHEL_08_010040-010050-010060
-rhel8stig_banner_file: /etc/issue
 rhel8stig_logon_banner:
   You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
   By using this IS (which includes any device attached to this IS), you consent to the following conditions
@@ -443,12 +440,6 @@ rhel8stig_logon_banner:
   -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
   -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
   -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
-
-# RHEL_08_010680 to change if using hostfile only - separate checks
-rhel8stig_uses_dns: true
-
-# RHEL_08_010360 if run via ansible it is placed in cron.d setting as manually set in cron.daily
-rhel8stig_aide_cron_file: /etc/cron.d/aide
 
 # RHEL_08_200027 &28
 rhel8stig_pam_faillock_dir: {{ rhel8stig_pam_faillock_dir }}
@@ -464,8 +455,17 @@ rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 
 # RHEL_08_030690 if using remote syslog server
 rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server }}
-rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server_port }}
-rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server_protocol }}'
+rhel8stig_remotelog_server_port: {{ rhel8stig_remotelog_server_port }}
+rhel8stig_remotelog_server_protocol: '{{ rhel8stig_remotelog_server_protocol }}'
 
-# RHEL_08_040137
+# RHEL_08_040137
 python_bin: {{ ansible_python.executable }}
+
+### Aide
+rhel8stig_use_aide: {{ rhel8stig_use_aide }}
+rhel8stig_aide_cron_file: {{ rhel8stig_aide_cron_file }}  # NOTE the path may change if not running daily
+rhel8stig_aide_cron_day: {{ rhel8stig_aide_cron_day }}
+rhel8stig_aide_cron_hour: {{ rhel8stig_aide_cron_hour }}
+rhel8stig_aide_cron_minute: {{ rhel8stig_aide_cron_minute }}
+rhel8stig_aide_cron_job: {{ rhel8stig_aide_cron_job }}
+rhel8stig_aide_cron_name: {{ rhel8stig_aide_cron_name }}

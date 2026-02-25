@@ -50,8 +50,8 @@
     - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS"
       ansible.builtin.command: update-crypto-policies --show
       changed_when: false
-      failed_when: discovered_crypto_policies_status.rc not in [0, 1]
-      register: discovered_crypto_policies_status
+      failed_when: discovered_crypto_policies_status_show.rc not in [0, 1]
+      register: discovered_crypto_policies_status_show
 
     - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS mode on kernel"
       ansible.builtin.command: grep -Ew 'min_rsa_size|hash ' /etc/crypto-policies/state/CURRENT.pol
@@ -68,7 +68,7 @@
         mode: 'u-x,go-rwx'
 
     - name: "HIGH | RHEL-08-010020 | PATCH | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Enable FIPS mode on kernel"
-      when: "'FIPS' not in discovered_crypto_policies_status.stdout"
+      when: "'FIPS' not in discovered_crypto_policies_status_show.stdout"
       ansible.builtin.command: update-crypto-policies --set FIPS:STIG
       changed_when: false
       register: discovered_fips_status
@@ -201,11 +201,11 @@
     - name: "HIGH | RHEL-08-010270 | AUDIT | RHEL 8 cryptographic policy must not be overridden. | Check FIPS"
       ansible.builtin.command: update-crypto-policies --is-applied
       changed_when: false
-      failed_when: discovered_crypto_policies_status.rc not in [0, 1]
-      register: discovered_crypto_policies_status
+      failed_when: discovered_crypto_policies_status_applied.rc not in [0, 1]
+      register: discovered_crypto_policies_status_applied
 
     - name: "HIGH | RHEL-08-010270 | AUDIT | RHEL 8 cryptographic policy must not be overridden. | Add to reinstall"
-      when: "'policy is applied' not in discovered_crypto_policies_status.stdout"
+      when: "'policy is applied' not in discovered_crypto_policies_status_applied.stdout"
       ansible.builtin.debug:
         msg: 'WARNING!! FIPS policy is not applied - running as handler to reinstall crypto-policies'
       changed_when: true

@@ -545,6 +545,13 @@ rhel8stig_firewall_service: firewalld
 rhel8stig_start_firewall_service: true
 
 ### Aide
+# AIDE is a file integrity checking tool, similar in nature to Tripwire.
+# While it cannot prevent intrusions, it can detect unauthorized changes
+# to configuration files by alerting when the files are changed. Review
+# the AIDE quick start guide and AIDE documentation before proceeding.
+# By setting this variable to `true`, all of the settings related to AIDE will be applied!
+rhel8stig_use_aide: true
+
 # If DB file older than below will automatically rebuild DB
 # e.g. options:1w = 1 week, 1d = 1day 1h = 1 hour
 rhel8stig_aide_db_file_age: 1w
@@ -688,10 +695,15 @@ rhel8stig_ssh_ciphers: "aes256-gcm@openssh.com,aes256-ctr,aes128-gcm@openssh.com
 # RHEL-08-010360 | AIDE Cron Job
 rhel8stig_aide_cron_user: root
 rhel8stig_aide_cron_cron_file: aide
-rhel8stig_aide_cron_job: "/usr/sbin/aide --check"
+rhel8stig_aide_cron_job: '/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root@sysname.mil'
 rhel8stig_aide_cron_special_time: daily
 rhel8stig_aide_cron_notify_by_mail: true
 rhel8stig_aide_cron_notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
+rhel8stig_aide_cron_file: /etc/cron.daily/aide  # NOTE the path may change if not running daily
+rhel8stig_aide_cron_day: '*'
+rhel8stig_aide_cron_hour: '4'
+rhel8stig_aide_cron_minute: '30'
+rhel8stig_aide_cron_name: 'Aide Job runs Daily at 0430'
 
 # RHEL-08-010380
 # Setting to enable or disable fixes that depend on password-based authentication

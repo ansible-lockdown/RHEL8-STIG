@@ -237,12 +237,12 @@
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
       failed_when: false
-      register: discovered_audit_log_dir
+      register: discovered_audit_log_dir_owner
 
     - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Set audit log dir owner"
-      when: discovered_audit_log_dir.stdout | length > 0
+      when: discovered_audit_log_dir_owner.stdout | length > 0
       ansible.builtin.file:
-        path: "{{ discovered_audit_log_dir.stdout }}"
+        path: "{{ discovered_audit_log_dir_owner.stdout }}"
         owner: root
         state: directory
         mode: 'go-rwx'
@@ -268,12 +268,12 @@
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
       failed_when: false
-      register: discovered_audit_log_dir
+      register: discovered_audit_log_dir_group_owner
 
     - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Set audit log dir group"
-      when: discovered_audit_log_dir.stdout | length > 0
+      when: discovered_audit_log_dir_group_owner.stdout | length > 0
       ansible.builtin.file:
-        path: "{{ discovered_audit_log_dir.stdout }}"
+        path: "{{ discovered_audit_log_dir_group_owner.stdout }}"
         group: root
         state: directory
         mode: 'go-rwx'
@@ -298,12 +298,12 @@
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
       failed_when: false
-      register: discovered_audit_log_dir
+      register: discovered_audit_log_dir_perms
 
     - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
-      when: discovered_audit_log_dir.stdout | length > 0
+      when: discovered_audit_log_dir_perms.stdout | length > 0
       ansible.builtin.file:
-        path: "{{ discovered_audit_log_dir.stdout }}"
+        path: "{{ discovered_audit_log_dir_perms.stdout }}"
         mode: 'go-rwx'
         state: directory
 
@@ -1471,7 +1471,9 @@
   loop: "{{ rhel8stig_audit_bins }}"
 
 - name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
-  when: rhel8stig_030650
+  when:
+    - rhel8stig_030650
+    - rhel8stig_use_aide
   tags:
     - RHEL-08-030650
     - CAT2

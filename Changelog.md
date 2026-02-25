@@ -7,6 +7,7 @@
 - Updated benchmark version
 - Lic Year update
 - Branding update on .j2's
+- Updated discovered vars tasks naming to be unique
 - Updated .github workflows to standard
 - Fixed handler typo `rRstart sssd` -> `Restart sssd` in Cat_2/RHEL-08-020xxx (020016)
 - Fixed goss audit variable mismatch RHEL_08_010381 mapped to wrong toggle (010380 -> 010381)

@@ -615,7 +615,7 @@
       notify: Dconf update
 
     - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
-      when: rhel8stig_020030_lock_enabled.stdout | length == 0
+      when: discovered_lock_enabled.stdout | length == 0
       ansible.builtin.lineinfile:
         path: /etc/dconf/db/local.d/00-screensaver
         create: true

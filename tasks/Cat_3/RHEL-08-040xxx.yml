@@ -186,6 +186,7 @@
   when:
     - rhel8stig_040300
     - rhel8stig_040310
+    - rhel8stig_use_aide
   tags:
     - CAT3
     - RHEL-08-040300
