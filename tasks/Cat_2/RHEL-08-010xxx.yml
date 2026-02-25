@@ -1479,7 +1479,7 @@
     name: opensc
     state: present
 
-- name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
+- name: "MEDIUM | RHEL-08-010420 | AUDIT | RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution."
   when: rhel8stig_010420
   tags:
     - RHEL-08-010420
@@ -1492,19 +1492,19 @@
   vars:
     warn_control_id: "MEDIUM | RHEL-08-010420"
   block:
-    - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
+    - name: "MEDIUM | RHEL-08-010420 | AUDIT | RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
       ansible.builtin.shell: dmesg |grep "NX ("
       changed_when: false
       failed_when: false
       register: discovered_nx_bit_state
 
-    - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
+    - name: "MEDIUM | RHEL-08-010420 | AUDIT | RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
       when: '"(Execute Disable) protection: active" not in discovered_nx_bit_state.stdout'
       ansible.builtin.debug:
         msg:
           - "WARNING!! You do not have execute disable active. Please change the setting in your BIOS settings"
 
-    - name: "MEDIUM | RHEL-08-010420 | AUDIT |  RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
+    - name: "MEDIUM | RHEL-08-010420 | AUDIT | RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Message on NX no being set"
       when: '"(Execute Disable) protection: active" not in discovered_nx_bit_state.stdout'
       ansible.builtin.import_tasks:
         file: warning_facts.yml
@@ -2115,7 +2115,7 @@
         opts: "{{ item.options }},noexec"
       loop: "{{ ansible_facts.mounts }}"
 
-- name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
+- name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media."
   when:
     - rhel8stig_010620
     - not rhel8stig_system_is_chroot
@@ -2130,7 +2130,7 @@
     - mounts
     - media
   block:
-    - name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /media"
+    - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /media"
       when:
         - rhel8stig_010620
         - item.mount == '/media'
@@ -2143,7 +2143,7 @@
         opts: "{{ item.options }},nosuid"
       loop: "{{ ansible_facts.mounts }}"
 
-    - name: "MEDIUM | RHEL-08-010620 | PATCH |  RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
+    - name: "MEDIUM | RHEL-08-010620 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on file systems that are used with removable media. | Set nosuid to /mnt"
       when:
         - rhel8stig_010620
         - item.mount == '/mnt'

@@ -244,7 +244,7 @@
         regexp: '^account    required pam_faillock.so'
         line: 'account    required pam_faillock.so'
         insertafter: '^account'
-      notify: rRstart sssd
+      notify: Restart sssd
       loop:
         - system-auth
         - password-auth
@@ -1528,7 +1528,7 @@
     validate: /usr/sbin/sshd -t -f %s
   notify: Restart sshd
 
-- name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
+- name: "MEDIUM | RHEL-08-020351 | PATCH | RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
   when: rhel8stig_020351
   tags:
     - RHEL-08-020351

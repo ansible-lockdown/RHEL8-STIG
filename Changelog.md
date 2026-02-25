@@ -1,11 +1,18 @@
 # Changes to RHEL8STIG
 
-## 5.0.0 STIG v2r6 Jan 2026
+## STIG v2r6
 
-updated benchmark version
-lint
-standards
-test improvments
+### Feb 2026 QA
+
+- Updated benchmark version
+- Updated .github workflows to standard
+- Fixed handler typo `rRstart sssd` -> `Restart sssd` in Cat_2/RHEL-08-020xxx (020016)
+- Fixed goss audit variable mismatch RHEL_08_010381 mapped to wrong toggle (010380 -> 010381)
+- Fixed goss audit variable mismatch RHEL_08_030690 mapped to wrong toggle (030090 -> 030690)
+- Removed deprecated `verbosity` option from `.ansible-lint`
+- Fixed 8 double-space grammar issues in Cat_2 task names
+- Removed unused regex variables from `vars/main.yml` (rhel8stig_regexp_quoted_params, rhel8stig_replace_quoted_params, rhel8stig_service_started)
+- Renamed 5 non-standard register variables to `discovered_*` prefix convention in `prelim.yml`
 
 ## CAT1
 - 010015 - new control - crypto-policies
