@@ -1,6 +1,6 @@
 ---
 ## metadata for Audit benchmark
-benchmark_version: 'v2r2'
+benchmark_version: "v2r4"
 
 ## Benchmark name used by auditing control role
 # The audit variable found at the base
@@ -86,6 +86,9 @@ get_audit_binary_method: download
 ## e.g copy from ansible control node to remote host
 audit_bin_copy_location: /some/accessible/path
 
+# Ability to limit the number of concurrent processes used by goss (default 50)
+audit_max_concurrent: 50
+
 # how to get audit files onto host options
 # options are git/copy/archive/get_url other e.g. if you wish to run from already downloaded conf
 audit_content: git
@@ -101,7 +104,7 @@ audit_conf_source: "some path or url to copy from"
 audit_conf_dest: "/opt"
 
 # Where the audit logs are stored
-audit_log_dir: '/opt'
+audit_log_dir: "/opt"
 
 ## Ability to collect and take audit files moving to a centralized location
 # This enables the collection of the files from the host
@@ -124,384 +127,386 @@ audit_output_destination: /opt/audit_summaries/
 # PLEASE NOTE: These work in coordination with the cat1, cat2, cat3 group variables. You must enable an entire group
 # in order for the variables below to take effect.
 # CAT 1 rules
-rhel_08_010000: true
-rhel_08_010020: true
-rhel_08_010030: true
-rhel_08_010121: true
-rhel_08_010140: true
-rhel_08_010150: true
-rhel_08_010370: true
-rhel_08_010371: true
-rhel_08_010460: true
-rhel_08_010470: true
-rhel_08_010820: true
-rhel_08_020330: true
-rhel_08_020331: true
-rhel_08_020332: true
-rhel_08_040000: true
-rhel_08_040010: true
-rhel_08_040060: true
-rhel_08_040170: true
-rhel_08_040171: true
-rhel_08_040172: true
-rhel_08_040190: true
-rhel_08_040200: true
-rhel_08_040360: true
+rhel8stig_010000: true
+rhel8stig_010020: true
+rhel8stig_010030: true
+rhel8stig_010121: true
+rhel8stig_010140: true
+rhel8stig_010150: true
+rhel8stig_010370: true
+rhel8stig_010371: true
+rhel8stig_010460: true
+rhel8stig_010470: true
+rhel8stig_010820: true
+rhel8stig_020330: true
+rhel8stig_020331: true
+rhel8stig_020332: true
+rhel8stig_040000: true
+rhel8stig_040010: true
+rhel8stig_040060: true
+rhel8stig_040170: true
+rhel8stig_040171: true
+rhel8stig_040172: true
+rhel8stig_040190: true
+rhel8stig_040200: true
+rhel8stig_040360: true
 
 # CAT 2 rules
-rhel_08_010010: true
-rhel_08_010019: true
-rhel_08_010040: true
-rhel_08_010049: true
-rhel_08_010050: true
-rhel_08_010060: true
-rhel_08_010070: true
-rhel_08_010090: true
-rhel_08_010100: true
-rhel_08_010110: true
-rhel_08_010120: true
-rhel_08_010130: true
-rhel_08_010141: true
-rhel_08_010149: true
-rhel_08_010151: true
-rhel_08_010152: true
-rhel_08_010159: true
-rhel_08_010160: true
-rhel_08_010161: true
-rhel_08_010162: true
-rhel_08_010163: true
-rhel_08_010170: true
-rhel_08_010180: true
-rhel_08_010190: true
-rhel_08_010200: true
-rhel_08_010201: true
-rhel_08_010210: true
-rhel_08_010220: true
-rhel_08_010230: true
-rhel_08_010240: true
-rhel_08_010250: true
-rhel_08_010260: true
-rhel_08_010287: true
-rhel_08_010290: true
-rhel_08_010291: true
-rhel_08_010293: true
-rhel_08_010294: true
-rhel_08_010295: true
-rhel_08_010300: true
-rhel_08_010310: true
-rhel_08_010320: true
-rhel_08_010330: true
-rhel_08_010331: true
-rhel_08_010340: true
-rhel_08_010341: true
-rhel_08_010350: true
-rhel_08_010351: true
-rhel_08_010358: true
-rhel_08_010359: true
-rhel_08_010360: true
-rhel_08_010372: true
-rhel_08_010373: true
-rhel_08_010374: true
-rhel_08_010379: true
-rhel_08_010380: true
-rhel_08_010381: true
-rhel_08_010382: true
-rhel_08_010383: true
-rhel_08_010384: true
-rhel_08_010385: true
-rhel_08_010390: true
-rhel_08_010400: true
-rhel_08_010410: true
-rhel_08_010420: true
-rhel_08_010421: true
-rhel_08_010422: true
-rhel_08_010423: true
-rhel_08_010430: true
-rhel_08_010450: true
-rhel_08_010480: true
-rhel_08_010490: true
-rhel_08_010500: true
-rhel_08_010520: true
-rhel_08_010521: true
-rhel_08_010522: true
-rhel_08_010543: true
-rhel_08_010544: true
-rhel_08_010550: true
-rhel_08_010561: true
-rhel_08_010570: true
-rhel_08_010571: true
-rhel_08_010572: true
-rhel_08_010580: true
-rhel_08_010590: true
+rhel8stig_010010: true
+rhel8stig_010019: true
+rhel8stig_010040: true
+rhel8stig_010049: true
+rhel8stig_010050: true
+rhel8stig_010060: true
+rhel8stig_010070: true
+rhel8stig_010090: true
+rhel8stig_010100: true
+rhel8stig_010110: true
+rhel8stig_010120: true
+rhel8stig_010130: true
+rhel8stig_010141: true
+rhel8stig_010149: true
+rhel8stig_010151: true
+rhel8stig_010152: true
+rhel8stig_010159: true
+rhel8stig_010160: true
+rhel8stig_010161: true
+rhel8stig_010162: true
+rhel8stig_010163: true
+rhel8stig_010170: true
+rhel8stig_010180: true
+rhel8stig_010190: true
+rhel8stig_010200: true
+rhel8stig_010201: true
+rhel8stig_010210: true
+rhel8stig_010220: true
+rhel8stig_010230: true
+rhel8stig_010240: true
+rhel8stig_010250: true
+rhel8stig_010260: true
+rhel8stig_010287: true
+rhel8stig_010290: true
+rhel8stig_010291: true
+rhel8stig_010293: true
+rhel8stig_010294: true
+rhel8stig_010295: true
+rhel8stig_010296: true
+rhel8stig_010297: true
+rhel8stig_010300: true
+rhel8stig_010310: true
+rhel8stig_010320: true
+rhel8stig_010330: true
+rhel8stig_010331: true
+rhel8stig_010340: true
+rhel8stig_010341: true
+rhel8stig_010350: true
+rhel8stig_010351: true
+rhel8stig_010358: true
+rhel8stig_010359: true
+rhel8stig_010360: true
+rhel8stig_010372: true
+rhel8stig_010373: true
+rhel8stig_010374: true
+rhel8stig_010379: true
+rhel8stig_010380: true
+rhel8stig_010381: true
+rhel8stig_010382: true
+rhel8stig_010383: true
+rhel8stig_010384: true
+rhel8stig_010385: true
+rhel8stig_010390: true
+rhel8stig_010400: true
+rhel8stig_010410: true
+rhel8stig_010420: true
+rhel8stig_010421: true
+rhel8stig_010422: true
+rhel8stig_010423: true
+rhel8stig_010430: true
+rhel8stig_010450: true
+rhel8stig_010455: true
+rhel8stig_010480: true
+rhel8stig_010490: true
+rhel8stig_010500: true
+rhel8stig_010520: true
+rhel8stig_010521: true
+rhel8stig_010522: true
+rhel8stig_010543: true
+rhel8stig_010544: true
+rhel8stig_010550: true
+rhel8stig_010561: true
+rhel8stig_010570: true
+rhel8stig_010571: true
+rhel8stig_010572: true
+rhel8stig_010580: true
+rhel8stig_010590: true
 ## Note Azure is currently default mounting /mnt for cloud-init this will cause issues with these controls
 ## refer to https://github.com/Azure/WALinuxAgent/issues/1971
-rhel_08_010600: true
-rhel_08_010610: true
-rhel_08_010620: true
+rhel8stig_010600: true
+rhel8stig_010610: true
+rhel8stig_010620: true
 ##
-rhel_08_010630: true
-rhel_08_010640: true
-rhel_08_010650: true
-rhel_08_010660: true
-rhel_08_010670: true
-rhel_08_010671: true
-rhel_08_010672: true
-rhel_08_010673: true
-rhel_08_010674: true
-rhel_08_010675: true
-rhel_08_010680: true
-rhel_08_010690: true
-rhel_08_010700: true
-rhel_08_010710: true
-rhel_08_010720: true
-rhel_08_010730: true
-rhel_08_010731: true
-rhel_08_010740: true
-rhel_08_010741: true
-rhel_08_010750: true
-rhel_08_010760: true
-rhel_08_010770: true
-rhel_08_010780: true
-rhel_08_010790: true
-rhel_08_010800: true
-rhel_08_010830: true
-rhel_08_020000: true
-rhel_08_020010: true
-rhel_08_020011: true
-rhel_08_020012: true
-rhel_08_020013: true
-rhel_08_020014: true
-rhel_08_020015: true
-rhel_08_020016: true
-rhel_08_020017: true
-rhel_08_020018: true
-rhel_08_020019: true
-rhel_08_020020: true
-rhel_08_020021: true
-rhel_08_020022: true
-rhel_08_020023: true
-rhel_08_020025: true
-rhel_08_020026: true
-rhel_08_020027: true
-rhel_08_020028: true
-rhel_08_020030: true
-rhel_08_020031: true
-rhel_08_020032: true
-rhel_08_020035: true
-rhel_08_020050: true
-rhel_08_020060: true
-rhel_08_020080: true
-rhel_08_020081: true
-rhel_08_020082: true
-rhel_08_020090: true
-rhel_08_020100: true
-rhel_08_020101: true
-rhel_08_020102: true
-rhel_08_020103: true
-rhel_08_020104: true
-rhel_08_020110: true
-rhel_08_020120: true
-rhel_08_020130: true
-rhel_08_020140: true
-rhel_08_020150: true
-rhel_08_020160: true
-rhel_08_020170: true
-rhel_08_020180: true
-rhel_08_020190: true
-rhel_08_020200: true
-rhel_08_020210: true
-rhel_08_020230: true
-rhel_08_020235: true
-rhel_08_020231: true
-rhel_08_020240: true
-rhel_08_020250: true
-rhel_08_020260: true
-rhel_08_020270: true
-rhel_08_020280: true
-rhel_08_020290: true
-rhel_08_020300: true
-rhel_08_020310: true
-rhel_08_020320: true
-rhel_08_020350: true
-rhel_08_020351: true
-rhel_08_020352: true
-rhel_08_020353: true
-rhel_08_030000: true
-rhel_08_030010: true
-rhel_08_030020: true
-rhel_08_030030: true
-rhel_08_030040: true
-rhel_08_030060: true
-rhel_08_030061: true
-rhel_08_030062: true
-rhel_08_030070: true
-rhel_08_030080: true
-rhel_08_030090: true
-rhel_08_030100: true
-rhel_08_030110: true
-rhel_08_030120: true
-rhel_08_030121: true
-rhel_08_030122: true
-rhel_08_030130: true
-rhel_08_030140: true
-rhel_08_030150: true
-rhel_08_030160: true
-rhel_08_030170: true
-rhel_08_030171: true
-rhel_08_030172: true
-rhel_08_030180: true
-rhel_08_030181: true
-rhel_08_030190: true
-rhel_08_030200: true
-rhel_08_030250: true
-rhel_08_030260: true
-rhel_08_030280: true
-rhel_08_030290: true
-rhel_08_030300: true
-rhel_08_030301: true
-rhel_08_030302: true
-rhel_08_030310: true
-rhel_08_030311: true
-rhel_08_030312: true
-rhel_08_030313: true
-rhel_08_030314: true
-rhel_08_030315: true
-rhel_08_030316: true
-rhel_08_030317: true
-rhel_08_030320: true
-rhel_08_030330: true
-rhel_08_030340: true
-rhel_08_030350: true
-rhel_08_030360: true
-rhel_08_030361: true
-rhel_08_030370: true
-rhel_08_030390: true
-rhel_08_030400: true
-rhel_08_030410: true
-rhel_08_030420: true
-rhel_08_030480: true
-rhel_08_030490: true
-rhel_08_030550: true
-rhel_08_030560: true
-rhel_08_030570: true
-rhel_08_030580: true
-rhel_08_030590: true
-rhel_08_030600: true
-rhel_08_030610: true
-rhel_08_030620: true
-rhel_08_030630: true
-rhel_08_030640: true
-rhel_08_030650: true
-rhel_08_030660: true
-rhel_08_030670: true
-rhel_08_030680: true
-rhel_08_030690: true
-rhel_08_030700: true
-rhel_08_030710: true
-rhel_08_030720: true
-rhel_08_030730: true
-rhel_08_030731: true
-rhel_08_030740: true
-rhel_08_040001: true
-rhel_08_040002: true
-rhel_08_040003: true
-rhel_08_040020: true
-rhel_08_040030: true
-rhel_08_040070: true
-rhel_08_040080: true
-rhel_08_040090: true
-rhel_08_040100: true
-rhel_08_040101: true
-rhel_08_040110: true
-rhel_08_040111: true
-rhel_08_040120: true
-rhel_08_040121: true
-rhel_08_040122: true
-rhel_08_040123: true
-rhel_08_040124: true
-rhel_08_040125: true
-rhel_08_040126: true
-rhel_08_040127: true
-rhel_08_040128: true
-rhel_08_040129: true
-rhel_08_040130: true
-rhel_08_040131: true
-rhel_08_040132: true
-rhel_08_040133: true
-rhel_08_040134: true
-rhel_08_040135: true
-rhel_08_040136: true
-rhel_08_040137: true
-rhel_08_040139: true
-rhel_08_040140: true
-rhel_08_040141: true
-rhel_08_040150: true
-rhel_08_040159: true
-rhel_08_040160: true
-rhel_08_040161: true
-rhel_08_040180: true
-rhel_08_040209: true
-rhel_08_040210: true
-rhel_08_040220: true
-rhel_08_040230: true
-rhel_08_040239: true
-rhel_08_040240: true
-rhel_08_040249: true
-rhel_08_040250: true
-rhel_08_040259: true
-rhel_08_040260: true
-rhel_08_040261: true
-rhel_08_040262: true
-rhel_08_040270: true
-rhel_08_040279: true
-rhel_08_040280: true
-rhel_08_040281: true
-rhel_08_040282: true
-rhel_08_040283: true
-rhel_08_040284: true
-rhel_08_040285: true
-rhel_08_040286: true
-rhel_08_040290: true
-rhel_08_040320: true
-rhel_08_040321: true
-rhel_08_040330: true
-rhel_08_040340: true
-rhel_08_040341: true
-rhel_08_040342: true
-rhel_08_040350: true
-rhel_08_040370: true
-rhel_08_040380: true
-rhel_08_040390: true
-rhel_08_040400: true
+rhel8stig_010630: true
+rhel8stig_010640: true
+rhel8stig_010650: true
+rhel8stig_010660: true
+rhel8stig_010670: true
+rhel8stig_010671: true
+rhel8stig_010672: true
+rhel8stig_010673: true
+rhel8stig_010674: true
+rhel8stig_010675: true
+rhel8stig_010680: true
+rhel8stig_010690: true
+rhel8stig_010700: true
+rhel8stig_010710: true
+rhel8stig_010720: true
+rhel8stig_010730: true
+rhel8stig_010731: true
+rhel8stig_010740: true
+rhel8stig_010741: true
+rhel8stig_010750: true
+rhel8stig_010760: true
+rhel8stig_010770: true
+rhel8stig_010780: true
+rhel8stig_010790: true
+rhel8stig_010800: true
+rhel8stig_010830: true
+rhel8stig_020000: true
+rhel8stig_020010: true
+rhel8stig_020011: true
+rhel8stig_020012: true
+rhel8stig_020013: true
+rhel8stig_020014: true
+rhel8stig_020015: true
+rhel8stig_020016: true
+rhel8stig_020017: true
+rhel8stig_020018: true
+rhel8stig_020019: true
+rhel8stig_020020: true
+rhel8stig_020021: true
+rhel8stig_020022: true
+rhel8stig_020023: true
+rhel8stig_020025: true
+rhel8stig_020026: true
+rhel8stig_020027: true
+rhel8stig_020028: true
+rhel8stig_020030: true
+rhel8stig_020031: true
+rhel8stig_020032: true
+rhel8stig_020035: true
+rhel8stig_020050: true
+rhel8stig_020060: true
+rhel8stig_020080: true
+rhel8stig_020081: true
+rhel8stig_020082: true
+rhel8stig_020090: true
+rhel8stig_020100: true
+rhel8stig_020101: true
+rhel8stig_020104: true
+rhel8stig_020110: true
+rhel8stig_020120: true
+rhel8stig_020130: true
+rhel8stig_020140: true
+rhel8stig_020150: true
+rhel8stig_020160: true
+rhel8stig_020170: true
+rhel8stig_020180: true
+rhel8stig_020190: true
+rhel8stig_020200: true
+rhel8stig_020210: true
+rhel8stig_020230: true
+rhel8stig_020235: true
+rhel8stig_020231: true
+rhel8stig_020240: true
+rhel8stig_020250: true
+rhel8stig_020260: true
+rhel8stig_020270: true
+rhel8stig_020280: true
+rhel8stig_020290: true
+rhel8stig_020300: true
+rhel8stig_020310: true
+rhel8stig_020320: true
+rhel8stig_020350: true
+rhel8stig_020351: true
+rhel8stig_020352: true
+rhel8stig_020353: true
+rhel8stig_030000: true
+rhel8stig_030010: true
+rhel8stig_030020: true
+rhel8stig_030030: true
+rhel8stig_030040: true
+rhel8stig_030060: true
+rhel8stig_030061: true
+rhel8stig_030062: true
+rhel8stig_030070: true
+rhel8stig_030080: true
+rhel8stig_030090: true
+rhel8stig_030100: true
+rhel8stig_030110: true
+rhel8stig_030120: true
+rhel8stig_030121: true
+rhel8stig_030122: true
+rhel8stig_030130: true
+rhel8stig_030140: true
+rhel8stig_030150: true
+rhel8stig_030160: true
+rhel8stig_030170: true
+rhel8stig_030171: true
+rhel8stig_030172: true
+rhel8stig_030180: true
+rhel8stig_030181: true
+rhel8stig_030190: true
+rhel8stig_030200: true
+rhel8stig_030250: true
+rhel8stig_030260: true
+rhel8stig_030280: true
+rhel8stig_030290: true
+rhel8stig_030300: true
+rhel8stig_030301: true
+rhel8stig_030302: true
+rhel8stig_030310: true
+rhel8stig_030311: true
+rhel8stig_030312: true
+rhel8stig_030313: true
+rhel8stig_030314: true
+rhel8stig_030315: true
+rhel8stig_030316: true
+rhel8stig_030317: true
+rhel8stig_030320: true
+rhel8stig_030330: true
+rhel8stig_030340: true
+rhel8stig_030350: true
+rhel8stig_030360: true
+rhel8stig_030361: true
+rhel8stig_030370: true
+rhel8stig_030390: true
+rhel8stig_030400: true
+rhel8stig_030410: true
+rhel8stig_030420: true
+rhel8stig_030480: true
+rhel8stig_030490: true
+rhel8stig_030550: true
+rhel8stig_030560: true
+rhel8stig_030570: true
+rhel8stig_030580: true
+rhel8stig_030590: true
+rhel8stig_030600: true
+rhel8stig_030610: true
+rhel8stig_030620: true
+rhel8stig_030630: true
+rhel8stig_030640: true
+rhel8stig_030650: true
+rhel8stig_030655: true
+rhel8stig_030660: true
+rhel8stig_030670: true
+rhel8stig_030680: true
+rhel8stig_030690: true
+rhel8stig_030700: true
+rhel8stig_030710: true
+rhel8stig_030720: true
+rhel8stig_030730: true
+rhel8stig_030731: true
+rhel8stig_030740: true
+rhel8stig_040001: true
+rhel8stig_040002: true
+rhel8stig_040003: true
+rhel8stig_040020: true
+rhel8stig_040030: true
+rhel8stig_040070: true
+rhel8stig_040080: true
+rhel8stig_040090: true
+rhel8stig_040100: true
+rhel8stig_040101: true
+rhel8stig_040110: true
+rhel8stig_040111: true
+rhel8stig_040120: true
+rhel8stig_040121: true
+rhel8stig_040122: true
+rhel8stig_040123: true
+rhel8stig_040124: true
+rhel8stig_040125: true
+rhel8stig_040126: true
+rhel8stig_040127: true
+rhel8stig_040128: true
+rhel8stig_040129: true
+rhel8stig_040130: true
+rhel8stig_040131: true
+rhel8stig_040132: true
+rhel8stig_040133: true
+rhel8stig_040134: true
+rhel8stig_040135: true
+rhel8stig_040136: true
+rhel8stig_040137: true
+rhel8stig_040139: true
+rhel8stig_040140: true
+rhel8stig_040141: true
+rhel8stig_040150: true
+rhel8stig_040159: true
+rhel8stig_040160: true
+rhel8stig_040161: true
+rhel8stig_040180: true
+rhel8stig_040209: true
+rhel8stig_040210: true
+rhel8stig_040220: true
+rhel8stig_040230: true
+rhel8stig_040239: true
+rhel8stig_040240: true
+rhel8stig_040249: true
+rhel8stig_040250: true
+rhel8stig_040259: true
+rhel8stig_040260: true
+rhel8stig_040261: true
+rhel8stig_040262: true
+rhel8stig_040270: true
+rhel8stig_040279: true
+rhel8stig_040280: true
+rhel8stig_040281: true
+rhel8stig_040282: true
+rhel8stig_040283: true
+rhel8stig_040284: true
+rhel8stig_040285: true
+rhel8stig_040286: true
+rhel8stig_040290: true
+rhel8stig_040320: true
+rhel8stig_040321: true
+rhel8stig_040330: true
+rhel8stig_040340: true
+rhel8stig_040341: true
+rhel8stig_040342: true
+rhel8stig_040350: true
+rhel8stig_040370: true
+rhel8stig_040380: true
+rhel8stig_040390: true
+rhel8stig_040400: true
 
 # CAT 3 rules
-rhel_08_010171: true
-rhel_08_010292: true
-rhel_08_010375: true
-rhel_08_010376: true
-rhel_08_010440: true
-rhel_08_010471: true
-rhel_08_010472: true
-rhel_08_010540: true
-rhel_08_010541: true
-rhel_08_010542: true
-rhel_08_020024: true
-rhel_08_020340: true
-rhel_08_030063: true
-rhel_08_030601: true
-rhel_08_030602: true
-rhel_08_030603: true
-rhel_08_030741: true
-rhel_08_030742: true
-rhel_08_040004: true
-rhel_08_040021: true
-rhel_08_040022: true
-rhel_08_040023: true
-rhel_08_040024: true
-rhel_08_040025: true
-rhel_08_040026: true
-rhel_08_040300: true
-rhel_08_040310: true
+rhel8stig_010171: true
+rhel8stig_010292: true
+rhel8stig_010375: true
+rhel8stig_010376: true
+rhel8stig_010440: true
+rhel8stig_010471: true
+rhel8stig_010472: true
+rhel8stig_010540: true
+rhel8stig_010541: true
+rhel8stig_010542: true
+rhel8stig_020024: true
+rhel8stig_020340: true
+rhel8stig_030063: true
+rhel8stig_030601: true
+rhel8stig_030602: true
+rhel8stig_030603: true
+rhel8stig_030741: true
+rhel8stig_030742: true
+rhel8stig_040004: true
+rhel8stig_040021: true
+rhel8stig_040022: true
+rhel8stig_040023: true
+rhel8stig_040024: true
+rhel8stig_040025: true
+rhel8stig_040026: true
+rhel8stig_040300: true
+rhel8stig_040310: true
 
 # Whether or not to run tasks related to auditing/patching the desktop environment
 rhel8stig_gui: "{{ prelim_gnome_present.stat.exists | default(false) }}"
@@ -535,48 +540,13 @@ rhel8stig_ipv6_required: true
 # When set to anything other than mcafee it will skip this control assuming localized threat prevention management
 rhel8stig_av_sftw: mcafee
 
-# RHEL-08-010110 & 010130 & 010760 & 020190 & 020200 & 020231 & 020310 & 020351
-# rhel8stig_login_defs_file_perms
-# Permissions set on /etc/login.defs
-rhel8stig_login_defs_file_perms: 0644
-
-# RHEL-08-010210
-# rhel8stig_var_log_messages_perm is the permissions the /var/log/messages file is set to.
-# To conform to STIG standards this needs to be 0640 or more restrictive
-rhel8stig_var_log_messages_perm: 0640
-
-# RHEL-08-010240
-# rhel8stig_var_log_perm is the permissions the /var/log file is set to.
-# To conform to STIG standards this needs to be 0755 or more restrictive
-rhel8stig_var_log_perm: 0755
-
-# RHEL-08-010300
-# rhel8stig_sys_commands_perm is the permissions the system comments will have
-# To conform to STIG standards this needs to be set to 0755 or more restrictive
-rhel8stig_sys_commands_perm: 0755
-
-# RHEL-08-010330
-# rhel8stig_lib_file_perm is the permissions the library files will be set to
-# To conform to STIG standards this needs to be set to 755 or more restrictive
-rhel8stig_lib_file_perm: 755
-
 # RHEL-08-010380
 # rhel8stig_sudoers_exclude_nopasswd_list is exception list for not having the NOPASSWD removed
 #
 rhel8stig_sudoers_exclude_nopasswd_list:
-    - rocky
-    - ec2-user
+  - rocky
+  - ec2-user
 #    - vagrant
-
-# RHEL-08-010480
-# rhel8stig_ssh_pub_key_perm are the permissions set to the SSH public host keys
-# To conform to STIG standards this needs to be set to 0644 or less permissive
-rhel8stig_ssh_pub_key_perm: 0644
-
-# RHEL-08-010490
-# rhel8stig_ssh_priv_key_perm are the permissions set to the SSH private host keys
-# To conform to STIG standards this needs to be set to 0600 or less permissive
-rhel8stig_ssh_priv_key_perm: 0600
 
 # RHEL-08-010690
 rhel8stig_change_user_path: false
@@ -591,45 +561,16 @@ rhel8stig_ww_dir_owner: root
 # To conform to STIG standards this needs to be set to root, sys, bin, or an application group
 rhel8stig_ww_dir_grpowner: root
 
-# RHEL-08-010730
-# rhel8stig_local_int_home_perms is the permissions set to local interactive user home directories
-# To conform to STIG standards this needs to be set to 0750 more less permissive
-rhel8stig_local_int_home_perms: 0750
-
-# RHEL-08-010731
-# rhel8stig_local_int_home_file_perms is the permissions set to files in the local interactive
-# user home directories. These are only set when rhel8stig_disruption_high is set to true
-# All files users home directories that are less restrictive than 0750 will be set to this value
-rhel8stig_local_int_home_file_perms: 0750
-
-# RHEL-08-010770
-# rhel8stig_local_int_perm is the permissions set to the local initialization files
-# To conform to STIG standards this needs to be set to 0740 or less permissive
-rhel8stig_local_int_perm: 0740
-
-# RHEL-08-020100 pamd file permissions - /etc/pam.d/(password-auth|system-auth) files
-# rhel8stig_pamd_file_perms
-# This needs a minimum of 0644 ( more restrictive may cause issues testing will be required)
-rhel8stig_pamd_file_perms: 0644
-
-# RHEL-08-020110 - pwquality file permissions
-# mode: "{{ rhel8stig_pamd_file_perms }}"
-rhel8stig_pwquality_file_perms: 0644
-
-# RHEL-08-0400xx
-# blacklist.conf - /etc/modprobe.d/blacklist.conf file permissions
-rhel8stig_blacklist_conf_file_perms: 0640
-
 # RHEL-08-020250
 # This is a check for a "supported release"
 # These are the minimum supported releases.
 # (Red Hat has support for older versions if you pay extra for it.)
 rhel8stig_min_supported_os_ver:
-    RedHat: "8.10"
-    CentOS: "8.10"
-    Rocky: "8.10"
-    AlmaLinux: "8.10"
-    OracleLinux: "8.10"
+  RedHat: "8.10"
+  CentOS: "8.10"
+  Rocky: "8.10"
+  AlmaLinux: "8.10"
+  OracleLinux: "8.10"
 
 # RHEL-08-040260
 # If system is not router, run tasks that disable router functions.
@@ -651,90 +592,90 @@ rhel8stig_tftp_required: false
 
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
-rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword  # pragma: allowlist secret
+rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword # pragma: allowlist secret
 rhel8stig_boot_superuser: bootloader_admin
 
-# AIDE settings
-# Set to false for fire and forget mode
-rhel8stig_wait_for_aide_init: true
-rhel8stig_aide_handler: "{{ (rhel8stig_wait_for_aide_init) | ternary('init aide and wait','init aide') }}"
+### Aide
+# AIDE is a file integrity checking tool, similar in nature to Tripwire.
+# While it cannot prevent intrusions, it can detect unauthorized changes
+# to configuration files by alerting when the files are changed. Review
+# the AIDE quick start guide and AIDE documentation before proceeding.
+# By setting this variable to `true`, all of the settings related to AIDE will be applied!
+rhel8stig_use_aide: true
 
-# Set to false to not overwrite an existing AIDE DB
-rhel8stig_overwrite_aide_db: true
+# If DB file older than below will automatically rebuild DB
+# e.g. options:1w = 1 week, 1d = 1day 1h = 1 hour
+rhel8stig_aide_db_file_age: 1w
 
-# AIDE database file locations
-rhel8stig_aide_temp_db_file: /var/lib/aide/aide.db.new.gz
+# If aide already setup this forces a new DB to be created despite age
+rhel8stig_aide_db_recreate: false
+
+# New db file
+rhel8stig_aide_db_new_file: /var/lib/aide/aide.db.new.gz
+# Active db file
 rhel8stig_aide_db_file: /var/lib/aide/aide.db.gz
-
 rhel8stig_aide_cron:
-    user: root
-    cron_file: aide
-    job: '/usr/sbin/aide --check'
-    special_time: daily
-    # Disable the notification check rule to disable mailing notifications
-    notify_by_mail: true
-    notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
+  user: root
+  cron_file: aide
+  job: "/usr/sbin/aide --check"
+  special_time: daily
+  # Disable the notification check rule to disable mailing notifications
+  notify_by_mail: true
+  notify_cmd: ' | /bin/mail -s "$(hostname) - Daily aide integrity check run" root@localhost'
 
-rhel8stig_cron_special_disable: "{{
-        rhel8stig_workaround_for_disa_benchmark or
-        rhel8stig_workaround_for_ssg_benchmark or
-        false }}"
+rhel8stig_cron_special_disable: "{{ rhel8stig_workaround_for_disa_benchmark or rhel8stig_workaround_for_ssg_benchmark or false }}"
 
 # Set maximum number of simultaneous system logins (RHEL-08-040000)
 rhel8stig_maxlogins: 10
 # TODO: ansible-lint: var-spacing
-rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary(
-        rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '),
-        rhel8stig_logon_banner_nice) }}"
+rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary( rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '), rhel8stig_logon_banner_nice)
+  }}"
 rhel8stig_logon_banner_nice: |
-    You are accessing a U.S. Government (USG) Information System (IS) that is
-    provided for USG-authorized use only.
+  You are accessing a U.S. Government (USG) Information System (IS) that is
+  provided for USG-authorized use only.
 
-    By using this IS (which includes any device attached to this IS), you consent
-    to the following conditions:
+  By using this IS (which includes any device attached to this IS), you consent
+  to the following conditions:
 
-    -The USG routinely intercepts and monitors communications on this IS for
-    purposes including, but not limited to, penetration testing, COMSEC monitoring,
-    network operations and defense, personnel misconduct (PM), law enforcement
-    (LE), and counterintelligence (CI) investigations.
+  -The USG routinely intercepts and monitors communications on this IS for
+  purposes including, but not limited to, penetration testing, COMSEC monitoring,
+  network operations and defense, personnel misconduct (PM), law enforcement
+  (LE), and counterintelligence (CI) investigations.
 
-    -At any time, the USG may inspect and seize data stored on this IS.
+  -At any time, the USG may inspect and seize data stored on this IS.
 
-    -Communications using, or data stored on, this IS are not private, are subject
-    to routine monitoring, interception, and search, and may be disclosed or used
-    for any USG-authorized purpose.
+  -Communications using, or data stored on, this IS are not private, are subject
+  to routine monitoring, interception, and search, and may be disclosed or used
+  for any USG-authorized purpose.
 
-    -This IS includes security measures (e.g., authentication and access controls)
-    to protect USG interests--not for your personal benefit or privacy.
+  -This IS includes security measures (e.g., authentication and access controls)
+  to protect USG interests--not for your personal benefit or privacy.
 
-    -Notwithstanding the above, using this IS does not constitute consent to PM, LE
-    or CI investigative searching or monitoring of the content of privileged
-    communications, or work product, related to personal representation or services
-    by attorneys, psychotherapists, or clergy, and their assistants. Such
-    communications and work product are private and confidential. See User
-    Agreement for details.
+  -Notwithstanding the above, using this IS does not constitute consent to PM, LE
+  or CI investigative searching or monitoring of the content of privileged
+  communications, or work product, related to personal representation or services
+  by attorneys, psychotherapists, or clergy, and their assistants. Such
+  communications and work product are private and confidential. See User
+  Agreement for details.
 
 # Password complexity settings
-rhel8stig_password_complexity:
-    ucredit: -1
-    lcredit: -1
-    dcredit: -1
-    ocredit: -1
-    difok: 8
-    minclass: 4
-    maxrepeat: 3
-    maxclassrepeat: 4
-    minlen: 15
-    dictcheck: 1
+rhel8stig_password_complexity_ucredit: -1
+rhel8stig_password_complexity_lcredit: -1
+rhel8stig_password_complexity_dcredit: -1
+rhel8stig_password_complexity_ocredit: -1
+rhel8stig_password_complexity_difok: 8
+rhel8stig_password_complexity_minclass: 4
+rhel8stig_password_complexity_maxrepeat: 3
+rhel8stig_password_complexity_maxclassrepeat: 4
+rhel8stig_password_complexity_minlen: 15
+rhel8stig_password_complexity_dictcheck: 1
 
-# rhel_08_010400 or rhel_08_020090 or rhel_08_020250 or rhel_08_020290
 rhel8stig_sssd_conf: /etc/sssd/sssd.conf
 rhel8stig_sssd_domain: testing.test
-rhel8stig_sssd:
-    certmap: "certmap/{{ rhel8stig_sssd_domain }}/rule_name"
-    matchrule: "=.*EDIPI@mil"
-    maprule: (userCertificate;binary={cert!bin})
-    domains: "{{ rhel8stig_sssd_domain }}"
+rhel8stig_sssd_certmap: "certmap/{{ rhel8stig_sssd_domain }}/rule_name"
+rhel8stig_sssd_matchrule: "=.*EDIPI@mil"
+rhel8stig_sssd_maprule: (userCertificate;binary={cert!bin})
+rhel8stig_sssd_domains: "{{ rhel8stig_sssd_domain }}"
 
 # RHEL-08-010200 | All network connections associated with SSH traffic must
 # terminate at the end of the session or after 10 minutes of inactivity, except
@@ -758,31 +699,39 @@ rhel8stig_pam_pwquality_retry: 3
 # avoid removing 'dbus', 'nobody', 'systemd-network', and 'polkitd', as they all
 # have home directories of '/' by default.
 rhel8stig_unnecessary_accounts:
-    - ftp
-    - games
+  - ftp
+  - games
 rhel8stig_remove_unnecessary_user_files: false
 
 # RHEL-08-020220
 # RHEL-08-020221
 # pam_pwhistory settings - Verify the operating system prohibits password reuse for a minimum of five generations.
 rhel8stig_pam_pwhistory:
-    retries: 3
+  retries: 3
 
 # RHEL-08-020010
 # RHEL-08-020011
 # RHEL-08-020012
 # RHEL-08-020013
 # pam_faillock settings - accounts must be locked for max time period after 3 unsuccessful attempts within 15 minutes.
-# dir: is set to /var/log/faillock which is the non-default folder. Control 020017 states to not use the standard directory which is /var/run/faillock
-rhel8stig_pam_faillock:
-    attempts: 3
-    interval: 900
-    unlock_time: 0
-    fail_for_root: "{{ rhel_08_020023 }}"
-    dir: /var/log/faillock
+# dir: is set to /var/log/faillock which is the non-default folder. Control 020017 states to not use the standard directory which is /var/run/faillock:
+rhel8stig_pam_faillock_attempts: 3
+rhel8stig_pam_faillock_interval: 900
+rhel8stig_pam_faillock_unlock_time: 0
+rhel8stig_pam_faillock_fail_for_root: "{{ rhel8stig_020023 }}"
+rhel8stig_pam_faillock_dir: /var/log/faillock
 
 # RHEL-08-020035
-rhel_08_020035_idlesessiontimeout: 600
+rhel8stig_idlesessiontimeout: 600
+
+rhel8stig_audit_bins:
+  - "/usr/sbin/auditctl"
+  - "/usr/sbin/aureport"
+  - "/usr/sbin/ausearch"
+  - "/usr/sbin/autrace"
+  - "/usr/sbin/auditd"
+  - "/usr/sbin/rsyslogd"
+  - "/usr/sbin/augenrules"
 
 # RHEL-08-030060
 # rhel8stig_auditd_disk_full_action options are SYSLOG, HALT, and SINGLE to fit STIG standards
@@ -807,20 +756,19 @@ rhel8stig_net_promisc_mode_required: false
 # RHEL-08-020190
 # RHEL-08-020200
 # RHEL-08-020310
-rhel8stig_login_defaults:
-    encrypt_method: SHA512
-    pass_min_days: 1
-    pass_max_days: 60
-    fail_delay_secs: 4
-    umask: '077'
-    create_home: 'yes'
+rhel8stig_login_defaults_encrypt_method: SHA512
+rhel8stig_login_defaults_pass_min_days: 1
+rhel8stig_login_defaults_pass_max_days: 60
+rhel8stig_login_defaults_fail_delay_secs: 4
+rhel8stig_login_defaults_umask: "077"
+rhel8stig_login_defaults_create_home: "yes"
 
 # RHEL-08-030690 uncomment and set the value to a remote IP address that can receive audit logs
 # NOTE different protocol configs '@''=UDP '@@''=TCP '':omrelp:'=RELP
 rhel8stig_remotelog_server:
-    server: 10.10.10.10
-    port: 9999
-    protocol: '@@'
+  server: 10.10.10.10
+  port: 9999
+  protocol: "@@"
 
 # RHEL-08-030020
 rhel8stig_auditd_mail_acct: root
@@ -841,9 +789,6 @@ rhel8stig_availability_override: false
 #      Use this for any other setup to avoid loss of data or data corruption.
 rhel8stig_auditd_failure_flag: "{{ rhel8stig_availability_override | ternary(1, 2) }}"
 
-# RHEL-08-010020
-rhel8stig_boot_part: "{{ rhel_08_boot_part.stdout }}"
-
 # RHEL-08-010740/RHEL-08-010750
 rhel8stig_passwd_label: "{{ (this_item | default(item)).id }}: {{ (this_item | default(item)).dir }}"
 
@@ -858,9 +803,9 @@ rhel8_stig_resolv_options:
 #    - 'rotate 2'
 #    - 'timeout:1'
 
-rhel8stig_dns_servers:  # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
-    - 8.8.8.8
-    - 8.8.4.4
+rhel8stig_dns_servers: # The order needs to be set as expected. If you have 3 you will need to amend playbook (not ideal)
+  - 8.8.8.8
+  - 8.8.4.4
 
 rhel8stig_int_gid: 1000
 
@@ -871,13 +816,13 @@ rhel8stig_hashing_rounds: 100000
 # RHEL-08-010100
 rhel8stig_path_to_sshkey: "/root/.ssh/"
 
-# RHEL-08-010331
-# rhel8stig_lib_dir_perms is the permissions that will be set to library directories when they are found to be 755 or more permissive and rhel8stig_disruption_high is true
-# To conform to STIG standards these directories need to be 755 or less permissive
-rhel8stig_lib_dir_perms: 0755
-
 # now in prelim
-# rhel8stig_interactive_uid_start: '1000'
+# Enable UID discovery:
+discover_int_uid: true
+# If discovery set to false use these values
+min_int_uid: 1000
+max_int_uid: 65534
+min_int_gid: 1000
 
 # RHEL-08-030740
 # rhel8stig_ntp_server_name is the name of the NTP server
@@ -886,8 +831,8 @@ rhel8stig_ntp_server_name: 0.us.pool.ntp.mil
 # RHEL-08-040137
 # rhel8stig_fapolicy_white_list is the whitelist for fapolicyd, the last item in the list must be dyny all all
 rhel8stig_fapolicy_white_list:
-    - 'deny_audit perm=any pattern=ld_so : all'
-    - 'deny perm=any all : all'
+  - "deny_audit perm=any pattern=ld_so : all"
+  - "deny perm=any all : all"
 
 # RHEL-08-040090
 # rhel8stig_custom_firewall_zone is the desired name for the new customer firewall zone
@@ -903,17 +848,17 @@ rhel8stig_existing_zone_to_copy: public
 # rhel8stig_white_list_services is the services that you want to allow through initially for the new firewall zone
 # This can also be a port number if no service exists
 rhel8stig_white_list_services:
-    - ssh
-    - http
-    - https
+  - ssh
+  - http
+  - https
 
 # RHEL-08-010290
 # RHEL-08-010290
 # This will be the MACs setting. It is a string that will be the entirety of the MAC's setting in the openssh.config file
 # to conform to STIG standard control RHEL-08-010290 this variable must include hmac-sha2-512,hmac-sha2-256
 # to conform to STIG standard control RHEL-08-010291 this variable must include aes256-ctr,aes192-ctr,aes128-ctr
-rhel8stig_ssh_macs: 'MACS=hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
-rhel8stig_ssh_ciphers: "Ciphers=aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr"
+rhel8stig_ssh_macs: "hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256"
+rhel8stig_ssh_ciphers: "aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes128-ctr"
 # RHEL-08-040342
 # Expected Values for FIPS KEX algorithms
 rhel8stig_ssh_kex: "KexAlgorithms=ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512"

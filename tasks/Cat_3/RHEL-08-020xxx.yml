@@ -1,0 +1,37 @@
+---
+
+- name: "LOW | RHEL-08-020024 | PATCH | RHEL 8 must limit the number of concurrent sessions to ten for all accounts and/or account types."
+  when: rhel8stig_020024
+  tags:
+    - RHEL-08-020024
+    - CAT3
+    - CCI-000054
+    - NIST800-53R4_AC-10
+    - SRG-OS-000027-GPOS-00008
+    - SV-230346r1069306_rule
+    - V-230346
+  ansible.builtin.lineinfile:
+    path: /etc/security/limits.conf
+    regexp: ^\*\s+           hard\s+    maxlogins'
+    line: '*                hard    maxlogins       {{ rhel8stig_maxlogins }}'
+    insertbefore: '^# End of file'
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+
+- name: "LOW | RHEL-08-020340 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon logon."
+  when: rhel8stig_020340
+  tags:
+    - RHEL-08-020340
+    - CAT3
+    - CCI-000052
+    - NIST800-53R4_AC-9
+    - SRG-OS-000480-GPOS-00227
+    - SV-230381r1069295_rule
+    - V-230381
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/postlogin
+    regexp: 'session\*required\s*pam_lastlog\.so.*showfailed'
+    line: "session     required                   pam_lastlog.so showfailed"
+    insertbefore: BOF

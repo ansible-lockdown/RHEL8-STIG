@@ -1,0 +1,1623 @@
+---
+
+- name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+  when: rhel8stig_020000
+  tags:
+    - RHEL-08-020000
+    - CAT2
+    - CCI-000016
+    - NIST800-53R4_AC-2
+    - SRG-OS-000002-GPOS-00002
+    - SV-230331r1017143_rule
+    - V-230331
+    - accounts
+  vars:
+    warn_control_id: "MEDIUM | RHEL-08-020000"
+  block:
+    - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+      ansible.builtin.debug:
+        msg:
+          - "WARNING!!  Please check temporary accounts for expiration dates to be 72 hours or less."
+          - "To do this please run sudo chage -l account_name for the accounts you need to check"
+          - "The results will display the Account Expires information"
+          - 'To set account expire run sudo chage -E `date -d "+3 days" +%Y-%m-%d` account_name'
+
+    - name: "MEDIUM | RHEL-08-020000 | AUDIT | RHEL 8 temporary user accounts must be provisioned with an expiration time of 72 hours or less."
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020010
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020010
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230332r1017144_rule
+    - V-230332
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: ^auth\s+required\s+pam_faillock.so preauth
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ (rhel8stig_pam_faillock_fail_for_root) | ternary(' even_deny_root ',' ') }} fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertafter: '^account'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020011
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020011
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230333r1017145_rule
+    - V-230333
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: '^deny =|^\# deny ='
+    line: "deny = {{ rhel8stig_pam_faillock_attempts }}"
+
+- name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020012
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020012
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230334r1017146_rule
+    - V-230334
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth'
+      notify: Restart sssd
+      with_items:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      with_items:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertafter: '^account'
+      notify: Restart sssd
+      with_items:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020013
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020013
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230335r1017147_rule
+    - V-230335
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: '^fail_interval =|^\# fail_interval ='
+    line: "fail_interval = {{ rhel8stig_pam_faillock_interval }}"
+
+- name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020014
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020014
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230336r1017148_rule
+    - V-230336
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth       required pam_env.so'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+requireds+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020015
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020015
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230337r1069292_rule
+    - V-230337
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: (?i)^#?\s*unlock_time\s*=
+    line: "unlock_time = {{ rhel8stig_pam_faillock_unlock_time }}"
+
+- name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
+  when:
+    - rhel8stig_020016
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020016
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230338r1017150_rule
+    - V-230338
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist.| Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth       required pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth       required pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account    required pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertafter: '^account'
+      notify: rRstart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
+  when:
+    - rhel8stig_020017
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020017
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230339r1017151_rule
+    - V-230339
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: (?i)^#?\s*dir\s*=
+    line: "dir = {{ rhel8stig_pam_faillock_dir }}"
+
+- name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020018
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020018
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230340r1017152_rule
+    - V-230340
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur.| Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth       required pam_env.so'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020019
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020019
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230341r1017153_rule
+    - V-230341
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: (?i)^#?\s*silent
+    line: "silent"
+
+- name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020020
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020020
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230342r1017154_rule
+    - V-230342
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth       required pam_env.so'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
+  when:
+    - rhel8stig_020021
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020021
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230343r1017155_rule
+    - V-230343
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: (?i)^#?\s*audit
+    line: "audit"
+
+- name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020022
+    - ansible_distribution_version is version('8.1', '<=')
+  tags:
+    - RHEL-08-020022
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230344r1017156_rule
+    - V-230344
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth       required pam_env.so'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+    - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: "/etc/pam.d/{{ item }}"
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+      loop:
+        - system-auth
+        - password-auth
+
+- name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
+  when:
+    - rhel8stig_020023
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020023
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-230345r1017157_rule
+    - V-230345
+    - pamd
+  ansible.builtin.lineinfile:
+    path: "/etc/security/faillock.conf"
+    regexp: (?i)^#?\s*even_deny_root
+    line: "even_deny_root"
+
+- name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
+  when:
+    - rhel8stig_020025
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020025
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-244533r1069318_rule
+    - V-244533
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/system-auth
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ ( rhel8stig_pam_faillock_fail_for_root ) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth\s+required\s+pam_env.so'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/system-auth
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/system-auth
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+
+- name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
+  when:
+    - rhel8stig_020026
+    - ansible_distribution_version is version('8.2', '>=')
+  tags:
+    - RHEL-08-020026
+    - CAT2
+    - CCI-000044
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SRG-OS-000329-GPOS-00128
+    - SV-244534r1069319_rule
+    - V-244534
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set preauth"  # noqa: jinja[spacing]
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/password-auth
+        regexp: '^auth\s+required\s+pam_faillock.so preauth'
+        line: "auth       required pam_faillock.so preauth dir={{ rhel8stig_pam_faillock_dir }} silent audit deny={{ rhel8stig_pam_faillock_attempts }}{{ (rhel8stig_pam_faillock_fail_for_root) | ternary(' even_deny_root ',' ') }}fail_interval={{ rhel8stig_pam_faillock_interval }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}"
+        insertafter: '^auth\s+required\s+pam_env.so'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set authfail"
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/password-auth
+        regexp: '^auth\s+required\s+pam_faillock.so authfail'
+        line: 'auth       required pam_faillock.so authfail dir={{ rhel8stig_pam_faillock_dir }} unlock_time={{ rhel8stig_pam_faillock_unlock_time }}'
+        insertafter: '^auth'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file. | Set account faillock"
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/password-auth
+        regexp: '^account\s+required\s+pam_faillock.so'
+        line: 'account    required pam_faillock.so'
+        insertbefore: '^account'
+      notify: Restart sssd
+
+- name: |
+    "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
+     MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+  when: rhel8stig_020027 or rhel8stig_020028
+  tags:
+    - RHEL-08-020027
+    - RHEL-08-020028
+    - CAT2
+    - CCI-000044
+    - CCI-002238
+    - NIST800-53R4_AC-7
+    - SRG-OS-000021-GPOS-00005
+    - SV-250315r1017356_rule
+    - SV-250316r1017357_rule
+    - V-250315
+    - V-250316
+    - selinux
+  block:
+    - name: |
+        "MEDIUM | RHEL-08-020027 | PATCH | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory
+         MEDIUM | RHEL-08-020028 | PATCH | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+      community.general.sefcontext:
+        target: "{{ rhel8stig_pam_faillock_dir }}(/.*)?"
+        ftype: a
+        setype: faillog_t
+        seuser: system_u
+        state: present
+      register: discover_add_faillock_secontext
+
+    - name: |
+        "MEDIUM | RHEL-08-020027 | RHEL 8 systems, versions 8.2 and above, must configure SELinux context type to allow the use of a non-default faillock tally directory.
+         MEDIUM | RHEL-08-020028 | RHEL 8 systems below version 8.2 must configure SELinux context type to allow the use of a non-default faillock tally directory."
+      when: discover_add_faillock_secontext.changed  # noqa no-handler
+      ansible.builtin.command: "restorecon -irvF {{ rhel8stig_pam_faillock_dir }}"
+      changed_when: true
+
+- name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
+  when:
+    - rhel8stig_020030
+    - "'dconf' in ansible_facts.packages"
+    - rhel8stig_always_configure_dconf
+  tags:
+    - RHEL-08-020030
+    - CAT2
+    - CCI-000056
+    - NIST800-53R4_AC-11
+    - SRG-OS-000028-GPOS-00009
+    - SRG-OS-000030-GPOS-00011
+    - SV-230347r1017160_rule
+    - V-230347
+    - gui
+  block:
+    - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
+      ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
+      changed_when: false
+      failed_when: false
+      register: discover_lock_enabled
+
+    - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if exists"
+      when: discover_lock_enabled.stdout | length > 0
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: ^lock-enabled
+        line: lock-enabled=true
+      loop: "{{ discover_lock_enabled.stdout_lines }}"
+      notify: Dconf update
+
+    - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Set if does not exist"
+      when: rhel8stig_020030_lock_enabled.stdout | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/dconf/db/local.d/00-screensaver
+        create: true
+        regexp: '^lock-enabled'
+        owner: root
+        group: root
+        mode: 'u-x,go-wx'
+        line: |
+          [org/gnome/desktop/screensaver]
+          # Set this to true to lock the screen when the screensaver activates
+          lock-enabled=true
+      notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020031 | PATCH | RHEL 8 must initiate a session lock for graphical user interfaces when the screensaver is activated."
+  when:
+    - rhel8stig_020031
+    - rhel8stig_always_configure_dconf
+    - rhel8stig_gui
+  tags:
+    - RHEL-08-020031
+    - CAT2
+    - CCI-000057
+    - NIST800-53R4_AC-11
+    - SRG-OS-000029-GPOS-00010
+    - SRG-OS-000031-GPOS-00012
+    - SRG-OS-000480-GPOS-00227
+    - SV-244535r1017342_rule
+    - V-244535
+    - dconf
+  ansible.builtin.copy:
+    dest: /etc/dconf/db/local.d/00-screensaver
+    content: |
+      [org/gnome/desktop/screensaver]
+      lock-delay=uint32 5
+    mode: 'u-x,go-wx'
+  notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020032 | PATCH | RHEL 8 must disable the user list at logon for graphical user interfaces."
+  when:
+    - rhel8stig_020032
+    - rhel8stig_always_configure_dconf
+    - rhel8stig_gui
+  tags:
+    - RHEL-08-020032
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-244536r1017343_rule
+    - V-244536
+    - dconf
+  ansible.builtin.copy:
+    dest: /etc/dconf/db/local.d/02-login-screen_rhel8stig_020032
+    content: |
+      [org/gnome/login-screen]
+      disable-user-list=true
+    mode: 'u-x,go-wx'
+
+- name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8.7 and higher must terminate idle user sessions."
+  when:
+    - rhel8stig_020035
+    - ansible_facts.distribution_version is version_compare('8.7', '>=')
+  tags:
+    - RHEL-08-020035
+    - CAT2
+    - CCI-001133
+    - NIST800-53R4_SC-10
+    - SRG-OS-000163-GPOS-00072
+    - SV-257258r1069328_rule
+    - V-257258
+    - session
+  ansible.builtin.lineinfile:
+    path: "/etc/systemd/logind.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^#?\s*StopIdleSessionSec\s*=', line: "StopIdleSessionSec={{ rhel8stig_idlesessiontimeout }}" }
+    - { regexp: '^#?\s*KillUserProcesses\s*=', line: "KillUserProcesses=no" }
+  notify: Restart_systemd_login
+
+- name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
+  when:
+    - rhel8stig_020050
+    - "'dconf' in ansible_facts.packages"
+  tags:
+    - RHEL-08-020050
+    - CAT2
+    - CCI-000056
+    - NIST800-53R4_AC-11
+    - SRG-OS-000028-GPOS-00009
+    - SRG-OS-000030-GPOS-00011
+    - SV-230351r1017164_rule
+    - V-230351
+    - smartcard
+  block:
+    - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+      ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/*"
+      changed_when: false
+      failed_when: false
+      register: discovered_removal_action
+
+    - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
+      ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'"
+      changed_when: false
+      failed_when: false
+      register: discovered_removal_action_file
+
+    - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set removal-action param if doesn't exist"
+      when: discovered_removal_action.stdout_lines | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/dconf/db/distro.d/20-authselect
+        create: true
+        owner: root
+        group: root
+        mode: 'u-x,go-wx'
+        line: |
+          [org/gnome/settings-daemon/peripherals/smartcard]
+          removal-action='lock-screen'
+      notify: Dconf update
+
+    - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Update removal-action if exists"
+      when: discovered_removal_action.stdout_lines | length > 0
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: ^removal-action=
+        line: removal-action='lock-screen'
+      loop: "{{ discovered_removal_action.stdout_lines }}"
+      notify: Dconf update
+
+    - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+      when: discovered_removal_action_file.stdout_lines | length > 0
+      ansible.builtin.lineinfile:
+        path: '/etc/dconf/db/distro.d/locks/{{ item }}'
+        line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+      loop: "{{ discovered_removal_action_file.stdout_lines }}"
+      notify: Dconf update
+
+    - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Set smartcard section of db"
+      when: discovered_removal_action_file.stdout_lines | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/dconf/db/distro.d/locks/20-authselect
+        create: true
+        line: /org/gnome/settings-daemon/peripherals/smartcard/removal-action
+        owner: root
+        group: root
+        mode: 'u-x,g-wx,o-rwx'
+      notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity."
+  when:
+    - rhel8stig_020060
+    - "'dconf' in ansible_facts.packages"
+    - rhel8stig_always_configure_dconf
+  tags:
+    - RHEL-08-020060
+    - CAT2
+    - CCI-000057
+    - NIST800-53R4_AC-11
+    - SRG-OS-000029-GPOS-00010
+    - SRG-OS-000031-GPOS-00012
+    - SV-230352r1017165_rule
+    - V-230352
+    - gui
+  block:
+    - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Find idle-delay parameter"
+      ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
+      changed_when: false
+      failed_when: false
+      register: discovered_idle_delay_param
+
+    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if doesn't exist"
+      when: discovered_idle_delay_param.stdout_lines | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/dconf/db/local.d/00-screensaver
+        create: true
+        owner: root
+        group: root
+        mode: 'u-x,g-wx,o-rwx'
+        regexp: '^idle-delay'
+        line: |
+          [org/gnome/desktop/session]
+          # Set the lock time out to 900 seconds before the session is considered idle
+          idle-delay=uint32 900
+      notify: Dconf update
+
+    - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 15 minutes of inactivity. | Set idle-delay if exists"
+      when: discovered_idle_delay_param.stdout_lines | length > 0
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: '^idle-delay='
+        line: idle-delay=uint32 900
+        owner: root
+        group: root
+        mode: 'u-x,g-wx,o-rwx'
+      loop: "{{ discovered_idle_delay_param.stdout_lines }}"
+      notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
+  when:
+    - rhel8stig_020080
+    - "'dconf' in ansible_facts.packages"
+    - rhel8stig_always_configure_dconf
+  tags:
+    - RHEL-08-020080
+    - CAT2
+    - CCI-000057
+    - NIST800-53R4_AC-11
+    - SRG-OS-000029-GPOS-00010
+    - SRG-OS-000031-GPOS-00012
+    - SRG-OS-000480-GPOS-00227
+    - SV-230354r1069323_rule
+    - V-230354
+    - gui
+  ansible.builtin.lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    create: true
+    line: /org/gnome/desktop/screensaver/lock-delay
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020081 | PATCH | RHEL 8 must prevent a user from overriding the session idle-delay setting for the graphical user interface."
+  when:
+    - rhel8stig_020081
+    - rhel8stig_always_configure_dconf
+    - rhel8stig_gui
+  tags:
+    - RHEL-08-020081
+    - CAT2
+    - CCI-000057
+    - NIST800-53R4_AC-11
+    - SRG-OS-000029-GPOS-00010
+    - SRG-OS-000031-GPOS-00012
+    - SRG-OS-000480-GPOS-00227
+    - SV-244538r1069324_rule
+    - V-244538
+  ansible.builtin.lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    regexp: '#?.*idle-delay'
+    line: '/org/gnome/desktop/session/idle-delay'
+    mode: 'u-x,go-wx'
+    create: true
+  notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020082 | PATCH | RHEL 8 must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
+  when:
+    - rhel8stig_020082
+    - rhel8stig_always_configure_dconf
+    - rhel8stig_gui
+  tags:
+    - RHEL-08-020082
+    - CAT2
+    - CCI-000057
+    - NIST800-53R4_AC-11
+    - SRG-OS-000029-GPOS-00010
+    - SRG-OS-000031-GPOS-00012
+    - SRG-OS-000480-GPOS-00227
+    - SV-244539r1069325_rule
+    - V-244539
+    - dconf
+  ansible.builtin.copy:
+    ansible.builtin.lineinfile:
+    path: /etc/dconf/db/local.d/locks/session
+    regexp: '#?.*lock-enabled'
+    line: '/org/gnome/desktop/screensaver/lock-enabled'
+    mode: 'u-x,go-wx'
+  notify: Dconf update
+
+- name: "MEDIUM | RHEL-08-020090 | PATCH | RHEL 8 must map the authenticated identity to the user or group account for PKI-based authentication."
+  when:
+    - rhel8stig_020090
+    - prelim_sssd_conf_present.stat.exists
+  tags:
+    - RHEL-08-020090
+    - CAT2
+    - CCI-000187
+    - NIST800-53R4_IA-5
+    - SRG-OS-000068-GPOS-00036
+    - SV-230355r1017168_rule
+    - V-230355
+    - authentication
+  ansible.builtin.lineinfile:
+    path: "{{ rhel8stig_sssd_conf }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    owner: root
+    group: root
+    mode: 'u-x,go-rwx'
+  loop:
+    - { regexp: '^\[{{ rhel8stig_sssd_certmap }}\]', line: '[{{ rhel8stig_sssd_certmap }}]' }
+    - { regexp: '^matchrule {{ rhel8stig_sssd_matchrule }}', line: 'matchrule {{ rhel8stig_sssd_matchrule }}' }
+    - { regexp: '^maprule = {{ rhel8stig_sssd_maprule }}', line: 'maprule = {{ rhel8stig_sssd_maprule }}' }
+    - { regexp: 'domains = {{ rhel8stig_sssd_domains }}', line: 'domains = {{ rhel8stig_sssd_domains }}' }
+  notify: Restart sssd
+
+- name: "MEDIUM | RHEL-08-020100 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the password-auth file."
+  when: rhel8stig_020100
+  tags:
+    - RHEL-08-020100
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000069-GPOS-00037
+    - SV-230356r982195_rule
+    - V-230356
+    - pamd
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/password-auth
+    regexp: '^password\s+(required|requisite)\s+pam_pwquality.so'
+    line: 'password   requisite pam_pwquality.so'
+    insertafter: '^password'
+
+- name: "MEDIUM | RHEL-08-020101 | PATCH | RHEL 8 must ensure the password complexity module is enabled in the system-auth file."
+  when: rhel8stig_020101
+  tags:
+    - RHEL-08-020101
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-251713r1017366_rule
+    - V-251713
+    - pamd
+  ansible.builtin.lineinfile:
+    path: /etc/pam.d/system-auth
+    regexp: '^password\s+(required|requisite)\s+pam_pwquality.so'
+    line: 'password   requisite pam_pwquality.so'
+    insertafter: '^password'
+
+- name: "MEDIUM | RHEL-08-020104 | PATCH | RHEL 8 systems, version 8.4 and above, must ensure the password complexity module is configured for three retries or less."
+  when:
+    - rhel8stig_020104
+    - ansible_distribution_version is version('8.4', '>=')
+  tags:
+    - RHEL-08-020104
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-251716r1069329_rule
+    - V-251716
+    - pamd
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^retry =|^#.*retry ='
+    line: retry = {{ rhel8stig_pam_pwquality_retry }}
+    mode: 'u-x,go-wx'
+
+- name: "MEDIUM | RHEL-08-020110 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one upper-case character be used."
+  when: rhel8stig_020110
+  tags:
+    - RHEL-08-020110
+    - CAT2
+    - CCI-000192
+    - NIST800-53R4_IA-5
+    - SRG-OS-000069-GPOS-00037
+    - SV-230357r1017169_rule
+    - V-230357
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*ucredit'
+    line: "ucredit = {{ rhel8stig_password_complexity_ucredit }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020120 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one lower-case character be used."
+  when: rhel8stig_020120
+  tags:
+    - RHEL-08-020120
+    - CAT2
+    - CCI-00019
+    - NIST800-53R4_IA-5
+    - SRG-OS-000070-GPOS-00038
+    - SV-230358r1017170_rule
+    - V-230358
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*lcredit'
+    line: "lcredit = {{ rhel8stig_password_complexity_lcredit }}"
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020130 | PATCH | RHEL 8 must enforce password complexity by requiring that at least one numeric character be used."
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*dcredit'
+    line: "dcredit = {{ rhel8stig_password_complexity_dcredit }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+  when: rhel8stig_020130
+  tags:
+    - RHEL-08-020130
+    - CAT2
+    - CCI-000194
+    - NIST800-53R4_IA-5
+    - SRG-OS-000071-GPOS-00039
+    - SV-230359r1017171_rule
+    - V-230359
+    - pwquality
+
+- name: "MEDIUM | RHEL-08-020140 | PATCH | RHEL 8 must require the maximum number of repeating characters of the same character class be limited to four when passwords are changed."
+  when: rhel8stig_020140
+  tags:
+    - RHEL-08-020140
+    - CAT2
+    - CCI-000195
+    - NIST800-53R4_IA-5
+    - SRG-OS-000072-GPOS-00040
+    - SV-230360r1017172_rule
+    - V-230360
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*maxclassrepeat'
+    line: "maxclassrepeat = {{ rhel8stig_password_complexity_maxclassrepeat }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-20150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
+  when: rhel8stig_020150
+  tags:
+    - RHEL-08-020150
+    - CAT2
+    - CCI-000195
+    - NIST800-53R4_IA-5
+    - SRG-OS-000072-GPOS-00040
+    - SV-230361r1017173_rule
+    - V-230361
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*maxrepeat'
+    line: "maxrepeat = {{ rhel8stig_password_complexity_maxrepeat }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020160 | PATCH | RHEL 8 must require the change of at least four character classes when passwords are changed."
+  when: rhel8stig_020160
+  tags:
+    - RHEL-08-020160
+    - CAT2
+    - CCI-000195
+    - NIST800-53R4_IA-5
+    - SRG-OS-000072-GPOS-00040
+    - SV-230362r1017174_rule
+    - V-230362
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*minclass'
+    line: "minclass = {{ rhel8stig_password_complexity_minclass }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020170 | PATCH | RHEL 8 must require the change of at least 8 characters when passwords are changed."
+  when: rhel8stig_020170
+  tags:
+    - RHEL-08-020170
+    - CAT2
+    - CCI-000195
+    - NIST800-53R4_IA-5
+    - SRG-OS-000072-GPOS-00040
+    - SV-230363r1017175_rule
+    - V-230363
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*difok'
+    line: "difok = {{ rhel8stig_password_complexity_difok }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+  when: rhel8stig_020180
+  tags:
+    - RHEL8-08-020180
+    - CAT2
+    - CCI-000198
+    - NIST800-53R4_IA-5
+    - SRG-OS-000075-GPOS-00043
+    - SV-230364r1017176_rule
+    - V-230364
+    - password
+  block:
+    - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
+      ansible.builtin.shell: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+      changed_when: false
+      failed_when: false
+      register: discovered_min_password_users
+
+    - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
+      ansible.builtin.command: chage -m 1 {{ item }}
+      changed_when: true
+      loop: "{{ discovered_min_password_users.stdout_lines }}"
+
+- name: "MEDIUM | RHEL-08-020190 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/logins.def."
+  when: rhel8stig_020190
+  tags:
+    - RHEL-08-020190
+    - CAT2
+    - CCI-000198
+    - NIST800-53R4_IA-5
+    - SRG-OS-000075-GPOS-00043
+    - SV-230365r1017177_rule
+    - V-230365
+    - login
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: ^#?PASS_MIN_DAYS
+    line: "PASS_MIN_DAYS {{ rhel8stig_login_defaults_pass_min_days }}"
+
+- name: "MEDIUM | RHEL-08-020200 | PATCH | RHEL 8 user account passwords must have a 60-day maximum password lifetime restriction."
+  when: rhel8stig_020200
+  tags:
+    - RHEL-08-020200
+    - CAT2
+    - CCI-000199
+    - NIST800-53R4_IA-5
+    - SRG-OS-000076-GPOS-00044
+    - SV-230366r1038967_rule
+    - V-230366
+    - login
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: ^#?PASS_MAX_DAYS
+    line: "PASS_MAX_DAYS {{ rhel8stig_login_defaults_pass_max_days }}"
+
+- name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
+  when:
+    - rhel8stig_020210
+    - rhel8stig_disruption_high
+  tags:
+    - RHEL-08-020210
+    - CAT2
+    - CCI-000199
+    - NIST800-53R4_IA-5
+    - SRG-OS-000076-GPOS-00044
+    - SV-230367r1038967_rule
+    - V-230367
+    - disruption-high
+    - password
+  block:
+    - name: "MEDIUM | RHEL-08-020210 | AUDIT | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Get list of users"
+      ansible.builtin.command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
+      check_mode: false
+      changed_when: discovered_max_lifetime_users.stdout | length > 0
+      register: discovered_max_lifetime_users
+
+    - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
+      ansible.builtin.command: chage -d '-1 day' {{ item }}
+      changed_when: true
+      check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+      loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
+
+    - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Set 60 max lifetime"
+      ansible.builtin.command: chage -M 60 {{ item }}
+      changed_when: true
+      check_mode: "{{ rhel8stig_disruptive_check_mode }}"
+      loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
+
+- name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
+  when: rhel8stig_020230
+  tags:
+    - RHEL-08-020230
+    - CAT2
+    - CCI-000205
+    - NIST800-53R4_IA-5
+    - SRG-OS-000078-GPOS-00046
+    - SV-230369r1017181_rule
+    - V-230369
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*minlen'
+    line: "minlen = {{ rhel8stig_password_complexity_minlen }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,g-wx,o-rwx'
+
+- name: "MEDIUM | RHEL-08-020231 | PATCH | RHEL 8 passwords for new users must have a minimum of 15 characters."
+  when: rhel8stig_020231
+  tags:
+    - RHEL-08-020231
+    - CAT2
+    - CCI-000205
+    - NIST800-53R4_IA-5
+    - SRG-OS-000078-GPOS-00046
+    - SV-230370r1017182_rule
+    - V-230370
+    - passwords
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: ^#?PASS_MIN_LEN
+    line: "PASS_MIN_LEN 15"
+    owner: root
+    group: root
+
+- name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users."
+  when: rhel8stig_020240
+  tags:
+    - RHEL-08-020240
+    - CAT2
+    - CCI-000764
+    - NIST800-53R4_IA-2
+    - SRG-OS-000104-GPOS-00051
+    - SV-230371r1017183_rule
+    - V-230371
+    - user
+  vars:
+    warn_control_id: "MEDIUM | RHEL-08-020240"
+  block:
+    - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
+      ansible.builtin.shell: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+      changed_when: false
+      failed_when: false
+      register: discovered_duplicate_uid_users
+
+    - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Message out duplicate users"
+      ansible.builtin.debug:
+        msg:
+          - "WARNING!! Below are a list of users with duplicate UID's. Please review and create a unique ID for each user"
+          - "{{ discovered_duplicate_uid_users.stdout_lines }}"
+
+    - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | warning"
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts."
+  when:
+    - rhel8stig_020250
+    - prelim_sssd_conf_present.stat.exists
+  tags:
+    - RHEL-08-020250
+    - CAT2
+    - CCI-000765
+    - NIST800-53R4_IA-2
+    - SRG-OS-000105-GPOS-00052
+    - SRG-OS-000106-GPOS-00053
+    - SRG-OS-000107-GPOS-00054
+    - SRG-OS-000108-GPOS-00055
+    - SV-230372r1017184_rule
+    - V-230372
+    - pamd
+  block:
+    - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
+      ansible.builtin.command: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
+      changed_when: false
+      failed_when: false
+      register: discovered_smartcard_auth_sss
+
+    - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
+      ansible.builtin.command: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
+      changed_when: false
+      failed_when: false
+      register: discovered_sytem_auth_sss
+
+    - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_cert_aut in sssd.conf"
+      ansible.builtin.lineinfile:
+        path: "{{ rhel8stig_sssd_conf }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        insertafter: "{{ item.insertafter }}"
+        owner: root
+        group: root
+        mode: 'u-x,go-rwx'
+      loop:
+        - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+        - { regexp: '^pam_cert_auth =', insertafter: '\[pam\]', line: 'pam_cert_auth = True' }
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in smartcard-auth"
+      when: discovered_smartcard_auth_sss.stdout | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/smartcard-auth
+        line: auth       sufficient pam_sss.so try_cert_auth
+        owner: root
+        group: root
+        mode: 'u-x,go-wx'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in smartcard-auth"
+      when: discovered_smartcard_auth_sss.stdout | length > 0
+      community.general.pamd:
+        name: /etc/pam.d/smartcard-auth
+        state: updated
+        type: auth
+        control: sufficient
+        module_path: pam_sss.so
+        module_arguments: 'try_cert_auth'
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if doesn't exist in system-auth"
+      when: discovered_sytem_auth_sss.stdout | length == 0
+      community.general.pamd:
+        name: /etc/pam.d/system-auth
+        state: after
+        type: auth
+        control: required
+        module_path: pam_env.so
+        new_type: auth
+        new_control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+        new_module_path: pam_sss.so
+        module_arguments: try_cert_auth
+      notify: Restart sssd
+
+    - name: "MEDIUM | RHEL-08-020250 | PATCH | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Set pam_sss.so if does exist in system-auth"
+      when: discovered_sytem_auth_sss.stdout | length > 0
+      community.general.pamd:
+        name: /etc/pam.d/system-auth
+        state: updated
+        type: auth
+        control: '[success=done authinfo_unavail=ignore ignore=ignore default=die]'
+        module_path: pam_env.so
+        module_arguments: try_cert_auth
+      notify: Restart sssd
+
+- name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
+  when: rhel8stig_020260
+  tags:
+    - RHEL-08-020260
+    - CAT2
+    - CCI-000795
+    - NIST800-53R4_IA-4
+    - SRG-OS-000118-GPOS-00060
+    - SV-230373r1017185_rule
+    - V-230373
+    - useradd
+  block:
+    - name: "MEDIUM | RHEL-08-20260 | AUDIT | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity. | Get current"
+      ansible.builtin.shell: grep -i inactive /etc/default/useradd | cut -d = -f2 | grep -v 35
+      changed_when: false
+      failed_when: discovered_current_useradd_inactive.rc not in [ 0, 1 ]
+      register: discovered_current_useradd_inactive
+
+    - name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity. | Set current"
+      when: discovered_current_useradd_inactive.stdout | length > 0
+      ansible.builtin.command: useradd -D -f 35
+      changed_when: true
+
+- name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
+  when: rhel8stig_020270
+  tags:
+    - RHEL-08-020270
+    - CAT2
+    - CCI-001682
+    - NIST800-53R4_AC-2
+    - SRG-OS-000123-GPOS-00064
+    - SV-230374r1069293_rule
+    - V-230374
+    - user
+  vars:
+    warn_control_id: "MEDIUM | RHEL-08-020270"
+  block:
+    - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
+      ansible.builtin.shell: "awk -F: '{if ($3 <= {{ min_int_uid }}) { print $1 }}' /etc/passwd"
+      changed_when: false
+      failed_when: false
+      register: discovered_users_list
+
+    - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
+      ansible.builtin.debug:
+        msg:
+          - "WARNING!! Below are the system accounts. If any where temporary accounts plese make sure they are removed or disabled after the crisis is resovled or within 72 hours"
+          - "{{ discovered_users_list.stdout_lines }}"
+
+    - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "MEDIUM | RHEL-08-020280 | PATCH | All RHEL 8 passwords must contain at least one special character."
+  when: rhel8stig_020280
+  tags:
+    - RHEL-08-020280
+    - CAT2
+    - CCI-001619
+    - NIST800-53R4_IA-5
+    - SRG-OS-000266-GPOS-00101
+    - SV-230375r1017187_rule
+    - V-230375
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*ocredit'
+    line: "ocredit = {{ rhel8stig_password_complexity_ocredit }}"
+
+- name: "MEDIUM | RHEL-08-020290 | PATCH | The RHEL 8 must prohibit the use of cached authentications after one day."
+  when:
+    - rhel8stig_020290
+    - prelim_sssd_conf_present.stat.exists
+  tags:
+    - RHEL-08-020290
+    - CAT2
+    - CCI-002007
+    - NIST800-53R4_IA-5
+    - SRG-OS-000383-GPOS-00166
+    - SV-230376r1069307_rule
+    - V-230376
+    - sssd
+  ansible.builtin.lineinfile:
+    path: "{{ rhel8stig_sssd_conf }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    owner: root
+    group: root
+    mode: 'u-x,go-rwx'
+  loop:
+    - { regexp: '^\[pam\]', insertafter: 'EOF', line: '[pam]' }
+    - { regexp: '^offline_credentials_expiration =', insertafter: '\[pam\]', line: 'offline_credentials_expiration = 1' }
+
+- name: "MEDIUM | RHEL-08-020300 | PATCH | RHEL 8 must prevent the use of dictionary words for passwords."
+  when: rhel8stig_020300
+  tags:
+    - RHEL-08-020300
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00225
+    - SV-230377r1017188_rule
+    - V-230377
+    - pwquality
+  ansible.builtin.lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^#?\s*dictcheck'
+    line: "dictcheck = {{ rhel8stig_password_complexity_dictcheck }}"
+
+- name: "MEDIUM | RHEL-08-020310 | PATCH | RHEL 8 must enforce a delay of at least four seconds between logon prompts following a failed logon attempt."
+  when: rhel8stig_020310
+  tags:
+    - RHEL-08-020310
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00226
+    - SV-230378r1017189_rule
+    - V-230378
+    - login
+  ansible.builtin.lineinfile:
+    dest: /etc/login.defs
+    regexp: ^#?FAIL_DELAY
+    line: "FAIL_DELAY {{ rhel8stig_login_defaults_fail_delay_secs }}"
+
+- name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts."
+  when: rhel8stig_020320
+  tags:
+    - RHEL-08-020320
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230379r1017190_rule
+    - V-230379
+    - accounts
+  block:
+    - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Find unnecessary accounts"
+      ansible.builtin.command: "grep '^{{ item }}:' /etc/passwd"
+      check_mode: false
+      failed_when: discovered_unnecessary_accounts_found.rc > 1
+      changed_when: discovered_unnecessary_accounts_found.rc == 0
+      register: discovered_unnecessary_accounts_found
+      loop: "{{ rhel8stig_unnecessary_accounts }}"
+
+    - name: "MEDIUM | RHEL-08-020320 | PATCH | RHEL 8 must not have unnecessary accounts. | Remove accounts"
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+        remove: "{{ rhel8stig_remove_unnecessary_user_files }}"
+      register: discovered_unnecessary_accounts_removed
+      loop: "{{ rhel8stig_unnecessary_accounts }}"
+
+    - name: "MEDIUM | RHEL-08-020320 | AUDIT | RHEL 8 must not have unnecessary accounts. | Re-parse passwd file"
+      when: discovered_unnecessary_accounts_removed is changed  # noqa no-handler
+      ansible.builtin.include_tasks: parse_etc_passwd.yml
+      vars:
+        rhel8stig_passwd_tasks: "RHEL-08-020320"  # pragma: allowlist secret
+
+- name: "MEDIUM | RHEL-08-020350 | PATCH | RHEL 8 must display the date and time of the last successful account logon upon an SSH logon."
+  when:
+    - rhel8stig_020350
+    - rhel8stig_ssh_required
+  tags:
+    - RHEL-08-020350
+    - CAT2
+    - CCI-000052
+    - NIST800-53R4_AC-9
+    - SRG-OS-000480-GPOS-00227
+    - SV-230382r1069309_rule
+    - V-230382
+    - ssh
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '(?i)^#?\s*PrintLastLog (yes|no)'
+    line: 'PrintLastLog yes'
+    validate: /usr/sbin/sshd -t -f %s
+  notify: Restart sshd
+
+- name: "MEDIUM | RHEL-08-020351 | PATCH |  RHEL 8 must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
+  when: rhel8stig_020351
+  tags:
+    - RHEL-08-020351
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00228
+    - SV-230383r1017192_rule
+    - V-230383
+    - login
+    - umask
+  ansible.builtin.lineinfile:
+    path: /etc/login.defs
+    regexp: ^#?UMASK.*
+    line: "UMASK           {{ rhel8stig_login_defaults_umask }}"
+
+- name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts."
+  when: rhel8stig_020352
+  tags:
+    - RHEL-08-020352
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00228
+    - SV-230384r1017193_rule
+    - V-230384
+    - umask
+  block:
+    - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Find umask files"
+      ansible.builtin.find:
+        paths: "{{ item }}"
+        patterns: '^\.'
+        contains: 'umask'
+        recurse: true
+        hidden: true
+        use_regex: true
+      register: discovered_interactive_user_files_umask
+      loop: "{{ discovered_interactive_users_home.stdout_lines }}"
+
+    - name: "MEDIUM | RHEL-08-020352 | PATCH | RHEL 8 must set the umask value to 077 for all local interactive user accounts. | Remove umask param"
+      when: discovered_interactive_user_files_umask.stdout_lines is defined
+      ansible.builtin.lineinfile:
+        path: "{{ item }}"
+        regexp: "umask\\s+(?!{{ rhel8stig_login_defaults_umask }})"
+        state: absent
+      loop: "{{ discovered_interactive_user_files_umask.stdout_lines }}"
+
+- name: "MEDIUM | RHEL-08-020353 | PATCH | RHEL 8 must define default permissions for logon and non-logon shells."
+  when: rhel8stig_020353
+  tags:
+    - RHEL-08-020353
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230385r1017194_rule
+    - V-230385
+    - umask
+  ansible.builtin.replace:
+    path: "{{ item }}"
+    regexp: 'umask\s\d\d\d'
+    replace: "umask {{ rhel8stig_login_defaults_umask }}"
+  loop:
+    - /etc/bashrc
+    - /etc/csh.cshrc
+    - /etc/profile

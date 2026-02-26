@@ -1,0 +1,206 @@
+---
+
+- name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities."
+  when: rhel8stig_040004
+  tags:
+    - RHEL-08-040004
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230491r1017274_rule
+    - V-230491
+    - grub
+  block:
+    - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
+      ansible.builtin.shell: grep -i cmdline /etc/default/grub | grep pti=on
+      changed_when: false
+      failed_when: false
+      register: discovered_pti_grub_cmdline_linux
+
+    - name: "LOW | RHEL-08-040004 | PATCH | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Set pti=on active"
+      when: discovered_pti_grub_cmdline_linux.stdout | length == 0
+      ansible.builtin.command: grubby --update-kernel=ALL --args="pti=on"
+      changed_when: true
+      notify: Rebuild grub
+
+- name: "LOW | RHEL-08-040021 | PATCH | RHEL 8 must disable the asynchronous transfer mode (ATM) protocol."
+  when: rhel8stig_040021
+  tags:
+    - RHEL-08-040021
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230494r1017277_rule
+    - V-230494
+    - modprobe
+    - atm
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install atm', line: 'install atm /bin/false', insertafter: 'EOF' }
+    - { regexp: '^blacklist atm', line: 'blacklist atm', insertafter: '^install atm /bin/true' }
+  notify: Change_requires_reboot
+
+- name: "LOW | RHEL-08-040022 | PATCH | RHEL 8 must disable the controller area network (CAN) protocol."
+  when: rhel8stig_040022
+  tags:
+    - RHEL-08-040022
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230495r1069311_rule
+    - V-230495
+    - modprobe
+    - can
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install can', line: 'install can /bin/false', insertafter: 'EOF' }
+    - { regexp: 'blacklist can', line: 'blacklist can', insertafter: '^install can /bin/true' }
+  notify: Change_requires_reboot
+
+- name: "LOW | RHEL-08-040023 | PATCH | RHEL 8 must disable the stream control transmission (SCTP) protocol."
+  when: rhel8stig_040023
+  tags:
+    - RHEL-08-040023
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230496r1069312_rule
+    - V-230496
+    - modprobe
+    - sctp
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install sctp', line: 'install sctp /bin/false', insertafter: 'EOF' }
+    - { regexp: '^blacklist sctp', line: 'blacklist sctp', insertafter: '^install sctp' }
+  notify: Change_requires_reboot
+
+- name: "LOW | RHEL-08-040024 | PATCH | RHEL 8 must disable the transparent inter-process communication (TIPC) protocol."
+  when: rhel8stig_040024
+  tags:
+    - RHEL-08-040024
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230497r1069313_rule
+    - V-230497
+    - modprobe
+    - tipc
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install tipc', line: 'install tipc /bin/false', insertafter: 'EOF' }
+    - { regexp: '^blacklist tipc', line: 'blacklist tipc', insertafter: '^install tipc' }
+  notify: Change_requires_reboot
+
+- name: "LOW | RHEL-08-040025 | PATCH | RHEL 8 must disable mounting of cramfs."
+  when: rhel8stig_040025
+  tags:
+    - RHEL-08-040025
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230498r1069314_rule
+    - V-230498
+    - modprobe
+    - cramfs
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install cramfs', line: 'install cramfs /bin/false', insertafter: 'EOF' }
+    - { regexp: 'blacklist cramfs', line: 'blacklist cramfs', insertafter: '^install cramfs' }
+  notify: Change_requires_reboot
+
+- name: "LOW | RHEL-08-040026 | PATCH | RHEL 8 must disable IEEE 1394 (FireWire) Support."
+  when: rhel8stig_040026
+  tags:
+    - RHEL-08-040026
+    - CAT3
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230499r1069315_rule
+    - V-230499
+    - modprobe
+    - firewire
+  ansible.builtin.lineinfile:
+    path: /etc/modprobe.d/blacklist.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.insertafter }}"
+    create: true
+    owner: root
+    group: root
+    mode: 'u-x,go-wx'
+  loop:
+    - { regexp: '^install firewire-core', line: 'install firewire-core /bin/false', insertafter: 'EOF' }
+    - { regexp: '^blacklist firewire-core', line: 'blacklist firewire-core', insertafter: '^install firewire-core' }
+  notify: Change_requires_reboot
+
+- name: |
+    "LOW | RHEL-08-040300 | PATCH | The RHEL 8 file integrity tool must be configured to verify extended attributes."
+    "LOW | RHEL-08-040310 | PATCH | The RHEL 8 file integrity tool must be configured to verify Access Control Lists (ACLs)."
+  when:
+    - rhel8stig_040300
+    - rhel8stig_040310
+  tags:
+    - CAT3
+    - RHEL-08-040300
+    - RHEL-08-040310
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230551r1017313_rule
+    - SV-230552r1101902_rule
+    - V-230551
+    - V-230552
+    - aide
+  ansible.builtin.template:
+    src: aide.conf.j2
+    dest: /etc/aide.conf
+    owner: root
+    group: root
+    mode: 'u-x,go-rwx'

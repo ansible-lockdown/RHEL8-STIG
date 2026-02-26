@@ -1,8 +1,7 @@
 ---
 
-- name: Run RHEL8 STiG hardening
+- name: Run RHEL8 STIG hardening
   hosts: "{{ hosts | default('all') }}"
   become: true
-
   roles:
-      - role: "{{ playbook_dir }}"
+    - role: "{{ playbook_dir }}"
