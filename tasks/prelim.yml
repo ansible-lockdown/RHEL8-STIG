@@ -92,7 +92,7 @@
     file: audit.yml
 
 - name: "PRELIM | Include pre-remediation audit tasks"
-  when: run_audit or audit_only or setup_audit
+  when: run_audit or audit_only
   tags: always
   ansible.builtin.import_tasks:
     file: pre_remediation_audit.yml
