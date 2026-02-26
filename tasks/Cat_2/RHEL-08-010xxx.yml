@@ -1579,8 +1579,8 @@
     - V-230279
     - grub
   block:
-    - name: "MEDIUM | RHEL-08-010423 | PATCH | RHEL 8 must clear memory when it is freed to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
-      ansible.builtin.shell: grep -i "grub_cmdline_linux" /etc/default/grub | grep init_in_free=1
+    - name: "MEDIUM | RHEL-08-010423 | AUDIT | RHEL 8 must clear memory when it is freed to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
+      ansible.builtin.shell: grep -i "grub_cmdline_linux" /etc/default/grub | grep init_on_free=1
       changed_when: false
       failed_when: false
       register: discovered_init_grub_cmdline_linux
