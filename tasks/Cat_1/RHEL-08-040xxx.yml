@@ -1,0 +1,184 @@
+---
+
+- name: "HIGH | RHEL-08-040000 | PATCH | RHEL 8 must not have the telnet-server package installed."
+  when: rhel8stig_040000
+  tags:
+    - RHEL-08-040000
+    - CAT1
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230487r1017271_rule
+    - V-230487
+  ansible.builtin.package:
+    name: telnet-server
+    state: absent
+
+- name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not have the rsh-server package installed."
+  when: rhel8stig_040010
+  tags:
+    - RHEL-08-040010
+    - CAT1
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230492r1017275_rule
+    - V-230492
+  ansible.builtin.package:
+    name: rsh-server
+    state: absent
+
+- name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
+  when: rhel8stig_040170
+  tags:
+    - RHEL-08-040170
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230529r1017289_rule
+    - V-230529
+  block:
+    - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Mask ctrl-alt-del.target"
+      ansible.builtin.systemd:
+        name: ctrl-alt-del.target
+        masked: true
+      notify: Systemctl daemon-reload
+
+    - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8. | Create symlink to /dev/null"
+      ansible.builtin.file:
+        src: /dev/null
+        dest: /etc/systemd/system/ctrl-alt-del.target
+        state: link
+      notify: Systemctl daemon-reload
+
+- name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
+  when:
+    - rhel8stig_040171
+    - "'gnome-desktop' in ansible_facts.packages or 'gnome-desktop3' in ansible_facts.packages"
+  tags:
+    - RHEL-08-040171
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230530r1069317_rule
+    - V-230530
+  block:
+    - name: "HIGH | RHEL-08-040171 | AUDIT | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
+      ansible.builtin.command: grep -r logout /etc/dconf/db/local.d/*
+      changed_when: false
+      failed_when: false
+      register: discovered_gui_logout_settings_status
+
+    - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Add if missing"
+      when: discovered_gui_logout_settings_status.stdout | length == 0
+      ansible.builtin.lineinfile:
+        path: /etc/dconf/db/local.d/00-disable-CAD
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        insertafter: "{{ item.insertafter }}"
+        create: true
+        owner: root
+        group: root
+        mode: 'u-x,go-wx'
+      loop:
+        - { regexp: '^\[org/gnome/settings-daemon/plugins/media-keys\]', line: '[org/gnome/settings-daemon/plugins/media-keys]', insertafter: 'EOF' }
+        - { regexp: 'logout=', line: "logout=''", insertafter: '\[org/gnome/settings-daemon/plugins/media-keys\]' }
+      loop_control:
+        label: "{{ item.line }}"
+
+    - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Edit if exists"
+      when: discovered_gui_logout_settings_status.stdout | length > 0
+      ansible.builtin.replace:
+        path: "{{ discovered_gui_logout_settings_status.stdout }}"
+        regexp: '^[L|l]ogout=.*'
+        replace: "logout=''"
+
+- name: "HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled."
+  when: rhel8stig_040172
+  tags:
+    - RHEL-08-040172
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230531r1017292_rule
+    - V-230531
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system.conf
+    regexp: '^CtrlAltDelBurstAction=|^#CtrlAltDelBurstAction='
+    line: CtrlAltDelBurstAction=none
+  notify: Systemctl daemon-reload
+
+- name: "HIGH | RHEL-08-040190 | PATCH | The Trivial File Transfer Protocol (TFTP) server package must not be installed if not required for RHEL 8 operational support."
+  when:
+    - rhel8stig_040190
+    - not rhel8stig_tftp_required
+  tags:
+    - RHEL-08-040190
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230533r1017295_rule
+    - V-230533
+    - tftp
+  ansible.builtin.package:
+    name: tftp-server
+    state: absent
+
+- name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system."
+  when: rhel8stig_040200
+  tags:
+    - RHEL-08-040200
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230534r1017296_rule
+    - V-230534
+    - disruption_high
+  vars:
+    warn_control_id: "HIGH | RHEL-08-040200"
+  block:
+    - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
+      ansible.builtin.shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
+      changed_when: false
+      failed_when: false
+      register: discovered_nonroot_uid
+
+    - name: "HIGH | HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
+      when:
+        - discovered_nonroot_uid.stdout | length > 0
+        - rhel8stig_disruption_high
+      ansible.builtin.command: "passwd -l {{ item }}"
+      changed_when: true
+      loop: "{{ discovered_nonroot_uid.stdout_lines }}"
+
+    - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
+      when: discovered_nonroot_uid.stdout | length > 0
+      ansible.builtin.debug:
+        msg:
+          - "WARNING!! The following accounts were locked since they had UID of 0 and were not the root user"
+          - " {{ discovered_nonroot_uid.stdout_lines }}"
+
+    - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Display accounts that were locked"
+      when: discovered_nonroot_uid.stdout | length > 0
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "HIGH | RHEL-08-040360 | PATCH | A File Transfer Protocol (FTP) server package must not be installed unless mission essential on RHEL 8."
+  when: rhel8stig_040360
+  tags:
+    - RHEL-08-040360
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230558r1017320_rule
+    - V-230558
+    - ftp
+  ansible.builtin.package:
+    name: vsftpd
+    state: absent

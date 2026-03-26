@@ -1,0 +1,1717 @@
+---
+
+- name: "MEDIUM | RHEL-08-030000 | PATCH | The RHEL 8 audit system must be configured to audit the execution of privileged functions and prevent all software from executing at higher privilege levels than users executing the software."
+  when: rhel8stig_030000
+  tags:
+    - RHEL-08-030000
+    - CAT2
+    - CCI-002233
+    - NIST800-53R4_AC-6
+    - SRG-OS-000326-GPOS-00126
+    - SRG-OS-000327-GPOS-00127
+    - SV-230386r958730_rule
+    - V-230386
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030010 | PATCH | Cron logging must be implemented in RHEL 8."
+  when: rhel8stig_030010
+  tags:
+    - RHEL-08-030010
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230387r1017195_rule
+    - V-230387
+    - cron
+    - rsyslog
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^cron.*'
+    line: 'cron.*                                                  /var/log/cron'
+
+- name: "MEDIUM | RHEL-08-030020 | PATCH | The RHEL 8 System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) must be alerted of an audit processing failure event."
+  when: rhel8stig_030020
+  tags:
+    - RHEL-08-030020
+    - CAT2
+    - CCI-000139
+    - NIST800-53R4_AU-5
+    - SRG-OS-000046-GPOS-00022
+    - SV-230388r1017196_rule
+    - V-230388
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^#?action_mail_acct\s*='
+    line: "action_mail_acct = {{ rhel8stig_auditd_mail_acct }}"
+  register: discovered_action_mail_acct_result
+  failed_when:
+    - discovered_action_mail_acct_result is failed
+    - discovered_action_mail_acct_result.rc != 257
+
+- name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
+  when: rhel8stig_030030
+  tags:
+    - RHEL-08-030030
+    - CAT2
+    - CCI-000139
+    - NIST800-53R4_AU-5
+    - SRG-OS-000046-GPOS-00022
+    - SV-230389r1017197_rule
+    - V-230389
+    - aliases
+  ansible.builtin.lineinfile:
+    path: /etc/aliases
+    regexp: '^postmaster\:'
+    line: 'postmaster:     root'
+
+- name: "MEDIUM | RHEL-08-030040 | PATCH | The RHEL 8 System must take appropriate action when an audit processing failure occurs."
+  when: rhel8stig_030040
+  tags:
+    - RHEL-08-030040
+    - CAT2
+    - CCI-000140
+    - NIST800-53R4_AU-5
+    - SRG-OS-000047-GPOS-00023
+    - SV-230390r1038966_rule
+    - V-230390
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^#?disk_error_action\s*='
+    line: "disk_error_action = {{ rhel8stig_auditd_disk_error_action }}"
+
+- name: "MEDIUM | RHEL-08-030060 | PATCH | The RHEL 8 audit system must take appropriate action when the audit storage volume is full."
+  when: rhel8stig_030060
+  tags:
+    - RHEL-08-030060
+    - CAT2
+    - CCI-000140
+    - NIST800-53R4_AU-5
+    - SRG-OS-000047-GPOS-00023
+    - SV-230392r1038966_rule
+    - V-230392
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^#?disk_full_action\s*='
+    line: "disk_full_action = {{ rhel8stig_auditd_disk_full_action }}"
+
+- name: "MEDIUM | RHEL-08-030061 | PATCH | The RHEL 8 audit system must audit local events."
+  when: rhel8stig_030061
+  tags:
+    - RHEL-08-030061
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230393r1017200_rule
+    - V-230393
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^#?local_events\s*='
+    line: "local_events = yes"
+
+- name: "MEDIUM | RHEL-08-030062 | PATCH | RHEL 8 must label all off-loaded audit logs before sending them to the central log server."
+  when: rhel8stig_030062
+  tags:
+    - RHEL-08-030062
+    - CAT2
+    - CCI-001851
+    - NIST800-53R4_AU-4
+    - SRG-OS-000342-GPOS-00133
+    - SV-230394r958754_rule
+    - V-230394
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^name_format ='
+    line: "name_format = hostname"
+  notify: Restart auditd
+
+- name: "MEDIUM | RHEL-08-030070 | PATCH | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access."
+  when: rhel8stig_030070
+  tags:
+    - RHEL-08-030070
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SRG-OS-000206-GPOS-00084
+    - SV-230396r1017202_rule
+    - V-230396
+    - permissions
+    - log
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | logfile location"
+      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
+      register: discovered_auditlog_location_auditd
+      changed_when: false
+
+    - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | check file exists"
+      ansible.builtin.stat:
+        path: "{{ discovered_auditlog_location_auditd.stdout }}"
+      register: discovered_auditlog
+
+    - name: "MEDIUM | RHEL-08-030070 | PATCH | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | logfile location"
+      ansible.builtin.file:
+        path: "{{ discovered_auditlog_location_auditd.stdout }}"
+        state: "{{ (discovered_auditlog.stat.exists) | ternary('file', 'touch') }}"
+        mode: 'o-x,go-rwx'
+
+- name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access."
+  when: rhel8stig_030080
+  tags:
+    - RHEL-08-030080
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SRG-OS-000206-GPOS-00084
+    - SV-230397r1017203_rule
+    - V-230397
+    - permissions
+    - log
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
+      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_file
+
+    - name: "MEDIUM | RHEL-08-030080 | PATCH | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Set audit log owner"
+      when: discovered_audit_log_file.stdout | length > 0
+      ansible.builtin.file:
+        path: "{{ discovered_audit_log_file.stdout }}"
+        owner: root
+
+- name: "MEDIUM | RHEL-08-030090 | PATCH | RHEL 8 audit logs must be group-owned by root to prevent unauthorized read access."
+  when: rhel8stig_030090
+  tags:
+    - RHEL-08-030090
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230398r1017204_rule
+    - V-230398
+    - permissions
+    - log
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^log_group'
+    line: "log_group = root"
+
+- name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access."
+  when: rhel8stig_030100
+  tags:
+    - RHEL-08-030100
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230399r1017205_rule
+    - V-230399
+    - permissions
+    - log
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
+      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_dir
+
+    - name: "MEDIUM | RHEL-08-030100 | PATCH | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Set audit log dir owner"
+      when: discovered_audit_log_dir.stdout | length > 0
+      ansible.builtin.file:
+        path: "{{ discovered_audit_log_dir.stdout }}"
+        owner: root
+        state: directory
+        mode: 'go-rwx'
+
+- name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access."
+  when: rhel8stig_030110
+  tags:
+    - skip_ansible_lint
+    - RHEL-08-030110
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230400r1017206_rule
+    - V-230400
+    - permissions
+    - log
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
+      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_dir
+
+    - name: "MEDIUM | RHEL-08-030110 | PATCH | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Set audit log dir group"
+      when: discovered_audit_log_dir.stdout | length > 0
+      ansible.builtin.file:
+        path: "{{ discovered_audit_log_dir.stdout }}"
+        group: root
+        state: directory
+        mode: 'go-rwx'
+
+- name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access."
+  when: rhel8stig_030120
+  tags:
+    - RHEL-08-030120
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230401r1017207_rule
+    - V-230401
+    - permissions
+    - log
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
+      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_dir
+
+    - name: "MEDIUM | RHEL-08-030120 | PATCH | RHEL 8 audit log directories must have a mode of 0700 or less permissive to prevent unauthorized read access. | Set audit log dir perms"
+      when: discovered_audit_log_dir.stdout | length > 0
+      ansible.builtin.file:
+        path: "{{ discovered_audit_log_dir.stdout }}"
+        mode: 'go-rwx'
+        state: directory
+
+- name: "MEDIUM | RHEL-08-030121 | PATCH | RHEL 8 audit system must protect auditing rules from unauthorized change."
+  when: rhel8stig_030121
+  tags:
+    - RHEL-08-030121
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230402r1017208_rule
+    - V-230402
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030122 | PATCH | RHEL 8 audit system must protect logon UIDs from unauthorized change."
+  when: rhel8stig_030122
+  tags:
+    - RHEL-08-030122
+    - CAT2
+    - CCI-000162
+    - NIST800-53R4_AU-9
+    - SRG-OS-000057-GPOS-00027
+    - SRG-OS-000058-GPOS-00028
+    - SRG-OS-000059-GPOS-00029
+    - SV-230403r1017209_rule
+    - V-230403
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030130 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
+  when: rhel8stig_030130
+  tags:
+    - RHEL-08-030130
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000466-GPOS-00210
+    - SRG-OS-000476-GPOS-00221
+    - SV-230404r1017210_rule
+    - V-230404
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030140 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/security/opasswd."
+  when: rhel8stig_030140
+  tags:
+    - RHEL-08-030140
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230405r1017211_rule
+    - V-230405
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030150 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd."
+  when: rhel8stig_030150
+  tags:
+    - RHEL-08-030150
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230406r1017212_rule
+    - V-230406
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030160 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow."
+  when: rhel8stig_030160
+  tags:
+    - RHEL-08-030160
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230407r1017213_rule
+    - V-230407
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030170 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
+  when: rhel8stig_030170
+  tags:
+    - RHEL-08-030170
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230408r1017214_rule
+    - V-230408
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030171 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers."
+  when: rhel8stig_030171
+  tags:
+    - RHEL-08-030171
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230409r1017215_rule
+    - V-230409
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030172 | PATCH | RHEL 8 must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/sudoers.d/."
+  when: rhel8stig_030172
+  tags:
+    - RHEL-08-030172
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230410r1017216_rule
+    - V-230410
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed."
+  when: rhel8stig_030180
+  tags:
+    - rhel8stig_030180
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-230411r1017217_rule
+    - V-230411
+    - dnf
+    - auditd
+  ansible.builtin.package:
+    name: audit
+    state: present
+
+- name: "MEDIUM | RHEL-08-030181 | PATCH | RHEL 8 audit records must contain information to establish what type of events occurred, the source of events, where events occurred, and the outcome of events."
+  when: rhel8stig_030181
+  tags:
+    - RHEL-08-030181
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000004-GPOS-00004
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000304-GPOS-00121
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000470-GPOS-00214
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000239-GPOS-00089
+    - SRG-OS-000240-GPOS-00090
+    - SRG-OS-000241-GPOS-00091
+    - SRG-OS-000303-GPOS-00120
+    - SRG-OS-000476-GPOS-00221
+    - SV-244542r1017348_rule
+    - V-244542
+    - auditd
+  ansible.builtin.service:
+    name: auditd
+    enabled: true
+  notify: Restart auditd
+
+- name: "MEDIUM | RHEL-08-030190 | PATCH | Successful/unsuccessful uses of the su command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030190
+  tags:
+    - RHEL-08-030190
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000064-GPOS-00032
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000466-GPOS-00210
+    - SV-230412r1017218_rule
+    - V-230412
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
+  when: rhel8stig_030200
+  tags:
+    - RHEL-08-030200
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000458-GPOS-00203
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000463-GPOS-00207
+    - SRG-OS-000468-GPOS-00212
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000474-GPOS-00219
+    - SRG-OS-000466-GPOS-00210
+    - SV-230413r1017219_rule
+    - V-230413
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030250 | PATCH | Successful/unsuccessful uses of the chage command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030250
+  tags:
+    - RHEL-08-030250
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000468-GPOS-00212
+    - SRG-OS-000471-GPOS-00215
+    - SV-230418r1017220_rule
+    - V-230418
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030260 | PATCH | Successful/unsuccessful uses of the chcon command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030260
+  tags:
+    - RHEL-08-030260
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000468-GPOS-00212
+    - SRG-OS-000471-GPOS-00215
+    - SV-230419r1017221_rule
+    - V-230419
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030280 | PATCH | Successful/unsuccessful uses of the ssh-agent in RHEL 8 must generate an audit record."
+  when: rhel8stig_030280
+  tags:
+    - RHEL-08-030280
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230421r1017222_rule
+    - V-230421
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030290 | PATCH | Successful/unsuccessful uses of the passwd command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030290
+  tags:
+    - RHEL-08-030290
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230422r1017223_rule
+    - V-230422
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030300 | PATCH | Successful/unsuccessful uses of the mount command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030300
+  tags:
+    - RHEL-08-030300
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230423r1017224_rule
+    - V-230423
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030301 | PATCH | Successful/unsuccessful uses of the umount command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030301
+  tags:
+    - RHEL-08-030301
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230424r1017225_rule
+    - V-230424
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030302 | PATCH | Successful/unsuccessful uses of the mount syscall in RHEL 8 must generate an audit record."
+  when: rhel8stig_030302
+  tags:
+    - RHEL-08-030302
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230425r1017226_rule
+    - V-230425
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030310 | PATCH | Successful/unsuccessful uses of the unix_update in RHEL 8 must generate an audit record."
+  when: rhel8stig_030310
+  tags:
+    - RHEL-08-030310
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230426r1017227_rule
+    - V-230426
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030311 | PATCH | Successful/unsuccessful uses of postdrop in RHEL 8 must generate an audit record."
+  when: rhel8stig_030311
+  tags:
+    - RHEL-08-030311
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230427r1017228_rule
+    - V-230427
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030312 | PATCH | Successful/unsuccessful uses of postqueue in RHEL 8 must generate an audit record."
+  when: rhel8stig_030312
+  tags:
+    - RHEL-08-030312
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230428r1017229_rule
+    - V-230428
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030313 | PATCH | Successful/unsuccessful uses of semanage in RHEL 8 must generate an audit record."
+  when: rhel8stig_030313
+  tags:
+    - RHEL-08-030313
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230429r1017230_rule
+    - V-230429
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030314 | PATCH | Successful/unsuccessful uses of setfiles in RHEL 8 must generate an audit record."
+  when: rhel8stig_030314
+  tags:
+    - RHEL-08-030314
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230430r1017231_rule
+    - V-230430
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030315 | PATCH | Successful/unsuccessful uses of userhelper in RHEL 8 must generate an audit record."
+  when: rhel8stig_030315
+  tags:
+    - RHEL-08-030315
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230431r1017232_rule
+    - V-230431
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030316 | PATCH | Successful/unsuccessful uses of setsebool in RHEL 8 must generate an audit record."
+  when: rhel8stig_030316
+  tags:
+    - RHEL-08-030316
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230432r1017233_rule
+    - V-230432
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030317 | PATCH | Successful/unsuccessful uses of unix_chkpwd in RHEL 8 must generate an audit record."
+  when: rhel8stig_030317
+  tags:
+    - RHEL-08-030317
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230433r1017234_rule
+    - V-230433
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030320 | PATCH | Successful/unsuccessful uses of the ssh-keysign in RHEL 8 must generate an audit record."
+  when: rhel8stig_030320
+  tags:
+    - RHEL-08-030320
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230434r1017235_rule
+    - V-230434
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030330 | PATCH | Successful/unsuccessful uses of the setfacl command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030330
+  tags:
+    - RHEL-08-030330
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230435r1017236_rule
+    - V-230435
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030340 | PATCH | Successful/unsuccessful uses of the pam_timestamp_check command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030340
+  tags:
+    - RHEL-08-030340
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230436r1017237_rule
+    - V-230436
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030350 | PATCH | Successful/unsuccessful uses of the newgrp command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030350
+  tags:
+    - RHEL-08-030350
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230437r1017238_rule
+    - V-230437
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030360 | PATCH | Successful/unsuccessful uses of the init_module command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030360
+  tags:
+    - RHEL-08-030360
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230438r1017241_rule
+    - V-230438
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030361
+  tags:
+    - RHEL-08-030361
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230439r1017243_rule
+    - V-230439
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030370 | PATCH | Successful/unsuccessful uses of the gpasswd command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030370
+  tags:
+    - RHEL-08-030370
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230444r1017244_rule
+    - V-230444
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030390 | PATCH | Successful/unsuccessful uses of the delete_module command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030390
+  tags:
+    - RHEL-08-030390
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230446r1017245_rule
+    - V-230446
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030400 | PATCH | Successful/unsuccessful uses of the crontab command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030400
+  tags:
+    - RHEL-08-030400
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230447r1017246_rule
+    - V-230447
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030410 | PATCH | Successful/unsuccessful uses of the chsh command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030410
+  tags:
+    - RHEL-08-030410
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SV-230448r1017247_rule
+    - V-230448
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030420
+  tags:
+    - RHEL-08-030420
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SV-230449r1017249_rule
+    - V-230449
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030480
+  tags:
+    - RHEL-08-030480
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SRG-OS-000466-GPOS-00210
+    - SV-230455r1017251_rule
+    - V-230455
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030490
+  tags:
+    - RHEL-08-030490
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SRG-OS-000466-GPOS-00210
+    - SV-230456r1017253_rule
+    - V-230456
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030550 | PATCH | Successful/unsuccessful uses of the sudo command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030550
+  tags:
+    - RHEL-08-030550
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SRG-OS-000466-GPOS-00210
+    - SV-230462r1017254_rule
+    - V-230462
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030560 | PATCH | Successful/unsuccessful uses of the usermod command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030560
+  tags:
+    - RHEL-08-030560
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SRG-OS-000466-GPOS-00210
+    - SV-230463r1017255_rule
+    - V-230463
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030570 | PATCH | Successful/unsuccessful uses of the chacl command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030570
+  tags:
+    - RHEL-08-030570
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000064-GPOS-00033
+    - SRG-OS-000466-GPOS-00210
+    - SV-230464r1017256_rule
+    - V-230464
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030580 | PATCH | Successful/unsuccessful uses of the kmod command in RHEL 8 must generate an audit record."
+  when: rhel8stig_030580
+  tags:
+    - RHEL-08-030580
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000471-GPOS-00216
+    - SRG-OS-000477-GPOS-00222
+    - SV-230465r1017257_rule
+    - V-230465
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030590 | PATCH | Successful/unsuccessful modifications to the faillock log file in RHEL 8 must generate an audit record."
+  when: rhel8stig_030590
+  tags:
+    - RHEL-08-030590
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000473-GPOS-00218
+    - SV-230466r1017258_rule
+    - V-230466
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030600 | PATCH | Successful/unsuccessful modifications to the lastlog file in RHEL 8 must generate an audit record."
+  when: rhel8stig_030600
+  tags:
+    - RHEL-08-030600
+    - CAT2
+    - CCI-000169
+    - NIST800-53R4_AU-12
+    - SRG-OS-000062-GPOS-00031
+    - SRG-OS-000037-GPOS-00015
+    - SRG-OS-000042-GPOS-00020
+    - SRG-OS-000392-GPOS-00172
+    - SRG-OS-000462-GPOS-00206
+    - SRG-OS-000471-GPOS-00215
+    - SRG-OS-000473-GPOS-00218
+    - SV-230467r1017259_rule
+    - V-230467
+    - auditd
+  ansible.builtin.debug:
+    msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
+  changed_when: true
+  notify: Update auditd
+
+- name: "MEDIUM | RHEL-08-030610 | PATCH | Audit file permissions"
+  when: rhel8stig_030610
+  tags:
+    - RHEL-08-030610
+    - CAT2
+    - permissions
+    - auditd
+  block:
+    - name: "MEDIUM | RHEL-08-030610 | AUDIT | Find custom audit rules"
+      ansible.builtin.find:
+        paths: /etc/audit/rules.d/
+        file_type: file
+        patterns: "*.rules"
+        recurse: false
+      register: discovered_custom_audit_rules
+      changed_when: false
+      check_mode: false
+
+    - name: "MEDIUM | RHEL-08-030610 | PATCH | Set audit file permissions"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: '0640'
+        owner: root
+        group: root
+      failed_when: discovered_custom_audit_rules_permissions.state not in '[ file, absent ]'
+      register: discovered_custom_audit_rules_permissions
+      loop:
+        - /etc/audit/rules.d/audit.rules
+        - /etc/audit/auditd.conf
+        - "{{ discovered_custom_audit_rules.files | map(attribute='path') | list }}"
+
+- name: "MEDIUM | RHEL-08-030620 | PATCH | RHEL 8 audit tools must have a mode of 0755 or less permissive."
+  when: rhel8stig_030620
+  tags:
+    - RHEL-08-030620
+    - CAT2
+    - CCI-001493
+    - NIST800-53R4_AU-9
+    - SRG-OS-000256-GPOS-00097
+    - SV-230472r1017263_rule
+    - V-230472
+    - permissions
+    - auditd
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: 'go-w'
+  loop: "{{ rhel8stig_audit_bins }}"
+
+- name: "MEDIUM | RHEL-08-030630 | PATCH | RHEL 8 audit tools must be owned by root."
+  when: rhel8stig_030630
+  tags:
+    - RHEL-08-030630
+    - CAT2
+    - CCI-001493
+    - NIST800-53R4_AU-9
+    - SRG-OS-000256-GPOS-00097
+    - SRG-OS-000257-GPOS-00098
+    - SRG-OS-000258-GPOS-00099
+    - SV-230473r1017264_rule
+    - V-230473
+    - permissions
+    - auditd
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+  loop: "{{ rhel8stig_audit_bins }}"
+
+- name: "MEDIUM | RHEL-08-030640 | PATCH | RHEL 8 audit tools must be group-owned by root."
+  when: rhel8stig_030640
+  tags:
+    - RHEL-08-030640
+    - CAT2
+    - CCI-001493
+    - NIST800-53R4_AU-9
+    - SRG-OS-000256-GPOS-00097
+    - SRG-OS-000257-GPOS-00098
+    - SRG-OS-000258-GPOS-00099
+    - SV-230474r1017265_rule
+    - V-230474
+    - permissions
+    - auditd
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: root
+  loop: "{{ rhel8stig_audit_bins }}"
+
+- name: "MEDIUM | RHEL-08-030650 | PATCH | RHEL 8 must use cryptographic mechanisms to protect the integrity of audit tools."
+  when: rhel8stig_030650
+  tags:
+    - RHEL-08-030650
+    - CAT2
+    - CCI-001496
+    - NIST800-53R4_AU-9
+    - SRG-OS-000278-GPOS-00108
+    - SV-230475r1017266_rule
+    - V-230475
+    - aide
+  ansible.builtin.lineinfile:
+    path: /etc/aide.conf
+    line: "{{ item }}"
+  loop:
+    - "# Audit Tools"
+    - /usr/sbin/auditctl p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/auditd p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/ausearch p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/aureport p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/autrace p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/rsyslogd p+i+n+u+g+s+b+acl+xattrs+sha512
+    - /usr/sbin/augenrules p+i+n+u+g+s+b+acl+xattrs+sha512
+
+- name: "MEDIUM | RHEL-08-030655 | PATCH | RHEL 8 must audit any script or executable called by cron as root or by any privileged user."
+  when: rhel8stig_030655
+  tags:
+    - RHEL-08-030655
+    - CAT2
+    - CCI-000172
+    - NIST800-53R4_AU-12
+    - SRG-OS-000471-GPOS-00215
+    - SV-274877r1106148_rule
+    - V-274877
+    - cron
+  notify: Update auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/rules.d/50_cron.rules
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+    create: true
+    mode: 'u-x,go-rwx'
+    owner: root
+    group: root
+  loop:
+    - { regexp: '^-w\s+/etc/cron\.d/?\s+-p\s+wa\s+-k\s+cronjobs', line: "-w /etc/cron.d/ -p wa -k cronjobs" }
+    - { regexp: '^-w\s+/var/spool/cron/?\s+-p\s+wa\s+-k\s+cronjobs', line: "-w /var/spool/cron/ -p wa -k cronjobs" }
+
+- name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility."
+  when: rhel8stig_030660
+  tags:
+    - RHEL-08-030660
+    - CAT2
+    - CCI-001849
+    - NIST800-53R4_AU-4
+    - SRG-OS-000341-GPOS-00132
+    - SV-230476r958752_rule
+    - V-230476
+    - auditd
+  vars:
+    warn_control_id: "MEDIUM | RHEL-08-030660"
+  block:
+    - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
+      ansible.builtin.shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_path
+
+    - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get size of audit log partition"
+      ansible.builtin.command: "df -h {{ discovered_audit_log_path.stdout }}"
+      changed_when: false
+      failed_when: false
+      register: discovered_audit_log_partition
+
+    - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
+      ansible.builtin.debug:
+        msg:
+          - "WARNING!! Below is the path and size of the partiion for the audit logs. Please make sure there is enough disk space for logs and logs are on their own partition"
+          - "Path: {{ discovered_audit_log_path.stdout }}"
+          - "Disk Space: {{ discovered_audit_log_partition.stdout }}"
+
+    - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Message out partition size"
+      ansible.builtin.import_tasks:
+        file: warning_facts.yml
+
+- name: "MEDIUM | RHEL-08-030670 | PATCH |  RHEL 8 must have the packages required for offloading audit logs installed."
+  when: rhel8stig_030670
+  tags:
+    - RHEL-08-030670
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230477r1017267_rule
+    - V-230477
+    - rsyslog
+  ansible.builtin.package:
+    name: rsyslog
+    state: present
+
+- name: "MEDIUM | RHEL-08-030680 | PATCH | RHEL 8 must have the packages required for encrypting offloaded audit logs installed."
+  when: rhel8stig_030680
+  tags:
+    - RHEL-08-030680
+    - CAT2
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230478r1017268_rule
+    - V-230478
+    - gnutls
+    - rsyslog
+  ansible.builtin.package:
+    name: rsyslog-gnutls
+    state: present
+
+- name: "MEDIUM | RHEL-08-030690 | PATCH | The RHEL 8 audit records must be off-loaded onto a different system or storage media from the system being audited."
+  when: rhel8stig_030690
+  tags:
+    - RHEL-08-030690
+    - CAT2
+    - CCI-001851
+    - NIST800-53R4_AU-4
+    - SRG-OS-000342-GPOS-00133
+    - SRG-OS-000479-GPOS-00224
+    - SV-230479r958754_rule
+    - V-230479
+    - auditd
+    - rsyslog
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^.*\@\@'
+    line: "*.* {{ rhel8stig_remotelog_server.protocol }}{{ rhel8stig_remotelog_server.server }}:{{ rhel8stig_remotelog_server.port }}"
+
+- name: "MEDIUM | RHEL-08-030700 | PATCH | RHEL 8 must take appropriate action when the internal event queue is full."
+  when: rhel8stig_030700
+  tags:
+    - RHEL-08-030700
+    - CAT2
+    - CCI-001851
+    - NIST800-53R4_CM-6
+    - SRG-OS-000342-GPOS-00133
+    - SRG-OS-000479-GPOS-00224
+    - SV-230480r958754_rule
+    - V-230480
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^overflow_action ='
+    line: 'overflow_action = {{ rhel8stig_audisp_overflow_action }}'
+  notify: Restart auditd
+
+- name: "MEDIUM | RHEL-08-030710 | PATCH | RHEL 8 must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
+  when: rhel8stig_030710
+  tags:
+    - RHEL-08-030710
+    - CAT2
+    - CCI-001851
+    - NIST800-53R4_CM-6
+    - SRG-OS-000342-GPOS-00133
+    - SRG-OS-000479-GPOS-00224
+    - SV-230481r958754_rule
+    - V-230481
+    - auditd
+    - rsyslog
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^\$DefaultNetstreamDriver', line: '$DefaultNetstreamDriver gtls' }
+    - { regexp: '^\$ActionSendStreamDriverMode', line: '$ActionSendStreamDriverMode 1' }
+
+- name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
+  when: rhel8stig_030720
+  tags:
+    - rhel8stig_030720
+    - CAT2
+    - CCI-001851
+    - NIST800-53R4_AU-4
+    - SRG-OS-000342-GPOS-00133
+    - SRG-OS-000479-GPOS-00224
+    - SV-230482r958754_rule
+    - V-230482
+    - auditd
+    - rsyslog
+  ansible.builtin.lineinfile:
+    path: /etc/rsyslog.conf
+    regexp: '^\$ActionSendStreamDriverAuthMode'
+    line: "$ActionSendStreamDriverAuthMode x509/name"
+  notify: Restart auditd
+
+- name: "MEDIUM | RHEL-08-030730 | PATCH | RHEL 8 must take action when allocated audit record storage volume reaches 75 percent of the repository maximum audit record storage capacity."
+  when: rhel8stig_030730
+  tags:
+    - RHEL-08-030730
+    - CAT2
+    - CCI-001855
+    - NIST800-53R4_AU-5
+    - SRG-OS-000343-GPOS-00134
+    - SV-230483r971542_rule
+    - V-230483
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: (?i)^#?\s*space_left\s*='
+    line: 'space_left = 25%'
+
+- name: "MEDIUM | RHEL-08-030731 | PATCH | RHEL 8 must notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when allocated audit record storage volume 75 percent utilization."
+  when: rhel8stig_030731
+  tags:
+    - RHEL-08-030731
+    - CAT2
+    - CCI-001855
+    - NIST800-53R4_AU-5
+    - SRG-OS-000343-GPOS-00134
+    - SV-244543r971542_rule
+    - V-244543
+    - auditd
+  ansible.builtin.lineinfile:
+    path: /etc/audit/auditd.conf
+    regexp: '^space_left_action ='
+    line: 'space_left_action = EMAIL'
+
+- name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
+  when:
+    - rhel8stig_030740
+    - "'chrony' in ansible_facts.packages"
+  tags:
+    - RHEL-08-030740
+    - CAT2
+    - CCI-001891
+    - NIST800-53R4_AU-8
+    - SRG-OS-000355-GPOS-00143
+    - SRG-OS-000356-GPOS-00144
+    - SRG-OS-000359-GPOS-00146
+    - SV-230484r1017382_rule
+    - V-230484
+    - chrony
+  ansible.builtin.lineinfile:
+    path: /etc/chrony.conf
+    regexp: '^server'
+    line: 'server {{ rhel8stig_ntp_server_name }} iburst maxpoll 16'
+  notify: Restart {{ rhel8stig_time_service }}

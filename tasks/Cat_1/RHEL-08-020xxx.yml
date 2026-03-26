@@ -1,0 +1,52 @@
+---
+
+- name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
+  when:
+    - rhel8stig_020330
+    - rhel8stig_disruption_high
+    - rhel8stig_ssh_required
+  tags:
+    - RHEL-08-020330
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-230380r1017191_rule
+    - V-230380
+    - disruption_high
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: (?i)^#?\s*PermitEmptyPasswords
+    line: 'PermitEmptyPasswords no'
+    validate: '/usr/sbin/sshd -T -f %s'
+  notify: Restart sshd
+
+- name: "HIGH | RHEL-08-020331 | PATCH | RHEL 8 must not allow blank or null passwords in the system-auth file."
+  when: rhel8stig_020331
+  tags:
+    - RHEL-08-020331
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-268322r1017568_rule
+    - V-244540
+  ansible.builtin.replace:
+    path: /etc/pam.d/system-auth
+    regexp: ' nullok'
+    replace: ''
+
+- name: "HIGH | RHEL-08-020332 | PATCH | RHEL 8 must not allow blank or null passwords in the password-auth file."
+  when: rhel8stig_020332
+  tags:
+    - RHEL-08-020332
+    - CAT1
+    - CCI-000366
+    - NIST800-53R4_CM-6
+    - SRG-OS-000480-GPOS-00227
+    - SV-244541r1017347_rule
+    - V-244541
+  ansible.builtin.replace:
+    path: /etc/pam.d/password-auth
+    regexp: ' nullok'
+    replace: ''

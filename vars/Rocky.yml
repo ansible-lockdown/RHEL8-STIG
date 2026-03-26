@@ -1,9 +1,6 @@
 ---
 
-gpg_keys:
-    - name: 'Release Engineering'
-      packager: "infrastructure@rockylinux.org"
-      fingerprint: "7051 C470 A929 F454 CEBE  37B7 15AF 5DAC 6D74 5A60"
-
+os_gpg_key_pubkey_name: gpg-pubkey-6d745a60-60287f36  # pragma: allowlist secret
+os_gpg_key_pubkey_content: "Release Engineering <infrastructure@rockylinux.org> 6d745a60"
 gpg_package: rocky-gpg-keys
 rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial

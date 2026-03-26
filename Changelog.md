@@ -1,5 +1,45 @@
 # Changes to RHEL8STIG
 
+## 5.0.0 STIG v2r4
+
+RuleIDs updated for listed controls after changes
+
+- RHEL-08-010330, RHEL-08-010340, RHEL-08-010350
+- Added “/usr/lib64” to Check and Fix Text paths.
+- RHEL-08-010380 - Updated sudoers “NOPASSWD” Check Text command.
+- RHEL-08-010381 - Updated Check Text command to split the search for “NOPASSWD” and “!authenticate”
+- RHEL-08-010382 - Updated sudoers “ALL” Check Text command.
+- RHEL-08-010741 - Updated finding text.
+- RHEL-08-030610 - Adjusted to change rules.d file thanks to @platymatt
+- RHEL-08-030655 - Added requirement to audit any script or executable called by cron as root or by any privileged user.
+- RHEL-08-040030 - Updated Check command.
+- RHEL-08-040310 - Updated the Discussion to include “aide.conf” monitoring explanation and updated the Check to require the SA to review the “aide.conf” manually.
+- QA Linting Fixes
+- Revamp 08-01010
+- Removed boot_partition premlim var
+
+## STIG v2r3
+
+Complete lint update
+Updated handlers to start with upper case
+separated controls to group numbers
+removed conditionals if pkg - to give OK instead of skipped
+separated many control to their own task
+Added warning list to end of play
+Renamed control variables to correct format
+auditd logic updated
+sssd prelim warning now added to warning summary
+bootloader - 010020 UUID logic updated
+010423 fixed and 010660 updated
+audit alignment
+mount logic rewrite
+- RHEL-08-101030 - Moved to CAT1
+- RHEL-08-010296 - Added Client ssh MACs control.
+- RHEL-08-010297 - Added Client ssh Cipher control.
+- RHEL-08-010455 - Added requirement.
+- RHEL-08-020103 - removed
+- RHEL-08-020104 - removed
+
 ## STIG v2r2
 
 RuleIDs updated for listed controls after changes in control
@@ -158,7 +198,7 @@ Controls updated
   - 010290 - ruleid and SSH MACS updated
   - 010291 - ruleid and SSH Ciphers updated
   - 010770 - ruleid
-  - 020035 - new control idlesession timeout new var rhel_08_020035_idlesessiontimeout
+  - 020035 - new control idlesession timeout new var idlesessiontimeout
   - 020041 - ruleid and tmux script update
   - 030690 - ruleid and protocol options added
   - 040159 - ruleid

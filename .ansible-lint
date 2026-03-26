@@ -1,26 +1,8 @@
 ---
 
-parseable: true
 quiet: true
 skip_list:
-    - 'schema'
-    - 'no-changed-when'
-    - 'var-spacing'
-    - 'experimental'
-    - 'name[play]'
-    - 'name[casing]'
-    - 'name[template]'
-    - 'key-order[task]'
-    - 'tag[no-duplicate]'
-    - '204'
-    - '305'
-    - '303'
-    - '403'
-    - '306'
-    - '602'
-    - '208'
-    - 'tag[no-duplicate]'
+  - 'package-latest'
+  - 'risky-shell-pipe'
 use_default_rules: true
-rulesdir:
-    - ./rules/
 verbosity: 0
