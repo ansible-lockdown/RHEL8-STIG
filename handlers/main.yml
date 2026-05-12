@@ -158,7 +158,7 @@
 - name: Confirm grub2 user cfg
   ansible.builtin.stat:
     path: "/etc/grub.d/01_users"
-  changed_when: discovered_grub2_user_cfg.stat.exists
+  changed_when: discovered_grub2_user_cfg.stat. is defined
   register: discovered_grub2_user_cfg
   listen: Make grub2 config
 
