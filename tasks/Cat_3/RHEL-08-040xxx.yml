@@ -15,6 +15,7 @@
     - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
       ansible.builtin.shell: grep -i cmdline /etc/default/grub | grep pti=on
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_pti_grub_cmdline_linux
 
@@ -32,7 +33,7 @@
     - CCI-000381
     - NIST800-53R4_CM-7
     - SRG-OS-000095-GPOS-00049
-    - SV-230494r1017277_rule
+    - SV-230494r1069310_rule
     - V-230494
     - modprobe
     - atm
