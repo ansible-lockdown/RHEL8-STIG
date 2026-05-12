@@ -35,6 +35,7 @@
       when: rhel8stig_epel_required
       ansible.builtin.command: dnf repolist | grep epel
       changed_when: false
+      check_mode: false
       failed_when: discovered_epel_repos.rc not in [0, 1]
       register: discovered_epel_repos
 
@@ -85,6 +86,7 @@
     - name: "HIGH | RHEL-08-040171 | AUDIT | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed. | Check for setting existing"
       ansible.builtin.command: grep -r logout /etc/dconf/db/local.d/*
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_gui_logout_settings_status
 
@@ -174,6 +176,7 @@
     - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
       ansible.builtin.shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_nonroot_uid
 

@@ -156,6 +156,7 @@
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
       register: discovered_auditlog_location_auditd
       changed_when: false
+      check_mode: false
 
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | check file exists"
       ansible.builtin.stat:
@@ -188,6 +189,7 @@
     - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_file
 
@@ -236,6 +238,7 @@
     - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_dir_owner
 
@@ -267,6 +270,7 @@
     - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_dir_group_owner
 
@@ -297,6 +301,7 @@
     - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_dir_perms
 
@@ -550,7 +555,7 @@
 - name: "MEDIUM | RHEL-08-030180 | PATCH | The RHEL 8 audit package must be installed."
   when: rhel8stig_030180
   tags:
-    - rhel8stig_030180
+    - RHEL-08-030180
     - CAT2
     - CCI-000169
     - NIST800-53R4_AU-12
@@ -1389,6 +1394,11 @@
   tags:
     - RHEL-08-030610
     - CAT2
+    - CCI-000171
+    - NIST800-53R4_AU-12
+    - SRG-OS-000256-GPOS-00097
+    - SV-230471r1069296_rule
+    - V-230471
     - permissions
     - auditd
   block:
@@ -1504,7 +1514,7 @@
     - CCI-000172
     - NIST800-53R4_AU-12
     - SRG-OS-000471-GPOS-00215
-    - SV-274877r1106148_rule
+    - SV-274877r1155381_rule
     - V-274877
     - cron
   notify: Update auditd
@@ -1538,12 +1548,14 @@
     - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
       ansible.builtin.shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_path
 
     - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get size of audit log partition"
       ansible.builtin.command: "df -h {{ discovered_audit_log_path.stdout }}"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_audit_log_partition
 
@@ -1649,13 +1661,13 @@
 - name: "MEDIUM | RHEL-08-030720 | PATCH | RHEL 8 must authenticate the remote logging server for off-loading audit logs."
   when: rhel8stig_030720
   tags:
-    - rhel8stig_030720
+    - RHEL-08-030720
     - CAT2
     - CCI-001851
     - NIST800-53R4_AU-4
     - SRG-OS-000342-GPOS-00133
     - SRG-OS-000479-GPOS-00224
-    - SV-230482r958754_rule
+    - SV-230482r1069330_rule
     - V-230482
     - auditd
     - rsyslog
@@ -1709,7 +1721,7 @@
     - SRG-OS-000355-GPOS-00143
     - SRG-OS-000356-GPOS-00144
     - SRG-OS-000359-GPOS-00146
-    - SV-230484r1017382_rule
+    - SV-230484r1038944_rule
     - V-230484
     - chrony
   ansible.builtin.lineinfile:

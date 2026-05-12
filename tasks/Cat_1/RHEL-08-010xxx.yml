@@ -50,12 +50,14 @@
     - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS"
       ansible.builtin.command: update-crypto-policies --show
       changed_when: false
+      check_mode: false
       failed_when: discovered_crypto_policies_status_show.rc not in [0, 1]
       register: discovered_crypto_policies_status_show
 
     - name: "HIGH | RHEL-08-010020 | AUDIT | RHEL 8 must implement a FIPS 140-3-compliant systemwide cryptographic policy. | Check FIPS mode on kernel"
       ansible.builtin.command: grep -Ew 'min_rsa_size|hash ' /etc/crypto-policies/state/CURRENT.pol
       changed_when: false
+      check_mode: false
       failed_when: discovered_fips_current_policy_status.rc not in [0, 1]
       register: discovered_fips_current_policy_status
 
@@ -71,6 +73,7 @@
       when: "'FIPS' not in discovered_crypto_policies_status_show.stdout"
       ansible.builtin.command: update-crypto-policies --set FIPS:STIG
       changed_when: false
+      check_mode: false
       register: discovered_fips_status
       notify: Change_requires_reboot
 
@@ -92,6 +95,7 @@
     - name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Get partition layout"
       ansible.builtin.shell: lsblk  | grep -Ev "boot|crypto_LUKS"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_partition_layout
 
@@ -126,6 +130,7 @@
       changed_when: false
       failed_when: false
       check_mode: false
+      no_log: true
       register: discovered_no_pw_users
 
     - name: "HIGH | RHEL-08-010121 | PATCH | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Warn on accounts with no passwords"
@@ -167,8 +172,8 @@
     - CCI-000213
     - NIST800-53R4_AC-3
     - SRG-OS-000080-GPOS-00048
-    - SV-230234r1017053_rule
-    - SV-230235r1017054_rule
+    - SV-230234r1137691_rule
+    - SV-230235r1137691_rule
     - V-230234
     - V-230235
     - grub
@@ -201,6 +206,7 @@
     - name: "HIGH | RHEL-08-010270 | AUDIT | RHEL 8 cryptographic policy must not be overridden. | Check FIPS"
       ansible.builtin.command: update-crypto-policies --is-applied
       changed_when: false
+      check_mode: false
       failed_when: discovered_crypto_policies_status_applied.rc not in [0, 1]
       register: discovered_crypto_policies_status_applied
 
@@ -288,6 +294,7 @@
     - name: "HIGH | RHEL-08-010470 | AUDIT | There must be no .shosts files on the RHEL 8 operating system. | Find .shosts files"
       ansible.builtin.command: find / -name "*.shosts"
       changed_when: false
+      check_mode: false
       failed_when: discovered_shost_file_list.rc not in [ 0, 1 ]
       register: discovered_shost_file_list
 

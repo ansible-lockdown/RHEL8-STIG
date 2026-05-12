@@ -32,6 +32,7 @@
     - name: "MEDIUM | RHEL-08-010019 | PATCH | RHEL 8 must ensure cryptographic verification of vendor software packages. | find keys"
       ansible.builtin.shell: "rpm -qa | grep {{ os_gpg_key_pubkey_name }}" # noqa: command-instead-of-module
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_os_installed_pub_keys
 
@@ -39,6 +40,7 @@
       when: discovered_os_installed_pub_keys.rc == 0
       ansible.builtin.shell: 'rpm -q --queryformat "%{PACKAGER} %{VERSION}\\n" {{ os_gpg_key_pubkey_name }} | grep "{{ os_gpg_key_pubkey_content }}"' # noqa: command-instead-of-module
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_os_gpg_key_check
 
@@ -67,7 +69,7 @@
     - NIST800-53R4_AC-8
     - SRG-OS-000023-GPOS-00006
     - SRG-OS-000228-GPOS-00088
-    - SV-230225r1017044_rule
+    - SV-230225r1069297_rule
     - V-230225
   ansible.builtin.lineinfile:
     path: /etc/ssh/sshd_config
@@ -109,7 +111,7 @@
     - NIST800-53R4_AC-8
     - SRG-OS-000023-GPOS-00006
     - SRG-OS-000228-GPOS-00088
-    - SV-230226r1017045_rule
+    - SV-230226r1069298_rule
     - V-230226
   ansible.builtin.copy: # noqa: template-instead-of-copy
     dest: /etc/dconf/db/local.d/01-banner-message
@@ -154,7 +156,7 @@
     - CCI-000067
     - NIST800-53R4_AC-17
     - SRG-OS-000032-GPOS-00013
-    - SV-230228r1017047_rule
+    - SV-230228r1069299_rule
     - V-230228
     - rsyslog
   ansible.builtin.lineinfile:
@@ -184,6 +186,7 @@
     - name: "MEDIUM | RHEL-08-010090 | AUDIT | RHEL 8, for PKI-based authentication, must validate certificates by constructing a certification path (which includes status information) to an accepted trust anchor. | Get current certs"
       ansible.builtin.command: openssl x509 -text -in /etc/sssd/pki/sssd_auth_ca_db.pem
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_certs_list
 
@@ -208,7 +211,7 @@
     - CCI-000186
     - NIST800-53R4_IA-5
     - SRG-OS-000067-GPOS-00035
-    - SV-230230r1017049_rule
+    - SV-230230r1069287_rule
     - V-230230
     - sshd
   block:
@@ -258,7 +261,9 @@
     - name: "MEDIUM | RHEL-08-010120 | AUDIT | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Get user accounts not using FIPS 140-2 hashing"
       ansible.builtin.shell: 'cat /etc/shadow | grep -v "*" | grep -v "!" | grep -v ":$6$" | cut -f1 -d:'
       changed_when: false
+      check_mode: false
       failed_when: false
+      no_log: true
       register: discovered_non_fips_hashed_accounts
 
     - name: "MEDIUM | RHEL-08-010120 | PATCH | RHEL 8 must employ FIPS 140-2 approved cryptographic hashing algorithms for all stored passwords. | Lock user not using FIPS 140-2 hashing"
@@ -315,8 +320,8 @@
     - CCI-000213
     - NIST800-53R4_AC-3
     - SRG-OS-000080-GPOS-00048
-    - SV-244521r1017327_rule
-    - SV-244522r1017328_rule
+    - SV-244521r1137691_rule
+    - SV-244522r1137691_rule
     - V-244521
     - V-244522
     - grub
@@ -336,7 +341,7 @@
     - CCI-000213
     - NIST800-53R4_AC-3
     - SRG-OS-000080-GPOS-00048
-    - SV-230236r1017055_rule
+    - SV-230236r1137691_rule
     - V-230236
     - systemd
   ansible.builtin.lineinfile:
@@ -356,7 +361,7 @@
     - CCI-000213
     - NIST800-53R4_AC-3
     - SRG-OS-000080-GPOS-00048
-    - SV-244523r1017329_rule
+    - SV-244523r1137691_rule
     - V-244523
     - systemd
   ansible.builtin.lineinfile:
@@ -421,6 +426,7 @@
     - name: "MEDIUM | RHEL-08-010161 | AUDIT | RHEL 8 must prevent system daemons from using Kerberos for authentication. | Find .keytab files"
       ansible.builtin.command: find / -name *.keytab
       changed_when: false
+      check_mode: false
       failed_when: discovered_keytab_files.rc not in [ 0, 1 ]
       register: discovered_keytab_files
 
@@ -489,13 +495,14 @@
     - CCI-001090
     - NIST800-53R4_SC-4
     - SRG-OS-000138-GPOS-00069
-    - SV-230243r1017061_rule
+    - SV-230243r1137695_rule
     - V-230243
     - permissions
   block:
     - name: "MEDIUM | RHEL-08-010190 | AUDIT | A sticky bit must be set on all RHEL 8 public directories to prevent unauthorized and unintended information transferred via shared system resources. | Find world-writable directories"
       ansible.builtin.shell: "find / -xdev -type d \\( -perm -0002 -a ! -perm -1000 \\) -print 2>/dev/null | sed 's/.* //'"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_world_writable_files
 
@@ -602,7 +609,7 @@
     - CCI-001314
     - NIST800-53R4_SI-11
     - SRG-OS-000206-GPOS-00084
-    - SV-230248r1017066_rule
+    - SV-230248r1069291_rule
     - V-230248
     - permissions
   ansible.builtin.file:
@@ -704,6 +711,7 @@
     - name: "MEDIUM | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
       ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
       changed_when: false
+      check_mode: false
       failed_when: discovered_current_macs.rc not in [ 0, 1 ]
       register: discovered_current_macs
 
@@ -734,6 +742,7 @@
     - name: "MEDIUM | RHEL-08-010291 | AUDIT | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | get Ciphers"
       ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
       changed_when: false
+      check_mode: false
       register: discovered_current_ciphers
 
     - name: "MEDIUM | RHEL-08-010291 | PATCH | The RHEL 8 operating system must implement DoD-approved encryption to protect the confidentiality of SSH server connections. | Apply Ciphers"
@@ -796,6 +805,7 @@
     - name: "MEDIUM | RHEL-08-010300 | AUDIT | RHEL 8 system commands must have mode 755 or less permissive."
       ansible.builtin.shell: find -L /bin /sbin /usr/bin /usr/sbin /usr/libexec /usr/local/bin /usr/local/sbin -perm /022 -type f -exec ls -l {} \; | awk '{ print $NF}'
       changed_when: false
+      check_mode: false
       failed_when: discovered_system_command_permissions.rc not in [ 0, 1 ]
       register: discovered_system_command_permissions
 
@@ -820,6 +830,7 @@
     - name: "MEDIUM | RHEL-08-010310 | AUDIT | RHEL 8 system commands must be owned by root."
       ansible.builtin.shell: find -L /bin /sbin /usr/bin /usr/sbin /usr/libexec /usr/local/bin /usr/local/sbin ! -user root -exec ls {} \;
       changed_when: false
+      check_mode: false
       failed_when: discovered_sys_commands_owner.rc not in [ 0, 1 ]
       register: discovered_sys_commands_owner
 
@@ -848,6 +859,7 @@
     - name: "MEDIUM | RHEL-08-010320 | AUDIT | RHEL 8 system commands must be group-owned by root or a system account."
       ansible.builtin.shell: find -L /bin /sbin /usr/bin /usr/sbin /usr/local/bin /usr/local/sbin ! \( -group root -o -group tty \) -exec ls -l {} \;
       changed_when: false
+      check_mode: false
       failed_when: discovered_sys_commands_group.rc not in [ 0, 1 ]
       register: discovered_sys_commands_group
 
@@ -879,6 +891,7 @@
     - name: "MEDIUM | RHEL-08-010330 | AUDIT | RHEL 8 library files must have mode 755 or less permissive."
       ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -perm /022 -type f -exec ls -l {} \; | awk '{ print $NF}'
       changed_when: false
+      check_mode: false
       failed_when: discovered_library_file_perms.rc not in [ 0, 1 ]
       register: discovered_library_file_perms
 
@@ -905,6 +918,7 @@
     - name: "MEDIUM | RHEL-08-010331 | AUDIT | RHEL 8 library directories must have mode 755 or less permissive."
       ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -perm /022 -type d -exec ls -l {} \; | awk '{ print $NF}'
       changed_when: false
+      check_mode: false
       failed_when: discovered_library_directory_perms.rc not in [ 0, 1 ]
       register: discovered_library_directory_perms
 
@@ -928,6 +942,7 @@
     - name: "MEDIUM | RHEL-08-010340 | AUDIT | RHEL 8 library files must be owned by root."
       ansible.builtin.command: find -L /lib /lib64 /usr/lib /usr/lib64 -type f -name "*.so*" ! -user root
       changed_when: false
+      check_mode: false
       failed_when: discovered_lib_files_owner.rc not in [ 0, 1 ]
       register: discovered_lib_files_owner
 
@@ -973,6 +988,7 @@
     - name: "MEDIUM | RHEL-08-010350 | AUDIT | RHEL 8 library files must be group-owned by root."
       ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -type f -name "*.so*" ! -group root
       changed_when: false
+      check_mode: false
       failed_when: discovered_lib_files_group.rc not in [ 0, 1 ]
       register: discovered_lib_files_group
 
@@ -1008,8 +1024,8 @@
     - CAT2
     - CCI-001499
     - SRG-OS-000259-GPOS-00100
-    - SV-257923r1044991_rule
-    - V-257923
+    - SV-251709r1017364_rule
+    - V-251709
     - NIST800-53R4_CM-5
   vars:
     warn_control_id: "MEDIUM | RHEL-08-010351"
@@ -1017,6 +1033,7 @@
     - name: "MEDIUM | RHEL-08-010351 | AUDIT | RHEL 8 library directories must be group-owned by root or a system account."
       ansible.builtin.shell: find -L /lib /lib64 /usr/lib /usr/lib64 -uid +1000 -type d -exec ls {} \;
       changed_when: false
+      check_mode: false
       failed_when: discovered_lib_dirs_group.rc not in [ 0, 1 ]
       register: discovered_lib_dirs_group
 
@@ -1040,7 +1057,7 @@
     - CCI-001744
     - NIST800-53R4_CM-3
     - SRG-OS-000363-GPOS-00150
-    - SV-256974r1017374_rule
+    - SV-256974r1069321_rule
     - V-256974
     - mailx
   ansible.builtin.package:
@@ -1124,6 +1141,7 @@
     - name: "MEDIUM | RHEL-08-010372 | AUDIT | RHEL 8 must prevent the loading of a new kernel for later execution. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "kernel.kexec_load_disabled = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_conflicting_kernel_settings
 
@@ -1155,6 +1173,7 @@
     - name: "MEDIUM | RHEL-08-010373 | AUDIT | RHEL 8 must enable kernel parameters to enforce discretionary access control on symlinks. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "fs.protected_symlinks = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_conflicting_symlink_settings
 
@@ -1195,6 +1214,7 @@
     - name: "MEDIUM | RHEL-08-010374 | AUDIT | RHEL 8 must enable kernel parameters to enforce discretionary access control on hardlinks. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "fs.protected_hardlinks = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_hardlink_conflicting_settings
 
@@ -1291,6 +1311,7 @@
     - name: "MEDIUM | RHEL-08-010382 | AUDIT | RHEL 8 must restrict privilege elevation to authorized personnel. | Get ALL settings"
       ansible.builtin.shell: grep -iws 'ALL' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_sudoers_all
 
@@ -1329,6 +1350,7 @@
     - name: "MEDIUM | RHEL-08-010383 | AUDIT | RHEL 8 must use the invoking user's password for privilege escalation when using sudo. | Get privilege escalation"
       ansible.builtin.shell: egrep -is '(!rootpw|!targetpw|!runaspw)' /etc/sudoers /etc/sudoers.d/* | grep -v '#' | cut -d ':' -f1 | sort --uniq
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_sudo_priv_escalation
 
@@ -1380,13 +1402,14 @@
     - CCI-002038
     - NIST800-53R4_IA-11
     - SRG-OS-000373-GPOS-00156
-    - SV-237643r1017325_rule
+    - SV-237643r1050789_rule
     - V-237643
     - sudo
   block:
     - name: "MEDIUM | RHEL-08-010384 | AUDIT | RHEL 8 must require re-authentication when using the sudo command. | Get files with timeout set"
       ansible.builtin.shell: grep -is 'timestamp_timeout' /etc/sudoers /etc/sudoers.d/* | cut -d":" -f1 | uniq | sort
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_sudo_timeout_files
 
@@ -1417,7 +1440,7 @@
     - SRG-OS-000373-GPOS-00156
     - SRG-OS-000373-GPOS-00157
     - SRG-OS-000373-GPOS-00158
-    - SV-251712r1017383_rule
+    - SV-251712r1050789_rule
     - V-251712
   ansible.builtin.lineinfile:
     path: /etc/pam.d/sudo
@@ -1498,6 +1521,7 @@
     - name: "MEDIUM | RHEL-08-010420 | AUDIT | RHEL 8 must implement non-executable data to protect its memory from unauthorized code execution. | Get NX bit state"
       ansible.builtin.shell: dmesg |grep "NX ("
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_nx_bit_state
 
@@ -1528,6 +1552,7 @@
     - name: "MEDIUM | RHEL-08-010421 | AUDIT | RHEL 8 must clear the page allocator to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
       ansible.builtin.shell: grep -iE grub_cmdline_linux /etc/default/grub | grep page_poison=1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_page_poison_grub_cmdline_linux
 
@@ -1555,6 +1580,7 @@
     - name: "MEDIUM | RHEL-08-010422 | AUDIT | RHEL 8 must disable virtual syscalls. | Get GRUB_CMDLINE_LINUX settings"
       ansible.builtin.shell: grep -iE grub_cmdline_linux /etc/default/grub | grep vsyscall=none
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_vsyscall_grub_cmdline_linux
 
@@ -1575,13 +1601,14 @@
     - NIST800-53R4_SC-3
     - SRG-OS-000134-GPOS-00068
     - SRG-OS-000433-GPOS-00192
-    - SV-230279r1017092_rule
+    - SV-230279r1069286_rule
     - V-230279
     - grub
   block:
     - name: "MEDIUM | RHEL-08-010423 | AUDIT | RHEL 8 must clear memory when it is freed to prevent use-after-free attacks. | Get GRUB_CMDLINE_LINUX settings"
       ansible.builtin.shell: grep -i "grub_cmdline_linux" /etc/default/grub | grep init_on_free=1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_init_grub_cmdline_linux
 
@@ -1608,6 +1635,7 @@
     - name: " MEDIUM | RHEL-08-010430 | AUDIT | RHEL 8 must implement address space layout randomization (ASLR) to protect its memory from unauthorized code execution. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "kernel.randomize_va_space = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_aslr_conflicting_settings
 
@@ -1688,6 +1716,7 @@
     - name: "MEDIUM | RHEL-08-010480 | AUDIT | The RHEL 8 SSH public host key files must have mode 0644 or less permissive. | Find files"
       ansible.builtin.shell: find /etc/ssh -name ssh_host*_key.pub
       changed_when: false
+      check_mode: false
       failed_when: discovered_public_ssh_keys.rc not in [ 0, 1 ]
       register: discovered_public_ssh_keys
 
@@ -1716,6 +1745,7 @@
     - name: "MEDIUM | RHEL-08-010490 | AUDIT | The RHEL 8 SSH private host key files must have mode 0640 or less permissive. | Find files"
       ansible.builtin.shell: find /etc/ssh -name ssh_host*_key
       changed_when: false
+      check_mode: false
       failed_when: discovered_private_ssh_keys.rc not in [ 0, 1 ]
       register: discovered_private_ssh_keys
 
@@ -2216,7 +2246,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230308r1017118_rule
+    - SV-230308r1155390_rule
     - V-230308
     - mounts
     - nfs
@@ -2261,6 +2291,7 @@
     - name: "MEDIUM | RHEL-08-010671 | AUDIT | RHEL 8 must disable the kernel.core_pattern."
       ansible.builtin.shell: grep -rsP 'kernel.core_pattern\s*=\s*.*(?<!\|\/bin\/false)$' /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_kernel_core_settings
 
@@ -2402,7 +2433,7 @@
 
     - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf if dns is set in nsswitch.conf"
       when:
-        - not rhel8_stig_use_resolv_template
+        - not rhel8stig_use_resolv_template
         - discovered_networkmanager_status.stdout == '0'
         - discovered_nameserver_count.stdout | int >= 2
       ansible.builtin.lineinfile:
@@ -2417,7 +2448,7 @@
     - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | Set resolv.conf using a template when not NetworkManager controlled"
       when:
         - discovered_networkmanager_status.stdout == '0'
-        - rhel8_stig_use_resolv_template
+        - rhel8stig_use_resolv_template
       ansible.builtin.template:
         src: resolv.conf.j2
         dest: /etc/resolv.conf
@@ -2428,14 +2459,14 @@
     - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | If networkmanager is setting resolv.conf, debug msg to audit/change DNS settings in dhcp."
       when:
         - discovered_networkmanager_status.stdout != '0' or rhel8stig_010680_nameserver_count.stdout| int < 2
-        - not rhel8_stig_use_resolv_template
+        - not rhel8stig_use_resolv_template
       ansible.builtin.debug:
         msg: "The file /etc/resolv.conf is managed by network manager and/or shows less than two DNS servers configured. Please correct this in your DHCP configurations."
 
     - name: "MEDIUM | RHEL-08-010680 | PATCH | For RHEL 8 systems using Domain Name Servers (DNS) resolution, at least two name servers must be configured. | If networkmanager is setting resolv.conf, debug msg to audit/change DNS settings in dhcp."
       when:
         - discovered_networkmanager_status.stdout != '0' or rhel8stig_010680_nameserver_count.stdout| int < 2
-        - not rhel8_stig_use_resolv_template
+        - not rhel8stig_use_resolv_template
       ansible.builtin.import_tasks:
         file: warning_facts.yml
 
@@ -2458,6 +2489,7 @@
       with_items: "{{ discovered_interactive_users_home.stdout_list }}"
       register: discovered_ini_path_grep_list
       changed_when: false
+      check_mode: false
       failed_when: false
 
     - name: "MEDIUM | RHEL-08-010690 | PATCH | Executable search paths within the initialization files of all local interactive RHEL 8 users must only contain paths that resolve to the system default or the users home directory."
@@ -2480,13 +2512,14 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230318r1017129_rule
+    - SV-230318r1155352_rule
     - V-230318
     - permissions
   block:
     - name: "MEDIUM | RHEL-08-010700 | AUDIT | All RHEL 8 world-writable directories must be owned by root, sys, bin, or an application group. | Get directories"
       ansible.builtin.command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -uid +999
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_worldwide_dir_owners
 
@@ -2514,6 +2547,7 @@
     - name: "MEDIUM | RHEL-08-010710 | AUDIT | All RHEL 8 world-writable directories must be group-owned by root, sys, bin, or an application group. | Get directories"
       ansible.builtin.command: find {{ ansible_mounts | map(attribute='mount') | join(' ') }} -xdev -type d -perm -0002 -gid +999
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_world_writable_dir_group_owners
 
@@ -2542,12 +2576,14 @@
     - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get users with no home directory"
       ansible.builtin.shell: pwck -r | grep user | cut -f2 -d"'"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_users_no_home_dir
 
     - name: "MEDIUM | RHEL-08-010720 | PATCH | All RHEL 8 local interactive users must have a home directory assigned in the /etc/passwd file. | Get interactive users with no home directory"
       ansible.builtin.shell: grep vboxadd /etc/passwd | awk -F ":" '$3>{{ min_int_uid }} {print $1}'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_user_list
 
@@ -2737,6 +2773,7 @@
     - name: "MEDIUM | RHEL-08-010780 | AUDIT | All RHEL 8 files and directories must have a valid owner. | Get nouser files"
       ansible.builtin.command: find / -nouser
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_nouser_files
 
@@ -2768,6 +2805,7 @@
     - name: "MEDIUM | RHEL-08-010790 | AUDIT | All RHEL 8 files and directories must have a valid group owner. | Get nogroup files"
       ansible.builtin.command: find / -nogroup
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_nogroup_owned_files
 
@@ -2792,7 +2830,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230328r1017139_rule
+    - SV-230328r1155410_rule
     - V-23032
     - complexity-high
     - mounts
