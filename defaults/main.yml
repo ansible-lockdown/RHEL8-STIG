@@ -567,7 +567,6 @@ rhel8stig_cron_special_disable: "{{ rhel8stig_workaround_for_disa_benchmark or r
 
 # Set maximum number of simultaneous system logins (RHEL-08-040000)
 rhel8stig_maxlogins: 10
-# TODO: ansible-lint: var-spacing
 rhel8stig_logon_banner: "{{ rhel8stig_workaround_for_disa_benchmark | ternary( rhel8stig_logon_banner_nice | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', ' '), rhel8stig_logon_banner_nice)
   }}"
 rhel8stig_logon_banner_nice: |
@@ -715,12 +714,12 @@ rhel8stig_sudo_timestamp_timeout: 1
 
 # RHEL-08-010680
 # This can be managed using a template ensure settings are correct
-rhel8_stig_use_resolv_template: false
-rhel8_stig_resolv_domain: example.com
-rhel8_stig_resolv_search:
+rhel8stig_use_resolv_template: false
+rhel8stig_resolv_domain: example.com
+rhel8stig_resolv_search:
 #    - 'example.com'
 #    - 'blah'
-rhel8_stig_resolv_options:
+rhel8stig_resolv_options:
 #    - 'rotate 2'
 #    - 'timeout:1'
 
