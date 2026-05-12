@@ -214,7 +214,7 @@ RHEL_08_020060: {{ rhel8stig_020060 }}
 RHEL_08_020080: {{ rhel8stig_020080 }}
 RHEL_08_020081: {{ rhel8stig_020081 }}
 RHEL_08_020082: {{ rhel8stig_020082 }}
-RHEL_08_020090: {{ rhel8stig_020090 }}  # TODO
+RHEL_08_020090: {{ rhel8stig_020090 }}
 RHEL_08_020100: {{ rhel8stig_020100 }}
 RHEL_08_020101: {{ rhel8stig_020101 }}
 RHEL_08_020104: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or greater
