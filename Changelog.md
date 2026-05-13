@@ -2,6 +2,14 @@
 
 ## STIG v2r6
 
+### May26 Alignment
+- fixed meta references
+- added check mode
+- removed old unused items
+- no log added
+- company naming aligned
+- var naming aligned
+
 ### Feb 2026 QA
 
 - Updated benchmark version
