@@ -158,14 +158,12 @@
 - name: Confirm grub2 user cfg
   ansible.builtin.stat:
     path: "/etc/grub.d/01_users"
-  changed_when: discovered_grub2_user_cfg.stat. is defined
+  changed_when: false
   register: discovered_grub2_user_cfg
   listen: Make grub2 config
 
 - name: Rebuild grub
-  when:
-    - discovered_grub2_user_cfg.stat.exists
-    - not system_is_container
+  when: not system_is_container
   ansible.builtin.command: "/usr/sbin/grub2-mkconfig -o {{ prelim_bootloader_path }}/grub.cfg"
   changed_when: true
   listen: Make grub2 config
