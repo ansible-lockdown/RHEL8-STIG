@@ -17,18 +17,16 @@ on: # yamllint disable-line rule:truthy
   # Allow manual running of workflow
   workflow_dispatch:
 
-# Allow permissions for AWS auth
-permissions:
-  id-token: write
-  contents: read
-  pull-requests: read
-
 # A workflow run is made up of one or more jobs
 # that can run sequentially or in parallel
 jobs:
   # This will create messages for first time contributers and direct them to the Discord server
   welcome:
     runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+      pull-requests: write
 
     steps:
       - uses: actions/first-interaction@main
@@ -45,6 +43,13 @@ jobs:
   playbook-test:
     # The type of runner that the job will run on
     runs-on: self-hosted
+
+    # Allow permissions for AWS auth
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: read
+
     env:
       ENABLE_DEBUG: ${{ vars.ENABLE_DEBUG }}
       # Imported as a variable by terraform
@@ -60,7 +65,7 @@ jobs:
     steps:
 
       - name: Git clone the lockdown repository to test
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -76,7 +81,7 @@ jobs:
 
       # Pull in terraform code for linux servers
       - name: Clone GitHub IaC plan
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           repository: ansible-lockdown/github_linux_IaC
           path: .github/workflows/github_linux_IaC
@@ -123,6 +128,7 @@ jobs:
         env:
           OSVAR: ${{ vars.OSVAR }}
           TF_VAR_benchmark_type: ${{ vars.BENCHMARK_TYPE }}
+          TF_VAR_ansible_version: ${{ vars.ANSIBLE_RUNNER_VERSION }}
           TF_VAR_privsubnet_id: ${{ secrets.AWS_PRIVSUBNET_ID }}
           TF_VAR_vpc_secgrp_id: ${{ secrets.AWS_VPC_SECGRP_ID }}
         run: tofu apply -var-file "${OSVAR}.tfvars" --auto-approve -input=false
@@ -132,7 +138,7 @@ jobs:
         if: env.ENABLE_DEBUG == 'true'
         run: cat hosts.yml
 
-## Aws deployments taking a while to come up insert sleep or playbook fails
+# Aws deployments taking a while to come up insert sleep or playbook fails
 
       - name: Sleep to allow system to come up
         run: sleep ${{ vars.BUILD_SLEEPTIME }}
