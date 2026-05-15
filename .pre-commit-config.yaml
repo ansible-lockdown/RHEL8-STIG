@@ -1,4 +1,5 @@
----
+--
+
 ##### CI for use by github no need for action to be added
 ##### Inherited
 ci:
@@ -48,7 +49,7 @@ repos:
     name: Run Gitleaks test
 
 - repo: https://github.com/ansible-community/ansible-lint
-  rev: v26.1.1
+  rev: v26.4.0
   hooks:
   - id: ansible-lint
     name: Ansible-lint

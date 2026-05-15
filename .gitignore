@@ -6,17 +6,9 @@ tests/*redhat-subscription
 tests/Dockerfile
 *.iso
 *.box
-
 packer_cache
 delete*
 ignore*
-
-#
-*xccdf.xml
-*.pdf
-*history.md
-*plan.md
-
 # VSCode
 .vscode
 vagrant
@@ -44,12 +36,7 @@ tramp
 rh-creds.env
 travis.env
 
-# Lockdown-specific
-benchparse/
-*xccdf.xml
-*.retry
-
-# Secrets and credentials
+# Secret/key files
 *.vault
 *.key
 *.pem
@@ -61,7 +48,13 @@ benchparse/
 *vault_pass*
 .vault_pass
 
-# QA and test artifacts
+# Lockdown-specific
+benchparse/
+*xccdf.xml
+*.retry
+*.pdf
+*history.md
+*plan.md
 *qa_report*
 test_inv
 prompt.md
