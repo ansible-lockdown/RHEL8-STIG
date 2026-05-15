@@ -2,7 +2,7 @@
 galaxy_info:
   author: "MindPoint Group"
   description: "Apply the DISA RHEL 8 STIG"
-  company: "MindPoint Group"
+  company: "MindPoint Group - A Tyto Athene Company"
   license: MIT
   role_name: rhel8_stig
   namespace: mindpointgroup

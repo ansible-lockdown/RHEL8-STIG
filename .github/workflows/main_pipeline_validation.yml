@@ -43,7 +43,7 @@ jobs:
     steps:
 
       - name: Git clone the lockdown repository to test
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -59,7 +59,7 @@ jobs:
 
       # Pull in terraform code for linux servers
       - name: Clone GitHub IaC plan
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           repository: ansible-lockdown/github_linux_IaC
           path: .github/workflows/github_linux_IaC
@@ -107,6 +107,7 @@ jobs:
         env:
           OSVAR: ${{ vars.OSVAR }}
           TF_VAR_benchmark_type: ${{ vars.BENCHMARK_TYPE }}
+          TF_VAR_ansible_version: ${{ vars.ANSIBLE_RUNNER_VERSION }}
           TF_VAR_privsubnet_id: ${{ secrets.AWS_PRIVSUBNET_ID }}
           TF_VAR_vpc_secgrp_id: ${{ secrets.AWS_VPC_SECGRP_ID }}
         run: tofu apply -var-file "${OSVAR}.tfvars" --auto-approve -input=false
@@ -116,7 +117,7 @@ jobs:
         if: env.ENABLE_DEBUG == 'true'
         run: cat hosts.yml
 
-## AWS deployments taking a while to come up insert sleep or playbook fails
+# Aws deployments taking a while to come up insert sleep or playbook fails
 
       - name: Sleep to allow system to come up
         run: sleep ${{ vars.BUILD_SLEEPTIME }}

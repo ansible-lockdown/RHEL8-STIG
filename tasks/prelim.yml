@@ -41,11 +41,13 @@
     - name: PRELIM | Capture UID_MIN information from logins.def
       ansible.builtin.shell: grep -w "^UID_MIN" /etc/login.defs | awk '{print $NF}'
       changed_when: false
+      check_mode: false
       register: discovered_uid_min
 
     - name: PRELIM | Capture UID_MAX information from logins.def
       ansible.builtin.shell: grep -w "^UID_MAX" /etc/login.defs | awk '{print $NF}'
       changed_when: false
+      check_mode: false
       register: discovered_uid_max
 
     - name: PRELIM | Set_facts for interactive uid
@@ -110,7 +112,7 @@
     - CAT1
     - CCI-000068
     - SRG-OS-000033-GPOS-00014
-    - SV-230223r792855_rule
+    - SV-230223r1155356_rule
     - V-230223
   ansible.builtin.package:
     name: crypto-policies-scripts
@@ -198,6 +200,7 @@
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $1 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_usernames
 
 - name: "PRELIM | AUDIT | Discover Interactive User accounts home directories"
@@ -205,6 +208,7 @@
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $6 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_users_home
 
 - name: "PRELIM | AUDIT | Discover Interactive user UIDs"
@@ -212,6 +216,7 @@
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $3 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_uids
 
 - name: "PRELIM | RHEL-08-010690 | Ensure user enumeration command is modified when autofs remote home directories are in use"
@@ -235,6 +240,7 @@
     - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
       ansible.builtin.command: "{{ local_interactive_user_dir_command }}"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: prelim_getent
 
@@ -330,6 +336,7 @@
   ansible.builtin.shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   loop: "{{ rhel8stig_stig_interactive_homedir_results }}"
   changed_when: false
+  check_mode: false
   failed_when: false
   register: prelim_interactive_user_ini_file_list
 

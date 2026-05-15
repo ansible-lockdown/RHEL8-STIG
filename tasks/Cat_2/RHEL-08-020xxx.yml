@@ -602,6 +602,7 @@
     - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
       ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_lock_enabled
 
@@ -714,12 +715,14 @@
     - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
       ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/*"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_removal_action
 
     - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
       ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_removal_action_file
 
@@ -776,13 +779,14 @@
     - NIST800-53R4_AC-11
     - SRG-OS-000029-GPOS-00010
     - SRG-OS-000031-GPOS-00012
-    - SV-230352r1017165_rule
+    - SV-230352r1155401_rule
     - V-230352
     - gui
   block:
     - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity. | Find idle-delay parameter"
       ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_idle_delay_param
 
@@ -989,7 +993,7 @@
   tags:
     - RHEL-08-020120
     - CAT2
-    - CCI-00019
+    - CCI-000193
     - NIST800-53R4_IA-5
     - SRG-OS-000070-GPOS-00038
     - SV-230358r1017170_rule
@@ -1103,10 +1107,10 @@
     group: root
     mode: 'u-x,g-wx,o-rwx'
 
-- name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
+- name: "MEDIUM | RHEL-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow."
   when: rhel8stig_020180
   tags:
-    - RHEL8-08-020180
+    - RHEL-08-020180
     - CAT2
     - CCI-000198
     - NIST800-53R4_IA-5
@@ -1115,13 +1119,15 @@
     - V-230364
     - password
   block:
-    - name: "MEDIUM | RHEL8-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
+    - name: "MEDIUM | RHEL-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
       ansible.builtin.shell: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
       changed_when: false
+      check_mode: false
       failed_when: false
+      no_log: true
       register: discovered_min_password_users
 
-    - name: "MEDIUM | RHEL8-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
+    - name: "MEDIUM | RHEL-08-020180 | PATCH | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Change user restriction"
       ansible.builtin.command: chage -m 1 {{ item }}
       changed_when: true
       loop: "{{ discovered_min_password_users.stdout_lines }}"
@@ -1177,6 +1183,7 @@
       ansible.builtin.command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
       check_mode: false
       changed_when: discovered_max_lifetime_users.stdout | length > 0
+      no_log: true
       register: discovered_max_lifetime_users
 
     - name: "MEDIUM | RHEL-08-020210 | PATCH | RHEL 8 user account passwords must be configured so that existing passwords are restricted to a 60-day maximum lifetime. | Reset password timeout to prevent locking out user."
@@ -1191,7 +1198,7 @@
       check_mode: false
       loop: "{{ discovered_max_lifetime_users.stdout_lines }}"
 
-- name: "MEDIUM | RHEL-08-20230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
+- name: "MEDIUM | RHEL-08-020230 | PATCH | RHEL 8 passwords must have a minimum of 15 characters."
   when: rhel8stig_020230
   tags:
     - RHEL-08-020230
@@ -1246,6 +1253,7 @@
     - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
       ansible.builtin.shell: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_duplicate_uid_users
 
@@ -1279,12 +1287,14 @@
     - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in smartcard-auth"
       ansible.builtin.command: grep 'auth       sufficient pam_sss.so' /etc/pam.d/smartcard-auth
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_smartcard_auth_sss
 
     - name: "MEDIUM | RHEL-08-020250 | AUDIT | RHEL 8 must implement smart card logon for multifactor authentication for access to interactive accounts. | Find pam_sss.so in system-auth"
       ansible.builtin.command: grep 'auth       [success=done authinfo_unavail=ignore ignore=ignore default=die] pam_sss.so' /etc/pam.d/system-auth
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_sytem_auth_sss
 
@@ -1348,7 +1358,7 @@
         module_arguments: try_cert_auth
       notify: Restart sssd
 
-- name: "MEDIUM | RHEL-08-20260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
+- name: "MEDIUM | RHEL-08-020260 | PATCH | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity."
   when: rhel8stig_020260
   tags:
     - RHEL-08-020260
@@ -1363,6 +1373,7 @@
     - name: "MEDIUM | RHEL-08-20260 | AUDIT | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity. | Get current"
       ansible.builtin.shell: grep -i inactive /etc/default/useradd | cut -d = -f2 | grep -v 35
       changed_when: false
+      check_mode: false
       failed_when: discovered_current_useradd_inactive.rc not in [ 0, 1 ]
       register: discovered_current_useradd_inactive
 
@@ -1388,6 +1399,7 @@
     - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
       ansible.builtin.shell: "awk -F: '{if ($3 <= {{ min_int_uid }}) { print $1 }}' /etc/passwd"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_users_list
 
