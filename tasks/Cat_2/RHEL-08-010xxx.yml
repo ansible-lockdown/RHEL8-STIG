@@ -2654,7 +2654,7 @@
   vars:
     warn_control_id: "MEDIUM | RHEL-08-010731"
   block:
-    - name: MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Align "
+    - name: MEDIUM | RHEL-08-010731 | PATCH | All RHEL 8 local interactive user home directory files must have mode 0750 or less permissive. | Align
       when: rhel8stig_disruption_high
       ansible.builtin.file:
         path: "{{ item }}"

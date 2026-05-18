@@ -90,7 +90,7 @@ audit_conf_source: "some path or url to copy from"
 audit_conf_dest: "/opt"
 
 # Where the audit logs are stored
-audit_log_dir: '/opt'
+audit_log_dir: "/opt"
 
 ## Ability to collect and take audit files moving to a centralized location
 # This enables the collection of the files from the host
