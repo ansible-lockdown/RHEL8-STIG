@@ -9,6 +9,10 @@
 - no log added
 - company naming aligned
 - var naming aligned
+- aide logic
+- audit improvements
+- linting
+- removed vars not required
 
 ### Feb 2026 QA
 
