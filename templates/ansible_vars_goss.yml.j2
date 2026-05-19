@@ -1,3 +1,4 @@
+---
 
 ## metadata for Audit benchmark
 benchmark_version: {{ benchmark_version }}
@@ -40,17 +41,18 @@ skip_postfix_check: {% if 'postfix' not in ansible_facts.packages %}True{% else 
 skip_tftp_check: {% if rhel8stig_tftp_required %}False{% else %}True{% endif %}
 
 
-# Sets up the system dependant on bootloader
+# Sets up the system dependent on bootloader
 legacy_boot: {{ prelim_legacy_boot }}
 rhel8stig_bootloader_path: {{ prelim_bootloader_path }}
 
-
 # Cat 1 rules
 RHEL_08_010000: {{ rhel8stig_010000 }}
+RHEL_08_010015: {{ rhel8stig_010015 }}
 RHEL_08_010020: {{ rhel8stig_010020 }}
 RHEL_08_010121: {{ rhel8stig_010121 }}
 RHEL_08_010140: {{ rhel8stig_010140 }}
 RHEL_08_010150: {{ rhel8stig_010150 }}
+RHEL_08_010270: {{ rhel8stig_010270 }}
 RHEL_08_010370: {{ rhel8stig_010370 }}
 RHEL_08_010371: {{ rhel8stig_010371 }}
 RHEL_08_010460: {{ rhel8stig_010460 }}
@@ -61,7 +63,6 @@ RHEL_08_020331: {{ rhel8stig_020331 }}
 RHEL_08_020332: {{ rhel8stig_020332 }}
 RHEL_08_040000: {{ rhel8stig_040000 }}
 RHEL_08_040010: {{ rhel8stig_040010 }}
-RHEL_08_040060: {{ rhel8stig_040060 }}
 RHEL_08_040170: {{ rhel8stig_040170 }}
 RHEL_08_040171: {{ rhel8stig_040171 }}
 RHEL_08_040172: {{ rhel8stig_040172 }}
@@ -92,9 +93,8 @@ RHEL_08_010159: {{ rhel8stig_010159 }}
 RHEL_08_010160: {{ rhel8stig_010160 }}
 RHEL_08_010161: {{ rhel8stig_010161 }}
 RHEL_08_010162: {{ rhel8stig_010162 }}
-RHEL_08_010163: {{ rhel8stig_010162 }} ### to be fixed as not yet written for V1r2
+RHEL_08_010163: {{ rhel8stig_010163 }}
 RHEL_08_010170: {{ rhel8stig_010170 }}
-RHEL_08_010180: {{ rhel8stig_010180 }}
 RHEL_08_010190: {{ rhel8stig_010190 }}
 RHEL_08_010200: {{ rhel8stig_010200 }}
 RHEL_08_010201: {{ rhel8stig_010201 }}
@@ -104,12 +104,10 @@ RHEL_08_010230: {{ rhel8stig_010230 }}
 RHEL_08_010240: {{ rhel8stig_010240 }}
 RHEL_08_010250: {{ rhel8stig_010250 }}
 RHEL_08_010260: {{ rhel8stig_010260 }}
-RHEL_08_010287: {{ rhel8stig_010287 }}
+RHEL_08_010275: {{ rhel8stig_010275 }}
+RHEL_08_010280: {{ rhel8stig_010280 }}
 RHEL_08_010290: {{ rhel8stig_010290 }}
 RHEL_08_010291: {{ rhel8stig_010291 }}
-RHEL_08_010293: {{ rhel8stig_010293 }}
-RHEL_08_010294: {{ rhel8stig_010294 }}
-RHEL_08_010295: {{ rhel8stig_010295 }}
 RHEL_08_010296: {{ rhel8stig_010296 }}
 RHEL_08_010297: {{ rhel8stig_010297 }}
 RHEL_08_010300: {{ rhel8stig_010300 }}
@@ -129,7 +127,7 @@ RHEL_08_010373: {{ rhel8stig_010373 }}
 RHEL_08_010374: {{ rhel8stig_010374 }}
 RHEL_08_010379: {{ rhel8stig_010379 }}
 RHEL_08_010380: {{ rhel8stig_010380 }}
-RHEL_08_010381: {{ rhel8stig_010380 }}
+RHEL_08_010381: {{ rhel8stig_010381 }}
 RHEL_08_010382: {{ rhel8stig_010382 }}
 RHEL_08_010383: {{ rhel8stig_010383 }}
 RHEL_08_010384: {{ rhel8stig_010384 }}
@@ -166,7 +164,6 @@ RHEL_08_010620: {{ rhel8stig_010620 }}
 RHEL_08_010630: {{ rhel8stig_010630 }}
 RHEL_08_010640: {{ rhel8stig_010640 }}
 RHEL_08_010650: {{ rhel8stig_010650 }}
-RHEL_08_010660: {{ rhel8stig_010660 }}
 RHEL_08_010670: {{ rhel8stig_010670 }}
 RHEL_08_010671: {{ rhel8stig_010671 }}
 RHEL_08_010672: {{ rhel8stig_010672 }}
@@ -189,7 +186,7 @@ RHEL_08_010780: {{ rhel8stig_010780 }}
 RHEL_08_010790: {{ rhel8stig_010790 }}
 RHEL_08_010800: {{ rhel8stig_010800 }}
 RHEL_08_010830: {{ rhel8stig_010830 }}
-RHEL_08_020000: {{ rhel8stig_020000 }}
+
 RHEL_08_020010: {{ rhel8stig_020010 }}
 RHEL_08_020011: {{ rhel8stig_020011 }}
 RHEL_08_020012: {{ rhel8stig_020012 }}
@@ -217,7 +214,7 @@ RHEL_08_020060: {{ rhel8stig_020060 }}
 RHEL_08_020080: {{ rhel8stig_020080 }}
 RHEL_08_020081: {{ rhel8stig_020081 }}
 RHEL_08_020082: {{ rhel8stig_020082 }}
-RHEL_08_020090: {{ rhel8stig_020090 }}  # TODO
+RHEL_08_020090: {{ rhel8stig_020090 }}
 RHEL_08_020100: {{ rhel8stig_020100 }}
 RHEL_08_020101: {{ rhel8stig_020101 }}
 RHEL_08_020104: {% if ansible_facts['distribution_version'] is version('8.4', '>=') %}true{% else %}false{% endif %}  # Only runs if 8.4 or greater
@@ -247,6 +244,7 @@ RHEL_08_020350: {{ rhel8stig_020350 }}
 RHEL_08_020351: {{ rhel8stig_020351 }}
 RHEL_08_020352: {{ rhel8stig_020352 }}
 RHEL_08_020353: {{ rhel8stig_020353 }}
+RHEL_08_020360: {{ rhel8stig_020360 }}
 RHEL_08_030000: {{ rhel8stig_030000 }}
 RHEL_08_030010: {{ rhel8stig_030010 }}
 RHEL_08_030020: {{ rhel8stig_030020 }}
@@ -317,7 +315,7 @@ RHEL_08_030655: {{ rhel8stig_030655 }}
 RHEL_08_030660: {{ rhel8stig_030660 }}
 RHEL_08_030670: {{ rhel8stig_030670 }}
 RHEL_08_030680: {{ rhel8stig_030680 }}
-RHEL_08_030690: {{ rhel8stig_030090 }}
+RHEL_08_030690: {{ rhel8stig_030690 }}
 RHEL_08_030700: {{ rhel8stig_030700 }}
 RHEL_08_030710: {{ rhel8stig_030710 }}
 RHEL_08_030720: {{ rhel8stig_030720 }}
@@ -388,7 +386,6 @@ RHEL_08_040321: {{ rhel8stig_040321 }}
 RHEL_08_040330: {{ rhel8stig_040330 }}
 RHEL_08_040340: {{ rhel8stig_040340 }}
 RHEL_08_040341: {{ rhel8stig_040341 }}
-RHEL_08_040342: {{ rhel8stig_040342 }}
 RHEL_08_040350: {{ rhel8stig_040350 }}
 RHEL_08_040370: {{ rhel8stig_040370 }}
 RHEL_08_040380: {{ rhel8stig_040380 }}
@@ -406,7 +403,6 @@ RHEL_08_010540: {{ rhel8stig_010540 }}
 RHEL_08_010541: {{ rhel8stig_010541 }}
 RHEL_08_010542: {{ rhel8stig_010542 }}
 RHEL_08_020024: {{ rhel8stig_020024 }}
-RHEL_08_020340: {{ rhel8stig_020340 }}
 RHEL_08_030063: {{ rhel8stig_030063 }}
 RHEL_08_030601: {{ rhel8stig_030601 }}
 RHEL_08_030602: {{ rhel8stig_030602 }}
@@ -432,9 +428,7 @@ rhel8stig_boot_superuser: {{ rhel8stig_boot_superuser }}
 MIN_UID: {{ min_int_uid }}
 MAX_UID: {{ max_int_uid }}
 
-
 # RHEL_08_010040-010050-010060
-rhel8stig_banner_file: /etc/issue
 rhel8stig_logon_banner:
   You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
   By using this IS (which includes any device attached to this IS), you consent to the following conditions
@@ -443,12 +437,6 @@ rhel8stig_logon_banner:
   -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
   -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
   -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
-
-# RHEL_08_010680 to change if using hostfile only - separate checks
-rhel8stig_uses_dns: true
-
-# RHEL_08_010360 if run via ansible it is placed in cron.d setting as manually set in cron.daily
-rhel8stig_aide_cron_file: /etc/cron.d/aide
 
 # RHEL_08_200027 &28
 rhel8stig_pam_faillock_dir: {{ rhel8stig_pam_faillock_dir }}
@@ -463,9 +451,18 @@ rhel8stig_auditd_max_log_file_action: {{ rhel8stig_auditd_max_log_file_action }}
 rhel8stig_auditd_disk_full_action: {{ rhel8stig_auditd_disk_full_action }}
 
 # RHEL_08_030690 if using remote syslog server
-rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server.server }}
-rhel8stig_remotelog_port: {{ rhel8stig_remotelog_server.port }}
-rhel8stig_remotelog_protocol: '{{ rhel8stig_remotelog_server.protocol }}'
+rhel8stig_remotelog_server: {{ rhel8stig_remotelog_server }}
+rhel8stig_remotelog_server_port: {{ rhel8stig_remotelog_server_port }}
+rhel8stig_remotelog_server_protocol: '{{ rhel8stig_remotelog_server_protocol }}'
 
-# RHEL_08_040137
+# RHEL_08_040137
 python_bin: {{ ansible_python.executable }}
+
+### Aide
+rhel8stig_use_aide: {{ rhel8stig_use_aide }}
+rhel8stig_aide_cron_file: {{ rhel8stig_aide_cron_file }}  # NOTE the path may change if not running daily
+rhel8stig_aide_cron_day: '{{ rhel8stig_aide_cron_day }}'
+rhel8stig_aide_cron_hour: '{{ rhel8stig_aide_cron_hour }}'
+rhel8stig_aide_cron_minute: '{{ rhel8stig_aide_cron_minute }}'
+rhel8stig_aide_cron_job: '{{ rhel8stig_aide_cron_job }}'
+rhel8stig_aide_cron_name: '{{ rhel8stig_aide_cron_name }}'

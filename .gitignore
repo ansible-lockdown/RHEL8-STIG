@@ -36,10 +36,28 @@ tramp
 rh-creds.env
 travis.env
 
+# Secret/key files
+*.vault
+*.key
+*.pem
+*.p12
+*.pfx
+*.keystore
+*.jks
+*.credentials
+*vault_pass*
+.vault_pass
+
 # Lockdown-specific
 benchparse/
 *xccdf.xml
 *.retry
+*.pdf
+*history.md
+*plan.md
+*qa_report*
+test_inv
+prompt.md
 
 # GitHub Action/Workflow files
 .github/

@@ -193,7 +193,6 @@ rhel8stig_030742: false
 # fips
 rhel8stig_010290: false
 rhel8stig_010291: false
-rhel8stig_010293: false
 
 # aide
 rhel8stig_010359: false

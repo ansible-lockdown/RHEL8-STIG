@@ -21,7 +21,7 @@
   tags:
     - RHEL-08-040002
     - CAT2
-    - CCI-00038
+    - CCI-000381
     - NIST800-53R4_CM-7
     - SRG-OS-000095-GPOS-00049
     - SV-230489r1017273_rule
@@ -64,7 +64,7 @@
     - rhel8stig_040030
     - not rhel8stig_system_is_chroot
     - rhel8stig_firewall_service != "not_required"
-    - rhel8stig_disruptive
+    - rhel8stig_disruption_high
   tags:
     - RHEL-08-040030
     - CAT2
@@ -138,13 +138,14 @@
     - CCI-000778
     - NIST800-53R4_IA-3
     - SRG-OS-000114-GPOS-00059
-    - SV-230502r1017284_rule
+    - SV-230502r1155393_rule
     - V-230502
     - autofs
   block:
-    - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error"  # noqa: command-instead-of-module
+    - name: "MEDIUM | RHEL-08-040070 | AUDIT | The RHEL 8 file system automounter must be disabled unless required. | Check on autofs service to prevent disable error" # noqa: command-instead-of-module
       ansible.builtin.shell: "systemctl show autofs | grep LoadState | cut -d= -f2"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_autofs_status
 
@@ -152,8 +153,8 @@
       when: discovered_autofs_status.stdout == "loaded"
       ansible.builtin.service:
         name: autofs
-        state: stopped
         enabled: false
+        masked: true
 
 - name: "MEDIUM | RHEL-08-040080 | PATCH | RHEL 8 must be configured to disable USB mass storage."
   when: rhel8stig_040080
@@ -307,11 +308,12 @@
         - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | current setting"
           ansible.builtin.shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
           changed_when: false
+          check_mode: false
           failed_when: false
-          register: rhel8stig_target_drop_set
+          register: discovered_target_drop_set
 
         - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
-          when: rhel8stig_target_drop_set.rc != 0
+          when: discovered_target_drop_set.rc != 0
           ansible.builtin.command: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
           changed_when: true
 
@@ -339,7 +341,7 @@
     - V-230506
     - wifi
   block:
-    - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available"  # noqa: command-instead-of-module
+    - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if nmcli command is available" # noqa: command-instead-of-module
       ansible.builtin.command: rpm -q NetworkManager
       check_mode: false
       changed_when: false
@@ -349,12 +351,12 @@
     - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
       when: discovered_nmcli_available.rc == 0
       ansible.builtin.command: nmcli radio wifi
-      register: rhel8stig_wifi_enabled
+      register: discovered_wifi_enabled
       check_mode: false
-      changed_when: rhel8stig_wifi_enabled.stdout != "disabled"
+      changed_when: discovered_wifi_enabled.stdout != "disabled"
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
-      when: rhel8stig_wifi_enabled is changed  # noqa no-handler
+      when: discovered_wifi_enabled is changed # noqa no-handler
       ansible.builtin.command: nmcli radio wifi off
       changed_when: true
 
@@ -856,7 +858,7 @@
     - NIST800-53R4_IA-3
     - SRG-OS-000378-GPOS-00163
     - SV-244547r1014811_rule
-    - SV-230524r1014813_rule
+    - SV-230524r1155418_rule
     - SV-244548r1014815_rule
     - V-244547
     - V-230524
@@ -934,7 +936,7 @@
         state: present
 
     - name: "MEDIUM | RHEL-08-040160 | PATCH | All RHEL 8 networked systems must have and implement SSH to protect the confidentiality and integrity of transmitted and received information, as well as information during preparation for transmission. | Start/Enable ssh server"
-      when: rhel8stig_040159
+      when: rhel8stig_040160
       ansible.builtin.service:
         name: sshd
         enabled: true
@@ -985,7 +987,7 @@
   tags:
     - RHEL-08-040209
     - CAT2
-    - CI-000366
+    - CCI-000366
     - SRG-OS-000480-GPOS-00227
     - SV-244550r1017350_rule
     - V-244550
@@ -994,6 +996,7 @@
     - name: "MEDIUM | RHEL-08-040209 | AUDIT | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.default.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_settings
 
@@ -1033,6 +1036,7 @@
     - name: "MEDIUM | RHEL-08-040210 | AUDIT | RHEL 8 must prevent IPv6 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.default.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmpipv6_settings
 
@@ -1060,7 +1064,7 @@
   tags:
     - RHEL-08-040220
     - CAT2
-    - CCI-00036
+    - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
     - SV-230536r1017298_rule
@@ -1070,6 +1074,7 @@
     - name: "MEDIUM | RHEL-08-040220 | AUDIT | RHEL 8 must not send Internet Control Message Protocol (ICMP) redirects. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.all.send_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_redirect_settings
 
@@ -1107,6 +1112,7 @@
     - name: "MEDIUM | RHEL-08-040230 | AUDIT | The RHEL 8 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.icmp_echo_ignore_broadcasts\s*=\s*0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_echo_settings
 
@@ -1144,6 +1150,7 @@
     - name: "MEDIUM | RHEL-08-040239 | AUDIT | RHEL 8 must not forward IPv4 source-routed packets. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.all.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv4_forward_settings
 
@@ -1183,6 +1190,7 @@
     - name: "MEDIUM | RHEL-08-040240 | AUDIT | RHEL 8 must not forward IPv6 source-routed packets. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.all.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv6_routed_settings
 
@@ -1218,6 +1226,7 @@
     - name: "MEDIUM | RHEL-08-040249 | AUDIT | RHEL 8 must not forward IPv4 source-routed packets by default. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.default.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv4_source_routed_settings
 
@@ -1257,6 +1266,7 @@
     - name: "MEDIUM | RHEL-08-040250 | AUDIT | RHEL 8 must not forward IPv6 source-routed packets by default. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.default.accept_source_route = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv6_source_routed_settings
 
@@ -1294,6 +1304,7 @@
     - name: "MEDIUM | RHEL-08-040259 | AUDIT | RHEL 8 must not enable IPv4 packet forwarding unless the system is a router. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.all.forwarding = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv4_packet_forwarding_settings
 
@@ -1334,6 +1345,7 @@
     - name: "MEDIUM | RHEL-08-040260 | AUDIT | RHEL 8 must not enable IPv6 packet forwarding unless the system is a router. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.all.forwarding = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv6_packet_forwarding_settings
 
@@ -1374,6 +1386,7 @@
     - name: "MEDIUM | RHEL-08-040261 | AUDIT | RHEL 8 must not accept router advertisements on all IPv6 interfaces. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.all.accept_ra = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv6_router_advertising_settings
 
@@ -1414,6 +1427,7 @@
     - name: "MEDIUM | RHEL-08-040262 | AUDIT | RHEL 8 must not accept router advertisements on all IPv6 interfaces by default. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.default.accept_ra = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ipv6_router_advertising_default_settings
 
@@ -1451,6 +1465,7 @@
     - name: "MEDIUM | RHEL-08-040270 | AUDIT | The RHEL 8 must not allow interfaces to perform Internet Control Message Protocol (ICMP) redirects by default. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.default.send_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_redirects_default_settings
 
@@ -1488,6 +1503,7 @@
     - name: "MEDIUM | RHEL-08-040279 | AUDIT | RHEL 8 must ignore IPv4 Internet Control Message Protocol (ICMP) redirect messages. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.all.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_redirects_all_settings
 
@@ -1527,6 +1543,7 @@
     - name: "MEDIUM | RHEL-08-040280 | AUDIT | RHEL 8 must ignore IPv6 Internet Control Message Protocol (ICMP) redirect messages. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv6.conf.all.accept_redirects = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_icmp_ipv6_redirects_all_settings
 
@@ -1564,6 +1581,7 @@
     - name: "MEDIUM | RHEL-08-040281 | AUDIT | RHEL 8 must disable access to network bpf syscall from unprivileged processes. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "kernel.unprivileged_bpf_disabled = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_bpf_settings
 
@@ -1594,20 +1612,21 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230546r1017308_rule
+    - SV-230546r1155413_rule
     - V-230546
     - sysctl
   block:
     - name: "MEDIUM | RHEL-08-040282 | AUDIT | RHEL 8 must restrict usage of ptrace to descendant processes. | Find conflicting instances"
       ansible.builtin.shell: grep -Ers "kernel.yama.ptrace_scope\s*=\s*.*" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_ptrace_settings
 
     - name: "MEDIUM | RHEL-08-040282 | PATCH | RHEL 8 must restrict usage of ptrace to descendant processes. | Replace conflicting instances"
       when:
         - discovered_ptrace_settings.stdout | length > 0
-        - item != rhel8stig_sysctl_file
+        - item != '/etc/sysctl.d/99-ptrace-restrict.conf'
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: kernel.yama.ptrace_scope.*
@@ -1621,7 +1640,7 @@
         state: present
         reload: "{{ rhel8stig_sysctl_reload }}"
         sysctl_set: true
-        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+        sysctl_file: /etc/sysctl.d/99-ptrace-restrict.conf
 
 - name: "MEDIUM | RHEL-08-040283 | PATCH | RHEL 8 must restrict exposed kernel pointer addresses access."
   when: rhel8stig_040283
@@ -1638,6 +1657,7 @@
     - name: "MEDIUM | RHEL-08-040283 | AUDIT | RHEL 8 must restrict exposed kernel pointer addresses access. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "kernel.kptr_restrict = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_kptr_settings
 
@@ -1675,6 +1695,7 @@
     - name: "MEDIUM | RHEL-08-040284 | AUDIT | RHEL 8 must disable the use of user namespaces. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "user.max_user_namespaces = [^0]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_max_user_namespace_settings
 
@@ -1705,20 +1726,21 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230549r1017311_rule
+    - SV-230549r1155416_rule
     - V-230549
     - sysctl
   block:
     - name: "MEDIUM | RHEL-08-040285 | AUDIT | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.ipv4.conf.all.rp_filter = [^1]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_reverse_path_settings
 
     - name: "MEDIUM | RHEL-08-040285 | PATCH | RHEL 8 must use reverse path filtering on all IPv4 interfaces. | Replace conflicting instances"
       when:
         - discovered_reverse_path_settings.stdout | length > 0
-        - item != rhel8stig_sysctl_file
+        - item != '/etc/sysctl.d/ipv4_rp_filter.conf'
       ansible.builtin.lineinfile:
         path: "{{ item }}"
         regexp: net.ipv4.conf.all.rp_filter = [^1]
@@ -1732,7 +1754,7 @@
         state: present
         reload: "{{ rhel8stig_sysctl_reload }}"
         sysctl_set: true
-        sysctl_file: "{{ rhel8stig_sysctl_file }}"
+        sysctl_file: /etc/sysctl.d/ipv4_rp_filter.conf
 
 - name: "MEDIUM | RHEL-08-040286 | PATCH | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler."
   when: rhel8stig_040286
@@ -1748,6 +1770,7 @@
     - name: "MEDIUM | RHEL-08-040286 | AUDIT | RHEL 8 must enable hardening for the Berkeley Packet Filter Just-in-time compiler. | Find conflicting instances"
       ansible.builtin.shell: grep -rs "net.core.bpf_jit_harden = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
       changed_when: false
+      check_mode: false
       failed_when: false
       register: discovered_bpf_jit_settings
 
@@ -1897,37 +1920,6 @@
     line: 'X11UseLocalhost yes'
     validate: '/usr/sbin/sshd -T -f %s'
 
-- name: "MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | Add KEXs"
-  when:
-    - rhel8stig_040342
-    - rhel8stig_ssh_required
-  tags:
-    - RHEL-08-040342
-    - CAT2
-    - CCI-001453
-    - NIST800-53R4_CM-6
-    - SRG-OS-000250-GPOS-00093
-    - SV-255924r1017372_rule
-    - V-255924
-    - fips
-  block:
-    - name: "MEDIUM | RHEL-08-040342 | AUDIT | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | get KEXs"
-      ansible.builtin.shell: grep -E "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i okexa | sed s'/-o//g'
-      changed_when: false
-      failed_when: false
-      register: discovered_current_kex_settings
-
-    - name: MEDIUM | RHEL-08-040342 | PATCH | RHEL 8 SSH server must be configured to use only FIPS-validated key exchange algorithms. | update KEXs"
-      when:
-        - discovered_current_kex_settings is defined
-        - discovered_current_kex_settings.stdout | length > 0
-      ansible.builtin.lineinfile:
-        path: /etc/crypto-policies/back-ends/opensshserver.config
-        regexp: '(^CRYPTO_POLICY=.*)-o{{ discovered_current_kex_settings.stdout }}(.*$)'
-        line: '\g<1>-o{{ rhel8stig_ssh_kex }}\g<2>'
-        backrefs: true
-      notify: Change_requires_reboot
-
 - name: "MEDIUM | RHEL-08-040350 | PATCH | If the Trivial File Transfer Protocol (TFTP) server is required, the RHEL 8 TFTP daemon must be configured to operate in secure mode."
   when:
     - rhel8stig_040350
@@ -1960,7 +1952,7 @@
     - CCI-000381
     - NIST800-53R4_CM-7
     - SRG-OS-000480-GPOS-00227
-    - SV-230559r1014820_rule
+    - SV-230559r1155398_rule
     - V-230559
     - dnf
     - gssproxy

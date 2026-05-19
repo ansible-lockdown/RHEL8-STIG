@@ -1,5 +1,80 @@
 # Changes to RHEL8STIG
 
+## STIG v2r6
+
+### May26 Alignment
+- fixed meta references
+- added check mode
+- removed old unused items
+- no log added
+- company naming aligned
+- var naming aligned
+- aide logic
+- audit improvements
+- linting
+- removed vars not required
+
+### Feb 2026 QA
+
+- Updated benchmark version
+- Lic Year update
+- Branding update on .j2's
+- Updated discovered vars tasks naming to be unique
+- Updated .github workflows to standard
+- Fixed handler typo `rRstart sssd` -> `Restart sssd` in Cat_2/RHEL-08-020xxx (020016)
+- Fixed goss audit variable mismatch RHEL_08_010381 mapped to wrong toggle (010380 -> 010381)
+- Fixed goss audit variable mismatch RHEL_08_030690 mapped to wrong toggle (030090 -> 030690)
+- Removed deprecated `verbosity` option from `.ansible-lint`
+- Fixed 8 double-space grammar issues in Cat_2 task names
+- Removed unused regex variables from `vars/main.yml` (rhel8stig_regexp_quoted_params, rhel8stig_replace_quoted_params, rhel8stig_service_started)
+- Renamed 5 non-standard register variables to `discovered_*` prefix convention in `prelim.yml`
+- Verified all 366 rules against V2R6
+- Aligned defaults/main.yml and goss template with RHEL8-STIG-Audit vars/STIG.yml
+- 010180 - removed from defaults and goss template (no remediation task existed; originally merged into 010700)
+- 040060 - removed rule toggle from defaults and goss template (no remediation task existed; rhel8stig_epel_required retained under 040010 where it is used)
+- 040342 - removed from defaults, goss template, and remediation task in Cat_2/RHEL-08-040xxx.yml (not in V2R6; KEX handled by crypto-policies); rhel8stig_ssh_kex variable removed
+
+### CAT1
+- 010015 - new control - crypto-policies
+- 010020 - new requirements - rewrite - Crypto FIPS
+- 010270 - new - Crypto FIPS
+- 040010 - rsh-server changed to EPEL
+- 040172 - updated to drop in file
+
+### CAT2
+- 010275 - new - bind - crypto
+- 010280 - new - ipsec - crypto
+- 010287 - removed
+- 010293 - removed
+- 010294 - removed
+- 010295 - removed
+- 010296 - updated
+- 010297 - updated
+- 010350 - changed to root owner
+- 010455
+- 010572 - ignore vfat
+- 010580 - ignore vfat
+- 010630
+- 010640
+- 010660 - removed
+- 010670
+- 010671 - dropin file
+- 010672 - not required if kdump disabled
+- 010673 - not required if kdump disabled
+- 010674 - not required if kdump disabled
+- 010675 - not required if kdump disabled
+- 020000 - removed as duplicate of 020270
+- 020060 - 10 min timeout
+- 020360 - new - shell session TMOUT 10 min inactivity
+- 030655 - new - audit cron scripts/executables (added in v2r4, aligned for v2r6)
+- 040282 - dropin file
+- 040285 - dropin file
+
+### CAT 3
+
+- 010472 - new - rng-tools package installed
+- 020340 - removed
+
 ## 5.0.0 STIG v2r4
 
 RuleIDs updated for listed controls after changes
@@ -376,10 +451,10 @@ Controls updated
       - RHEL-08-040280 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040281 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040282 - Updated to include find and remove for conflicting parameters
-      - RHEL-08-040283 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040284 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040285 - Updated to include find adn remove for conflicting parameters
-      - RHEL-08-040286 - Updated to include find adn remove for conflicting parameters
+      - RHEL-08-040283 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040284 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040285 - Updated to include find and remove for conflicting parameters
+      - RHEL-08-040286 - Updated to include find and remove for conflicting parameters
       - RHEL-08-040340
       - RHEL-08-040341
       - RHEL-08-040400 - New control

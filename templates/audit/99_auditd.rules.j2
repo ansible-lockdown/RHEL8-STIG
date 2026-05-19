@@ -1,3 +1,5 @@
+{{ file_managed_by_ansible }}
+
 # This template will set all of the auditd configurations via a handler in the role in one task instead of individually
 {% if rhel8stig_030000 %}
 -a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k execpriv

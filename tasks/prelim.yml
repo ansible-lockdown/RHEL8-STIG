@@ -6,24 +6,24 @@
     - name: "PRELIM | Check whether machine is UEFI-based"
       ansible.builtin.stat:
         path: /sys/firmware/efi
-      register: rhel8_efi_boot
+      register: discovered_efi_boot
 
     - name: "PRELIM | Set fact if UEFI boot"
-      when: rhel8_efi_boot.stat.exists
+      when: discovered_efi_boot.stat.exists
       ansible.builtin.set_fact:
         prelim_bootloader_path: /boot/efi/EFI/{{ ansible_distribution | lower }}
         prelim_legacy_boot: false
 
     - name: "PRELIM | Set fact if UEFI boot | Oracle Linux"
       when:
-        - rhel8_efi_boot.stat.exists
+        - discovered_efi_boot.stat.exists
         - ansible_distribution == 'OracleLinux'
       ansible.builtin.set_fact:
         prelim_bootloader_path: /boot/efi/EFI/redhat
         prelim_legacy_boot: false
 
     - name: "PRELIM | Set if not UEFI boot"
-      when: not rhel8_efi_boot.stat.exists
+      when: not discovered_efi_boot.stat.exists
       ansible.builtin.set_fact:
         prelim_bootloader_path: /boot/grub2/
         prelim_legacy_boot: true
@@ -41,23 +41,25 @@
     - name: PRELIM | Capture UID_MIN information from logins.def
       ansible.builtin.shell: grep -w "^UID_MIN" /etc/login.defs | awk '{print $NF}'
       changed_when: false
-      register: uid_min_id
+      check_mode: false
+      register: discovered_uid_min
 
     - name: PRELIM | Capture UID_MAX information from logins.def
       ansible.builtin.shell: grep -w "^UID_MAX" /etc/login.defs | awk '{print $NF}'
       changed_when: false
-      register: uid_max_id
+      check_mode: false
+      register: discovered_uid_max
 
-    - name: PRELIM | Capture GID_MIN information from logins.def
-      ansible.builtin.shell: grep -w "^GID_MIN" /etc/login.defs | awk '{print $NF}'
-      changed_when: false
-      register: gid_min_id
-
-    - name: PRELIM | Set_facts for interactive uid/gid
+    - name: PRELIM | Set_facts for interactive uid
       ansible.builtin.set_fact:
-        min_int_uid: "{{ uid_min_id.stdout }}"
-        max_int_uid: "{{ uid_max_id.stdout }}"
-        min_int_gid: "{{ gid_min_id.stdout }}"
+        min_int_uid: "{{ discovered_uid_min.stdout }}"
+        max_int_uid: "{{ discovered_uid_max.stdout }}"
+
+- name: PRELIM | Set crypto policies and subpolicies fact
+  when: rhel8stig_additional_fips_crypto_subpolicies
+  tags: always
+  ansible.builtin.set_fact:
+    combined_crypto_policy_config: "{{ combined_crypto_policy_config }}:{{ rhel8stig_additional_fips_crypto_subpolicies_list | join(':') }}"
 
 - name: "PRELIM | RHEL-08-010400 | RHEL-08-020250 | RHEL-08-020290 | Set sssd.conf location"
   when:
@@ -86,14 +88,20 @@
         warn_control_id: "SSSD_checks_skipped"
 
 - name: "PRELIM | Include audit specific variables"
-  when: run_audit or audit_only or setup_audit
-  tags: always
+  when:
+    - run_audit or audit_only
+    - setup_audit
+  tags:
+    - setup_audit
+    - run_audit
   ansible.builtin.include_vars:
     file: audit.yml
 
 - name: "PRELIM | Include pre-remediation audit tasks"
-  when: run_audit or audit_only
-  tags: always
+  when:
+    - run_audit or audit_only
+    - setup_audit
+  tags: run_audit
   ansible.builtin.import_tasks:
     file: pre_remediation_audit.yml
 
@@ -104,7 +112,7 @@
     - CAT1
     - CCI-000068
     - SRG-OS-000033-GPOS-00014
-    - SV-230223r792855_rule
+    - SV-230223r1155356_rule
     - V-230223
   ansible.builtin.package:
     name: crypto-policies-scripts
@@ -185,13 +193,14 @@
   ansible.builtin.import_tasks:
     file: parse_etc_passwd.yml
     # vars:
-    #   rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320"  # pragma: allowlist secret
+    # rhel8stig_passwd_tasks: "RHEL-08-010740 RHEL-08-010750 RHEL-08-020320" # pragma: allowlist secret
 
 - name: "PRELIM | AUDIT | Discover Interactive Users"
   tags: always
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $1 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_usernames
 
 - name: "PRELIM | AUDIT | Discover Interactive User accounts home directories"
@@ -199,6 +208,7 @@
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $6 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_users_home
 
 - name: "PRELIM | AUDIT | Discover Interactive user UIDs"
@@ -206,6 +216,7 @@
   ansible.builtin.shell: >
       grep -E -v '^(root|halt|sync|shutdown)' /etc/passwd | awk -F: '(!index($7, "sbin/nologin") && $7 != "/bin/nologin" && $7 != "/bin/false") { print $3 }'
   changed_when: false
+  check_mode: false
   register: discovered_interactive_uids
 
 - name: "PRELIM | RHEL-08-010690 | Ensure user enumeration command is modified when autofs remote home directories are in use"
@@ -229,6 +240,7 @@
     - name: "PRELIM | RHEL-08-010690 | Gather local interactive user directories"
       ansible.builtin.command: "{{ local_interactive_user_dir_command }}"
       changed_when: false
+      check_mode: false
       failed_when: false
       register: prelim_getent
 
@@ -274,7 +286,7 @@
     - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Check for existing AIDE database"
       ansible.builtin.stat:
         path: "{{ rhel8stig_aide_db_file }}"
-      register: rhel8stig_aide_db_status
+      register: discovered_aide_db_status
       check_mode: false
       changed_when: false
       notify: Build_aide_db
@@ -315,25 +327,24 @@
       changed_when: true
       notify: Clean up ssh host key
 
-- name: "PRELIM | RHEL-08-010660 | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
+- name: "PRELIM | RHEL-08-010770 | AUDIT | Find ini files for interactive users."
   when:
     - rhel8stig_stig_interactive_homedir_results is defined
     - rhel8stig_disruption_high
-    - rhel8stig_010660 or
-      rhel8stig_010770
+    - rhel8stig_010770
   tags: always
   ansible.builtin.shell: find "{{ item }}" -maxdepth 1 -type f | grep '/\.[^/]*'
   loop: "{{ rhel8stig_stig_interactive_homedir_results }}"
   changed_when: false
+  check_mode: false
   failed_when: false
   register: prelim_interactive_user_ini_file_list
 
-- name: "PRELIM | RHEL-08-010660 | RHEL-08-010770 | Set fact for home directory paths for interactive users"
+- name: "PRELIM | RHEL-08-010770 | Set fact for home directory paths for interactive users"
   when:
     - rhel8stig_stig_interactive_homedir_results is defined
     - rhel8stig_disruption_high
-    - rhel8stig_010660 or
-      rhel8stig_010770
+    - rhel8stig_010770
   tags: always
   ansible.builtin.set_fact:
     prelim_interactive_homedir_ini_files: "{{ prelim_interactive_user_ini_file_list.results | map(attribute='stdout_lines') | list }}"
@@ -363,7 +374,7 @@
         owner: root
         group: root
         setype: faillog_t
-      register: faillock_dir
+      register: discovered_faillock_dir
 
 - name: "PRELIM | Section 1.1 | Create list of mount points"
   tags: always
