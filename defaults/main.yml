@@ -42,6 +42,10 @@ change_requires_reboot: false
 create_benchmark_facts: true
 ansible_facts_path: /etc/ansible/facts.d
 
+###
+### Settings for associated Audit role using Goss
+###
+
 ###########################################
 ### Goss is required on the remote host ###
 ### vars/auditd.yml for other settings  ###
@@ -53,6 +57,8 @@ setup_audit: false
 run_audit: false
 # Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
 audit_run_heavy_tests: true
+# Ability to limit the number of concurrent processes used by goss (default 50)
+audit_max_concurrent: 50
 
 ## Only run Audit do not remediate
 audit_only: false
@@ -61,16 +67,13 @@ audit_only: false
 
 # How to retrieve audit binary
 # Options are copy or download - detailed settings at the bottom of this file
-# you will need to access to either github or the file already downloaded
+# you will need access to either github or the file already downloaded
 get_audit_binary_method: download
 
 ## if get_audit_binary_method - copy the following needs to be updated for your environment
 ## it is expected that it will be copied from somewhere accessible to the control node
 ## e.g copy from ansible control node to remote host
 audit_bin_copy_location: /some/accessible/path
-
-# Ability to limit the number of concurrent processes used by goss (default 50)
-audit_max_concurrent: 50
 
 # how to get audit files onto host options
 # options are git/copy/archive/get_url other e.g. if you wish to run from already downloaded conf
@@ -79,7 +82,7 @@ audit_content: git
 # If using either archive, copy, get_url:
 ## Note will work with .tar files - zip will require extra configuration
 ### If using get_url this is expecting github url in tar.gz format e.g.
-### https://github.com/ansible-lockdown/RHEL8-STIG-Audit/archive/refs/tags/1.0.0.tar.gz
+### https://github.com/ansible-lockdown/{{ OS_TYPE }}-{{ BENCHMARK_TYPE }}-Audit/archive/refs/heads/benchmark-{{ benchmark_version }}.tar.gz
 audit_conf_source: "some path or url to copy from"
 
 # Destination for the audit content to be placed on managed node
