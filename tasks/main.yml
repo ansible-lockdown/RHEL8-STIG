@@ -46,11 +46,12 @@
       changed_when: false
       failed_when: false
       check_mode: false
-      register: ansible_user_password_set
+      no_log: true
+      register: discovered_user_password_set
 
     - name: "Assert that password set for {{ ansible_env.SUDO_USER }} and account not locked"  # noqa: name[template]
       ansible.builtin.assert:
-        that: ansible_user_password_set.stdout | length != 0 and ansible_user_password_set.stdout != "!!"
+        that: discovered_user_password_set.stdout | length != 0 and discovered_user_password_set.stdout != "!!"
         fail_msg: "You have {{ sudo_password_rule }} enabled but the user = {{ ansible_env.SUDO_USER }} has no password set - It can break access"
         success_msg: "You have a password set for the {{ ansible_env.SUDO_USER }}"
       vars:
@@ -65,11 +66,11 @@
       changed_when: false
       failed_when: false
       check_mode: false
-      register: rhel8stig_user_list
+      register: discovered_user_list
 
     - name: "Ensure superuser for grub does not match existing user"
       ansible.builtin.assert:
-        that: rhel8stig_boot_superuser not in rhel8stig_user_list.stdout_lines
+        that: rhel8stig_boot_superuser not in discovered_user_list.stdout_lines
         fail_msg: "A unique name must be used for bootloader access user='{{ rhel8stig_boot_superuser }}' already exists refer to variable rhel8stig_boot_superuser"
 
 - name: Include OS specific variables
@@ -90,13 +91,13 @@
 
 - name: Check if using resolv.conf template settings are changed
   when:
-    - rhel8_stig_use_resolv_template
+    - rhel8stig_use_resolv_template
     - rhel8stig_010680
   tags: always
   ansible.builtin.assert:
     that:
-      - rhel8_stig_resolv_domain != 'example.com'
-      - rhel8_stig_resolv_search | length > 0
+      - rhel8stig_resolv_domain != 'example.com'
+      - rhel8stig_resolv_search | length > 0
     msg: "WARNING!! You are set to change your resolv.conf file this can be very disruptive if not configured correctly"
 
 - name: Gather the package facts
@@ -137,7 +138,9 @@
   ansible.builtin.meta: flush_handlers
 
 - name: Reboot system
-  when: change_requires_reboot
+  when:
+    - change_requires_reboot
+    - not system_is_container
   block:
     - name: Reboot system if not skipped
       when: not rhel8stig_skip_reboot
@@ -173,7 +176,7 @@
         dest: "{{ ansible_facts_path }}/compliance_facts.fact"
         owner: root
         group: root
-        mode: "u-x,go-wx"
+        mode: 'u-x,go-wx'
 
 - name: Fetch audit files
   when:
