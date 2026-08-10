@@ -4,4 +4,4 @@ os_gpg_key_pubkey_name: gpg-pubkey-fd431d51-4ae0493b  # pragma: allowlist secret
 os_gpg_key_pubkey_content: "Red Hat, Inc. (release key 2) <security@redhat.com> fd431d51"
 
 gpg_package: redhat-release
-rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ ansible_distribution | lower }}-release
+rpm_gpg_key: /etc/pki/rpm-gpg/RPM-GPG-KEY-{{ ansible_facts['distribution'] | lower }}-release

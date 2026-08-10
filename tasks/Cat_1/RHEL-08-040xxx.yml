@@ -14,38 +14,6 @@
     name: telnet-server
     state: absent
 
-- name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-  when: rhel8stig_040010
-  tags:
-    - RHEL-08-040010
-    - CAT1
-    - CCI-000381
-    - NIST800-53R4_CM-7
-    - SRG-OS-000095-GPOS-00049
-    - SV-230492r1134888_rule
-    - V-230492
-  block:
-    - name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when: not rhel8stig_epel_required
-      ansible.builtin.package:
-        name: epel-release
-        state: absent
-
-    - name: "HIGH | RHEL-08-040010 | AUDIT | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when: rhel8stig_epel_required
-      ansible.builtin.command: dnf repolist | grep epel
-      changed_when: false
-      check_mode: false
-      failed_when: discovered_epel_repos.rc not in [0, 1]
-      register: discovered_epel_repos
-
-    - name: "HIGH | RHEL-08-040010 | WARN | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when:
-        - rhel8stig_epel_required
-        - discovered_epel_repos.stdout is defined
-      ansible.builtin.command: dnf config-manager --disable epel
-      changed_when: true
-
 - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
   when: rhel8stig_040170
   tags:
@@ -73,7 +41,7 @@
 - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   when:
     - rhel8stig_040171
-    - "'gnome-desktop' in ansible_facts.packages or 'gnome-desktop3' in ansible_facts.packages"
+    - "'gnome-desktop' in ansible_facts['packages'] or 'gnome-desktop3' in ansible_facts['packages']"
   tags:
     - RHEL-08-040171
     - CAT1
@@ -122,7 +90,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230531r1155396_rule
+    - SV-230531r1208754_rule
     - V-230531
   notify: Systemctl daemon-reload
   block:
@@ -136,8 +104,8 @@
 
     - name: HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled | ansible.builtin.lineinfile
       ansible.builtin.template:
-        src: etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.j2
-        dest: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction
+        src: etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.conf.j2
+        dest: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.conf
         mode: 'go-wx'
         owner: root
         group: root
@@ -174,13 +142,17 @@
     warn_control_id: "HIGH | RHEL-08-040200"
   block:
     - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
-      ansible.builtin.shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
+      ansible.builtin.shell: |
+        set -o pipefail
+        cat /etc/passwd | awk -F: '($3 == 0 && $1 != "root") {i++;print $1 } END {exit i}'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
       register: discovered_nonroot_uid
 
-    - name: "HIGH | HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
+    - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
       when:
         - discovered_nonroot_uid.stdout | length > 0
         - rhel8stig_disruption_high

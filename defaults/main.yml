@@ -1,22 +1,32 @@
 ---
+# defaults file for rhel8-stig
+# WARNING:
+# These values may be overridden by other vars-setting options(e.g. like the below 'container_vars_file'), as explained here:
+# https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 
 ## metadata for Audit benchmark
-benchmark_version: "v2r6"
+benchmark_version: 'v2r8'
 
 ## Benchmark name used by auditing control role
 # The audit variable found at the base
 benchmark: RHEL8-STIG
 
 # Whether to skip the OS check for supported OS's
+# Supported OSs will not need for this to be changed - see README e.g. CentOS
 skip_os_check: false
 
+## Switching on/off specific STIG categories
+# These variables govern whether the tasks of a particular CAT are to be executed when running the role.
+# E.g: If you want to execute the tasks of CAT I you should set the "_cat1" variable to true.
+# If you do not want the tasks from that CAT to get executed you simply set the variable to "false".
 rhel8stig_cat1: true
 rhel8stig_cat2: true
 rhel8stig_cat3: true
 
-# We've defined disruption-high to indicate items that are likely to cause
-# disruption in a normal workflow. These items can be remediated automatically
-# but are disabled by default to avoid disruption.
+# Disruption is high
+## Run tests that are considered higher risk and could have a system impact if not properly tested
+## Default false
+## Will be fine if clean new un-configured build
 rhel8stig_disruption_high: false
 
 # tweak role to run in a chroot, such as in kickstart %post script
@@ -28,14 +38,15 @@ system_is_container: false
 # Place to find the container yml file for your environment - /vars/...
 container_vars_file: is_container.yml
 
-# rhel8cis/stig is left off the front of this var for consistency in testing pipeline
+# rhel8stig is left off the front of this var for consistency in testing pipeline
 # system_is_ec2 toggle will disable tasks that fail on Amazon EC2 instances. Set true to skip and false to run tasks
 system_is_ec2: false
 
-# Whether to skip the reboot
+# Whether to skip the system reboot before audit
+# System will reboot if false, can give better audit results
 rhel8stig_skip_reboot: true
 
-# Defined will change if control requires
+# default value will change to true but won't reboot if not enabled but will error
 change_requires_reboot: false
 
 # Create managed not custom local_facts files
@@ -50,10 +61,17 @@ ansible_facts_path: /etc/ansible/facts.d
 ### Goss is required on the remote host ###
 ### vars/auditd.yml for other settings  ###
 
-# Allow audit to setup the requirements including installing git (if option chosen and downloading and adding goss binary to system)
+## Audit setup
+# Audits are carried out using Goss. This variable
+# determines whether execution of the role prepares for auditing
+# by installing the required binary.
 setup_audit: false
 
-# enable audits to run - this runs the audit and get the latest content
+## Enable audits to run - this runs the audit and get the latest content
+# This variable governs whether the audit using the
+# separately maintained audit role using Goss
+# is carried out.
+# This runs the audit and gets the latest content
 run_audit: false
 # Run heavy tests - some tests can have more impact on a system enabling these can have greater impact on a system
 audit_run_heavy_tests: true
@@ -65,24 +83,45 @@ audit_only: false
 
 #############################
 
-# How to retrieve audit binary
-# Options are copy or download - detailed settings at the bottom of this file
-# you will need access to either github or the file already downloaded
+## How to retrieve audit binary(Goss)
+# Options are 'copy' or 'download' - detailed settings at the bottom of this file
+# - if 'copy':
+#    - the filepath mentioned via the below 'audit_bin_copy_location' var will be used to access already downloaded Goss
+# - if 'download':
+#    - the GitHub Goss-releases URL will be used for a fresh-download, via 'audit_bin_url' and 'audit_pkg_arch_name' vars
 get_audit_binary_method: download
+
+## If downloading the audit binary(Goss)
+## Useful when self hosting the content
+## Enables the ability to not check ssl certificates using the get_url module
+audit_bin_validate_certs: true
+
+## Optional credentials for downloading the audit binary from a private location.
+## Uncomment and set; prefer a vault or alternative encryption for these values.
+# audit_bin_url_username:
+# audit_bin_url_password:
 
 ## if get_audit_binary_method - copy the following needs to be updated for your environment
 ## it is expected that it will be copied from somewhere accessible to the control node
 ## e.g copy from ansible control node to remote host
 audit_bin_copy_location: /some/accessible/path
 
-# how to get audit files onto host options
+## How to retrieve the audit role
+# The role for auditing is maintained separately.
+# This variable specifies the method of how to get the audit role
 # options are git/copy/archive/get_url other e.g. if you wish to run from already downloaded conf
+# onto the system. The options are as follows:
+# - 'git': clone audit content from GitHub REPOSITORY, set up via `audit_file_git` var, and
+#          VERSION(e.g. branch, tag name), set up via `audit_git_version` var.
+# - 'copy': copy from path as specified in variable `audit_conf_copy`.
+# - 'archive': same as 'copy', only that the specified filepath needs to be unpacked.
+# - 'get_url': Download from url as specified in variable `audit_files_url`
 audit_content: git
 
 # If using either archive, copy, get_url:
 ## Note will work with .tar files - zip will require extra configuration
 ### If using get_url this is expecting github url in tar.gz format e.g.
-### https://github.com/ansible-lockdown/{{ OS_TYPE }}-{{ BENCHMARK_TYPE }}-Audit/archive/refs/heads/benchmark-{{ benchmark_version }}.tar.gz
+### https://github.com/ansible-lockdown/{{ OS_TYPE }}-{{ BENCHMARK_TYPE }}-Audit/archive/refs/heads/benchmark_{{ benchmark_version }}.tar.gz
 audit_conf_source: "some path or url to copy from"
 
 # Destination for the audit content to be placed on managed node
@@ -430,6 +469,8 @@ rhel8stig_040180: true
 rhel8stig_040209: true
 rhel8stig_040210: true
 rhel8stig_040220: true
+rhel8stig_040221: true
+rhel8stig_040222: true
 rhel8stig_040230: true
 rhel8stig_040239: true
 rhel8stig_040240: true
@@ -448,6 +489,7 @@ rhel8stig_040283: true
 rhel8stig_040284: true
 rhel8stig_040285: true
 rhel8stig_040286: true
+rhel8stig_040287: true
 rhel8stig_040290: true
 rhel8stig_040320: true
 rhel8stig_040321: true
@@ -672,6 +714,8 @@ rhel8stig_hashing_rounds: 100000
 # RHEL-08-010140 and RHEL-08-020280
 # Password protect the boot loader
 rhel8stig_bootloader_password_hash: grub.pbkdf2.sha512.changethispassword # pragma: allowlist secret
+# Must NOT match any existing /etc/passwd entry - the role asserts this in
+# tasks/main.yml. Defense-in-depth: GRUB superuser distinct from login accounts.
 rhel8stig_boot_superuser: bootloader_admin
 
 # now in prelim

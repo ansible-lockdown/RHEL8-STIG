@@ -1,14 +1,33 @@
 ---
 
+# RHEL 8 targets are managed over /usr/libexec/platform-python (3.6) - the only interpreter on
+# RHEL 8 / Rocky 8 that carries the dnf Python bindings. These pins exist because of that, and
+# must not be raised without first checking the constraint below.
+#
+# community.general 12.0.0 and community.crypto 3.0.0 rewrote their modules to open with
+# `from __future__ import annotations`, which is a SyntaxError on Python 3.6. Ansible copies the
+# module source to the target and executes it there, so this fails at run time on the managed
+# node, not on the controller. The same major releases also raised requires_ansible to >=2.17,
+# which this role cannot use for the same reason - so the boundary is one boundary, not two.
+#
+# Left unpinned these resolve to git HEAD, which is already past both boundaries. Verified
+# against the published artifacts: community.general 11.4.0 (requires_ansible >=2.16.0) and
+# community.crypto 2.26.0 (>=2.9.10) carry no `from __future__ import annotations` in any module;
+# 12.0.0 and 3.0.0 do. ansible.posix is clean at every release checked and pinned only for
+# reproducibility.
+
 collections:
   - name: community.general
     source: https://github.com/ansible-collections/community.general
     type: git
+    version: 11.4.0
 
   - name: community.crypto
     source: https://github.com/ansible-collections/community.crypto
     type: git
+    version: 2.26.0
 
   - name: ansible.posix
     source: https://github.com/ansible-collections/ansible.posix
     type: git
+    version: 2.2.2

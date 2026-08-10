@@ -63,7 +63,11 @@
     - auditd
   block:
     - name: "LOW | RHEL-08-030602 | AUDIT | RHEL 8 must allocate an audit_backlog_limit of sufficient size to capture processes that start prior to the audit daemon. | Get GRUB_CMDLINE_LINUX settings"
-      ansible.builtin.shell: grep -i cmdline /etc/default/grub | grep audit_backlog_limit=8192
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -i cmdline /etc/default/grub | grep audit_backlog_limit=8192
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -99,7 +103,7 @@
 - name: "LOW | RHEL-08-030741 | PATCH | RHEL 8 must disable the chrony daemon from acting as a server."
   when:
     - rhel8stig_030741
-    - "'chrony' in ansible_facts.packages"
+    - "'chrony' in ansible_facts['packages']"
   tags:
     - RHEL-08-030741
     - CAT3

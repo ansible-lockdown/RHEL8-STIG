@@ -2,6 +2,11 @@
 
 rhel8stig_min_ansible_version: 2.12.1
 
+# Shell interpreter for ansible.builtin.shell tasks that require a shell
+# (pipe, glob, &&, or a shell builtin). Explicit + overridable to a POSIX
+# shell such as dash or ash for container runs.
+rhel8stig_shell_executable: /bin/bash
+
 # RHEL 8 STIG requirements
 combined_crypto_policy_config: FIPS
 

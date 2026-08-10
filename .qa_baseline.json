@@ -1,0 +1,97 @@
+{
+  "tool_version": "2.8.1",
+  "date": "2026-08-10T14:30:08.190742",
+  "findings": [
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 6,
+      "description": "Referenced but not defined: 'rhel8stig_os_distribution'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 13,
+      "description": "Referenced but not defined: 'rhel8stig_os_version_pre_8_2'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 46,
+      "description": "Referenced but not defined: 'rhel8stig_bootloader_path'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 427,
+      "description": "Referenced but not defined: 'rhel8stig_password_hash'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 107,
+      "description": "CHECK B: audit_bin_copy_location in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 97,
+      "description": "CHECK B: audit_bin_validate_certs in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 129,
+      "description": "CHECK B: audit_conf_dest in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 125,
+      "description": "CHECK B: audit_conf_source in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 119,
+      "description": "CHECK B: audit_content in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 132,
+      "description": "CHECK B: audit_log_dir in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 79,
+      "description": "CHECK B: audit_max_concurrent in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 92,
+      "description": "CHECK B: get_audit_binary_method in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 0,
+      "description": "CHECK E: templates/ansible_vars_goss.yml.j2 present; rename to templates/lockdown_audit.yml.j2",
+      "severity": "warning",
+      "check": "audit_vars"
+    }
+  ]
+}

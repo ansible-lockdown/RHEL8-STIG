@@ -73,10 +73,10 @@ jobs:
         working-directory: .github/workflows
         run: |
           if [ ${{ vars.IAC_BRANCH }} != '' ]; then
-              echo "IAC_BRANCH=${{ vars.IAC_BRANCH }}" >> $GITHUB_ENV
-              echo "Pipeline using the following IAC branch ${{ vars.IAC_BRANCH }}"
+            echo "IAC_BRANCH=${{ vars.IAC_BRANCH }}" >> $GITHUB_ENV
+            echo "Pipeline using the following IAC branch ${{ vars.IAC_BRANCH }}"
           else
-              echo IAC_BRANCH=main >> $GITHUB_ENV
+            echo IAC_BRANCH=main >> $GITHUB_ENV
           fi
 
       # Pull in terraform code for linux servers

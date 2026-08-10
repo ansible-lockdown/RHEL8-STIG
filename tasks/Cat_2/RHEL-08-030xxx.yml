@@ -49,10 +49,10 @@
     path: /etc/audit/auditd.conf
     regexp: '^#?action_mail_acct\s*='
     line: "action_mail_acct = {{ rhel8stig_auditd_mail_acct }}"
-  register: discovered_action_mail_acct_result
   failed_when:
     - discovered_action_mail_acct_result is failed
     - discovered_action_mail_acct_result.rc != 257
+  register: discovered_action_mail_acct_result
 
 - name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
   when: rhel8stig_030030
@@ -153,10 +153,14 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | logfile location"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
-      register: discovered_auditlog_location_auditd
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
+      register: discovered_auditlog_location_auditd
 
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | check file exists"
       ansible.builtin.stat:
@@ -187,7 +191,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -236,7 +244,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -268,7 +280,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -299,7 +315,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -633,7 +653,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
+- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr, and lremovexattr system calls."
   when: rhel8stig_030200
   tags:
     - RHEL-08-030200
@@ -1080,7 +1100,7 @@
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename, unlink, rmdir, renameat, and unlinkat system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030361
   tags:
     - RHEL-08-030361
@@ -1185,7 +1205,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate, ftruncate, creat, open, openat, and open_by_handle_at system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030420
   tags:
     - RHEL-08-030420
@@ -1207,7 +1227,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown, fchown, fchownat, and lchown system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030480
   tags:
     - RHEL-08-030480
@@ -1230,7 +1250,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod, fchmod, and fchmodat system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030490
   tags:
     - RHEL-08-030490
@@ -1389,7 +1409,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030610 | PATCH | Audit file permissions"
+- name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
   when: rhel8stig_030610
   tags:
     - RHEL-08-030610
@@ -1397,25 +1417,25 @@
     - CCI-000171
     - NIST800-53R4_AU-12
     - SRG-OS-000256-GPOS-00097
-    - SV-230471r1069296_rule
+    - SV-230471r1208750_rule
     - V-230471
     - permissions
     - auditd
   block:
-    - name: "MEDIUM | RHEL-08-030610 | AUDIT | Find custom audit rules"
+    - name: "MEDIUM | RHEL-08-030610 | AUDIT | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Find custom audit rules"
       ansible.builtin.find:
         paths: /etc/audit/rules.d/
         file_type: file
         patterns: "*.rules"
         recurse: false
-      register: discovered_custom_audit_rules
       changed_when: false
       check_mode: false
+      register: discovered_custom_audit_rules
 
-    - name: "MEDIUM | RHEL-08-030610 | PATCH | Set audit file permissions"
+    - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Set audit file permissions"
       ansible.builtin.file:
         path: "{{ item }}"
-        mode: 'u-x,g-wx,o-rwx'
+        mode: 'u-x,g-rwx,o-rwx'
         owner: root
         group: root
       failed_when: discovered_custom_audit_rules_permissions.state not in '[ file, absent ]'
@@ -1546,7 +1566,11 @@
     warn_control_id: "MEDIUM | RHEL-08-030660"
   block:
     - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
-      ansible.builtin.shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -1712,7 +1736,7 @@
 - name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
   when:
     - rhel8stig_030740
-    - "'chrony' in ansible_facts.packages"
+    - "'chrony' in ansible_facts['packages']"
   tags:
     - RHEL-08-030740
     - CAT2

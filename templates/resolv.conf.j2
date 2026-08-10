@@ -1,6 +1,6 @@
 {{ file_managed_by_ansible }}
 
-{% if rhel8stig_resolv_domain is defined %}
+{% if rhel8stig_resolv_domain is defined and rhel8stig_resolv_domain %}
 domain {{ rhel8stig_resolv_domain }}
 {% endif %}
 {% if rhel8stig_resolv_search is iterable %}

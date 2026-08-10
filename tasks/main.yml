@@ -4,9 +4,9 @@
   when: not skip_os_check
   tags: always
   ansible.builtin.assert:
-    that: (ansible_facts.distribution != 'CentOS' and ansible_facts.os_family == 'RedHat' or ansible_facts.os_family == "Rocky") and ansible_facts.distribution_major_version is version_compare('8', '==')
-    fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_facts.distribution }} {{ ansible_facts.distribution_major_version }} is not supported."
-    success_msg: "This role is running against a supported OS {{ ansible_facts.distribution }} {{ ansible_facts.distribution_major_version }}"
+    that: (ansible_facts['distribution'] != 'CentOS' and ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == "Rocky") and ansible_facts['distribution_major_version'] is version_compare('8', '==')
+    fail_msg: "This role can only be run against RHEL/Rocky 8. {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }} is not supported."
+    success_msg: "This role is running against a supported OS {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_major_version'] }}"
 
 - name: Check ansible version
   tags: always
@@ -18,7 +18,7 @@
 - name: Setup rules if container
   when:
     - ansible_connection == 'docker' or
-      ansible_facts.virtualization_type in ["docker", "lxc", "openvz", "podman", "container"]
+      ansible_facts['virtualization_type'] in ["docker", "lxc", "openvz", "podman", "container"]
   tags: always
   block:
     - name: Discover and set container variable if required
@@ -42,7 +42,11 @@
   tags: always
   block:
     - name: Capture current password state of connecting user"
-      ansible.builtin.shell: "grep {{ ansible_env.SUDO_USER }} /etc/shadow | awk -F: '{print $2}'"
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep {{ ansible_env.SUDO_USER }} /etc/shadow | awk -F: '{print $2}'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       failed_when: false
       check_mode: false
@@ -62,21 +66,25 @@
   tags: always
   block:
     - name: "Ensure superuser for grub does not match existing user | capture users"
-      ansible.builtin.shell: cat /etc/passwd | cut -d':' -f1
+      ansible.builtin.shell: |
+        set -o pipefail
+        cat /etc/passwd | cut -d':' -f1
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       failed_when: false
       check_mode: false
-      register: discovered_user_list
+      register: discovered_grub_existing_users
 
     - name: "Ensure superuser for grub does not match existing user"
       ansible.builtin.assert:
-        that: rhel8stig_boot_superuser not in discovered_user_list.stdout_lines
+        that: rhel8stig_boot_superuser not in discovered_grub_existing_users.stdout_lines
         fail_msg: "A unique name must be used for bootloader access user='{{ rhel8stig_boot_superuser }}' already exists refer to variable rhel8stig_boot_superuser"
 
 - name: Include OS specific variables
   tags: always
   ansible.builtin.include_vars:
-    file: "{{ ansible_facts.distribution }}.yml"
+    file: "{{ ansible_facts['distribution'] }}.yml"
 
 - name: Check rhel8stig_bootloader_password_hash variable has been changed
   when:
