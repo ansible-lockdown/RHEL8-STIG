@@ -1,0 +1,53 @@
+---
+# Molecule verify - spot-checks a representative, container-applicable subset of the
+# RHEL 8 STIG hardening the role applies. The authoritative validation is the Goss
+# audit run during converge (run_audit: true); this playbook is a fast sanity gate so
+# `molecule verify` is not a silent no-op - a scenario with no verify.yml logs
+# "Executed: Missing playbook" and exits 0, which reads as a pass. Assertions are limited
+# to controls that genuinely apply inside an unprivileged container (no auditd/sysctl/sshd
+# runtime).
+
+- name: Verify - RHEL 8 STIG hardening spot-checks
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify | Read /etc/login.defs
+      ansible.builtin.slurp:
+        src: /etc/login.defs
+      register: verify_login_defs
+
+    - name: Verify | login.defs enforces SHA512 password hashing
+      ansible.builtin.assert:
+        that:
+          - "'ENCRYPT_METHOD SHA512' in (verify_login_defs.content | b64decode)"
+        fail_msg: "/etc/login.defs is not hardened (expected ENCRYPT_METHOD SHA512)"
+        success_msg: "login.defs password hashing hardened (SHA512)"
+
+    - name: Verify | Stat the login banner
+      ansible.builtin.stat:
+        path: /etc/issue
+      register: verify_issue
+
+    - name: Verify | Login banner (/etc/issue) is populated
+      ansible.builtin.assert:
+        that:
+          - verify_issue.stat.exists
+          - verify_issue.stat.size > 0
+        fail_msg: "/etc/issue login banner is empty"
+        success_msg: "Login banner populated"
+
+    # V2R7 writes this drop-in without a .conf suffix. V2R8 renames it to
+    # 55-CtrlAltDel-BurstAction.conf, so this assertion is deliberately the inverse of the
+    # one on the V2R8 branch - do not copy that file over this one.
+    - name: Verify | Stat the RHEL-08-040172 Ctrl-Alt-Del burst drop-in
+      ansible.builtin.stat:
+        path: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction
+      register: verify_cad_dropin
+
+    - name: Verify | RHEL-08-040172 Ctrl-Alt-Del burst drop-in is deployed
+      ansible.builtin.assert:
+        that:
+          - verify_cad_dropin.stat.exists
+          - verify_cad_dropin.stat.size > 0
+        fail_msg: "Ctrl-Alt-Del burst drop-in was not written"
+        success_msg: "RHEL-08-040172 drop-in deployed"

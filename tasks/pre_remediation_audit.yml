@@ -6,7 +6,7 @@
   ansible.builtin.include_tasks:
     file: LE_audit_setup.yml
 
-- name: Pre Audit Setup | Ensure existence of {{ audit_conf_dir }}  # noqa name[template]
+- name: Pre Audit Setup | Ensure existence of {{ audit_conf_dir }}
   ansible.builtin.file:
     path: "{{ audit_conf_dir }}"
     mode: 'go-w'
@@ -71,11 +71,11 @@
     dest: "{{ audit_vars_path }}"
     mode: 'go-rwx'
 
-- name: Pre Audit | Run pre_remediation audit {{ benchmark }}  # noqa name[template]
+- name: Pre Audit | Run pre_remediation audit {{ benchmark }}
   ansible.builtin.shell: |
     set -o pipefail
     umask 0022
-    {{ audit_conf_dir }}/run_audit.sh -v {{ audit_vars_path }} -f {{ audit_format }} -m {{ audit_max_concurrent }} -o {{ pre_audit_outfile }} -g "{{ group_names }}"  # noqa yaml[line-length]
+    {{ audit_conf_dir }}/run_audit.sh -v {{ audit_vars_path }} -f {{ audit_format }} -m {{ audit_max_concurrent }} -o {{ pre_audit_outfile }} -g "{{ group_names }}"
   changed_when: true
   environment:
     AUDIT_BIN: "{{ audit_bin }}"

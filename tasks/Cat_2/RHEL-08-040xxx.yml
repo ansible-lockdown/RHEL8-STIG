@@ -32,6 +32,38 @@
     name: sendmail
     state: absent
 
+- name: "MEDIUM | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
+  when: rhel8stig_040010
+  tags:
+    - RHEL-08-040010
+    - CAT2
+    - CCI-000381
+    - NIST800-53R4_CM-7
+    - SRG-OS-000095-GPOS-00049
+    - SV-230492r1184277_rule
+    - V-230492
+  block:
+    - name: "MEDIUM | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
+      when: not rhel8stig_epel_required
+      ansible.builtin.package:
+        name: epel-release
+        state: absent
+
+    - name: "MEDIUM | RHEL-08-040010 | AUDIT | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
+      when: rhel8stig_epel_required
+      ansible.builtin.command: dnf repolist | grep epel
+      changed_when: false
+      check_mode: false
+      failed_when: discovered_epel_repos.rc not in [0, 1]
+      register: discovered_epel_repos
+
+    - name: "MEDIUM | RHEL-08-040010 | WARN | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
+      when:
+        - rhel8stig_epel_required
+        - discovered_epel_repos.stdout is defined
+      ansible.builtin.command: dnf config-manager --disable epel
+      changed_when: true
+
 - name: "MEDIUM | RHEL-08-040020 | PATCH | RHEL 8 must cover or disable the built-in or attached camera when not in use."
   when: rhel8stig_040020
   tags:
@@ -41,7 +73,7 @@
     - NIST800-53R4_CM-7
     - SRG-OS-000095-GPOS-00049
     - SRG-OS-000370-GPOS-00155
-    - SV-230493r1017276_rule
+    - SV-230493r1184280_rule
     - V-230493
     - camera
   ansible.builtin.lineinfile:
@@ -104,10 +136,10 @@
       block:
         - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Get services using iptables"
           ansible.builtin.shell: iptables-save | grep -i accept | grep -i input
-          register: discovered_ppsm_clsa_check_iptables
           changed_when: false
           failed_when: false
           check_mode: false
+          register: discovered_ppsm_clsa_check_iptables
 
         - name: "MEDIUM | RHEL-08-040030 | AUDIT | RHEL 8 must be configured to prohibit or restrict the use of functions, ports, protocols, and/or services, as defined in the Ports, Protocols, and Services Management (PPSM) Category Assignments List (CAL) and vulnerability assessments. | Message out findings"
           when: discovered_ppsm_clsa_check_iptables.stdout_lines is defined
@@ -351,9 +383,9 @@
     - name: "MEDIUM | RHEL-08-040110 | AUDIT | RHEL 8 wireless network adapters must be disabled. | check if wifi is enabled"
       when: discovered_nmcli_available.rc == 0
       ansible.builtin.command: nmcli radio wifi
-      register: discovered_wifi_enabled
-      check_mode: false
       changed_when: discovered_wifi_enabled.stdout != "disabled"
+      check_mode: false
+      register: discovered_wifi_enabled
 
     - name: "MEDIUM | RHEL-08-040110 | PATCH | RHEL 8 wireless network adapters must be disabled. | Disable wifi if enabled"
       when: discovered_wifi_enabled is changed # noqa no-handler
@@ -1000,7 +1032,7 @@
       failed_when: false
       register: discovered_icmp_settings
 
-    - name: "MEDIUM | RHEL-08-040209 | AUDIT | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Remove conflicting instances"
+    - name: "MEDIUM | RHEL-08-040209 | PATCH | RHEL 8 must prevent IPv4 Internet Control Message Protocol (ICMP) redirect messages from being accepted. | Remove conflicting instances"
       when:
         - discovered_icmp_settings.stdout | length > 0
         - item != rhel8stig_sysctl_file
@@ -1650,7 +1682,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230547r1017309_rule
+    - SV-230547r1184283_rule
     - V-230547
     - sysctl
   block:
@@ -1726,7 +1758,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230549r1155416_rule
+    - SV-230549r1184286_rule
     - V-230549
     - sysctl
   block:
@@ -1939,10 +1971,10 @@
     line: "\tserver_args\t\t= -s /var/lib/tftpboot"
     insertafter: "\tserver\t\t\t="
     state: present
-  register: discovered_tftp_server_args_settings
   failed_when:
     - discovered_tftp_server_args_settings is failed
     - discovered_tftp_server_args_settings.rc != 257
+  register: discovered_tftp_server_args_settings
 
 - name: "MEDIUM | RHEL-08-040370 | PATCH | The gssproxy package must not be installed unless mission essential on RHEL 8."
   when: rhel8stig_040370
