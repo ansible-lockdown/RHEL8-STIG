@@ -14,38 +14,6 @@
     name: telnet-server
     state: absent
 
-- name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-  when: rhel8stig_040010
-  tags:
-    - RHEL-08-040010
-    - CAT1
-    - CCI-000381
-    - NIST800-53R4_CM-7
-    - SRG-OS-000095-GPOS-00049
-    - SV-230492r1134888_rule
-    - V-230492
-  block:
-    - name: "HIGH | RHEL-08-040010 | PATCH | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when: not rhel8stig_epel_required
-      ansible.builtin.package:
-        name: epel-release
-        state: absent
-
-    - name: "HIGH | RHEL-08-040010 | AUDIT | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when: rhel8stig_epel_required
-      ansible.builtin.command: dnf repolist | grep epel
-      changed_when: false
-      check_mode: false
-      failed_when: discovered_epel_repos.rc not in [0, 1]
-      register: discovered_epel_repos
-
-    - name: "HIGH | RHEL-08-040010 | WARN | RHEL 8 must not install packages from the Extra Packages for Enterprise Linux (EPEL) repository."
-      when:
-        - rhel8stig_epel_required
-        - discovered_epel_repos.stdout is defined
-      ansible.builtin.command: dnf config-manager --disable epel
-      changed_when: true
-
 - name: "HIGH | RHEL-08-040170 | PATCH | The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 8."
   when: rhel8stig_040170
   tags:
@@ -180,7 +148,7 @@
       failed_when: false
       register: discovered_nonroot_uid
 
-    - name: "HIGH | HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
+    - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Lock non-root account with UID of 0"
       when:
         - discovered_nonroot_uid.stdout | length > 0
         - rhel8stig_disruption_high

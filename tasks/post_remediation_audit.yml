@@ -4,7 +4,7 @@
   ansible.builtin.shell: |
     set -o pipefail
     umask 0022
-    {{ audit_conf_dir }}/run_audit.sh -v {{ audit_vars_path }} -f {{ audit_format }} -m {{ audit_max_concurrent }} -o {{ post_audit_outfile }} -g "{{ group_names }}"  # noqa yaml[line-length]
+    {{ audit_conf_dir }}/run_audit.sh -v {{ audit_vars_path }} -f {{ audit_format }} -m {{ audit_max_concurrent }} -o {{ post_audit_outfile }} -g "{{ group_names }}"
   changed_when: true
   environment:
     AUDIT_BIN: "{{ audit_bin }}"

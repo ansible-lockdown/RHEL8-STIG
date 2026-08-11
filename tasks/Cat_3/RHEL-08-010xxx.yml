@@ -41,7 +41,7 @@
     - CCI-001090
     - NIST800-53R4_SC-4
     - SRG-OS-000138-GPOS-00069
-    - SV-230269r1137695_rule
+    - SV-230269r1184255_rule
     - V-230269
     - sysctl
   block:
@@ -77,7 +77,7 @@
     - CCI-001090
     - NIST800-53R4_SC-4
     - SRG-OS-000138-GPOS-00069
-    - SV-230270r1137695_rule
+    - SV-230270r1184258_rule
     - V-230270
     - sysctl
   block:

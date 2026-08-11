@@ -158,7 +158,7 @@
         mode: 'u+x,go-w'
 
 - name: "PRELIM | Find all sudoers files."
-  when: rhel8stig_010380 or rhel8stig_010381
+  when: rhel8stig_010380 or rhel8stig_010381 or rhel8stig_010455
   tags: always
   ansible.builtin.shell: "find /etc/sudoers /etc/sudoers.d/ -type f ! -name '*~' ! -name '*.*'"
   check_mode: false
@@ -286,10 +286,10 @@
     - name: "PRELIM | RHEL-08-010360 | RHEL-08-010380 | RHEL-08-040310 | Check for existing AIDE database"
       ansible.builtin.stat:
         path: "{{ rhel8stig_aide_db_file }}"
-      register: discovered_aide_db_status
-      check_mode: false
-      changed_when: false
       notify: Build_aide_db
+      changed_when: false
+      check_mode: false
+      register: discovered_aide_db_status
 
 - name: "PRELIM | RHEL-08-010170 | RHEL-08-010450 | Install SELinux related dependencies"
   when:

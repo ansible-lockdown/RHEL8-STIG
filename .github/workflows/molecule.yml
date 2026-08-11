@@ -1,0 +1,120 @@
+---
+
+name: Molecule
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - devel
+      - main
+    paths:
+      - 'defaults/**'
+      - 'handlers/**'
+      - 'tasks/**'
+      - 'templates/**'
+      - 'vars/**'
+      - 'molecule/**'
+      - 'collections/**'
+      - 'site.yml'
+      - '.github/workflows/molecule.yml'
+  pull_request:
+    branches:
+      - devel
+      - main
+    paths:
+      - 'defaults/**'
+      - 'handlers/**'
+      - 'tasks/**'
+      - 'templates/**'
+      - 'vars/**'
+      - 'molecule/**'
+      - 'collections/**'
+      - 'site.yml'
+      - '.github/workflows/molecule.yml'
+  # collections/requirements.yml pulls its collections from git with no version pin, and the
+  # test image tracks a moving tag, so the substrate shifts underneath this suite between
+  # commits. A weekly run surfaces that on its own build.
+  schedule:
+    - cron: "0 6 * * 1"
+  # Allow manual running of workflow
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  molecule:
+    # Container-based smoke test on GitHub-hosted runners. This does not replace the tofu/EC2
+    # pipelines - it is the fast, secret-free gate that runs in front of them.
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        # This role ships a single scenario. Rocky 8 has no UBI-init sibling worth a second leg.
+        scenario: [default]
+    env:
+      # Overrides the linux/arm64 default in molecule.yml - GitHub-hosted runners are amd64.
+      MOLECULE_DOCKER_PLATFORM: linux/amd64
+      PY_COLORS: "1"
+      ANSIBLE_FORCE_COLOR: "1"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          # Controller-side only. ansible-core 2.16 supports a 3.10-3.12 controller.
+          python-version: "3.12"
+
+      # RHEL 8 PINS ANSIBLE 2.16 ON PURPOSE - DO NOT RAISE THIS.
+      # The scenario targets /usr/libexec/platform-python (3.6), the only interpreter on
+      # Rocky 8 / RHEL 8 that ships the dnf Python bindings. Ansible 2.19+ refuses to run
+      # modules on Python 3.6: its generated AnsiballZ wrapper opens with
+      # `from __future__ import annotations`, a SyntaxError there. A newer pin produces a
+      # workflow that looks correct and fails on the first dnf task.
+      # See molecule/default/README_Molecule+Ansible216.md for the full rationale.
+      - name: Install Ansible 2.16, Molecule, and the docker driver
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'ansible-core>=2.16,<2.17' 'molecule>=24,<26' 'molecule-plugins[docker]' docker passlib
+          ansible --version
+
+      # The molecule docker driver requires community.docker and ansible.posix, and
+      # collections/requirements.yml does not carry community.docker. ansible-core ships no
+      # bundled collections, so install both here or `molecule create` fails before the role.
+      - name: Install collections required by the molecule docker driver
+        run: ansible-galaxy collection install community.docker ansible.posix
+
+      - name: Create container
+        run: molecule create -s ${{ matrix.scenario }}
+
+      - name: Converge
+        run: |
+          molecule converge -s ${{ matrix.scenario }} -- \
+            --extra-vars 'audit_output_destination=${{ github.workspace }}/molecule_audit_output/'
+
+      # Deliberately no idempotence step: converge #2 for this role is a known non-zero-change
+      # run, so gating on it would be red for reasons that are not regressions.
+      - name: Verify
+        run: molecule verify -s ${{ matrix.scenario }}
+
+      # Goss results are published for inspection, not used as a gate: post-scan failures are
+      # expected in a container. The real gate is converge finishing failed=0.
+      - name: Upload goss audit output
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: molecule-audit-${{ matrix.scenario }}
+          path: molecule_audit_output/
+          if-no-files-found: ignore
+
+      - name: Destroy container
+        if: always()
+        run: molecule destroy -s ${{ matrix.scenario }}

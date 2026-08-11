@@ -1,0 +1,790 @@
+{
+  "tool_version": "2.8.1",
+  "date": "2026-08-10T16:02:14.787362",
+  "findings": [
+    {
+      "file": "defaults/main.yml",
+      "line": 97,
+      "description": "Defined but never referenced: 'audit_bin_validate_certs'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 6,
+      "description": "Referenced but not defined: 'rhel8stig_os_distribution'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 13,
+      "description": "Referenced but not defined: 'rhel8stig_os_version_pre_8_2'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 46,
+      "description": "Referenced but not defined: 'rhel8stig_bootloader_path'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 424,
+      "description": "Referenced but not defined: 'rhel8stig_password_hash'",
+      "severity": "warning",
+      "check": "unused_vars"
+    },
+    {
+      "file": "tasks/main.yml",
+      "line": 69,
+      "description": "Duplicate register variable 'discovered_user_list' (first seen in tasks/Cat_2/RHEL-08-010xxx.yml:2445)",
+      "severity": "warning",
+      "check": "var_naming"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 107,
+      "description": "CHECK B: audit_bin_copy_location in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 97,
+      "description": "CHECK B: audit_bin_validate_certs in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 129,
+      "description": "CHECK B: audit_conf_dest in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 125,
+      "description": "CHECK B: audit_conf_source in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 119,
+      "description": "CHECK B: audit_content in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 132,
+      "description": "CHECK B: audit_log_dir in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 79,
+      "description": "CHECK B: audit_max_concurrent in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "defaults/main.yml",
+      "line": 92,
+      "description": "CHECK B: get_audit_binary_method in defaults/main.yml (move to vars/audit.yml; role-internal constant)",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "templates/ansible_vars_goss.yml.j2",
+      "line": 0,
+      "description": "CHECK E: templates/ansible_vars_goss.yml.j2 present; rename to templates/lockdown_audit.yml.j2",
+      "severity": "warning",
+      "check": "audit_vars"
+    },
+    {
+      "file": "vars/main.yml",
+      "line": 0,
+      "description": "No *_shell_executable variable in vars/main.yml or defaults/main.yml",
+      "severity": "warning",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/main.yml",
+      "line": 45,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/main.yml",
+      "line": 65,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/parse_etc_passwd.yml",
+      "line": 7,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/post_remediation_audit.yml",
+      "line": 4,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/post_remediation_audit.yml",
+      "line": 18,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/post_remediation_audit.yml",
+      "line": 32,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/pre_remediation_audit.yml",
+      "line": 75,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/pre_remediation_audit.yml",
+      "line": 89,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/pre_remediation_audit.yml",
+      "line": 103,
+      "description": "missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 42,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 48,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 163,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 200,
+      "description": "missing block scalar indicator (|); missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 208,
+      "description": "missing block scalar indicator (|); missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 216,
+      "description": "missing block scalar indicator (|); missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/prelim.yml",
+      "line": 336,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_1/RHEL-08-010xxx.yml",
+      "line": 96,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_1/RHEL-08-010xxx.yml",
+      "line": 129,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_1/RHEL-08-010xxx.yml",
+      "line": 389,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_1/RHEL-08-010xxx.yml",
+      "line": 420,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_1/RHEL-08-040xxx.yml",
+      "line": 145,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 33,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 41,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 262,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 503,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 663,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 688,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 717,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 749,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 776,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 846,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 891,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 998,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1030,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1071,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1168,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1207,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1266,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1378,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1409,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1437,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1465,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1492,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1573,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1602,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 1861,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2148,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2265,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2279,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2344,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2434,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-010xxx.yml",
+      "line": 2441,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 603,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 716,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 723,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 787,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 1123,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 1254,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 1374,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-020xxx.yml",
+      "line": 1400,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 156,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 190,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 239,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 271,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 302,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-030xxx.yml",
+      "line": 1549,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 118,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 138,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 178,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 341,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1029,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1069,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1107,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1145,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1183,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1223,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1259,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1299,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1337,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1378,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1419,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1460,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1498,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1536,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1576,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1614,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1652,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1690,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1728,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1766,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1803,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_2/RHEL-08-040xxx.yml",
+      "line": 1903,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_3/RHEL-08-010xxx.yml",
+      "line": 49,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_3/RHEL-08-010xxx.yml",
+      "line": 85,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_3/RHEL-08-030xxx.yml",
+      "line": 66,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    },
+    {
+      "file": "tasks/Cat_3/RHEL-08-040xxx.yml",
+      "line": 16,
+      "description": "missing set -o pipefail; missing args: executable: \"{{ <prefix>_shell_executable }}\"",
+      "severity": "error",
+      "check": "shell_pipefail"
+    }
+  ]
+}

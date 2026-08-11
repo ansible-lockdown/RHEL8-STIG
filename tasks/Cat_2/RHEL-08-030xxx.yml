@@ -49,10 +49,10 @@
     path: /etc/audit/auditd.conf
     regexp: '^#?action_mail_acct\s*='
     line: "action_mail_acct = {{ rhel8stig_auditd_mail_acct }}"
-  register: discovered_action_mail_acct_result
   failed_when:
     - discovered_action_mail_acct_result is failed
     - discovered_action_mail_acct_result.rc != 257
+  register: discovered_action_mail_acct_result
 
 - name: "MEDIUM | RHEL-08-030030 | PATCH | The RHEL 8 Information System Security Officer (ISSO) and System Administrator (SA) (at a minimum) must have mail aliases to be notified of an audit processing failure."
   when: rhel8stig_030030
@@ -154,9 +154,9 @@
   block:
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | logfile location"
       ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
-      register: discovered_auditlog_location_auditd
       changed_when: false
       check_mode: false
+      register: discovered_auditlog_location_auditd
 
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | check file exists"
       ansible.builtin.stat:
@@ -633,7 +633,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the lremovexattr system call."
+- name: "MEDIUM | RHEL-08-030200 | PATCH | The RHEL 8 audit system must be configured to audit any usage of the setxattr, fsetxattr, lsetxattr, removexattr, fremovexattr, and lremovexattr system calls."
   when: rhel8stig_030200
   tags:
     - RHEL-08-030200
@@ -1080,7 +1080,7 @@
     msg: "Control being set via Handler 'update auditd' which writes to /etc/audit.d/99_auditd.rules"
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030361 | PATCH | Successful/unsuccessful uses of the rename, unlink, rmdir, renameat, and unlinkat system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030361
   tags:
     - RHEL-08-030361
@@ -1185,7 +1185,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030420 | PATCH | Successful/unsuccessful uses of the truncate, ftruncate, creat, open, openat, and open_by_handle_at system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030420
   tags:
     - RHEL-08-030420
@@ -1207,7 +1207,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030480 | PATCH | Successful/unsuccessful uses of the chown, fchown, fchownat, and lchown system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030480
   tags:
     - RHEL-08-030480
@@ -1230,7 +1230,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod command in RHEL 8 must generate an audit record."
+- name: "MEDIUM | RHEL-08-030490 | PATCH | Successful/unsuccessful uses of the chmod, fchmod, and fchmodat system calls in RHEL 8 must generate an audit record."
   when: rhel8stig_030490
   tags:
     - RHEL-08-030490
@@ -1389,7 +1389,7 @@
   changed_when: true
   notify: Update auditd
 
-- name: "MEDIUM | RHEL-08-030610 | PATCH | Audit file permissions"
+- name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited."
   when: rhel8stig_030610
   tags:
     - RHEL-08-030610
@@ -1402,17 +1402,17 @@
     - permissions
     - auditd
   block:
-    - name: "MEDIUM | RHEL-08-030610 | AUDIT | Find custom audit rules"
+    - name: "MEDIUM | RHEL-08-030610 | AUDIT | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Find custom audit rules"
       ansible.builtin.find:
         paths: /etc/audit/rules.d/
         file_type: file
         patterns: "*.rules"
         recurse: false
-      register: discovered_custom_audit_rules
       changed_when: false
       check_mode: false
+      register: discovered_custom_audit_rules
 
-    - name: "MEDIUM | RHEL-08-030610 | PATCH | Set audit file permissions"
+    - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Set audit file permissions"
       ansible.builtin.file:
         path: "{{ item }}"
         mode: 'u-x,g-wx,o-rwx'

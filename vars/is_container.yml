@@ -4,14 +4,7 @@
 
 rhel8stig_ssh_required: false
 
-# tmux
-rhel8stig_020039: false
-rhel8stig_020040: false
-rhel8stig_020041: false
-rhel8stig_020070: false
-
 # auditd
-rhel8stig_010560: false
 rhel8stig_030000: false
 rhel8stig_030020: false
 rhel8stig_030040: false
@@ -38,10 +31,6 @@ rhel8stig_030180: false
 rhel8stig_030181: false
 rhel8stig_030190: false
 rhel8stig_030200: false
-rhel8stig_030210: false
-rhel8stig_030220: false
-rhel8stig_030230: false
-rhel8stig_030240: false
 rhel8stig_030250: false
 rhel8stig_030260: false
 # rhel8stig_030270: false
@@ -220,3 +209,74 @@ rhel8stig_040140: false
 rhel8stig_040141: false
 rhel8stig_040180: false
 rhel8stig_040330: false
+
+# Kernel sysctls (not settable in containers - kernel shared with host)
+rhel8stig_010372: false  # kernel.kexec_load_disabled
+rhel8stig_010375: false  # kernel.core_pattern (cat 3)
+rhel8stig_010376: false  # kernel.dmesg_restrict
+rhel8stig_010430: false  # kernel.randomize_va_space
+rhel8stig_010671: false  # kernel.core_pattern (cat 2)
+rhel8stig_040281: false  # kernel.unprivileged_bpf_disabled
+rhel8stig_040282: false  # kernel.yama.ptrace_scope
+rhel8stig_040283: false  # kernel.kptr_restrict
+
+# Network sysctls (most can't be set per-container or fail on missing interfaces)
+rhel8stig_040209: false
+rhel8stig_040210: false
+rhel8stig_040220: false
+rhel8stig_040230: false
+rhel8stig_040239: false
+rhel8stig_040240: false
+rhel8stig_040249: false
+rhel8stig_040250: false
+rhel8stig_040259: false
+rhel8stig_040260: false
+rhel8stig_040261: false
+rhel8stig_040262: false
+rhel8stig_040270: false
+rhel8stig_040279: false
+rhel8stig_040280: false
+rhel8stig_040285: false
+rhel8stig_040286: false  # net.core.bpf_jit_harden
+
+# Kernel-coupled services not available in containers
+rhel8stig_010670: false  # kdump service
+
+# Interactive-user home-dir family - role iterates all /etc/passwd users including
+# system accounts with non-standard home dirs (polkitd:/, tss:/dev/null); skip in
+# containers where there are typically no real interactive users to remediate
+rhel8stig_010720: false
+rhel8stig_010730: false
+rhel8stig_010731: false
+rhel8stig_010740: false
+rhel8stig_010741: false
+rhel8stig_010750: false
+
+# LUKS / disk encryption (containers don't have block devices to encrypt)
+rhel8stig_010030: false
+
+# Kernel buffer / runtime check (dmesg / kernel cmdline not available in container)
+rhel8stig_010420: false
+
+# Audit kernel subsystem (auditctl unavailable - shared kernel)
+rhel8stig_030655: false
+
+# Firewall service runtime state (containers handle networking differently)
+rhel8stig_040101: false
+
+# WiFi / NetworkManager radio (containers have no wifi hardware)
+rhel8stig_040110: false
+
+# sshd service runtime state (the file/config controls still apply if sshd installed,
+# but the service-running check fails in container; reset by setting ssh_required: true)
+rhel8stig_040160: false
+
+# state:absent on /etc/pam.d/sudo - minimal images lack the file entirely, so the
+# audit's exists:true check fails even though the rem succeeded (file is already absent)
+rhel8stig_010385: false
+
+# Manual-check audits (XCCDF says "ask the SA" - never automatable)
+rhel8stig_020270: false
+rhel8stig_020320: false
+rhel8stig_040090: false
+rhel8stig_040400: false
