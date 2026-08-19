@@ -30,6 +30,7 @@
     state: remounted
 
 - name: Restart_systemd_login
+  when: not system_is_container
   ansible.builtin.systemd:
     name: systemd-logind
     state: restarted
@@ -59,58 +60,6 @@
   notify: Change_requires_reboot
   listen: Reinstall_crypto_policies
 
-- name: AIDE - Check for DB file
-  ansible.builtin.stat:
-    path: "{{ rhel8stig_aide_db_file }}"
-  register: discovered_aide_db_file
-  listen: Build_aide_db
-
-- name: AIDE - Discover age of DB
-  when: discovered_aide_db_file.stat.exists
-  ansible.builtin.find:
-    path: "{{ rhel8stig_aide_db_file | dirname }}"
-    pattern: "{{ rhel8stig_aide_db_file | basename }}"
-    age: "{{ rhel8stig_aide_db_file_age }}"
-  register: discovered_aide_db_age
-  listen: Build_aide_db
-
-- name: "AIDE - Create DB if absent, forced or older than {{ rhel8stig_aide_db_file_age }}"
-  when: not discovered_aide_db_file.stat.exists or
-        (discovered_aide_db_age.files | length > 0) or
-        rhel8stig_aide_db_recreate
-  ansible.builtin.command: /usr/sbin/aide --init
-  changed_when: true
-  register: discovered_new_aide_db_created
-  listen: Build_aide_db
-
-- name: "AIDE - Rename DB file if DB created"
-  when:
-    - not discovered_aide_db_file.stat.exists or
-      (discovered_aide_db_age.files | length > 0) or
-      rhel8stig_aide_db_recreate
-    - discovered_new_aide_db_created.changed  # noqa: no-changed-when
-  ansible.builtin.command: "mv -f {{ rhel8stig_aide_db_new_file }} {{ rhel8stig_aide_db_file }}"
-  changed_when: true
-  listen: Build_aide_db
-
-- name: AIDE - If DB exists run check comparison
-  when:
-    - discovered_aide_db_file.stat.exists
-    - not discovered_new_aide_db_created.changed  # noqa: no-changed-when
-  ansible.builtin.command: /usr/sbin/aide --check
-  changed_when: true
-  failed_when: discovered_aidedb_check.rc not in [ 0, 1, 4, 7 ]
-  register: discovered_aidedb_check
-  listen: Build_aide_db
-
-- name: AIDE - Warning if checks fail
-  when: discovered_aidedb_check.rc != 0
-  vars:
-    warn_control_id: "MEDIUM | RHEL-09-651010-Aide-Check"
-  ansible.builtin.import_tasks:
-    file: warning_facts.yml
-  listen: Build_aide_db
-
 - name: Restart sssd
   when: "'sssd' in ansible_facts.packages"
   ansible.builtin.service:
@@ -137,6 +86,7 @@
     state: restarted
 
 - name: Restart firewalld
+  when: not system_is_container
   ansible.builtin.service:
     name: firewalld
     state: restarted
@@ -198,12 +148,12 @@
     mode: 'u-x,go-rwx'
   notify: Restart auditd
 
-- name: Restart auditd # noqa: command-instead-of-module
+- name: Restart auditd
   when:
     - not rhel8stig_system_is_chroot
     - not system_is_container
     - not change_requires_reboot
-  ansible.builtin.command: /usr/sbin/service auditd restart
+  ansible.builtin.command: /usr/sbin/service auditd restart  # noqa: command-instead-of-module
   changed_when: true
 
 - name: Rebuild initramfs
@@ -257,7 +207,7 @@
     - not discovered_aide_db_file.stat.exists or
       (discovered_aide_db_age.files | length > 0) or
       rhel8stig_aide_db_recreate
-    - discovered_new_aide_db_created.changed  # noqa: no-changed-when
+    - discovered_new_aide_db_created.changed
   ansible.builtin.command: "mv -f {{ rhel8stig_aide_db_new_file }} {{ rhel8stig_aide_db_file }}"
   changed_when: true
   listen: Build_aide_db
@@ -265,7 +215,7 @@
 - name: AIDE - If DB exists run check comparison
   when:
     - discovered_aide_db_file.stat.exists
-    - not discovered_new_aide_db_created.changed  # noqa: no-changed-when
+    - not discovered_new_aide_db_created.changed
   ansible.builtin.command: /usr/sbin/aide --check
   changed_when: true
   failed_when: discovered_aidedb_check.rc not in [ 0, 1, 4, 5, 7 ]
@@ -277,7 +227,7 @@
   ansible.builtin.import_tasks:
     file: warning_facts.yml
   vars:
-    warn_control_id: "MEDIUM | RHEL-09-651010-Aide-Check"
+    warn_control_id: "MEDIUM | RHEL-08-010360-Aide-Check"
   listen: Build_aide_db
 
 - name: Dconf update

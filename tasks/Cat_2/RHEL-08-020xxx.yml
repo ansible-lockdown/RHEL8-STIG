@@ -11,7 +11,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230332r1017144_rule
+    - SV-230332r1184264_rule
     - V-230332
     - pamd
   block:
@@ -78,7 +78,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230334r1017146_rule
+    - SV-230334r1184266_rule
     - V-230334
     - pamd
   block:
@@ -134,7 +134,7 @@
     regexp: '^fail_interval =|^\# fail_interval ='
     line: "fail_interval = {{ rhel8stig_pam_faillock_interval }}"
 
-- name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
+- name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020014
     - ansible_distribution_version is version('8.1', '<=')
@@ -145,7 +145,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230336r1017148_rule
+    - SV-230336r1184268_rule
     - V-230336
     - pamd
   block:
@@ -160,7 +160,7 @@
         - system-auth
         - password-auth
 
-    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set authfail"
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^auth\s+required\s+pam_faillock.so authfail'
@@ -171,7 +171,7 @@
         - system-auth
         - password-auth
 
-    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
+    - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period. | Set account faillock"
       ansible.builtin.lineinfile:
         path: "/etc/pam.d/{{ item }}"
         regexp: '^account\s+requireds+pam_faillock.so'
@@ -212,7 +212,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230338r1017150_rule
+    - SV-230338r1184270_rule
     - V-230338
     - pamd
   block:
@@ -279,7 +279,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230340r1017152_rule
+    - SV-230340r1184272_rule
     - V-230340
     - pamd
   block:
@@ -346,7 +346,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230342r1017154_rule
+    - SV-230342r1184274_rule
     - V-230342
     - pamd
   block:
@@ -413,7 +413,7 @@
     - NIST800-53R4_AC-7
     - SRG-OS-000021-GPOS-00005
     - SRG-OS-000329-GPOS-00128
-    - SV-230344r1017156_rule
+    - SV-230344r1184276_rule
     - V-230344
     - pamd
   block:
@@ -817,7 +817,7 @@
       loop: "{{ discovered_idle_delay_param.stdout_lines }}"
       notify: Dconf update
 
-- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding graphical user interface settings."
+- name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding the session lock-delay setting for the graphical user interface."
   when:
     - rhel8stig_020080
     - "'dconf' in ansible_facts.packages"
@@ -1047,7 +1047,7 @@
     group: root
     mode: 'u-x,g-wx,o-rwx'
 
-- name: "MEDIUM | RHEL-08-20150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
+- name: "MEDIUM | RHEL-08-020150 | PATCH | RHEL 8 must require the maximum number of repeating characters be limited to three when passwords are changed."
   when: rhel8stig_020150
   tags:
     - RHEL-08-020150

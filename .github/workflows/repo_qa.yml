@@ -1,0 +1,94 @@
+---
+
+name: Repo QA
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - devel
+      - main
+  pull_request:
+    branches:
+      - devel
+      - main
+  # The checker is pinned, but the role's own content and the pinned linters' rule sets do not
+  # move in lock-step with PR activity. A weekly run surfaces drift as its own build rather than
+  # on whatever unrelated PR is open at the time.
+  schedule:
+    - cron: "0 7 * * 1"
+  # Allow manual running of workflow
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    # Static QA gate, roughly 90s. Complements the Molecule workflow (runtime behaviour) and runs
+    # in front of the tofu/EC2 pipelines. No secrets.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # Checked out under a subdirectory so the checker's own source cannot be mistaken for role
+      # content by the scanner.
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          path: role
+
+      # Checked out rather than pip-installed on purpose: several checks load helpers from the
+      # tool's scripts/ directory at runtime via importlib, and that directory is not packaged
+      # (no __init__.py, and pyproject declares no packages/py-modules). A module-only install
+      # would silently degrade audit_vars, shell_pipefail and rule_coverage. Pinned to a release
+      # tag so a checker change cannot alter this repo's CI result on its own.
+      - name: Check out the QA checker
+        uses: actions/checkout@v7
+        with:
+          repository: frederickw082922/Repo_QA_Checker
+          ref: "2.8.1"
+          path: qa-checker
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # yamllint and ansible-lint are optional dependencies of the checker, guarded by
+      # shutil.which - when absent those two checks report SKIP rather than failing, so omitting
+      # them would quietly remove 2 of the checks that can emit FAIL. Versions match
+      # .pre-commit-config.yaml so CI and the local hook agree.
+      #
+      # Note this is the LINTER, which runs controller-side only. It is unrelated to the
+      # ansible-core 2.16 pin in molecule.yml, which exists because modules must execute on the
+      # target's platform-python 3.6.
+      - name: Install linters
+        run: |
+          python -m pip install --upgrade pip
+          pip install "yamllint==1.38.0" "ansible-lint==26.4.0"
+
+      # --strict is load-bearing, not cosmetic: most findings in this role are WARN severity, and
+      # without it a real regression exits 0 and passes silently. .qa_baseline.json absorbs the 112
+      # known findings, keyed per finding on (file, description) - so a NEW finding in an
+      # already-baselined check still fails. Regenerate the baseline only deliberately, never to
+      # silence a fresh finding.
+      #
+      # The count is high on this branch because the shell hardening sweep (set -o pipefail plus
+      # args.executable on every shell task) landed in V2R8, not V2R7 - 97 of the 112 are that one
+      # check. Back-porting the sweep here would diverge this branch from V2R8 for no benefit, so
+      # it is recorded rather than fixed. The V2R8 branch baselines 13.
+      - name: Run Ansible Lockdown QA check
+        working-directory: role
+        run: |
+          python ../qa-checker/Ansible_Lockdown_QA_Repo_Check.py \
+            -d . \
+            --strict \
+            --console \
+            --no-progress \
+            --no-report \
+            --skip spelling,grammar \
+            --baseline .qa_baseline.json

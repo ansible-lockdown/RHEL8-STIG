@@ -56,11 +56,9 @@ benchparse/
 *history.md
 *plan.md
 *qa_report*
-test_inv
-prompt.md
 
 # GitHub Action/Workflow files
 .github/
 
-# ansible-lint cache
+# ansible-lint
 .ansible/

@@ -10,7 +10,7 @@ on:
 
 jobs:
   export-badges:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && startsWith(github.repository, 'ansible-lockdown/Private-')) || (github.event_name == 'push' && github.ref_name == 'latest')
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref_name == 'latest')
     uses: ansible-lockdown/github_linux_IaC/.github/workflows/export_badges_private.yml@self_hosted
     with:
       repo_name: ${{ github.repository }}
