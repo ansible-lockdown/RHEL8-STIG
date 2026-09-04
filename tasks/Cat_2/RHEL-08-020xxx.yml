@@ -3,7 +3,7 @@
 - name: "MEDIUM | RHEL-08-020010 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
   when:
     - rhel8stig_020010
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020010
     - CAT2
@@ -51,7 +51,7 @@
 - name: "MEDIUM | RHEL-08-020011 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur."
   when:
     - rhel8stig_020011
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020011
     - CAT2
@@ -70,7 +70,7 @@
 - name: "MEDIUM | RHEL-08-020012 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020012
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020012
     - CAT2
@@ -118,7 +118,7 @@
 - name: "MEDIUM | RHEL-08-020013 | PATCH | RHEL 8 must automatically lock an account when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020013
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020013
     - CAT2
@@ -137,7 +137,7 @@
 - name: "MEDIUM | RHEL-08-020014 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020014
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020014
     - CAT2
@@ -185,7 +185,7 @@
 - name: "MEDIUM | RHEL-08-020015 | PATCH | RHEL 8 must automatically lock an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020015
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020015
     - CAT2
@@ -204,7 +204,7 @@
 - name: "MEDIUM | RHEL-08-020016 | PATCH | RHEL 8 must ensure account lockouts persist."
   when:
     - rhel8stig_020016
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020016
     - CAT2
@@ -252,7 +252,7 @@
 - name: "MEDIUM | RHEL-08-020017 | PATCH | RHEL 8 must ensure account lockouts persist."
   when:
     - rhel8stig_020017
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020017
     - CAT2
@@ -271,7 +271,7 @@
 - name: "MEDIUM | RHEL-08-020018 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
   when:
     - rhel8stig_020018
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020018
     - CAT2
@@ -319,7 +319,7 @@
 - name: "MEDIUM | RHEL-08-020019 | PATCH | RHEL 8 must prevent system messages from being presented when three unsuccessful logon attempts occur."
   when:
     - rhel8stig_020019
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020019
     - CAT2
@@ -338,7 +338,7 @@
 - name: "MEDIUM | RHEL-08-020020 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   when:
     - rhel8stig_020020
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020020
     - CAT2
@@ -386,7 +386,7 @@
 - name: "MEDIUM | RHEL-08-020021 | PATCH | RHEL 8 must log user name information when unsuccessful logon attempts occur."
   when:
     - rhel8stig_020021
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020021
     - CAT2
@@ -405,7 +405,7 @@
 - name: "MEDIUM | RHEL-08-020022 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020022
-    - ansible_distribution_version is version('8.1', '<=')
+    - ansible_facts['distribution_version'] is version('8.1', '<=')
   tags:
     - RHEL-08-020022
     - CAT2
@@ -453,7 +453,7 @@
 - name: "MEDIUM | RHEL-08-020023 | PATCH | RHEL 8 must include root when automatically locking an account until the locked account is released by an administrator when three unsuccessful logon attempts occur during a 15-minute time period."
   when:
     - rhel8stig_020023
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020023
     - CAT2
@@ -472,7 +472,7 @@
 - name: "MEDIUM | RHEL-08-020025 | PATCH | 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/system-auth file."
   when:
     - rhel8stig_020025
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020025
     - CAT2
@@ -511,7 +511,7 @@
 - name: "MEDIUM | RHEL-08-020026 | PATCH | RHEL 8 must configure the use of the pam_faillock.so module in the /etc/pam.d/password-auth file."
   when:
     - rhel8stig_020026
-    - ansible_distribution_version is version('8.2', '>=')
+    - ansible_facts['distribution_version'] is version('8.2', '>=')
   tags:
     - RHEL-08-020026
     - CAT2
@@ -586,7 +586,7 @@
 - name: "MEDIUM | RHEL-08-020030 | PATCH | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions."
   when:
     - rhel8stig_020030
-    - "'dconf' in ansible_facts.packages"
+    - "'dconf' in ansible_facts['packages']"
     - rhel8stig_always_configure_dconf
   tags:
     - RHEL-08-020030
@@ -600,7 +600,11 @@
     - gui
   block:
     - name: "MEDIUM | RHEL-08-020030 | AUDIT | RHEL 8 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions. | Check for lock-enabled"
-      ansible.builtin.shell: "grep -IlR ^lock-enabled /etc/dconf/db/*"
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -IlR ^lock-enabled /etc/dconf/db/*
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -678,7 +682,7 @@
 - name: "MEDIUM | RHEL-08-020035 | PATCH | RHEL 8.7 and higher must terminate idle user sessions."
   when:
     - rhel8stig_020035
-    - ansible_facts.distribution_version is version_compare('8.7', '>=')
+    - ansible_facts['distribution_version'] is version_compare('8.7', '>=')
   tags:
     - RHEL-08-020035
     - CAT2
@@ -700,7 +704,7 @@
 - name: "MEDIUM | RHEL-08-020050 | PATCH | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed."
   when:
     - rhel8stig_020050
-    - "'dconf' in ansible_facts.packages"
+    - "'dconf' in ansible_facts['packages']"
   tags:
     - RHEL-08-020050
     - CAT2
@@ -713,14 +717,22 @@
     - smartcard
   block:
     - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-      ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/*"
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -IlR removal-action= /etc/dconf/db/*
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
       register: discovered_removal_action
 
     - name: "MEDIUM | RHEL-08-020050 | AUDIT | RHEL 8 must be able to initiate directly a session lock for all connection types using smartcard when the smartcard is removed. | Find removal-action param"
-      ansible.builtin.shell: "grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'"
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -IlR removal-action= /etc/dconf/db/* | sed 's:.*/::'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -770,7 +782,7 @@
 - name: "MEDIUM | RHEL-08-020060 | PATCH | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity."
   when:
     - rhel8stig_020060
-    - "'dconf' in ansible_facts.packages"
+    - "'dconf' in ansible_facts['packages']"
     - rhel8stig_always_configure_dconf
   tags:
     - RHEL-08-020060
@@ -779,12 +791,16 @@
     - NIST800-53R4_AC-11
     - SRG-OS-000029-GPOS-00010
     - SRG-OS-000031-GPOS-00012
-    - SV-230352r1155401_rule
+    - SV-230352r1208749_rule
     - V-230352
     - gui
   block:
     - name: "MEDIUM | RHEL-08-020060 | AUDIT | RHEL 8 must automatically log out graphical user sessions after 10 minutes of inactivity. | Find idle-delay parameter"
-      ansible.builtin.shell: 'grep -IlR idle-delay= /etc/dconf/db/*'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -IlR idle-delay= /etc/dconf/db/*
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -820,7 +836,7 @@
 - name: "MEDIUM | RHEL-08-020080 | PATCH | RHEL 8 must prevent a user from overriding the session lock-delay setting for the graphical user interface."
   when:
     - rhel8stig_020080
-    - "'dconf' in ansible_facts.packages"
+    - "'dconf' in ansible_facts['packages']"
     - rhel8stig_always_configure_dconf
   tags:
     - RHEL-08-020080
@@ -952,7 +968,7 @@
 - name: "MEDIUM | RHEL-08-020104 | PATCH | RHEL 8 systems, version 8.4 and above, must ensure the password complexity module is configured for three retries or less."
   when:
     - rhel8stig_020104
-    - ansible_distribution_version is version('8.4', '>=')
+    - ansible_facts['distribution_version'] is version('8.4', '>=')
   tags:
     - RHEL-08-020104
     - CAT2
@@ -1120,7 +1136,11 @@
     - password
   block:
     - name: "MEDIUM | RHEL-08-020180 | AUDIT | RHEL 8 passwords for new users or password changes must have a 24 hours/1 day minimum password lifetime restriction in /etc/shadow. | Get list of users"
-      ansible.builtin.shell: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+      ansible.builtin.shell: |
+        set -o pipefail
+        awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -1251,7 +1271,11 @@
     warn_control_id: "MEDIUM | RHEL-08-020240"
   block:
     - name: "MEDIUM | RHEL-08-020240 | AUDIT | RHEL 8 duplicate User IDs (UIDs) must not exist for interactive users. | Get duplicate UID users"
-      ansible.builtin.shell: awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+      ansible.builtin.shell: |
+        set -o pipefail
+        awk -F ":" 'list[$3]++{print $1, $3}' /etc/passwd
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -1371,7 +1395,11 @@
     - useradd
   block:
     - name: "MEDIUM | RHEL-08-20260 | AUDIT | RHEL 8 account identifiers (individuals, groups, roles, and devices) must disabled after 35 days of inactivity. | Get current"
-      ansible.builtin.shell: grep -i inactive /etc/default/useradd | cut -d = -f2 | grep -v 35
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -i inactive /etc/default/useradd | cut -d = -f2 | grep -v 35
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: discovered_current_useradd_inactive.rc not in [ 0, 1 ]
@@ -1397,7 +1425,11 @@
     warn_control_id: "MEDIUM | RHEL-08-020270"
   block:
     - name: "MEDIUM | RHEL-08-020270 | AUDIT | RHEL 8 must automatically expire temporary accounts within 72 hours."
-      ansible.builtin.shell: "awk -F: '{if ($3 <= {{ min_int_uid }}) { print $1 }}' /etc/passwd"
+      ansible.builtin.shell: |
+        set -o pipefail
+        awk -F: '{if ($3 <= {{ min_int_uid }}) { print $1 }}' /etc/passwd
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false

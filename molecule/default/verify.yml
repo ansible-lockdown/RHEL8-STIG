@@ -2,10 +2,8 @@
 # Molecule verify - spot-checks a representative, container-applicable subset of the
 # RHEL 8 STIG hardening the role applies. The authoritative validation is the Goss
 # audit run during converge (run_audit: true); this playbook is a fast sanity gate so
-# `molecule verify` is not a silent no-op - a scenario with no verify.yml logs
-# "Executed: Missing playbook" and exits 0, which reads as a pass. Assertions are limited
-# to controls that genuinely apply inside an unprivileged container (no auditd/sysctl/sshd
-# runtime).
+# `molecule verify` is not a silent no-op. Assertions are limited to controls that
+# genuinely apply inside an unprivileged container (no auditd/sysctl/sshd runtime).
 
 - name: Verify - RHEL 8 STIG hardening spot-checks
   hosts: all
@@ -36,18 +34,20 @@
         fail_msg: "/etc/issue login banner is empty"
         success_msg: "Login banner populated"
 
-    # V2R7 writes this drop-in without a .conf suffix. V2R8 renames it to
-    # 55-CtrlAltDel-BurstAction.conf, so this assertion is deliberately the inverse of the
-    # one on the V2R8 branch - do not copy that file over this one.
     - name: Verify | Stat the RHEL-08-040172 Ctrl-Alt-Del burst drop-in
       ansible.builtin.stat:
-        path: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction
+        path: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.conf
       register: verify_cad_dropin
 
-    - name: Verify | RHEL-08-040172 Ctrl-Alt-Del burst drop-in is deployed
+    - name: Verify | Stat the pre-V2R8 suffixless drop-in (must be gone)
+      ansible.builtin.stat:
+        path: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction
+      register: verify_cad_old
+
+    - name: Verify | RHEL-08-040172 drop-in uses the V2R8 .conf suffix
       ansible.builtin.assert:
         that:
           - verify_cad_dropin.stat.exists
-          - verify_cad_dropin.stat.size > 0
-        fail_msg: "Ctrl-Alt-Del burst drop-in was not written"
-        success_msg: "RHEL-08-040172 drop-in deployed"
+          - not verify_cad_old.stat.exists
+        fail_msg: "Ctrl-Alt-Del burst drop-in is not the V2R8 .conf file (or the old suffixless file remains)"
+        success_msg: "RHEL-08-040172 drop-in is the V2R8 .conf file"

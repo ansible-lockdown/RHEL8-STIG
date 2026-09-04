@@ -5,7 +5,7 @@
 # https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html#variable-precedence-where-should-i-put-a-variable
 
 ## metadata for Audit benchmark
-benchmark_version: 'v2r7'
+benchmark_version: 'v2r8'
 
 ## Benchmark name used by auditing control role
 # The audit variable found at the base
@@ -121,7 +121,7 @@ audit_content: git
 # If using either archive, copy, get_url:
 ## Note will work with .tar files - zip will require extra configuration
 ### If using get_url this is expecting github url in tar.gz format e.g.
-### https://github.com/ansible-lockdown/{{ OS_TYPE }}-{{ BENCHMARK_TYPE }}-Audit/archive/refs/heads/benchmark_{{ benchmark_version }}.tar.gz
+### https://github.com/ansible-lockdown/{{ OSTYPE }}-{{ BENCHMARK_TYPE }}-Audit/archive/refs/tags/{{ benchmark_version }}.tar.gz
 audit_conf_source: "some path or url to copy from"
 
 # Destination for the audit content to be placed on managed node
@@ -469,6 +469,8 @@ rhel8stig_040180: true
 rhel8stig_040209: true
 rhel8stig_040210: true
 rhel8stig_040220: true
+rhel8stig_040221: true
+rhel8stig_040222: true
 rhel8stig_040230: true
 rhel8stig_040239: true
 rhel8stig_040240: true
@@ -487,6 +489,7 @@ rhel8stig_040283: true
 rhel8stig_040284: true
 rhel8stig_040285: true
 rhel8stig_040286: true
+rhel8stig_040287: true
 rhel8stig_040290: true
 rhel8stig_040320: true
 rhel8stig_040321: true

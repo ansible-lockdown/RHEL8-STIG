@@ -41,7 +41,7 @@
 - name: "HIGH | RHEL-08-040171 | PATCH | The x86 Ctrl-Alt-Delete key sequence in RHEL 8 must be disabled if a graphical user interface is installed."
   when:
     - rhel8stig_040171
-    - "'gnome-desktop' in ansible_facts.packages or 'gnome-desktop3' in ansible_facts.packages"
+    - "'gnome-desktop' in ansible_facts['packages'] or 'gnome-desktop3' in ansible_facts['packages']"
   tags:
     - RHEL-08-040171
     - CAT1
@@ -90,7 +90,7 @@
     - CCI-000366
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
-    - SV-230531r1155396_rule
+    - SV-230531r1208754_rule
     - V-230531
   notify: Systemctl daemon-reload
   block:
@@ -104,8 +104,8 @@
 
     - name: HIGH | RHEL-08-040172 | PATCH | The systemd Ctrl-Alt-Delete burst key sequence in RHEL 8 must be disabled | ansible.builtin.lineinfile
       ansible.builtin.template:
-        src: etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.j2
-        dest: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction
+        src: etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.conf.j2
+        dest: /etc/systemd/system.conf.d/55-CtrlAltDel-BurstAction.conf
         mode: 'go-wx'
         owner: root
         group: root
@@ -142,7 +142,11 @@
     warn_control_id: "HIGH | RHEL-08-040200"
   block:
     - name: "HIGH | RHEL-08-040200 | PATCH | The root account must be the only account having unrestricted access to the RHEL 8 system. | Get list of non-root accounts with UID of 0"
-      ansible.builtin.shell: "cat /etc/passwd | awk -F: '($3 == 0 && $1 != \"root\") {i++;print $1 } END {exit i}'"
+      ansible.builtin.shell: |
+        set -o pipefail
+        cat /etc/passwd | awk -F: '($3 == 0 && $1 != "root") {i++;print $1 } END {exit i}'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false

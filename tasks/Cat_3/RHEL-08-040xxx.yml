@@ -13,7 +13,11 @@
     - grub
   block:
     - name: "LOW | RHEL-08-040004 | AUDIT | RHEL 8 must enable mitigations against processor-based vulnerabilities. | Get GRUB_CMDLINE_LINUX settings"
-      ansible.builtin.shell: grep -i cmdline /etc/default/grub | grep pti=on
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -i cmdline /etc/default/grub | grep pti=on
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false

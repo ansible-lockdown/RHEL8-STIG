@@ -5,12 +5,11 @@ name: Repo QA
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
-      - devel
-      - main
+      - latest
   pull_request:
     branches:
-      - devel
-      - main
+      - latest
+      - benchmark*
   # The checker is pinned, but the role's own content and the pinned linters' rule sets do not
   # move in lock-step with PR activity. A weekly run surfaces drift as its own build rather than
   # on whatever unrelated PR is open at the time.
@@ -72,15 +71,10 @@ jobs:
           pip install "yamllint==1.38.0" "ansible-lint==26.4.0"
 
       # --strict is load-bearing, not cosmetic: most findings in this role are WARN severity, and
-      # without it a real regression exits 0 and passes silently. .qa_baseline.json absorbs the 112
+      # without it a real regression exits 0 and passes silently. .qa_baseline.json absorbs the 13
       # known findings, keyed per finding on (file, description) - so a NEW finding in an
       # already-baselined check still fails. Regenerate the baseline only deliberately, never to
       # silence a fresh finding.
-      #
-      # The count is high on this branch because the shell hardening sweep (set -o pipefail plus
-      # args.executable on every shell task) landed in V2R8, not V2R7 - 97 of the 112 are that one
-      # check. Back-porting the sweep here would diverge this branch from V2R8 for no benefit, so
-      # it is recorded rather than fixed. The V2R8 branch baselines 13.
       - name: Run Ansible Lockdown QA check
         working-directory: role
         run: |

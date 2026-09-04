@@ -6,16 +6,16 @@
   vars:
     setup_audit: true
     run_audit: true
-    # audit_git_version intentionally omitted: tasks/prelim.yml include_vars-es
-    # vars/audit.yml, which derives it from benchmark_version and outranks play vars,
-    # so a value here is inert. Pin a QA branch at run time with:
+    # audit_git_version intentionally omitted: vars/audit.yml derives it from
+    # benchmark_version via include_vars (which outranks play/host vars), so a
+    # value here is inert. Pin a QA branch at run time with:
     #   molecule converge -- --extra-vars 'audit_git_version=<branch>'
     system_is_container: true
     skip_reboot: true
     # Molecule default - overrides role default (`false`) to exercise full code path
     rhel8stig_disruption_high: true
     fetch_audit_output: true
-    audit_output_destination: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/../_temp_fetched_audits/"
+    audit_output_destination: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/../../_temp_fetched_audits/"
   pre_tasks:
     - name: Set root password so PAM rules don't lock us out
       ansible.builtin.user:

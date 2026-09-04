@@ -35,9 +35,9 @@ provisioner:
         ansible_python_interpreter: /usr/libexec/platform-python
         setup_audit: true
         run_audit: true
-        # audit_git_version intentionally omitted: tasks/prelim.yml include_vars-es
-        # vars/audit.yml, which derives it from benchmark_version and outranks host
-        # vars, so a value here is inert. Pin a QA branch at run time with:
+        # audit_git_version intentionally omitted: vars/audit.yml derives it from
+        # benchmark_version via include_vars (which outranks play/host vars), so a
+        # value here is inert. Pin a QA branch at run time with:
         #   molecule converge -- --extra-vars 'audit_git_version=<branch>'
         skip_reboot: true
         system_is_container: true
@@ -48,6 +48,6 @@ provisioner:
         # Files land one level above the role repo (working dir root), e.g.
         # `<working_dir>/_temp_fetched_audits/`. Override with `-e audit_output_destination=...`
         # if you want them somewhere else.
-        audit_output_destination: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/../_temp_fetched_audits/"
+        audit_output_destination: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/../../_temp_fetched_audits/"
 verifier:
   name: ansible

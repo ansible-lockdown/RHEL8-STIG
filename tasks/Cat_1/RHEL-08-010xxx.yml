@@ -11,8 +11,8 @@
     - SV-230221r1017040_rule
     - V-230221
   ansible.builtin.debug:
-    msg: Minimum supported version of {{ ansible_distribution }} is {{ rhel8stig_min_supported_os_ver[ansible_distribution] }}
-  changed_when: ansible_distribution_version is not version_compare(rhel8stig_min_supported_os_ver[ansible_distribution], '>=')
+    msg: Minimum supported version of {{ ansible_facts['distribution'] }} is {{ rhel8stig_min_supported_os_ver[ansible_facts['distribution']] }}
+  changed_when: ansible_facts['distribution_version'] is not version_compare(rhel8stig_min_supported_os_ver[ansible_facts['distribution']], '>=')
 
 - name: "HIGH | RHEL-08-010015 | PATCH | RHEL 8 must have the crypto-policies package installed."
   when: rhel8stig_010015
@@ -93,7 +93,11 @@
     warn_control_id: "HIGH | RHEL-08-010030"
   block:
     - name: "HIGH | RHEL-08-010030 | AUDIT | All RHEL 8 local disk partitions must implement cryptographic mechanisms to prevent unauthorized disclosure or modification of all information that requires at rest protection. | Get partition layout"
-      ansible.builtin.shell: lsblk  | grep -Ev "boot|crypto_LUKS"
+      ansible.builtin.shell: |
+        set -o pipefail
+        lsblk  | grep -Ev "boot|crypto_LUKS"
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -126,7 +130,11 @@
     warn_control_id: "HIGH | RHEL-08-010121"
   block:
     - name: "HIGH | RHEL-08-010121 | AUDIT | The RHEL 8 operating system must not have accounts configured with blank or null passwords. | Get users with no pw set"
-      ansible.builtin.shell: "awk -F: '!$2 {print $1}' /etc/shadow"
+      ansible.builtin.shell: |
+        set -o pipefail
+        awk -F: '!$2 {print $1}' /etc/shadow
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       failed_when: false
       check_mode: false
@@ -256,13 +264,13 @@
     - CCI-001749
     - NIST800-53R4_CM-5
     - SRG-OS-000366-GPOS-00153
-    - SV-230265r1017378_rule
+    - SV-230265r1208742_rule
     - V-230265
     - dnf
   ansible.builtin.lineinfile:
     path: /etc/dnf/dnf.conf
     regexp: '^localpkg_gpgcheck='
-    line: localpkg_gpgcheck=True
+    line: localpkg_gpgcheck=1
 
 - name: "HIGH | RHEL-08-010460 | PATCH | There must be no shosts.equiv files on the RHEL 8 operating system."
   when: rhel8stig_010460
@@ -327,7 +335,7 @@
   when:
     - rhel8stig_010275
     - rhel8stig_disruption_high
-    - "'bind' in ansible_facts.packages"
+    - "'bind' in ansible_facts['packages']"
   tags:
     - RHEL-08-010275
     - CAT1
@@ -353,7 +361,7 @@
   when:
     - rhel8stig_010280
     - rhel8stig_disruption_high
-    - "'libreswan' in ansible_facts.packages"
+    - "'libreswan' in ansible_facts['packages']"
   tags:
     - RHEL-08-010280
     - CAT1
@@ -386,7 +394,11 @@
     - sshd
   block:
     - name: "HIGH | RHEL-08-010290 | AUDIT | The RHEL 8 SSH daemon must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-2 validated cryptographic hash algorithms. | get MACs"
-      ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i MACs | sed s'/-o//g'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: discovered_current_macs.rc not in [ 0, 1 ]
@@ -417,7 +429,11 @@
     - sshd
   block:
     - name: "HIGH | RHEL-08-010291 | AUDIT | The RHEL 8 SSH server must be configured to use only DOD-approved encryption ciphers employing FIPS 140-3-validated cryptographic hash algorithms to protect the confidentiality of SSH server connections. | get Ciphers"
-      ansible.builtin.shell: grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep "^CRYPTO_POLICY" /etc/crypto-policies/back-ends/opensshserver.config | cut -d "'" -f2 | sed s'/ /\n/g' | grep -i Ciphers | sed s'/-o//g'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       register: discovered_current_ciphers
@@ -430,7 +446,7 @@
         backrefs: true
       notify: Change_requires_reboot
 
-- name: "HIGH | RHEL-08-010296 | PATCH | The RHEL 8 SSH client must be configured to use only Message Authentication Codes (MACs) employing FIPS 140-3 validated cryptographic hash algorithms. | Add MACs"
+- name: "HIGH | RHEL-08-010296 | PATCH | The RHEL 8 SSH client must be configured to use only DOD-approved Message Authentication Codes (MACs) employing FIPS 140-3-validated cryptographic hash algorithms to protect the confidentiality of SSH client connections. | Add MACs"
   when: rhel8stig_010296
   tags:
     - CAT1
@@ -438,7 +454,7 @@
     - CCI-001453
     - NIST800-53R4_AC-17
     - SRG-OS-000250-GPOS-00093
-    - SV-272482r1184242_rule
+    - SV-272482r1208740_rule
     - V-272482
     - fips
     - sshd

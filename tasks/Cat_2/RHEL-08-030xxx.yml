@@ -153,7 +153,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030070 | AUDIT | RHEL 8 audit logs must have a mode of 0600 or less permissive to prevent unauthorized read access. | logfile location"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | awk '{print $NF}'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       register: discovered_auditlog_location_auditd
@@ -187,7 +191,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030080 | AUDIT | RHEL 8 audit logs must be owned by root to prevent unauthorized read access. | Get audit log file"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" "
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -236,7 +244,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030100 | AUDIT | RHEL 8 audit log directory must be owned by root to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -268,7 +280,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030110 | AUDIT | RHEL 8 audit log directory must be group-owned by root to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -299,7 +315,11 @@
     - auditd
   block:
     - name: "MEDIUM | RHEL-08-030120 | AUDIT | RHEL 8 audit log directories must have a mode of 700 or less permissive to prevent unauthorized read access. | Get audit log directory"
-      ansible.builtin.shell: grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -iw log_file /etc/audit/auditd.conf | cut -f3 -d" " | sed 's,/*[^/]\+/*$,,'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -1397,7 +1417,7 @@
     - CCI-000171
     - NIST800-53R4_AU-12
     - SRG-OS-000256-GPOS-00097
-    - SV-230471r1069296_rule
+    - SV-230471r1208750_rule
     - V-230471
     - permissions
     - auditd
@@ -1415,7 +1435,7 @@
     - name: "MEDIUM | RHEL-08-030610 | PATCH | RHEL 8 must allow only the Information System Security Manager (ISSM) (or individuals or roles appointed by the ISSM) to select which auditable events are to be audited. | Set audit file permissions"
       ansible.builtin.file:
         path: "{{ item }}"
-        mode: 'u-x,g-wx,o-rwx'
+        mode: 'u-x,g-rwx,o-rwx'
         owner: root
         group: root
       failed_when: discovered_custom_audit_rules_permissions.state not in '[ file, absent ]'
@@ -1546,7 +1566,11 @@
     warn_control_id: "MEDIUM | RHEL-08-030660"
   block:
     - name: "MEDIUM | RHEL-08-030660 | AUDIT | RHEL 8 must allocate audit record storage capacity to store at least one week of audit records, when audit records are not immediately sent to a central audit record storage facility. | Get audit log partition"
-      ansible.builtin.shell: grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep log_file /etc/audit/auditd.conf | grep -v max | awk '{print $3}' | sed 's|\(.*\)/.*|\1|'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -1712,7 +1736,7 @@
 - name: "MEDIUM | RHEL-08-030740 | PATCH | RHEL 8 must compare internal information system clocks at least every 24 hours with a server synchronized to an authoritative time source, such as the United States Naval Observatory (USNO) time servers, or a time server designated for the appropriate DoD network (NIPRNet/SIPRNet), and/or the Global Positioning System (GPS)."
   when:
     - rhel8stig_030740
-    - "'chrony' in ansible_facts.packages"
+    - "'chrony' in ansible_facts['packages']"
   tags:
     - RHEL-08-030740
     - CAT2
