@@ -1782,6 +1782,7 @@
   when:
     - item.mount == '/home'
     - rhel8stig_010570
+    - "'nosuid' not in item.options.split(',')"
   tags:
     - RHEL-08-010570
     - CAT2
@@ -1797,13 +1798,14 @@
     state: mounted
     src: "{{ item.device }}"
     fstype: "{{ item.fstype }}"
-    opts: "defaults{{ rhel8stig_010570 | ternary(',nosuid', '') }}"
+    opts: "{{ item.options }},nosuid"
   loop: "{{ ansible_facts.mounts }}"
 
 - name: "MEDIUM | RHEL-08-010571 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on the /boot directory."
   when:
     - item.mount == '/boot'
     - rhel8stig_010571
+    - "'nosuid' not in item.options.split(',')"
   tags:
     - RHEL-08-010571
     - CAT2
@@ -1819,7 +1821,7 @@
     state: mounted
     src: "{{ item.device }}"
     fstype: "{{ item.fstype }}"
-    opts: "defaults{{ rhel8stig_010571 | ternary(',nosuid', '') }}"
+    opts: "{{ item.options }},nosuid"
   loop: "{{ ansible_facts.mounts }}"
 
 - name: "MEDIUM | RHEL-08-010572 | PATCH | RHEL 8 must prevent files with the setuid and setgid bit set from being executed on the /boot/efi directory."
@@ -1827,6 +1829,7 @@
     - item.mount == '/boot/efi'
     - item.fstype != 'vfat'
     - rhel8stig_010572
+    - "'nosuid' not in item.options.split(',')"
   tags:
     - RHEL-08-010572
     - CAT2
@@ -1842,7 +1845,7 @@
     state: mounted
     src: "{{ item.device }}"
     fstype: "{{ item.fstype }}"
-    opts: "defaults{{ rhel8stig_010572 | ternary(',nosuid', '') }}"
+    opts: "{{ item.options }},nosuid"
   loop: "{{ ansible_facts.mounts }}"
 
 - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions."
@@ -1897,10 +1900,7 @@
         label: "{{ item.mpoint }}"
 
 - name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent code from being executed on file systems that contain user home directories."
-  when:
-    - rhel8stig_010590
-    - item.mount == '/home'
-    - "'noexec' not in item.options"
+  when: rhel8stig_010590
   tags:
     - RHEL-08-010590
     - CAT2
@@ -1911,13 +1911,26 @@
     - V-230302
     - mounts
     - home
-  ansible.posix.mount:
-    path: "{{ item.mount }}"
-    state: mounted
-    src: "{{ item.device }}"
-    fstype: "{{ item.fstype }}"
-    opts: "{{ item.options }},{% if rhel8stig_010570 is sameas true %}nosuid,{% endif %}noexec"
-  loop: "{{ ansible_facts.mounts }}"
+  block:
+    - name: "MEDIUM | RHEL-08-010590 | AUDIT | Refresh mount facts after the preceding mount changes"
+      ansible.builtin.setup:
+        gather_subset:
+          - '!all'
+          - '!min'
+          - mounts
+        filter: ansible_mounts
+
+    - name: "MEDIUM | RHEL-08-010590 | PATCH | RHEL 8 must prevent code from being executed on file systems that contain user home directories. | Set noexec"
+      when:
+        - item.mount == '/home'
+        - "'noexec' not in item.options.split(',')"
+      ansible.posix.mount:
+        path: "{{ item.mount }}"
+        state: mounted
+        src: "{{ item.device }}"
+        fstype: "{{ item.fstype }}"
+        opts: "{{ item.options }},noexec"
+      loop: "{{ ansible_facts.mounts }}"
 
 ## Note Azure is currently default mounting /mnt for cloud-init this will cause issues
 ## refer to https://github.com/Azure/WALinuxAgent/issues/1971
