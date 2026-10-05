@@ -288,28 +288,25 @@
         zone: "{{ rhel8stig_custom_firewall_zone }}"
         permanent: true
         state: present
+      register: discovered_firewall_zone
 
-    - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Copy existing rules to new zone"
+    - name: "MEDIUM | RHEL-08-040090 | AUDIT | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Read existing zone"
+      when:
+        - rhel8stig_copy_existing_zone
+        - rhel8stig_existing_zone_to_copy | length > 0
+      ansible.builtin.slurp:
+        src: "/etc/firewalld/zones/{{ rhel8stig_existing_zone_to_copy }}.xml"
+      register: discovered_firewall_source_zone
+
+    - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Copy configured zone"
       when:
         - rhel8stig_copy_existing_zone
         - rhel8stig_existing_zone_to_copy | length > 0
       ansible.builtin.copy:
-        src: "/etc/firewalld/zones/{{ rhel8stig_existing_zone_to_copy }}.xml"
+        content: "{{ discovered_firewall_source_zone.content | b64decode | rhel8stig_firewalld_zone(rhel8stig_custom_firewall_zone) }}"
         dest: "/etc/firewalld/zones/{{ rhel8stig_custom_firewall_zone }}.xml"
-        remote_src: true
         mode: 'a-x,go-w'
-
-    - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Amend copied file"
-      when:
-        - rhel8stig_copy_existing_zone
-        - rhel8stig_existing_zone_to_copy | length > 0
-      ansible.builtin.replace:
-        path: "/etc/firewalld/zones/{{ rhel8stig_custom_firewall_zone }}.xml"
-        regexp: "{{ item.regexp }}"
-        replace: \1{{ item.replace }}\2
-      loop:
-        - { regexp: (\s*<zone)>(\s*$), replace: ' target="DROP">' }
-        - { regexp: (\s*<short>).*(<\/short>), replace: "{{ rhel8stig_custom_firewall_zone }}" }
+      register: discovered_firewall_zone_copy
 
     - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Allow internet and ssh"
       when: not rhel8stig_copy_existing_zone
@@ -319,8 +316,8 @@
         state: enabled
         service: "{{ (item == (item | regex_search('^[a-z]+$'))) | ternary(item, omit) }}"
         port: "{{ (item == (item | regex_search('^[0-9]+/[a-z]+$'))) | ternary(item, omit) }}"
-      loop:
-        - "{{ rhel8stig_white_list_services }}"
+      loop: "{{ rhel8stig_white_list_services }}"
+      register: discovered_firewall_services
 
     - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.10+"
       when:
@@ -331,6 +328,7 @@
         permanent: true
         state: enabled
         target: DROP
+      register: discovered_firewall_target
 
     - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Target Drop | 2.9"
       when:
@@ -338,7 +336,7 @@
         - not rhel8stig_copy_existing_zone
       block:
         - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | current setting"
-          ansible.builtin.shell: "firewall-cmd --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
+          ansible.builtin.shell: "firewall-cmd --permanent --list-all --zone={{ rhel8stig_custom_firewall_zone }} | grep 'target: DROP'"
           changed_when: false
           check_mode: false
           failed_when: false
@@ -348,14 +346,29 @@
           when: discovered_target_drop_set.rc != 0
           ansible.builtin.command: firewall-cmd --permanent --zone={{ rhel8stig_custom_firewall_zone }} --set-target=DROP
           changed_when: true
+          register: discovered_firewall_target_legacy
 
+    # Load new or updated permanent zones before selecting the default zone.
     - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Reload zones"
+      when: >-  # noqa no-handler
+        discovered_firewall_zone is changed or
+        discovered_firewall_zone_copy is changed or
+        discovered_firewall_services is changed or
+        discovered_firewall_target is changed or
+        discovered_firewall_target_legacy is changed
       ansible.builtin.command: firewall-cmd --reload
       changed_when: discovered_zone_reload.rc == 0
       failed_when: discovered_zone_reload.rc >= 2
       register: discovered_zone_reload
 
+    - name: "MEDIUM | RHEL-08-040090 | AUDIT | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Get default zone"
+      ansible.builtin.command: firewall-cmd --get-default-zone
+      changed_when: false
+      check_mode: false
+      register: discovered_default_zone
+
     - name: "MEDIUM | RHEL-08-040090 | PATCH | A RHEL 8 firewall must employ a deny-all, allow-by-exception policy for allowing connections to other systems. | Set new zone as default"
+      when: discovered_default_zone.stdout | trim != rhel8stig_custom_firewall_zone
       ansible.builtin.command: "firewall-cmd --set-default-zone={{ rhel8stig_custom_firewall_zone }}"
       changed_when: discovered_default_zone_set.rc == 0
       failed_when: discovered_default_zone_set.rc >= 2
