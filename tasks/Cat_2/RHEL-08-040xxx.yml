@@ -1825,7 +1825,7 @@
         sysctl_set: true
         sysctl_file: "{{ rhel8stig_sysctl_file }}"
 
-- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+- name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying."
   when:
     - "'postfix' in ansible_facts.packages"
     - rhel8stig_040290
@@ -1838,8 +1838,19 @@
     - SV-230550r1017312_rule
     - V-230550
     - mail
-  ansible.builtin.command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
-  changed_when: true
+  block:
+    - name: "MEDIUM | RHEL-08-040290 | AUDIT | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Get restriction"
+      ansible.builtin.command: postconf -h smtpd_client_restrictions
+      changed_when: false
+      check_mode: false
+      register: discovered_postfix_client_restrictions
+
+    - name: "MEDIUM | RHEL-08-040290 | PATCH | The RHEL 8 must be configured to prevent unrestricted mail relaying. | Set restriction"
+      when: >-
+        discovered_postfix_client_restrictions.stdout.replace(',', ' ').split() !=
+        ['permit_mynetworks', 'reject']
+      ansible.builtin.command: "postconf -e 'smtpd_client_restrictions = permit_mynetworks,reject'"
+      changed_when: true
 
 - name: "MEDIUM | RHEL-08-040320 | PATCH | The graphical display manager must not be installed on RHEL 8 unless approved."
   when:
