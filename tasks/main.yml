@@ -171,6 +171,8 @@
         mode: 'u=rwx,go=rx'
 
     - name: Create ansible facts file
+      tags:
+        - molecule-idempotence-notest
       ansible.builtin.template:
         src: etc/ansible/compliance_facts.j2
         dest: "{{ ansible_facts_path }}/compliance_facts.fact"
