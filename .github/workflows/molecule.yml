@@ -100,8 +100,15 @@ jobs:
           molecule converge -s ${{ matrix.scenario }} -- \
             --extra-vars 'audit_output_destination=${{ github.workspace }}/molecule_audit_output/'
 
-      # Deliberately no idempotence step: converge #2 for this role is a known non-zero-change
-      # run, so gating on it would be red for reasons that are not regressions.
+      # Converge #2 used to be a known non-zero-change run, so this workflow skipped the
+      # idempotence step entirely. The causes are fixed: the mount controls rebuilt opts from
+      # `defaults` and discarded existing options, 46 audit-rule controls forced a change through
+      # a debug task with changed_when, RHEL-08-040290 rewrote an already-correct Postfix setting,
+      # the harness set the root password with an unpinned salt, and the audit stage carried no
+      # exclusion tag. The gate runs from cold at changed=0, so it is enforced here.
+      - name: Idempotence
+        run: molecule idempotence -s ${{ matrix.scenario }}
+
       - name: Verify
         run: molecule verify -s ${{ matrix.scenario }}
 
@@ -117,4 +124,9 @@ jobs:
 
       - name: Destroy container
         if: always()
-        run: molecule destroy -s ${{ matrix.scenario }}
+        run: |
+          if command -v molecule >/dev/null 2>&1; then
+            molecule destroy -s ${{ matrix.scenario }}
+          else
+            echo "molecule was never installed; nothing to destroy."
+          fi

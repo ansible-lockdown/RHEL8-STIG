@@ -2,27 +2,27 @@
 
 ## Configure a RHEL8 based system to be complaint with DISA STIG
 
-This role is based on RHEL 8 DISA STIG: [Version 2, Rel 7 released on 1 April 2026](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R7_STIG.zip).
+This role is based on RHEL 8 DISA STIG: [Version 2, Rel 8 released on 1 July 2026](https://dl.dod.cyber.mil/wp-content/uploads/stigs/zip/U_RHEL_8_V2R8_STIG.zip).
 
 ---
 
-## Public Repository 📣
+## Public Repository
 
 ![Org Stars](https://img.shields.io/github/stars/ansible-lockdown?label=Org%20Stars&style=social)
 ![Stars](https://img.shields.io/github/stars/ansible-lockdown/RHEL8-STIG?label=Repo%20Stars&style=social)
 ![Forks](https://img.shields.io/github/forks/ansible-lockdown/RHEL8-STIG?style=social)
 ![Followers](https://img.shields.io/github/followers/ansible-lockdown?style=social)
-[![X URL](https://img.shields.io/twitter/url/https/twitter.com/AnsibleLockdown.svg?style=social&label=Follow%20%40AnsibleLockdown)](https://x.com/AnsibleLockdown)
+[![X URL](https://img.shields.io/twitter/url/https/x.com/AnsibleLockdown.svg?style=social&label=Follow%20%40AnsibleLockdown)](https://x.com/AnsibleLockdown)
 ![Discord Badge](https://img.shields.io/discord/925818806838919229?logo=discord)
 
 ![License](https://img.shields.io/github/license/ansible-lockdown/RHEL8-STIG?label=License)
 
-## Lint & Pre-Commit Tools 🔧
+## Lint & Pre-Commit Tools
 
 ![YamlLint](https://img.shields.io/badge/yamllint-Present-brightgreen?style=flat&logo=yaml&logoColor=white)
 ![Ansible-Lint](https://img.shields.io/badge/ansible--lint-Present-brightgreen?style=flat&logo=ansible&logoColor=white)
 
-## Community Release Information 📂
+## Community Release Information
 
 ![Release Branch](https://img.shields.io/badge/Release%20Branch-Main-brightgreen)
 ![Release Tag](https://img.shields.io/github/v/tag/ansible-lockdown/RHEL8-STIG?label=Release%20Tag&&color=success)
@@ -41,7 +41,7 @@ This role is based on RHEL 8 DISA STIG: [Version 2, Rel 7 released on 1 April 20
 
 ---
 
-## Subscriber Release Information 🔐
+## Subscriber Release Information
 
 ![Private Release Branch](https://img.shields.io/endpoint?url=https://ansible-lockdown.github.io/github_linux_IaC/badges/Private-RHEL8-STIG/release-branch.json)
 ![Private Benchmark Version](https://img.shields.io/endpoint?url=https://ansible-lockdown.github.io/github_linux_IaC/badges/Private-RHEL8-STIG/benchmark-version.json)
@@ -53,25 +53,31 @@ This role is based on RHEL 8 DISA STIG: [Version 2, Rel 7 released on 1 April 20
 
 ---
 
-## Looking for support? 🤝
+## Looking for support?
 
 [Lockdown Enterprise](https://www.lockdownenterprise.com#GH_AL_RHEL8-STIG)
 
 [Ansible support](https://www.mindpointgroup.com/cybersecurity-products/ansible-counselor#GH_AL_RHEL8-STIG)
 
-### Community 💬
+### Community
 
 On our [Discord Server](https://www.lockdownenterprise.com/discord) to ask questions, discuss features, or just chat with other Ansible-Lockdown users
 
+### Contributing
+
+Bug reports and feature requests are welcome from everyone, please raise an issue.
+
+Pull requests are accepted from approved contributors only. To be onboarded, join the [Discord Server](https://www.lockdownenterprise.com/discord) and request contributor access. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full process.
+
 ---
 
-## 🚨 Caution(s) 🚨
+## Caution(s)
 
 This role **will make changes to the system** which may have unintended consequences. This is not an auditing tool but rather a remediation tool to be used after an audit has been conducted.
 
 - Testing is the most important thing you can do.
 
-- Check Mode is not guaranteed! 🚫 The role will complete in check mode without errors, but it is not supported and should be used with caution.
+- Check Mode is not guaranteed! The role will complete in check mode without errors, but it is not supported and should be used with caution.
 
 - This role was developed against a clean install of the Operating System. If you are implementing to an existing system please review this role for any site specific changes that are needed.
 
@@ -81,7 +87,7 @@ This role **will make changes to the system** which may have unintended conseque
 
 ---
 
-## Coming From A Previous Release ⏪
+## Coming From A Previous Release
 
 STIG release always contains changes, it is highly recommended to review the new references and available variables. This have changed significantly since ansible-lockdown initial release.
 This is now compatible with python3 if it is found to be the default interpreter. This does come with pre-requisites which it configures the system accordingly.
@@ -103,7 +109,7 @@ The control found in defaults main also need to reflect this as this control the
 
 ---
 
-## Requirements ✅
+## Requirements
 
 **General:**
 
@@ -114,7 +120,7 @@ The control found in defaults main also need to reflect this as this control the
   - [Tower User Guide](https://docs.ansible.com/ansible-tower/latest/html/userguide/index.html)
   - [Ansible Community Info](https://docs.ansible.com/ansible/latest/community/index.html)
 - Functioning Ansible and/or Tower Installed, configured, and running. This includes all of the base Ansible/Tower configurations, needed packages installed, and infrastructure setup.
-- Please read through the tasks in this role to gain an understanding of what each control is doing. Some of the tasks are disruptive and can have unintended consequences in a live production system. Also familiarize yourself with the variables in the defaults/main.yml file.
+- Please read through the tasks in this role to gain an understanding of what each control is doing. Some of the tasks are disruptive and can have unintended consequences in a live production system. Also familiarize yourself with the variables in the defaults/main/main.yml file.
 
 **Technical Dependencies:**
 
@@ -129,13 +135,13 @@ RHEL Family OS 8
 
 ---
 
-## Auditing 🔍
+## Auditing
 
-This can be turned on or off within the defaults/main.yml file with the variable run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
+This can be turned on or off within the defaults/main/main.yml file with the variable run_audit. The value is false by default, please refer to the wiki for more details. The defaults file also populates the goss checks to check only the controls that have been enabled in the ansible role.
 
 This is a much quicker, very lightweight, checking (where possible) config compliance and live/running settings.
 
-A new form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/goss-org/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
+A new form of auditing has been developed, by using a small (12MB) go binary called [goss](https://github.com/krameff/goss) along with the relevant configurations to check. Without the need for infrastructure or other tooling.
 This audit will not only check the config has the correct setting but aims to capture if it is running with that configuration also trying to remove [false positives](https://www.mindpointgroup.com/blog/is-compliance-scanning-still-relevant/) in the process.
 
 Refer to [RHEL8-STIG-Audit](https://github.com/ansible-lockdown/RHEL8-STIG-Audit).
@@ -160,7 +166,7 @@ PLAY RECAP *********************************************************************
 default                    : ok=270  changed=23   unreachable=0    failed=0    skipped=140  rescued=0    ignored=0
 ```
 
-## Documentation 📖
+## Documentation
 
 - [Read The Docs](https://ansible-lockdown.readthedocs.io/en/latest/)
 - [Getting Started](https://www.lockdownenterprise.com/docs/getting-started-with-lockdown#GH_AL_RH8_STIG)
@@ -170,9 +176,9 @@ default                    : ok=270  changed=23   unreachable=0    failed=0    s
 
 ## Role Variables
 
-This role is designed that the end user should not have to edit the tasks themselves. All customizing should be done via the defaults/main.yml file or with extra vars within the project, job, workflow, etc.
+This role is designed that the end user should not have to edit the tasks themselves. All customizing should be done via the defaults/main/main.yml file or with extra vars within the project, job, workflow, etc.
 
-## Tags 🏷️
+## Tags
 
 There are many tags available for added control precision. Each control has its own set of tags noting what level, what OS element it relates to, whether it's a patch or audit, and the rule number. Additionally, NIST references follow a specific conversion format for consistency and clarity.
 
@@ -203,16 +209,13 @@ Below is an example of the tag section from a control within this role. Using th
         - V-230221
 ```
 
-## Community Contribution 🧑‍🤝‍🧑
+## Community Contribution
 
-We encourage you (the community) to contribute to this role. Please read the rules below.
+Pull requests are accepted from approved contributors only, and issues are welcome from everyone.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the onboarding process, the rules, and the commit signing
+requirements (GPG signature and Signed-off-by on every commit).
 
-- Your work is done in your own individual branch. Make sure to Signed-off-by and GPG sign all commits you intend to merge.
-- All community Pull Requests are pulled into the devel branch
-- Pull Requests into devel will confirm your commits have a GPG signature, Signed-off-by, and a functional test before being approved
-- Once your changes are merged and a more detailed review is complete, an authorized member will merge your changes into the main branch for a new release
-
-## Pipeline Testing 🔄
+## Pipeline Testing
 
 uses:
 
@@ -226,7 +229,7 @@ uses:
 
 Almalinux BaseOS, EPEL and many cloud providers repositories, do not allow gpgcheck(rule_1.2.1.2) or repo_gpgcheck (rule_1.2.1.3) this will cause issues during the playbook unless or a workaround is found.
 
-## Local Testing 💻
+## Local Testing
 
 local testing uses:
 
@@ -237,7 +240,7 @@ local testing uses:
 - molecule-vagrant 1.0.0
 - molecule-azure 0.5.0
 
-## Credits and Thanks 🙏
+## Credits and Thanks
 
 Massive thanks to the fantastic community and all its members.
 

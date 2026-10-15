@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: frederickw082922/Repo_QA_Checker
-          ref: "2.8.1"
+          ref: "2.8.4"
           path: qa-checker
 
       - name: Set up Python
@@ -69,18 +69,14 @@ jobs:
       - name: Install linters
         run: |
           python -m pip install --upgrade pip
-          pip install "yamllint==1.38.0" "ansible-lint==26.4.0"
+          pip install "yamllint==1.38.0" "ansible-lint==26.9.0"
 
       # --strict is load-bearing, not cosmetic: most findings in this role are WARN severity, and
-      # without it a real regression exits 0 and passes silently. .qa_baseline.json absorbs the 112
-      # known findings, keyed per finding on (file, description) - so a NEW finding in an
-      # already-baselined check still fails. Regenerate the baseline only deliberately, never to
+      # without it a real regression exits 0 and passes silently. .qa_baseline.json absorbs the 7
+      # known findings - three task-file complexity warnings and four audit-template variables that
+      # name emitted goss keys rather than references - keyed per finding on (file, description), so
+      # a NEW finding in an already-baselined check still fails. Regenerate the baseline only deliberately, never to
       # silence a fresh finding.
-      #
-      # The count is high on this branch because the shell hardening sweep (set -o pipefail plus
-      # args.executable on every shell task) landed in V2R8, not V2R7 - 97 of the 112 are that one
-      # check. Back-porting the sweep here would diverge this branch from V2R8 for no benefit, so
-      # it is recorded rather than fixed. The V2R8 branch baselines 13.
       - name: Run Ansible Lockdown QA check
         working-directory: role
         run: |

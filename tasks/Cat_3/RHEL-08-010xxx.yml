@@ -46,7 +46,11 @@
     - sysctl
   block:
     - name: "LOW | RHEL-08-010375 | AUIDT | RHEL 8 must restrict access to the kernel message buffer. | Find conflicting instances"
-      ansible.builtin.shell: grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -rs "kernel.dmesg_restrict = 0" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -82,7 +86,11 @@
     - sysctl
   block:
     - name: "LOW | RHEL-08-010376 | AUDIT | RHEL 8 must prevent kernel profiling by unprivileged users. | Find conflicting instances"
-      ansible.builtin.shell: grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      ansible.builtin.shell: |
+        set -o pipefail
+        grep -rs "kernel.perf_event_paranoid = [^2]" /run/sysctl.d/*.conf /usr/local/lib/sysctl.d/*.conf /usr/lib/sysctl.d/*.conf /lib/sysctl.d/*.conf /etc/sysctl.conf /etc/sysctl.d/*.conf | cut -d':' -f1
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       failed_when: false
@@ -156,7 +164,7 @@
     - V-230285
     - V-244527
   block:
-    - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service"
+    - name: "LOW | RHEL-08-010472 | PATCH | RHEL 8 must have the packages required to use the hardware random number generator entropy gatherer service."
       ansible.builtin.package:
         name: rng-tools
         state: present
@@ -167,10 +175,10 @@
         enabled: true
       notify: Restart rngd
 
-- name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+- name: "LOW | RHEL-08-010540 | AUDIT | RHEL 8 must use a separate file system for /var."
   when:
     - rhel8stig_010540
-    - ansible_mounts | selectattr('mount', 'match', '^/var$') | list | length == 0
+    - ansible_facts['mounts'] | selectattr('mount', 'match', '^/var$') | list | length == 0
   tags:
     - RHEL-08-010540
     - CAT3
@@ -185,18 +193,18 @@
   vars:
     warn_control_id: "LOW | RHEL-08-010540"
   block:
-    - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+    - name: "LOW | RHEL-08-010540 | AUDIT | RHEL 8 must use a separate file system for /var."
       ansible.builtin.debug:
         msg: "Warning!! /var is not mounted on a separate partition"
 
-    - name: "LOW | RHEL-08-010540 | AUDIT | The RHEL 8 must use a separate file system for /var."
+    - name: "LOW | RHEL-08-010540 | AUDIT | RHEL 8 must use a separate file system for /var."
       ansible.builtin.import_tasks:
         file: warning_facts.yml
 
 - name: "LOW | RHEL-08-010541 | AUDIT | RHEL 8 must use a separate file system for /var/log."
   when:
     - rhel8stig_010541
-    - ansible_mounts | selectattr('mount', 'match', '^/var/log$') | list | length == 0
+    - ansible_facts['mounts'] | selectattr('mount', 'match', '^/var/log$') | list | length == 0
   tags:
     - RHEL-08-010541
     - CAT3
@@ -218,10 +226,10 @@
       ansible.builtin.import_tasks:
         file: warning_facts.yml
 
-- name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+- name: "LOW | RHEL-08-010542 | AUDIT | RHEL 8 must use a separate file system for the system audit data path."
   when:
     - rhel8stig_010542
-    - ansible_mounts | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
+    - ansible_facts['mounts'] | selectattr('mount', 'match', '^/var/log/audit$') | list | length == 0
   tags:
     - RHEL-08-010542
     - CAT3
@@ -236,10 +244,10 @@
   vars:
     warn_control_id: "LOW | RHEL-08-010542"
   block:
-    - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+    - name: "LOW | RHEL-08-010542 | AUDIT | RHEL 8 must use a separate file system for the system audit data path."
       ansible.builtin.debug:
         msg: "Warning!! /var/log/audit is not mounted on a separate partition"
 
-    - name: "LOW | RHEL-08-010542 | AUDIT | The RHEL 8 must use a separate file system for the system audit data path."
+    - name: "LOW | RHEL-08-010542 | AUDIT | RHEL 8 must use a separate file system for the system audit data path."
       ansible.builtin.import_tasks:
         file: warning_facts.yml

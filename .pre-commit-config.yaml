@@ -43,13 +43,13 @@ repos:
     name: Detect Secrets test
 
 - repo: https://github.com/gitleaks/gitleaks
-  rev: v8.30.0
+  rev: v8.30.1
   hooks:
   - id: gitleaks
     name: Run Gitleaks test
 
 - repo: https://github.com/ansible-community/ansible-lint
-  rev: v26.8.0
+  rev: v26.9.0
   hooks:
   - id: ansible-lint
     name: Ansible-lint

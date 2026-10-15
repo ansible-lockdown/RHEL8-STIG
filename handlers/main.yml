@@ -6,7 +6,7 @@
 
 - name: Systemctl daemon-reload
   when: not system_is_container
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     daemon_reload: true
 
 - name: Remount_tmp
@@ -31,19 +31,19 @@
 
 - name: Restart_systemd_login
   when: not system_is_container
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
     name: systemd-logind
     state: restarted
 
 - name: Sysctl system
-  when: "'procps-ng' in ansible_facts.packages"
+  when: "'procps-ng' in ansible_facts['packages']"
   ansible.builtin.command: sysctl --system
   changed_when: true
 
 - name: Restart sshd
   when:
     - not rhel8stig_system_is_chroot
-    - "'openssh-server' in ansible_facts.packages"
+    - "'openssh-server' in ansible_facts['packages']"
     - not change_requires_reboot
   ansible.builtin.service:
     name: sshd
@@ -61,7 +61,7 @@
   listen: Reinstall_crypto_policies
 
 - name: Restart sssd
-  when: "'sssd' in ansible_facts.packages"
+  when: "'sssd' in ansible_facts['packages']"
   ansible.builtin.service:
     name: sssd
     state: restarted
@@ -138,15 +138,6 @@
   ansible.builtin.service:
     name: "{{ rhel8stig_time_service }}"
     state: restarted
-
-- name: Update auditd
-  ansible.builtin.template:
-    src: audit/99_auditd.rules.j2
-    dest: /etc/audit/rules.d/99_auditd.rules
-    owner: root
-    group: root
-    mode: 'u-x,go-rwx'
-  notify: Restart auditd
 
 - name: Restart auditd
   when:
@@ -231,8 +222,6 @@
   listen: Build_aide_db
 
 - name: Dconf update
-  when:
-    - "'dconf' in ansible_facts.packages"
-    - rhel8stig_always_configure_dconf
+  when: "'dconf' in ansible_facts['packages']"
   ansible.builtin.command: dconf update
   changed_when: true
