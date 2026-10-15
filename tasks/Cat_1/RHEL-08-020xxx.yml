@@ -1,6 +1,6 @@
 ---
 
-- name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not have accounts configured with blank or null passwords."
+- name: "HIGH | RHEL-08-020330 | PATCH | RHEL 8 must not allow accounts configured with blank or null passwords."
   when:
     - rhel8stig_020330
     - rhel8stig_disruption_high
@@ -30,7 +30,7 @@
     - NIST800-53R4_CM-6
     - SRG-OS-000480-GPOS-00227
     - SV-268322r1017568_rule
-    - V-244540
+    - V-268322
   ansible.builtin.replace:
     path: /etc/pam.d/system-auth
     regexp: ' nullok'

@@ -36,7 +36,7 @@ rhel8stig_system_is_router: {{ rhel8stig_system_is_router }}
 # Discovered items to assist with skips some audit checks
 skip_sssd_check: {% if prelim_sssd_conf_present.stat.exists %}False{% else %}True{% endif %}
 
-skip_postfix_check: {% if 'postfix' not in ansible_facts.packages %}True{% else %}False{% endif %}
+skip_postfix_check: {% if 'postfix' not in ansible_facts['packages'] %}True{% else %}False{% endif %}
 
 skip_tftp_check: {% if rhel8stig_tftp_required %}False{% else %}True{% endif %}
 
@@ -362,6 +362,8 @@ RHEL_08_040180: {{ rhel8stig_040180 }}
 RHEL_08_040209: {{ rhel8stig_040209 }}
 RHEL_08_040210: {{ rhel8stig_040210 }}
 RHEL_08_040220: {{ rhel8stig_040220 }}
+RHEL_08_040221: {{ rhel8stig_040221 }}
+RHEL_08_040222: {{ rhel8stig_040222 }}
 RHEL_08_040230: {{ rhel8stig_040230 }}
 RHEL_08_040239: {{ rhel8stig_040239 }}
 RHEL_08_040240: {{ rhel8stig_040240 }}
@@ -380,6 +382,7 @@ RHEL_08_040283: {{ rhel8stig_040283 }}
 RHEL_08_040284: {{ rhel8stig_040284 }}
 RHEL_08_040285: {{ rhel8stig_040285 }}
 RHEL_08_040286: {{ rhel8stig_040286 }}
+RHEL_08_040287: {{ rhel8stig_040287 }}
 RHEL_08_040290: {{ rhel8stig_040290 }}
 RHEL_08_040320: {{ rhel8stig_040320 }}
 RHEL_08_040321: {{ rhel8stig_040321 }}

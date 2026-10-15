@@ -7,6 +7,8 @@
       ansible.builtin.shell: |
         set -o pipefail
         cat /etc/passwd | grep -v '^#'
+      args:
+        executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
       register: prelim_capture_passwd_file
