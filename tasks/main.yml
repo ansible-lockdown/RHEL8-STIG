@@ -161,7 +161,9 @@
       changed_when: false
 
 - name: Run post remediation audit
-  when: run_audit
+  when:
+    - run_audit
+    - not ansible_check_mode
   tags:
     - always
     - molecule-idempotence-notest
@@ -194,6 +196,7 @@
   when:
     - fetch_audit_output
     - run_audit
+    - not ansible_check_mode
   tags:
     - always
     - molecule-idempotence-notest
@@ -201,7 +204,9 @@
     file: fetch_audit_output.yml
 
 - name: Show Audit Summary
-  when: run_audit
+  when:
+    - run_audit
+    - not ansible_check_mode
   tags:
     - run_audit
     - molecule-idempotence-notest

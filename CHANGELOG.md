@@ -1,6 +1,34 @@
 # Changes to RHEL8STIG
 
-## Based on STIG V2R8 - 2026 October - Community updates
+## Based on STIG V2R8
+
+### 2026 November - Community Updates
+
+- **Check mode changed the system.** RHEL-08-010020 ran `update-crypto-policies --set` and
+  RHEL-08-020210 ran both `chage` calls with `check_mode: false`, so a `--check` preview switched
+  the crypto policy and reset password aging on accounts. Those three tasks now honor check mode;
+  the AUDIT reads that feed them keep `check_mode: false`. RHEL-08-010140 and RHEL-08-010150 set
+  `diff: false`, as `--diff` printed the GRUB2 password hash. The audit is skipped with a warning
+  under `--check`, since the binary and content are only downloaded in a real run and the
+  pre-audit assert failed before any remediation
+- **RHEL-08-040090 rewrote and reloaded the firewall on every run, and failed on a fresh host.**
+  Copy mode read only `/etc/firewalld/zones/<zone>.xml`, which does not exist until that zone is
+  changed, so a fresh host stopped at the copy. Where it did exist, every run copied it over the
+  amended zone, amended it again, reloaded firewalld and set the default zone. The new zone is now
+  written in one step from the source, falling back to `/usr/lib/firewalld/zones`, with
+  `target="DROP"` and the custom short name, replacing any target the source carried. The default
+  zone is set in `firewalld.conf`, firewalld reloads only when the zone or the default changed, and
+  the branch for Ansible older than 2.10 is removed. With copy mode off, the allow list reached the
+  loop as a single item, so no service or port was applied and the zone was left `DROP` with nothing
+  allowed, not even `ssh`. Each entry is now applied: `<port>/<proto>` or a port range is a port,
+  anything else a service name, so hyphenated services such as `dhcpv6-client` work.
+  Reported in ansible-lockdown/RHEL8-STIG#387, thank you @karlg100
+- **RHEL-08-010580 failed once every mount had `nodev`.** The `grep --invert-match 'nodev'` in its
+  mount discovery exits 1 when nothing is left, and with `pipefail` that failed the play, including
+  on the run after the control had remediated the host. Exit 1 is now accepted as nothing to fix.
+  Reported in ansible-lockdown/RHEL8-STIG#397, thank you @joeknock90
+
+### 2026 October - Community Updates
 
 - **the molecule workflow now gates on idempotence.** It previously ran
   `create -> converge -> verify -> destroy`, deliberately skipping the idempotence step because

@@ -1964,6 +1964,7 @@
         executable: "{{ rhel8stig_shell_executable }}"
       changed_when: false
       check_mode: false
+      failed_when: discovered_nonroot_mounts_nodev_missing.rc not in [ 0, 1 ]
       register: discovered_nonroot_mounts_nodev_missing
 
     - name: "MEDIUM | RHEL-08-010580 | PATCH | RHEL 8 must prevent special devices on non-root local partitions. | Split results"
