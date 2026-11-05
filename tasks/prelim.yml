@@ -95,10 +95,27 @@
       vars:
         warn_control_id: "SSSD_checks_skipped"
 
+- name: "PRELIM | Audit skipped in check mode"
+  when:
+    - run_audit or audit_only
+    - ansible_check_mode
+  tags:
+    - run_audit
+    - molecule-idempotence-notest
+  block:
+    - name: "PRELIM | Audit skipped in check mode | Warn"
+      ansible.builtin.debug:
+        msg: "Warning!! The audit cannot run in check mode, as the audit binary and content are only downloaded in a real run. Run the audit separately without --check"
+
+    - name: "PRELIM | Audit skipped in check mode | Stop host as audit_only selected"
+      when: audit_only
+      ansible.builtin.meta: end_host
+
 - name: "PRELIM | Include pre-remediation audit tasks"
   when:
     - run_audit or audit_only
     - setup_audit
+    - not ansible_check_mode
   tags:
     - run_audit
     - molecule-idempotence-notest
