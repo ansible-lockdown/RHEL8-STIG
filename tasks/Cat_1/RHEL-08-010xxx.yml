@@ -73,7 +73,6 @@
       when: "'FIPS' not in discovered_crypto_policies_status_show.stdout"
       ansible.builtin.command: update-crypto-policies --set FIPS:STIG
       changed_when: false
-      check_mode: false
       register: discovered_fips_status
       notify: Change_requires_reboot
 
@@ -186,6 +185,7 @@
     - V-230235
     - grub
     - bootloader
+  diff: false
   ansible.builtin.lineinfile:
     path: "{{ prelim_bootloader_path }}/user.cfg"
     create: true
